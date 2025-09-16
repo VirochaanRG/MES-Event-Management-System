@@ -10,11 +10,11 @@ assignees: ""
 
 **Attendance**
 
-- [] Virochaan Ravichandran Gowri
-- [] Mohammed Mahdi Mahboob
-- [] Ibrahim Quraishi
-- [] Omar Al-Asfar
-- [] Rayyan Suhail
+- [ ] Virochaan Ravichandran Gowri
+- [ ] Mohammed Mahdi Mahboob
+- [ ] Ibrahim Quraishi
+- [ ] Omar Al-Asfar
+- [ ] Rayyan Suhail
 
 **Agenda**
 
