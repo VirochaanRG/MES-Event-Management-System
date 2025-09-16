@@ -1,10 +1,9 @@
 ---
 name: Lecture
 about: Track team details for lectures.
-title: 'Lecture - Date'
-labels: 'meeting'
-assignees: ''
-
+title: "Lecture - Date"
+labels: "meeting"
+assignees: ""
 ---
 
 **Topic**
@@ -13,11 +12,11 @@ assignees: ''
 
 **Attendance**
 
-- [ ] team member1
-- [ ] team member2
-- [ ] team member3
-- [ ] team member4
-- [ ] team member5
+- [] Virochaan Ravichandran Gowri
+- [] Mohammed Mahdi Mahboob
+- [] Ibrahim Quraishi
+- [] Omar Al-Asfar
+- [] Rayyan Suhail
 
 **Questions to Ask**
 
