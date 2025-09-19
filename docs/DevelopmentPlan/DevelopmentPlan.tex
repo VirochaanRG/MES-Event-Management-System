@@ -15,16 +15,14 @@
 \begin{document}
 
 \maketitle
-
+\begin{
 \begin{table}[hp]
 \caption{Revision History} \label{TblRevisionHistory}
 \begin{tabularx}{\textwidth}{llX}
 \toprule
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
-Date1 & Name(s) & Description of changes\\
-Date2 & Name(s) & Description of changes\\
-... & ... & ...\\
+September 21, 2025 & Ibrahim, Mohammad, Omar & Revision 0 \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -40,12 +38,11 @@ what is contained in the report.}
 
 \section{Confidential Information?}
 
-\wss{State whether your project has confidential information from industry, or
-not.  If there is confidential information, point to the agreement you have in
-place.}
+\begin{left}
+The project will deal with information confidential to the McMaster Engineering Society (MES) and the Canadian Federation of Engineering Students (CFES). 
+This information includes program generated analytics and financial reports for events hosted by the MES through the proposed system, and results from surveys conducted by the CFES
+\end{left}
 
-\wss{For most teams this section will just state that there is no confidential
-information to protect.}
 \section{IP to Protect}
 
 \wss{State whether there is IP to protect.  If there is, point to the agreement.
@@ -59,17 +56,21 @@ repo.}
 
 \section{Team Meeting Plan}
 
-\wss{How often will you meet? where?}
+\begin{left}
+The members of the team are expected to meet at least once weekly virtually through Microsoft Teams. 
+The purpose of these meetings is to provide updates on current work, plan accordingly for submission of deliverables, discuss next steps, and distribute tasks among team members. 
+The structure of this meeting will be as follows.
+\begin{enumerate}
+\item Each team member will provide a 5–6-minute update on the work completed within the last week. After each member has completed their update, the other team members are free to provide feedback.
+\item The meeting leader will go over next steps on current deliverables, as well as remind team members of upcoming deliverables
+\item If any new work is to be assigned, the meeting leader will split the work into a set of tasks. Team members will then select which tasks they are comfortable with taking
+\item The remaining meeting time will be spent on preparation for the upcoming sync meeting with the supervisors
+\end{enumerate}
 
-\wss{If the meeting is a physical location (not virtual), out of an abundance of
-caution for safety reasons you shouldn't put the location online}
-
-\wss{How often will you meet with your industry advisor?  when?  where?}
-
-\wss{Will meetings be virtual?  At least some meetings should likely be
-in-person.}
-
-\wss{How will the meetings be structured?  There should be a chair for all meetings.  There should be an agenda for all meetings.}
+Additionally, a weekly sync meeting will be scheduled with the industry advisor and team supervisor to ensure that the direction of the project remains aligned with the needs of the supervisors. 
+The meeting will ensure the supervisors are kept up to date with the state of the project and allow the supervisors to provide feedback or request changes. 
+If there are no significant updates within the week before the meeting (i.e. during exam season), the meeting will be cancelled with at least 24 hours notice for the supervisors.
+\end{left}
 
 \section{Team Communication Plan}
 
@@ -77,10 +78,20 @@ in-person.}
 
 \section{Team Member Roles}
 
-\wss{You should identify the types of roles you anticipate, like notetaker,
-leader, meeting chair, reviewer.  Assigning specific people to those roles is
-not necessary at this stage.  In a student team the role of the individuals will
-likely change throughout the year.}
+\begin{left}
+The following administrative roles will be assigned to team members:
+\begin{itemize}
+\item Team Liason: Main contact point between the team members and the supervisors. 
+This member is responsible for sending emails for communication between the team and supervisors as well as scheduling and leading the weekly sync meetings.
+\item Inter-Team Liason: Responsible for communication between capstone teams. 
+Since this project is a sub-component of a larger system for the MES with multiple teams working together, it is important to have a representative for the team who will be responsible for communication between teams to ensure consistency and compatibility between design decisions for the project.
+\item Meeting Leader: Responsible for facilitating the weekly meetings between team members. 
+Ensures that team meetings happen consistently and that team members are up to date with deliverables.
+\item Note Taker: Responsible for taking notes summarizing key points from every meeting, including team meetings and supervising meetings. 
+This member is also responsible for creating GitHub Issues for every meeting and providing a summary of attendance and key takeaways.
+\item Reviewer: Responsible for final review of any main deliverables before final submission to ensure they align with the course and supervisors’ expectations.
+\end{itemize}
+\end{left}
 
 \section{Workflow Plan}
 
@@ -110,37 +121,35 @@ you will be able to overcome this risk?
 
 \section{Expected Technology}
 
-\wss{What programming language or languages do you expect to use?  What external
-libraries?  What frameworks?  What technologies.  Are there major components of
-the implementation that you expect you will implement, despite the existence of
-libraries that provide the required functionality.  For projects with machine
-learning, will you use pre-trained models, or be training your own model?  }
-
-\wss{The implementation decisions can, and likely will, change over the course
-of the project.  The initial documentation should be written in an abstract way;
-it should be agnostic of the implementation choices, unless the implementation
-choices are project constraints.  However, recording our initial thoughts on
-implementation helps understand the challenge level and feasibility of a
-project.  It may also help with early identification of areas where project
-members will need to augment their training.}
-
-Topics to discuss include the following:
-
+\begin{left}
+At the request of the supervisor, the following tools and technologies must be used for development of the project to ensure compatibility and seamless integration between capstone teams.
 \begin{itemize}
-\item Specific programming language
-\item Specific libraries
-\item Pre-trained models
-\item Specific linter tool (if appropriate)
-\item Specific unit testing framework
-\item Investigation of code coverage measuring tools
-\item Specific plans for Continuous Integration (CI), or an explanation that CI
-  is not being done
-\item Specific performance measuring tools (like Valgrind), if
-  appropriate
-\item Tools you will likely be using?
+    \item JavaScript, and HTML/CSS shall be used in development of the frontend for both the web-based admin portal, and the user mobile application. 
+    React and Next.js will be used as the primary framework for the admin portal and React Native will be used to develop the mobile application.
+    \item PostgreSQL shall be used as the primary database for storage of any system and user data.
 \end{itemize}
 
-\wss{git, GitHub and GitHub projects should be part of your technology.}
+Additionally, the following programming languages, frameworks and libraries are expected to be used during development and may change at the discretion of the team.
+\begin{itemize}
+    \item JavaScript along with Node.js may be used in development of the backend server for both the web portal and mobile application. 
+    Additionally, Node.js modules such as node-postgres may be used to communicate with the database.
+    \item A styling library/framework such as Tailwind or Bootstrap may be used to simplify UI styling
+    \item A REST API will be used for communication between the frontend applications and the backend server. 
+    The default Fetch API provided within React and React Native may be used on the frontend, along with Node.js modules such as Express to handle requests on the backend server
+    \item Jest will be used as the primary unit testing framework for testing both the frontend and backend code with JavaScript, including unit testing and code coverage. 
+    Additionally, the React Testing Library may be used to test frontend components.
+    \item A linter such as Prettier will be used to ensure the source code adheres to a specific standard.
+\end{itemize}
+
+GitHub will be used as the project repository for documentation, project planning and administration, and source code management.
+\begin{itemize}
+    \item A GitHub Issue will be created for each attended lecture, tutorial, and team meeting outlining attendance, and key takeaways. 
+    \item A GitHub Issue will be created for each course deliverable, such as documentation, and code submissions
+    \item GitHub Projects will be used to host a Kanban Board of all GitHub Issues and their status
+    \item GitHub Actions will be used as the main CI platform. CI will be used to maintain code styling requirements and perform regression tests on pull requests before they can be merged. Additionally, GitHub actions may be used build and deploy source code into a staging environment.
+    \item Git will be used as the source code management platform for making code changes. The specific development environment in which these changes are made, such as the IDE, are subject to the preferences of the team members.
+\end{itemize}
+\end{left}
 
 \section{Coding Standard}
 
