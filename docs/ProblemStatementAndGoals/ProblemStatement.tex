@@ -24,6 +24,7 @@
 \midrule
 09-18-2025 & Virochaan Ravichandran Gowri & First Rough Draft\\
 09-18-2025 & Rayyan Suhail & First Rough Draft\\
+09-21-2025 & Rayyan Suhail & Goals - Rev0\\
 Date2 & Name(s) & Description of changes\\
 ... & ... & ...\\
 \bottomrule
@@ -75,22 +76,42 @@ The main stakeholders currently are:
 The Software Environment will be compatible will all major browsers and will work with all computers that are connected to the internet. The mobile components will work with both IOS and Android environments. For development we will be using Github for CI/CD and for version control. We will be primarily using Visual Studio Code for our development environment and Figma for UI Design and Mockups.
 
 \section{Goals}
-Our primary goal is the development of a platform that can aid in the creation and registration of events and host forms and surveys for feedback and future improvement. It will contain to main components:
+The primary objective of this project is to create a centralized platform that streamlines how the McMaster Engineering Society (MES) manages events and gathers feedback from students. The goals outlined below represent high-level outcomes that the system should achieve, focusing on reducing administrative burden, improving the student experience, and enabling data-driven decision making.
 \begin{enumerate}
-    \item \textbf{Web App:} \\
+    \item \textbf{Develop a Modular Custom Form Builder}
     \begin{itemize}
-        \item \textbf{Admin Dashboard}: Should allow for the admins to create events and forms. View analytics and perform rudimentary data analysis.
-        \item \textbf{User Interface}: Front end for web users to interact with the platform and answer forms and signup for events.
+        \item \textbf{Explanation}: Build a flexible form builder that allows MES administrators to create and manage registration and feedback forms with features such as conditional logic, branching, and multiple field types.
+        \item \textbf{Reasoning}: The current use of external tools is inefficient. A custom modular builder ensures independence from third-party tools, reduces admin overhead, and allows full customization.
     \end{itemize}
 
-    \item \textbf{Mobile App:} \\
-    Allow for push notifications and mobile users to use the app.
+    \item \textbf{Streamline Event Registration \& Check-in}
+    \begin{itemize}
+        \item \textbf{Explanation}: Create a unified registration process that integrates waivers, ticketing, and confirmations, along with check-in capabilities for attendees (later also used for event analytics).
+        \item \textbf{Reasoning}: Current registration is split across systems, creating administrative inefficiencies and a poor attendee experience. A single system simplifies the workflow and allows event detail storage for recurring events.
+    \end{itemize}
+
+    \item \textbf{Provide Backend Analytics \& Data Visualization}
+    \begin{itemize}
+        \item \textbf{Explanation}: Build an analytics dashboard that enables MES administrators to visualize event and survey data through charts, reports, and exportable files.
+        \item \textbf{Reasoning}: MES currently lacks the ability to analyze collected data, limiting the feedback loop for improving events and surveys. They also lack the ability to review feedback from previous years for recurring events so that improvements may be made for future events.
+    \end{itemize}
+
+    \item \textbf{Centralize Attendee \& Admin Information Management}
+    \begin{itemize}
+        \item \textbf{Explanation}: Create an integrated interface for event administrators to track attendees, payment statuses, waiver completions, and other event-specific details in one place.
+        \item \textbf{Reasoning}: Currently, attendee data is scattered across various unlinked services such as Google forms and Spreadsheets, making it hard for admins to manage logistics.
+    \end{itemize}
+
+    \item \textbf{Enhance Feedback Survey Design}
+    \begin{itemize}
+        \item \textbf{Explanation}: Enable MES administrators to create feedback surveys that are concise, targeted, and relevant to specific demographics (e.g., program, year of study) while minimizing unnecessary questions.
+        \item \textbf{Reasoning}: MES often conducts event and nationwide student surveys that become overly complex. Smarter feedback survey flows improve completion rates and yield more useful responses for planning future events.
+    \end{itemize}
 
 \end{enumerate}
+
 \section{Stretch Goals}
-\begin{enumerate}
-    \item \textbf{Test Title: }
-\end{enumerate}
+
 
 \section{Extras}
 
