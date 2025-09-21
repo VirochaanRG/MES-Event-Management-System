@@ -40,12 +40,24 @@ information.}
 
 \subsection{Problem}
 The Mcmaster Engineering Society (MES) hosts various large events throughout the year such as the Fireball Formal, Graduation Formal, and Pub Nights. Currently, the processes of registration, waiver collection, ticketing, and check-in are managed manually or across multiple platforms, resulting in unnecessary administrative burden for student organizers and a tough process for attendees. MES also makes surveys/forms to gather feedback from events, to aid registration processes and manages nationwide surveys gathering information on the experiences of undergratuate engineering students. These forms can often get very complex due to various branches and conditionals attempting to gain information from certain demographics or categories. Due to this complex nature the survey response rate is very low as many are put of from answering. Furthermore, there is very little data analytics that can be done from the current implementation making it difficult to actually gain information from both surveys and event registrations to improve future events and student experience.
-
+\\
 This project aims to develop a solution which can centralize the activities of the MES within a single platform with functionality for both admins and users.
 \subsection{Inputs and Outputs}
 
 \wss{Characterize the problem in terms of ``high level'' inputs and outputs.  
 Use abstraction so that you can avoid details.}
+The inputs and outputs have been split into End Users and Admins since the way they interact with the app is very different.\\
+\textbf{Inputs}:
+\begin{itemize}
+    \item \textbf{End Users:} 
+        User Info, Form Data, Event Details, Waiver Details.
+    \item \textbf{Admins:} Event Information, Form Categories and Sections
+\end{itemize} 
+\textbf{Outputs:} 
+\begin{itemize}
+    \item \textbf{End Users:} Notifications, Confirmations, Event Media
+    \item \textbf{Admins:} Admin Analytics, Downloadable Reports, Attendee Information.
+\end{itemize}
 
 \subsection{Stakeholders}
 The main stakeholders currently are:
@@ -58,8 +70,8 @@ The main stakeholders currently are:
         Students who will be using the platform to register for events and answer surveys.
 \end{itemize}
 \subsection{Environment}
-
 \wss{Hardware and Software Environment}
+The Software Environment will be compatible will all major browsers and will work with all computers that are connected to the internet. The mobile components will work with both IOS and Android environments. For development we will be using Github for CI/CD and for version control. We will be primarily using Visual Studio Code for our development environment and Figma for UI Design and Mockups.
 
 \section{Goals}
 Our primary goal is the development of a platform that can aid in the creation and registration of events and host forms and surveys for feedback and future improvement. It will contain to main components:
@@ -89,6 +101,11 @@ Lecture 02.) Normally the number of extras will be two.  Approval of the extras
 will be part of the discussion with the instructor for approving the project.
 The extras, with the approval (or request) of the instructor, can be modified
 over the course of the term.}
+
+\begin{enumerate}
+    \item \textbf{Code Walkthrough Reports:} Code walkthrough reports will allow us to better explain complex pieces of code especially in the creation of the form builder.
+    \item \textbf{Wireframe Report:} Wire frame reports will allow us to showcase the design principles and considerations taken into account when creating the User Interface.
+\end{enumerate} 
 
 \newpage{}
 
