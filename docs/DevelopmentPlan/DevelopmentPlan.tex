@@ -16,13 +16,19 @@
 \begin{document}
 
 \maketitle
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 \begin{table}[hp]
 \caption{Revision History} \label{TblRevisionHistory}
 \begin{tabularx}{\textwidth}{llX}
 \toprule
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
-September 21, 2025 & Ibrahim, Mohammad, Omar & Revision 0 \\
+September 22, 2025 & Ibrahim, Mahboob, Omar & Creation of revision 0\\
+Date2 & Name(s) & Description of changes\\
+... & ... & ...\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -48,10 +54,8 @@ teams.
 \end{comment}
 
 \section{Confidential Information?}
-
 \begin{flushleft}
-The project will deal with information confidential to the McMaster Engineering Society (MES) and the Canadian Federation of Engineering Students (CFES). 
-This information includes program generated analytics and financial reports for events hosted by the MES through the proposed system, and results from surveys conducted by the CFES.
+This project is not expected to deal with any information confidential to the McMaster Engineering Society. 
 \end{flushleft}
 
 \section{IP to Protect}
@@ -76,7 +80,6 @@ This project will use the GNU General Public License version 3 (GPLv3). The
 license can be found \href{https://github.com/VirochaanRG/MES-Event-Management-System/blob/main/LICENSE}{here}.
 
 \section{Team Meeting Plan}
-
 \begin{flushleft}
 The members of the team are expected to meet at least once weekly virtually through Microsoft Teams. 
 The purpose of these meetings is to provide updates on current work, plan accordingly for submission of deliverables, discuss next steps, and distribute tasks among team members. 
@@ -105,17 +108,45 @@ If there are no significant updates within the week before the meeting (i.e. dur
 \section{Team Member Roles}
 
 \begin{flushleft}
-The following administrative roles will be assigned to team members:
+The following administrative and technical roles will be assigned to team members:
+
+\subsection{Rayyan Suhail}
 \begin{itemize}
-\item Team Liason: Main contact point between the team members and the supervisors. 
-This member is responsible for sending emails for communication between the team and supervisors as well as scheduling and leading the weekly sync meetings.
-\item Inter-Team Liason: Responsible for communication between capstone teams. 
-Since this project is a sub-component of a larger system for the MES with multiple teams working together, it is important to have a representative for the team who will be responsible for communication between teams to ensure consistency and compatibility between design decisions for the project.
-\item Meeting Leader: Responsible for facilitating the weekly meetings between team members. 
-Ensures that team meetings happen consistently and that team members are up to date with deliverables.
-\item Note Taker: Responsible for taking notes summarizing key points from every meeting, including team meetings and supervising meetings. 
-This member is also responsible for creating GitHub Issues for every meeting and providing a summary of attendance and key takeaways.
-\item Reviewer: Responsible for final review of any main deliverables before final submission to ensure they align with the course and supervisors’ expectations.
+  \item Team Liason: Main contact point between the team members and the supervisors. 
+  Responsible for sending emails for communication between the team and supervisors as well as scheduling and leading the weekly sync meetings.
+  \item Web UI/UX Developer (Admin Portal): Responsible for frontend design and development of the admin web portal.
+  \item Software Tester (Web): Handles software testing of the web portal logic and UI.
+\end{itemize}
+
+\subsection{Ibrahim Quraishi}
+\begin{itemize}
+  \item Inter-Team Liason: Responsible for communication between capstone teams. 
+  Since this project is a sub-component of a larger system for the MES with multiple teams working together, it is important to have a representative for the team who will be responsible for communication between teams to ensure consistency and compatibility between design decisions for the project.
+  \item Full Stack Developer (Mobile): Responsible for development of frontend to backend connections for the end-user mobile application.
+  \item Software Tester (Backend): Handles unit and integration testing of backend services.
+\end{itemize}
+
+\subsection{Virochaan Ravichandran Gowri}
+\begin{itemize}
+  \item Meeting Leader: Responsible for facilitating the weekly meetings between team members. 
+  Ensures that team meetings happen consistently and that team members are up to date with deliverables.
+  \item Full Stack Developer (Web): Responsible for development of frontend to backend connections for the admin web portal.
+  \item DevOps/Project Manager: Updated and manages the GitHub Project and GitHub Actions workflows
+\end{itemize}
+
+\subsection{Omar Al-Asfar}
+\begin{itemize}
+  \item Reviewer: Responsible for final review of any main deliverables before final submission to ensure they align with the course and supervisors’ expectations.
+  \item Mobile UI/UX Developer: Responsible for frontend design and development of the end-user mobile application.
+  \item Software Tester (Mobile): Handles software testing of the mobile application logic and UI.
+\end{itemize}
+
+\subsection{Mohammad Mahdi Mahboob}
+\begin{itemize}
+  \item Note Taker: Responsible for taking notes summarizing key points from every meeting, including team meetings and supervising meetings. 
+  This member is also responsible for creating GitHub Issues for every meeting and providing a summary of attendance and key takeaways.
+  \item Backend Developer: Responsible for development of the backend server for the admin web portal and end-user mobile application.
+  \item Database Designer: Responsible for design for structure of database tables and relations
 \end{itemize}
 \end{flushleft}
 
@@ -228,9 +259,10 @@ Additionally, the following programming languages, frameworks and libraries are 
 \begin{itemize}
     \item JavaScript along with Node.js may be used in development of the backend server for both the web portal and mobile application. 
     Additionally, Node.js modules such as node-postgres may be used to communicate with the database.
-    \item A styling library/framework such as Tailwind or Bootstrap may be used to simplify UI styling
+    \item A styling library/framework such as Tailwind or Bootstrap may be used to simplify UI styling.
+    \item Figma will be used for design and mockups of the mobile and web application UIs.
     \item A REST API will be used for communication between the frontend applications and the backend server. 
-    The default Fetch API provided within React and React Native may be used on the frontend, along with Node.js modules such as Express to handle requests on the backend server
+    The default Fetch API provided within React and React Native may be used on the frontend, along with Node.js modules such as Express to handle requests on the backend server.
     \item Jest will be used as the primary unit testing framework for testing both the frontend and backend code with JavaScript, including unit testing and code coverage. 
     Additionally, the React Testing Library may be used to test frontend components.
     \item A linter such as Prettier will be used to ensure the source code adheres to a specific standard.
@@ -239,9 +271,10 @@ Additionally, the following programming languages, frameworks and libraries are 
 GitHub will be used as the project repository for documentation, project planning and administration, and source code management.
 \begin{itemize}
     \item A GitHub Issue will be created for each attended lecture, tutorial, and team meeting outlining attendance, and key takeaways. 
-    \item A GitHub Issue will be created for each course deliverable, such as documentation, and code submissions
-    \item GitHub Projects will be used to host a Kanban Board of all GitHub Issues and their status
-    \item GitHub Actions will be used as the main CI platform. CI will be used to maintain code styling requirements and perform regression tests on pull requests before they can be merged. Additionally, GitHub actions may be used build and deploy source code into a staging environment.
+    \item A GitHub Issue will be created for each course deliverable, such as documentation, and code submissions.
+    \item GitHub Projects will be used to host a Kanban Board of all GitHub Issues and their status.
+    \item GitHub Actions will be used as the main CI platform. CI will be used to maintain code styling requirements and perform regression tests on pull requests before they can be merged. 
+    Additionally, GitHub Actions may be used build and deploy source code into a staging environment.
     \item Git will be used as the source code management platform for making code changes. The specific development environment in which these changes are made, such as the IDE, are subject to the preferences of the team members.
 \end{itemize}
 \end{flushleft}
