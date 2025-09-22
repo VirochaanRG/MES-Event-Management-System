@@ -35,8 +35,8 @@ This document will outline the development plan for \textbf{\teamname}:
 handling of confidential information; IP protection and copyright licensing;
 team roles, collaboration, and organization guidelines; project development
 guidelines; project workflow and version control guidelines; and expected
-programming tools, technologies, and standards.
-\\
+programming tools, technologies, and standards.\\
+
 This project will be conducted in collaboration with two other Capstone teams
 to create one large unified product, and as such, the contents in these
 sections are subject to change based on updated requirements from the project
@@ -227,29 +227,34 @@ analytics in order to minimize redundancy and improve user experience. The
 interface integration is also challenging because they demand an entirely
 different set of features for the client, yet they must interact with the same
 underlying system.
-\\
+  \newline
+  \newline
 The following are some significant risks we expect to encounter during development.
 \begin{enumerate}
   \item \textbf{Implementation of Branching Logic} \\
   We expect that the hardest part of the implementation for the custom form builder will be development of some sort of branching logic based on form answers. During development, we risk implementing this feature with too mcuh simplicity that does not meet the needs of the MES, or making the implementation too complicated and difficult to understand.
-\\
+  \newline
+  \newline
   To mitigate this risk, we can study existing form building software that implements this functionality to gather ideas of how it should be implemented, as well as study previous forms created by the MES to gauge the required complexity and depth of the feature.
   \item \textbf{Frontend and Backend Integration} \\
   Our system is composed of many different subsystems, including the admin mobile and/or web application, end user web and/or mobile application, the backend server, and the database. A large volume of data such as user information, custom forms, user submissions, and analytical data will need to passed between multple subsystems. Due to this, there is a significant risk of data loss and innacuracies between each system.
-\\
+  \newline
+  \newline
   To mitigate the risk, it is imperative that features that require development on two or more subsystems are completed as soon as possible, and that work on each subsystem is done simultaneously. This ensures that integration between systems can be completed as quickly as possible and that developers are on the same page when developing features that require integration. This allows more time to be alloted towards testing said features and earlier detection of integration issues.
   \item \textbf{Application Scalability} \\
   Our system will be required to deal with a large volume of data and simultaneous users. During development, we will likely only have the capacity to test the system with a few users and much smaller volume of data. Due to this, we risk our project not being scalable to the capacity required by the MES.
-\\
+  \newline
+  \newline
   To mitigate this risk, we should follow and conduct research on scalable practices including but not limited to breaking the system into smaller and more maintainable services and using libraries or services with built in scalability.
 \end{enumerate}
 
 Some smaller risks associated with the project are as follows.
 
 \begin{enumerate}
-  \item \textbf{Integration Between Capstone Teams} \\
+  \item \textbf{Integration Between Capstone Teams} 
   Since our project is part of a larger system being developed by multiple capstone teams, we have been asked to work with other teams to integrate our solutions into one application. There are a lot of risks involved with working with so many independent developers on a larger project such as incompatibilities between systems or miscommunication between teams.
-\\
+  \newline
+  \newline
   We can mitigate this risk by assigning an inter-team communications lead, who will stay in contact with other teams to ensure developers are on the same page.
   
 \end{enumerate}
@@ -292,11 +297,27 @@ GitHub will be used as the project repository for documentation, project plannin
 
 \section{Coding Standard}
 
+The source code for the project will be subject to the following standards.
+
+\subsection{Language Style}
+
+The \href{https://github.com/airbnb/javascript}{Airbnb JavaScript Style Guide} and \href{https://github.com/airbnb/javascript/tree/master/react}{Airbnb React/JSX Style Guide} will be used as the main styling convention for JavaScript code, as it is one of the most widely used styling conventions. This styling guide can be integrated into the CI/CD pipeline via ESLint and GitHub applications
+
+\subsection{Git Standards} 
+
+The following branching model should be used when commiting to the repository.
+\begin{itemize}
+  \item main branch: production ready code
+  \item Feature/Deliverable branch: Code for each new feature/deliverable being completed
+\end{itemize}
+
+Any code changes should be made under a sub-branch under the appropriate feature/deliverable branch and should only be merged in via a pull request containing a description of what was changes and why. Once a feature is complete, a final pull request requiring all members of the team to review should be made before pulling into main.
+\newline\newline
+A Git worktree should be used for the main branch and each feature/deliverable branch being worked on. This is to avoid constant switching of branches when pulling new changes and code stashes.
+
 \newpage{}
 
 \section*{Appendix --- Reflection}
-
-\input{../Reflection.tex}
 
 \textbf{Ibrahim Quraishi}
 \begin{enumerate}
