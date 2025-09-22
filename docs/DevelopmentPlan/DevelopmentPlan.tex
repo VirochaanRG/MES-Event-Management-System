@@ -16,10 +16,6 @@
 \begin{document}
 
 \maketitle
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 \begin{table}[hp]
 \caption{Revision History} \label{TblRevisionHistory}
 \begin{tabularx}{\textwidth}{llX}
@@ -192,7 +188,7 @@ Issues will be managed through GitHub Issues. Through GitHub Project boards, iss
 % details. You will need to reproduce information that is in the course outline
 % for deadlines.}
 
-The project is hosted on GitHub at the following link: \url{}
+The project is hosted on GitHub at the following link: \url{https://github.com/users/VirochaanRG/projects/4}
 \\
 A Kanban Board project setup is currently being used to track the progress of the project. The board is divided into four columns: Meeting, To Do, In Progress, and Done. Each task is represented as a card that can be moved across the columns as it progresses through different stages of completion. This visual representation allows team members to easily see the status of each task and identify any bottlenecks in the workflow.
 \\\\
@@ -222,15 +218,8 @@ The project is scheduled to be completed over the course of two semesters. Howev
 \end{center}
 
 \section{Proof of Concept Demonstration Plan}
-
-\begin{comment}
-What is the main risk, or risks, for the success of your project?  What will you
-demonstrate during your proof of concept demonstration to convince yourself that
-you will be able to overcome this risk?
-
-Identify the risks + I.e some difficult features. What are we gonna do about these risks.  Talk about division of labour. 
-\end{comment}
-
+\begin{flushleft}
+  
 The main challenges we foresee for this project are creating the form builder
 and integrating user-side and admin-side interfaces for the application. The
 form-builder needs to be modular and track all data against a user to perform
@@ -239,11 +228,33 @@ interface integration is also challenging because they demand an entirely
 different set of features for the client, yet they must interact with the same
 underlying system.
 \\
-To get a working proof-of-concept, we expect to demonstrate a simplified interface
-with at least singular interactions from either endpoints which can communicate
-correctly with the underlying database. If the database is correctly and
-efficiently track all data, then we can expect that the final product can be
-developed with confidence.
+The following are some significant risks we expect to encounter during development.
+\begin{enumerate}
+  \item \textbf{Implementation of Branching Logic} \\
+  We expect that the hardest part of the implementation for the custom form builder will be development of some sort of branching logic based on form answers. During development, we risk implementing this feature with too mcuh simplicity that does not meet the needs of the MES, or making the implementation too complicated and difficult to understand.
+\\
+  To mitigate this risk, we can study existing form building software that implements this functionality to gather ideas of how it should be implemented, as well as study previous forms created by the MES to gauge the required complexity and depth of the feature.
+  \item \textbf{Frontend and Backend Integration} \\
+  Our system is composed of many different subsystems, including the admin mobile and/or web application, end user web and/or mobile application, the backend server, and the database. A large volume of data such as user information, custom forms, user submissions, and analytical data will need to passed between multple subsystems. Due to this, there is a significant risk of data loss and innacuracies between each system.
+\\
+  To mitigate the risk, it is imperative that features that require development on two or more subsystems are completed as soon as possible, and that work on each subsystem is done simultaneously. This ensures that integration between systems can be completed as quickly as possible and that developers are on the same page when developing features that require integration. This allows more time to be alloted towards testing said features and earlier detection of integration issues.
+  \item \textbf{Application Scalability} \\
+  Our system will be required to deal with a large volume of data and simultaneous users. During development, we will likely only have the capacity to test the system with a few users and much smaller volume of data. Due to this, we risk our project not being scalable to the capacity required by the MES.
+\\
+  To mitigate this risk, we should follow and conduct research on scalable practices including but not limited to breaking the system into smaller and more maintainable services and using libraries or services with built in scalability.
+\end{enumerate}
+
+Some smaller risks associated with the project are as follows.
+
+\begin{enumerate}
+  \item \textbf{Integration Between Capstone Teams} \\
+  Since our project is part of a larger system being developed by multiple capstone teams, we have been asked to work with other teams to integrate our solutions into one application. There are a lot of risks involved with working with so many independent developers on a larger project such as incompatibilities between systems or miscommunication between teams.
+\\
+  We can mitigate this risk by assigning an inter-team communications lead, who will stay in contact with other teams to ensure developers are on the same page.
+  
+\end{enumerate}
+
+\end{flushleft}
 
 \section{Expected Technology}
 
@@ -268,7 +279,7 @@ Additionally, the following programming languages, frameworks and libraries are 
     \item A linter such as Prettier will be used to ensure the source code adheres to a specific standard.
 \end{itemize}
 
-GitHub will be used as the project repository for documentation, project planning and administration, and source code management.
+GitHub will be used as the project repository for documentation, project planning and administration, and source code management. The repository can be found here: \url{https://github.com/VirochaanRG/MES-Event-Management-System}.
 \begin{itemize}
     \item A GitHub Issue will be created for each attended lecture, tutorial, and team meeting outlining attendance, and key takeaways. 
     \item A GitHub Issue will be created for each course deliverable, such as documentation, and code submissions.
@@ -281,25 +292,19 @@ GitHub will be used as the project repository for documentation, project plannin
 
 \section{Coding Standard}
 
-\wss{What coding standard will you adopt?}
-
 \newpage{}
 
 \section*{Appendix --- Reflection}
 
-\textbf{Virochaan Ravichandran Gowri's Reflection: }
-\begin{enumerate}
-    \item \textbf{Why is it important to create a development plan prior to starting the
-    project?} \\ 
-    Creating a development plan prior to starting the project is important because it provides us with a structured roadmap of how we can deliver this project. By including deadlines as well as roles and responsibilities we are ensuring we have certain guidelines on how best to work as a group together and when be begin the technical parts of our project we have a general understanding of the components we are going to work on. Also by defining meeting communication structures we can ensure that our group understands their responsibilities to each other and if/when issues crop up, we are well equipped to deal with them. Finally we also including some Project Management and workflow considerations in this plan. This will be crucial when we start developing the project to ensure we don't end up conflicting with one another and actually keep a good track of the work being done. By having all of this defined at the start of the project we are able to work efficiently and have documentation to fall upon if we get stuck during the development of the project.
-    \item \textbf{In your opinion, what are the advantages and disadvantages of using CI/CD?} \\
-    By using CI/CD primarily through Gitub Actions we gain many benefits throguh automatic QA and easier integration. We can easily compile files and create workflows for testing different components and including linting that ensures that we maintain a high code quality. Through this system we can ensure that even if multiple developers are working on the code the system will remain stable as changes will only be implemented if they pass through the workflows without errors. The main disadvantages are that there could be a learning curve to understanding this new technology as sometimes it can not be the most intuitive. There is also extra effort required in creating and maintaining the workflows as well as debugging the failed builds to understand what went wrong. Overall if used effectively CI/CD can be a powerful tool that can help us work better as a group and ensure we have a stable development platform.
-\end{enumerate}
+\input{../Reflection.tex}
 
-\textbf{Group Reflection: }
 \begin{enumerate}
-  \item \textbf{What disagreements did your group have in this deliverable, if any, and how did you resolve them?} \\ 
-  Our group experienced some minor disagreements during the development of this project primarily on the division and size of the roles and responsibilities and how best to structure the workflows. When discussing the technical roles we were unsure on how granular we wanted to be and how much responsibility we wanted to concentrate in each roles. We ended up splitting up the roles based on the interest of each group member and if they had prior experience. We also made sure that we didn't end up having anyone with too much responsibility as it would be unfair and could prove challenging for that person. We also had a discussion on the different technologies that we could use. Everyone had their own preferences and experiences using different technologies for full-stack development. To resolve this we researched what technology stacks worked best together and also had discussions with the supervisor to get his opinions as he also had a technical background. Then we got together and decided on the best stack for our use case. By having open and constant communication we managed to easily overcome these minor disagreements ensuring that we could have a succesful deliverable and set the standard for the rest of the project.
+    \item Why is it important to create a development plan prior to starting the
+    project?
+    \item In your opinion, what are the advantages and disadvantages of using
+    CI/CD?
+    \item What disagreements did your group have in this deliverable, if any,
+    and how did you resolve them?
 \end{enumerate}
 
 \newpage{}
