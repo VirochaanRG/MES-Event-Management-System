@@ -94,7 +94,13 @@ If there are no significant updates within the week before the meeting (i.e. dur
 
 \section{Team Communication Plan}
 
-\wss{Issues on GitHub should be part of your communication plan.}
+% \wss{Issues on GitHub should be part of your communication plan.}
+\begin{itemize}
+  \item Issues: GitHub
+  \item Meetings: MS Teams, Discord
+  \item Meetings (with advisor): MS Teams
+  \item Project Discussion: Discord
+\end{itemize}
 
 \section{Team Member Roles}
 
@@ -115,23 +121,74 @@ This member is also responsible for creating GitHub Issues for every meeting and
 
 \section{Workflow Plan}
 
+% \begin{itemize}
+% 	\item How will you be using git, including branches, pull request, etc.?
+% 	\item How will you be managing issues, including template issues, issue
+% 	classification, etc.?
+%   \item Use of CI/CD
+% \end{itemize}
+The repository will have two primary branches, one for development and of for documentation, responsible for technical development and software documentation respectively.
+\\\\
+The average workflow will be as follows: \\
 \begin{itemize}
-	\item How will you be using git, including branches, pull request, etc.?
-	\item How will you be managing issues, including template issues, issue
-	classification, etc.?
-  \item Use of CI/CD
+  \item Pull changes from primary branch depending on the task at hand
+  \item Create an issue for the assigned task if one does not already exist
+  \item Create a new branch with the naming convention of: [assigned task - name of contributor]
+  \begin{itemize}
+    \item If it is a new task, create a branch direcly under the primary
+    \item If it is a follow up/subtask, create a sub-working branch branch from previous branch
+  \end{itemize}
+  \item Commit changes with detailed message
+  \item Create unit tests for changes
+  \item Open a pull request to the primary branch
+  \item Link issue to pull request
+  \item Wait for approval from other members and for testing to pass
+  \item Merge pull request
 \end{itemize}
+
+Issues will be managed through GitHub Issues. Through GitHub Project boards, issues will be linked to notable meetings and milestones, and classified into categories: Meetings, To Do, In Progress, and Done. Each issue will be assigned to the relevant team members, who can provide feedback, report errors, and organize tasks. Issues will be tagged with distinct labels to indicate their priority, timeline, and type (e.g., bug, feature, documentation).
+\\
+
 
 \section{Project Decomposition and Scheduling}
 
+% \begin{itemize}
+%   \item How will you be using GitHub projects?
+%   \item Include a link to your GitHub project
+% \end{itemize}
+
+% \wss{How will the project be scheduled?  This is the big picture schedule, not
+% details. You will need to reproduce information that is in the course outline
+% for deadlines.}
+
+The project is hosted on GitHub at the following link: \url{}
+\\
+A Kanban Board project setup is currently being used to track the progress of the project. The board is divided into four columns: Backlog, To Do, In Progress, and Done. Each task is represented as a card that can be moved across the columns as it progresses through different stages of completion. This visual representation allows team members to easily see the status of each task and identify any bottlenecks in the workflow.
+\\
+The cards can pertain to:
 \begin{itemize}
-  \item How will you be using GitHub projects?
-  \item Include a link to your GitHub project
+  \item Lectures
+  \item Group and Supervisor Meetings
+  \item Project Milestones
 \end{itemize}
 
-\wss{How will the project be scheduled?  This is the big picture schedule, not
-details. You will need to reproduce information that is in the course outline
-for deadlines.}
+The project is scheduled to be completed over the course of two semesters. However, we aim to have a working prototype by January to be tested across various events, including the Fireball Formal, and CALE Conference.
+\\
+\begin{center}
+  \begin{tabular}{ |c|c| }
+  \hline
+  Deliverable & Due Date \\
+  \hline
+  Problem Statement and Goals, and Development Plan & Week 4 \\ 
+  Requirements Documentation and Hazard Analysis (Revision 0) & Week 6  \\  
+  Verification and Validation Plan (Revision 0) & Week 8 \\
+  Proof of Concept Report & Week 9 \\
+  Design Document (Revision 0) & Week 10 \\
+  Proof of Concept demos & Week 11 \\
+  Functional Prototype & January \\
+  \hline
+  \end{tabular}
+\end{center}
 
 \section{Proof of Concept Demonstration Plan}
 
