@@ -24,6 +24,7 @@
 \midrule
 09-18-2025 & Virochaan Ravichandran Gowri & First Rough Draft\\
 09-18-2025 & Rayyan Suhail & First Rough Draft\\
+09-21-2025 & Rayyan Suhail & Goals \& Strech Goals - Rev0\\
 Date2 & Name(s) & Description of changes\\
 ... & ... & ...\\
 \bottomrule
@@ -32,21 +33,23 @@ Date2 & Name(s) & Description of changes\\
 
 \section{Problem Statement}
 
-\wss{You should check your problem statement with the
-\href{https://github.com/smiths/capTemplate/blob/main/docs/Checklists/ProbState-Checklist.pdf}
-{problem statement checklist}.} 
-
-\wss{You can change the section headings, as long as you include the required
-information.}
-
 \subsection{Problem}
 The Mcmaster Engineering Society (MES) hosts various large events throughout the year such as the Fireball Formal, Graduation Formal, and Pub Nights. Currently, the processes of registration, waiver collection, ticketing, and check-in are managed manually or across multiple platforms, resulting in unnecessary administrative burden for student organizers and a tough process for attendees. MES also makes surveys/forms to gather feedback from events, to aid registration processes and manages nationwide surveys gathering information on the experiences of undergratuate engineering students. These forms can often get very complex due to various branches and conditionals attempting to gain information from certain demographics or categories. Due to this complex nature the survey response rate is very low as many are put of from answering. Furthermore, there is very little data analytics that can be done from the current implementation making it difficult to actually gain information from both surveys and event registrations to improve future events and student experience.
-
+\\
 This project aims to develop a solution which can centralize the activities of the MES within a single platform with functionality for both admins and users.
 \subsection{Inputs and Outputs}
-
-\wss{Characterize the problem in terms of ``high level'' inputs and outputs.  
-Use abstraction so that you can avoid details.}
+The inputs and outputs have been split into End Users and Admins since the way they interact with the app is very different.\\
+\textbf{Inputs}:
+\begin{itemize}
+    \item \textbf{End Users:} 
+        User Info, Form Data, Event Details, Waiver Details.
+    \item \textbf{Admins:} Event Information, Form Categories and Sections
+\end{itemize} 
+\textbf{Outputs:} 
+\begin{itemize}
+    \item \textbf{End Users:} Notifications, Confirmations, Event Media
+    \item \textbf{Admins:} Admin Analytics, Downloadable Reports, Attendee Information.
+\end{itemize}
 
 \subsection{Stakeholders}
 The main stakeholders currently are:
@@ -59,53 +62,101 @@ The main stakeholders currently are:
         Students who will be using the platform to register for events and answer surveys.
 \end{itemize}
 \subsection{Environment}
-
-\wss{Hardware and Software Environment}
+The Software Environment will be compatible will all major browsers and will work with all computers that are connected to the internet. The mobile components will work with both IOS and Android environments. For development we will be using Github for CI/CD and for version control. We will be primarily using Visual Studio Code for our development environment and Figma for UI Design and Mockups.
 
 \section{Goals}
-Our primary goal is the development of a platform that can aid in the creation and registration of events and host forms and surveys for feedback and future improvement. It will contain to main components:
+The primary objective of this project is to create a centralized platform that streamlines how the McMaster Engineering Society (MES) manages events and gathers feedback from students. The goals outlined below represent high-level outcomes that the system should achieve, focusing on reducing administrative burden, improving the student experience, and enabling data-driven decision making.
 \begin{enumerate}
-    \item \textbf{Web App:} \\
+    \item \textbf{Develop a Modular Custom Form Builder}
     \begin{itemize}
-        \item \textbf{Admin Dashboard}: Should allow for the admins to create events and forms. View analytics and perform rudimentary data analysis.
-        \item \textbf{User Interface}: Front end for web users to interact with the platform and answer forms and signup for events.
+        \item \textbf{Explanation}: Build a flexible form builder that allows MES administrators to create and manage registration and feedback forms with features such as conditional logic, branching, and multiple field types.
+        \item \textbf{Reasoning}: The current use of external tools is inefficient. A custom modular builder ensures independence from third-party tools, reduces admin overhead, and allows full customization.
     \end{itemize}
 
-    \item \textbf{Mobile App:} \\
-    Allow for push notifications and mobile users to use the app.
+    \item \textbf{Streamline Event Registration \& Check-in}
+    \begin{itemize}
+        \item \textbf{Explanation}: Create a unified registration process that integrates waivers, ticketing, and confirmations, along with check-in capabilities for attendees (later also used for event analytics).
+        \item \textbf{Reasoning}: Current registration is split across systems, creating administrative inefficiencies and a poor attendee experience. A single system simplifies the workflow and allows event detail storage for recurring events.
+    \end{itemize}
+
+    \item \textbf{Provide Backend Analytics \& Data Visualization}
+    \begin{itemize}
+        \item \textbf{Explanation}: Build an analytics dashboard that enables MES administrators to visualize event and survey data through charts, reports, and exportable files.
+        \item \textbf{Reasoning}: MES currently lacks the ability to analyze collected data, limiting the feedback loop for improving events and surveys. They also lack the ability to review feedback from previous years for recurring events so that improvements may be made for future events.
+    \end{itemize}
+
+    \item \textbf{Centralize Attendee \& Admin Information Management}
+    \begin{itemize}
+        \item \textbf{Explanation}: Create an integrated interface for event administrators to track attendees, payment statuses, waiver completions, and other event-specific details in one place.
+        \item \textbf{Reasoning}: Currently, attendee data is scattered across various unlinked services such as Google forms and Spreadsheets, making it hard for admins to manage logistics.
+    \end{itemize}
+
+    \item \textbf{Enhance Feedback Survey Design}
+    \begin{itemize}
+        \item \textbf{Explanation}: Enable MES administrators to create feedback surveys that are concise, targeted, and relevant to specific demographics (e.g., program, year of study) while minimizing unnecessary questions.
+        \item \textbf{Reasoning}: MES often conducts event and nationwide student surveys that become overly complex. Smarter feedback survey flows improve completion rates and yield more useful responses for planning future events.
+    \end{itemize}
 
 \end{enumerate}
+
 \section{Stretch Goals}
+
+\begin{enumerate}
+    \item \textbf{SaaS Expansion for External Event Management}
+    \begin{itemize}
+        \item \textbf{Explanation}: Transform the platform into a Software-as-a-Service (SaaS) product that can be customized and licensed to other student organizations, universities, or even professional event planners. This would include multi-tenant support and branding options, with a focus on a scalable infrastructure.
+        \item \textbf{Reasoning}: While initially built for MES, the same challenges exist across many organizations (registration, waivers, surveys, analytics). Packaging it as a SaaS product expands impact and creates a potential revenue stream.
+    \end{itemize}
+
+        \item \textbf{Real-Time Event Engagement Features}
+    \begin{itemize}
+        \item \textbf{Explanation}: Integrate live event features such as real-time polls, Q\&A boards, interactive schedules, and push notifications to engage attendees during events.
+        \item \textbf{Reasoning}: This takes the platform beyond logistics and makes it part of the live event experience, leading to a boost in participation and attendee satisfaction.
+    \end{itemize}
+
+        \item \textbf{AI-Powered Insights \& Recommendations}
+    \begin{itemize}
+        \item \textbf{Explanation}: Implement AI-driven analytics to automatically generate insights from all relevant input data, such as predicting event turnout, identifying factors that lower survey completion, or recommending improvements for future events.
+        \item \textbf{Reasoning}: This adds intelligence to the platform, turning data into actionable recommendations which can then be used to enhance future attendee experience.
+    \end{itemize}
+\end{enumerate}
+
 
 \section{Extras}
 
-\wss{For CAS 741: State whether the project is a research project. This
-designation, with the approval (or request) of the instructor, can be modified
-over the course of the term.}
-
-\wss{For SE Capstone: List your extras.  Potential extras include usability
-testing, code walkthroughs, user documentation, formal proof, GenderMag
-personas, Design Thinking, etc.  (The full list is on the course outline and in
-Lecture 02.) Normally the number of extras will be two.  Approval of the extras
-will be part of the discussion with the instructor for approving the project.
-The extras, with the approval (or request) of the instructor, can be modified
-over the course of the term.}
+\begin{enumerate}
+    \item \textbf{Usability Report:} Due to the potential complexity of the application including an usability report will showcase the testing we did to ensure our application is both easily usable but also efficient and accomplishes the features as we intended.
+    \item \textbf{Wireframe Report:} Wire frame reports will allow us to showcase the design principles and considerations taken into account when creating the User Interface.
+\end{enumerate} 
 
 \newpage{}
 
 \section*{Appendix --- Reflection}
 
-\wss{Not required for CAS 741}
 
-\input{../Reflection.tex}
+% \input{../Reflection.tex}
 
+\textbf{Virochaan Ravichandran Gowri Reflection}
 \begin{enumerate}
-    \item What went well while writing this deliverable? 
-    \item What pain points did you experience during this deliverable, and how
-    did you resolve them?
-    \item How did you and your team adjust the scope of your goals to ensure
-    they are suitable for a Capstone project (not overly ambitious but also of
-    appropriate complexity for a senior design project)?
+    \item \textbf{What went well while writing this deliverable? } \\
+    The writing of this deliverable went quite well in my opinion. From the original prompt from our supervisor we were able to glean many of the features and goals of the project which we then refined further through internal meetings and meetings with out supervisor. We also worked well to divide up the work equally between this document and the development plan ensuring we kept up to date with one another on the progress of our work. I found that the communication we had with one another 
+    \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\ 
+    One part that we struggled with is the claddification of goals between stretch goals and goals as well as providing enough details to our goals. We didn't want to make it too detailed so it would be considered features or requirements but we also wanted to have enough details so that it could still be considered measureable. We gained good insight on this through our TA meeting and he offered us some suggestions on how we could improve our goals to better meet the criteria. We also had some issues in our version control such as using branches but we researched some potential ways to use it and have improved our process for the future deliverables.
+    
 \end{enumerate}  
 
+\textbf{Rayyan Suhail Reflection}
+\begin{enumerate}
+    \item \textbf{What went well while writing this deliverable? } \\
+    I was able to clearly structure the goals and stretch goals by connecting them directly to the problem statement. Breaking them down into explanation and reasoning made the writing more organized and easier to follow. It also helped me translate the technical details of the project into measurable outcomes, which improved the overall clarity of the deliverable.
+    \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\ 
+    The main challenge I faced was balancing detail with conciseness—at first the explanations felt too long and technical. I resolved this by iterating through drafts, rewording sections into simpler language, and keeping only the most relevant points.
+    
+\end{enumerate} 
+
+\textbf{Group Reflection:}
+\begin{enumerate}
+    \item \textbf{How did you and your team adjust the scope of your goals to ensure they are suitable for a Capstone project (not overly ambitious but also of appropriate complexity for a senior design project)?} \\
+    We ensured that before the project started we understood the skillsets of each of the members in our group. We talked about the experience we had through both personal projects and in our co-op experiences. From this we decided upon a project that we all felt comfortable with accomplishing. Once a project was decided we realized that this project could become massive as there was endless features that we could add and build upon and there was natural room for expansion. Though we were excited about the potential we had to ensure that we tempered our expectations and did not get to carried away. To limit our scope we discussed with out supervisor what they valued the most and what features he considered essential. From this we developed our goals which would accomplish this while maintaining a scope that was actually feasible within the timeframe. 
+\end{enumerate} 
 \end{document}

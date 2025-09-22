@@ -2,6 +2,7 @@
 
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{comment}
 
 \title{Development Plan\\\progname}
 
@@ -15,113 +16,238 @@
 \begin{document}
 
 \maketitle
-\begin{
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 \begin{table}[hp]
 \caption{Revision History} \label{TblRevisionHistory}
 \begin{tabularx}{\textwidth}{llX}
 \toprule
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
-September 21, 2025 & Ibrahim, Mohammad, Omar & Revision 0 \\
+September 22, 2025 & Ibrahim, Mahboob, Omar & Creation of revision 0\\
+Date2 & Name(s) & Description of changes\\
+... & ... & ...\\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \newpage{}
 
-\wss{Put your introductory blurb here.  Often the blurb is a brief roadmap of
-what is contained in the report.}
+This document will outline the development plan for \textbf{\teamname}:
+handling of confidential information; IP protection and copyright licensing;
+team roles, collaboration, and organization guidelines; project development
+guidelines; project workflow and version control guidelines; and expected
+programming tools, technologies, and standards.
+\\
+This project will be conducted in collaboration with two other Capstone teams
+to create one large unified product, and as such, the contents in these
+sections are subject to change based on updated requirements from the project
+supervisors or design decisions made in conjunction with the collaborating
+teams.
 
+\begin{comment}
 \wss{Additional information on the development plan can be found in the
 \href{https://gitlab.cas.mcmaster.ca/courses/capstone/-/blob/main/Lectures/L02b_POCAndDevPlan/POCAndDevPlan.pdf?ref_type=heads}
 {lecture slides}.}
+\end{comment}
 
 \section{Confidential Information?}
-
-\begin{left}
-The project will deal with information confidential to the McMaster Engineering Society (MES) and the Canadian Federation of Engineering Students (CFES). 
-This information includes program generated analytics and financial reports for events hosted by the MES through the proposed system, and results from surveys conducted by the CFES
-\end{left}
+\begin{flushleft}
+This project is not expected to deal with any information confidential to the McMaster Engineering Society. 
+\end{flushleft}
 
 \section{IP to Protect}
 
+\begin{comment}
 \wss{State whether there is IP to protect.  If there is, point to the agreement.
 All students who are working on a project that requires an IP agreement are also
 required to sign the ``Intellectual Property Guide Acknowledgement.''}
+\end{comment}
+
+There is currently no IP which requires protection, and the project is planned
+to be open-source.
 
 \section{Copyright License}
 
+\begin{comment}
 \wss{What copyright license is your team adopting.  Point to the license in your
 repo.}
+\end{comment}
+
+This project will use the GNU General Public License version 3 (GPLv3). The
+license can be found \href{https://github.com/VirochaanRG/MES-Event-Management-System/blob/main/LICENSE}{here}.
 
 \section{Team Meeting Plan}
-
-\begin{left}
+\begin{flushleft}
 The members of the team are expected to meet at least once weekly virtually through Microsoft Teams. 
 The purpose of these meetings is to provide updates on current work, plan accordingly for submission of deliverables, discuss next steps, and distribute tasks among team members. 
 The structure of this meeting will be as follows.
-\begin{enumerate}
-\item Each team member will provide a 5–6-minute update on the work completed within the last week. After each member has completed their update, the other team members are free to provide feedback.
-\item The meeting leader will go over next steps on current deliverables, as well as remind team members of upcoming deliverables
-\item If any new work is to be assigned, the meeting leader will split the work into a set of tasks. Team members will then select which tasks they are comfortable with taking
-\item The remaining meeting time will be spent on preparation for the upcoming sync meeting with the supervisors
-\end{enumerate}
-
+  \begin{enumerate}
+    \item Each team member will provide a 5–6-minute update on the work completed within the last week. After each member has completed their update, the other team members are free to provide feedback.
+    \item The meeting leader will go over next steps on current deliverables, as well as remind team members of upcoming deliverables
+    \item If any new work is to be assigned, the meeting leader will split the work into a set of tasks. Team members will then select which tasks they are comfortable with taking
+    \item The remaining meeting time will be spent on preparation for the upcoming sync meeting with the supervisors
+  \end{enumerate}
 Additionally, a weekly sync meeting will be scheduled with the industry advisor and team supervisor to ensure that the direction of the project remains aligned with the needs of the supervisors. 
 The meeting will ensure the supervisors are kept up to date with the state of the project and allow the supervisors to provide feedback or request changes. 
 If there are no significant updates within the week before the meeting (i.e. during exam season), the meeting will be cancelled with at least 24 hours notice for the supervisors.
-\end{left}
+\end{flushleft}
 
 \section{Team Communication Plan}
 
-\wss{Issues on GitHub should be part of your communication plan.}
+% \wss{Issues on GitHub should be part of your communication plan.}
+\begin{itemize}
+  \item Issues: GitHub
+  \item Meetings: MS Teams, Discord
+  \item Meetings (with advisor): MS Teams
+  \item Project Discussion: Discord
+\end{itemize}
 
 \section{Team Member Roles}
 
-\begin{left}
-The following administrative roles will be assigned to team members:
+\begin{flushleft}
+The following administrative and technical roles will be assigned to team members:
+
+\subsection{Rayyan Suhail}
 \begin{itemize}
-\item Team Liason: Main contact point between the team members and the supervisors. 
-This member is responsible for sending emails for communication between the team and supervisors as well as scheduling and leading the weekly sync meetings.
-\item Inter-Team Liason: Responsible for communication between capstone teams. 
-Since this project is a sub-component of a larger system for the MES with multiple teams working together, it is important to have a representative for the team who will be responsible for communication between teams to ensure consistency and compatibility between design decisions for the project.
-\item Meeting Leader: Responsible for facilitating the weekly meetings between team members. 
-Ensures that team meetings happen consistently and that team members are up to date with deliverables.
-\item Note Taker: Responsible for taking notes summarizing key points from every meeting, including team meetings and supervising meetings. 
-This member is also responsible for creating GitHub Issues for every meeting and providing a summary of attendance and key takeaways.
-\item Reviewer: Responsible for final review of any main deliverables before final submission to ensure they align with the course and supervisors’ expectations.
+  \item Team Liason: Main contact point between the team members and the supervisors. 
+  Responsible for sending emails for communication between the team and supervisors as well as scheduling and leading the weekly sync meetings.
+  \item Web UI/UX Developer (Admin Portal): Responsible for frontend design and development of the admin web portal.
+  \item Software Tester (Web): Handles software testing of the web portal logic and UI.
 \end{itemize}
-\end{left}
+
+\subsection{Ibrahim Quraishi}
+\begin{itemize}
+  \item Inter-Team Liason: Responsible for communication between capstone teams. 
+  Since this project is a sub-component of a larger system for the MES with multiple teams working together, it is important to have a representative for the team who will be responsible for communication between teams to ensure consistency and compatibility between design decisions for the project.
+  \item Full Stack Developer (Mobile): Responsible for development of frontend to backend connections for the end-user mobile application.
+  \item Software Tester (Backend): Handles unit and integration testing of backend services.
+\end{itemize}
+
+\subsection{Virochaan Ravichandran Gowri}
+\begin{itemize}
+  \item Meeting Leader: Responsible for facilitating the weekly meetings between team members. 
+  Ensures that team meetings happen consistently and that team members are up to date with deliverables.
+  \item Full Stack Developer (Web): Responsible for development of frontend to backend connections for the admin web portal.
+  \item DevOps/Project Manager: Updated and manages the GitHub Project and GitHub Actions workflows
+\end{itemize}
+
+\subsection{Omar Al-Asfar}
+\begin{itemize}
+  \item Reviewer: Responsible for final review of any main deliverables before final submission to ensure they align with the course and supervisors’ expectations.
+  \item Mobile UI/UX Developer: Responsible for frontend design and development of the end-user mobile application.
+  \item Software Tester (Mobile): Handles software testing of the mobile application logic and UI.
+\end{itemize}
+
+\subsection{Mohammad Mahdi Mahboob}
+\begin{itemize}
+  \item Note Taker: Responsible for taking notes summarizing key points from every meeting, including team meetings and supervising meetings. 
+  This member is also responsible for creating GitHub Issues for every meeting and providing a summary of attendance and key takeaways.
+  \item Backend Developer: Responsible for development of the backend server for the admin web portal and end-user mobile application.
+  \item Database Designer: Responsible for design for structure of database tables and relations
+\end{itemize}
+\end{flushleft}
 
 \section{Workflow Plan}
 
+% \begin{itemize}
+% 	\item How will you be using git, including branches, pull request, etc.?
+% 	\item How will you be managing issues, including template issues, issue
+% 	classification, etc.?
+%   \item Use of CI/CD
+% \end{itemize}
+The repository will have two primary branches, one for development and of for documentation, responsible for technical development and software documentation respectively.
+\\\\
+The average workflow will be as follows: \\
 \begin{itemize}
-	\item How will you be using git, including branches, pull request, etc.?
-	\item How will you be managing issues, including template issues, issue
-	classification, etc.?
-  \item Use of CI/CD
+  \item Pull changes from primary branch depending on the task at hand
+  \item Create an issue for the assigned task if one does not already exist
+  \item Create a new branch with the naming convention of: [assigned task - name of contributor]
+  \begin{itemize}
+    \item If it is a new task, create a branch direcly under the primary
+    \item If it is a follow up/subtask, create a sub-working branch branch from previous branch
+  \end{itemize}
+  \item Commit changes with detailed message
+  \item Create unit tests for changes
+  \item Open a pull request to the primary branch
+  \item Link issue to pull request
+  \item Wait for approval from other members and for testing to pass
+  \item Merge pull request
 \end{itemize}
+
+Issues will be managed through GitHub Issues. Through GitHub Project boards, issues will be linked to notable meetings and milestones, and classified into categories: Meetings, To Do, In Progress, and Done. Each issue will be assigned to the relevant team members, who can provide feedback, report errors, and organize tasks. Issues will be tagged with distinct labels to indicate their priority, timeline, and type (e.g., bug, feature, documentation).
+\\
+
 
 \section{Project Decomposition and Scheduling}
 
+% \begin{itemize}
+%   \item How will you be using GitHub projects?
+%   \item Include a link to your GitHub project
+% \end{itemize}
+
+% \wss{How will the project be scheduled?  This is the big picture schedule, not
+% details. You will need to reproduce information that is in the course outline
+% for deadlines.}
+
+The project is hosted on GitHub at the following link: \url{}
+\\
+A Kanban Board project setup is currently being used to track the progress of the project. The board is divided into four columns: Meeting, To Do, In Progress, and Done. Each task is represented as a card that can be moved across the columns as it progresses through different stages of completion. This visual representation allows team members to easily see the status of each task and identify any bottlenecks in the workflow.
+\\\\
+The cards can pertain to:
 \begin{itemize}
-  \item How will you be using GitHub projects?
-  \item Include a link to your GitHub project
+  \item Lectures
+  \item Group and Supervisor Meetings
+  \item Project Milestones
 \end{itemize}
 
-\wss{How will the project be scheduled?  This is the big picture schedule, not
-details. You will need to reproduce information that is in the course outline
-for deadlines.}
+The project is scheduled to be completed over the course of two semesters. However, we aim to have a working prototype by January to be tested across various events, including the Fireball Formal, and CALE Conference.
+\\
+\begin{center}
+  \begin{tabular}{ |c|c| }
+  \hline
+  Deliverable & Due Date \\
+  \hline
+  Problem Statement and Goals, and Development Plan & Week 4 \\ 
+  Requirements Documentation and Hazard Analysis (Revision 0) & Week 6  \\  
+  Verification and Validation Plan (Revision 0) & Week 8 \\
+  Proof of Concept Report & Week 9 \\
+  Design Document (Revision 0) & Week 10 \\
+  Proof of Concept demos & Week 11 \\
+  Functional Prototype & January \\
+  \hline
+  \end{tabular}
+\end{center}
 
 \section{Proof of Concept Demonstration Plan}
 
+\begin{comment}
 What is the main risk, or risks, for the success of your project?  What will you
 demonstrate during your proof of concept demonstration to convince yourself that
 you will be able to overcome this risk?
 
+Identify the risks + I.e some difficult features. What are we gonna do about these risks.  Talk about division of labour. 
+\end{comment}
+
+The main challenges we foresee for this project are creating the form builder
+and integrating user-side and admin-side interfaces for the application. The
+form-builder needs to be modular and track all data against a user to perform
+analytics in order to minimize redundancy and improve user experience. The
+interface integration is also challenging because they demand an entirely
+different set of features for the client, yet they must interact with the same
+underlying system.
+\\
+To get a working proof-of-concept, we expect to demonstrate a simplified interface
+with at least singular interactions from either endpoints which can communicate
+correctly with the underlying database. If the database is correctly and
+efficiently track all data, then we can expect that the final product can be
+developed with confidence.
+
 \section{Expected Technology}
 
-\begin{left}
+\begin{flushleft}
 At the request of the supervisor, the following tools and technologies must be used for development of the project to ensure compatibility and seamless integration between capstone teams.
 \begin{itemize}
     \item JavaScript, and HTML/CSS shall be used in development of the frontend for both the web-based admin portal, and the user mobile application. 
@@ -133,9 +259,10 @@ Additionally, the following programming languages, frameworks and libraries are 
 \begin{itemize}
     \item JavaScript along with Node.js may be used in development of the backend server for both the web portal and mobile application. 
     Additionally, Node.js modules such as node-postgres may be used to communicate with the database.
-    \item A styling library/framework such as Tailwind or Bootstrap may be used to simplify UI styling
+    \item A styling library/framework such as Tailwind or Bootstrap may be used to simplify UI styling.
+    \item Figma will be used for design and mockups of the mobile and web application UIs.
     \item A REST API will be used for communication between the frontend applications and the backend server. 
-    The default Fetch API provided within React and React Native may be used on the frontend, along with Node.js modules such as Express to handle requests on the backend server
+    The default Fetch API provided within React and React Native may be used on the frontend, along with Node.js modules such as Express to handle requests on the backend server.
     \item Jest will be used as the primary unit testing framework for testing both the frontend and backend code with JavaScript, including unit testing and code coverage. 
     Additionally, the React Testing Library may be used to test frontend components.
     \item A linter such as Prettier will be used to ensure the source code adheres to a specific standard.
@@ -144,12 +271,13 @@ Additionally, the following programming languages, frameworks and libraries are 
 GitHub will be used as the project repository for documentation, project planning and administration, and source code management.
 \begin{itemize}
     \item A GitHub Issue will be created for each attended lecture, tutorial, and team meeting outlining attendance, and key takeaways. 
-    \item A GitHub Issue will be created for each course deliverable, such as documentation, and code submissions
-    \item GitHub Projects will be used to host a Kanban Board of all GitHub Issues and their status
-    \item GitHub Actions will be used as the main CI platform. CI will be used to maintain code styling requirements and perform regression tests on pull requests before they can be merged. Additionally, GitHub actions may be used build and deploy source code into a staging environment.
+    \item A GitHub Issue will be created for each course deliverable, such as documentation, and code submissions.
+    \item GitHub Projects will be used to host a Kanban Board of all GitHub Issues and their status.
+    \item GitHub Actions will be used as the main CI platform. CI will be used to maintain code styling requirements and perform regression tests on pull requests before they can be merged. 
+    Additionally, GitHub Actions may be used build and deploy source code into a staging environment.
     \item Git will be used as the source code management platform for making code changes. The specific development environment in which these changes are made, such as the IDE, are subject to the preferences of the team members.
 \end{itemize}
-\end{left}
+\end{flushleft}
 
 \section{Coding Standard}
 
@@ -158,8 +286,6 @@ GitHub will be used as the project repository for documentation, project plannin
 \newpage{}
 
 \section*{Appendix --- Reflection}
-
-\wss{Not required for CAS 741}
 
 \input{../Reflection.tex}
 
@@ -176,43 +302,57 @@ GitHub will be used as the project repository for documentation, project plannin
 
 \section*{Appendix --- Team Charter}
 
-\wss{borrows from
-\href{https://engineering.up.edu/industry_partnerships/files/team-charter.pdf}
-{University of Portland Team Charter}}
+% \wss{borrows from
+% \href{https://engineering.up.edu/industry_partnerships/files/team-charter.pdf}
+% {University of Portland Team Charter}}
 
 \subsection*{External Goals}
 
-\wss{What are your team's external goals for this project? These are not the
-goals related to the functionality or quality fo the project.  These are the
-goals on what the team wishes to achieve with the project.  Potential goals are
-to win a prize at the Capstone EXPO, or to have something to talk about in
-interviews, or to get an A+, etc.}
+% \wss{What are your team's external goals for this project? These are not the
+% goals related to the functionality or quality fo the project.  These are the
+% goals on what the team wishes to achieve with the project.  Potential goals are
+% to win a prize at the Capstone EXPO, or to have something to talk about in
+% interviews, or to get an A+, etc.}
+The primary goal of our team is to create a convenient and reliable solution that we can apply to adress a real-world problem. The team aims to have the project used in real MSE events, and potentially even by McMaster as a whole in the future. At the same time, the team aims to achieve an A+ in the course, and have it serve as a valuable talking point in future interviews. Finally, we intend to have fun while developing new skills that will be useful in our future careers.
 
 \subsection*{Attendance}
 
 \subsubsection*{Expectations}
 
-\wss{What are your team's expectations regarding meeting attendance (being on
-time, leaving early, missing meetings, etc.)?}
+% \wss{What are your team's expectations regarding meeting attendance (being on
+% time, leaving early, missing meetings, etc.)?}
+Our team expects all members to attend all scheduled meetings on time, and remain for the entire duration. In cases where a member is unable to attend, they are expected to inform the team well in advance with justification, so we can reschedule if possible or proceed accordingly. If a member plans to leave a meeting early, they should notify the team by the beginning of the meeting at the latest, so we can adjust the agenda if necessary. Continous unexcused absences will not be tolerated, and will be addressed by the team.
 
 \subsubsection*{Acceptable Excuse}
 
-\wss{What constitutes an acceptable excuse for missing a meeting or a deadline?
-What types of excuses will not be considered acceptable?}
+% \wss{What constitutes an acceptable excuse for missing a meeting or a deadline?
+% What types of excuses will not be considered acceptable?}
+Acceptable excuses for missing a meeting or deadline includes severe illness, family emergencies, or significant accidents. These constitute cases where missing a meeting unannounced is understandable. Other excuses, such as unavoidable commitments are only acceptable given that the member gave prompt notice. \\\\
+Unacceptable excuses generally includes any avoidable or last-minute situations. For example, forgetting about the meeting or deadline, oversleeping, or prioritizing other work over this project.
 
 \subsubsection*{In Case of Emergency}
 
-\wss{What process will team members follow if they have an emergency and cannot
-attend a team meeting or complete their individual work promised for a team
-deliverable?}
+% \wss{What process will team members follow if they have an emergency and cannot
+% attend a team meeting or complete their individual work promised for a team
+% deliverable?}
+In case of an emergency, the team member should inform the team as soon as possible, ideally before the meeting or deadline. After discussing the situation, the team will determine how to act:
+\begin{itemize}
+  \item In the event of a missed meeting, the team will reschedule or proceed without them.
+  \item In the event of being unable to complete their part of a deliverable, the team will then discuss how to redistribute tasks to accommodate the absence. If the work is unable to be completed by the others on time, the member should inform the course instructor and request relief.
+\end{itemize}
 
 \subsection*{Accountability and Teamwork}
 
 \subsubsection*{Quality} 
 
-\wss{What are your team's expectations regarding the quality
-of team members' preparation for team meetings and the quality of the
-deliverables that members bring to the team?}
+% \wss{What are your team's expectations regarding the quality
+% of team members' preparation for team meetings and the quality of the
+% deliverables that members bring to the team?}
+Our team's quality expectations are as follows:
+\begin{itemize}
+  \item Meetings: \\All members are expected to do their due diligence and prepare for future meetings as discussed in the piror ones. This may include reviewing/studying material, completing milestones, and preparing resources necessary for discussion. Everyone is expected to have an understanding of the current state of the project in order to contribute meaningfully to discussions.
+  \item Deliverables: \\All members are expected to complete their part of deliverables to the best of their ability. Members are expected to adhere to predetermined guidelines and standards. If a member is struggling or unconfident in their part, they are expected to communicate this to the team as soon as possible. Upon completion, all members are expected to thoroughly review the deliverable for quality before submission, and especially focus on areas that were highlighted for improvement. All feedback will be respectful but honest, and all members are expected to take constructive criticism professionaly.
+\end{itemize}
 
 \subsubsection*{Attitude}
 
@@ -239,11 +379,13 @@ their TA, or the instructor?  Are there incentives for reaching targets early?}
 
 \subsubsection*{Team Building}
 
-\wss{How will you build team cohesion (fun time, group rituals, etc.)? }
+% \wss{How will you build team cohesion (fun time, group rituals, etc.)? }
+To ensure team cohesion, we have decided to set up a Discord server for casual communication outside of meetings. We will also meet in person at least once a week in some manner, from attending lectures and events to simply meeting up for food. Finally, we will celebrate all milestones and achievements, no matter how small to boost team morale and motivation.
 
 \subsubsection*{Decision Making} 
 
-\wss{How will you make decisions in your group? Consensus?  Vote? How will you
-handle disagreements? }
+% \wss{How will you make decisions in your group? Consensus?  Vote? How will you
+% handle disagreements? }
+Decisions will be made in our group by consensus whenever possible. A conclusion everyone agrees on is important to ensure all members are motivated to invest time and effort into the project. If a consensus cannot be reached, the differing opinons will initially justify their decision and attempt to convince the others. If that does not work, a majority vote will be held.\\\\ Disagreements will be handled through open discussion. All members will have equal opportunity to voice their opinoins, and will remain calm and respectful. The priority will be given to the project goals outlined at the beginning of the course as opposed to personal feelings. If necessary, a neutral third party may be consulted to help mediate and resolve conflicts.
 
 \end{document}
