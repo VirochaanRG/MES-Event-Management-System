@@ -22,7 +22,9 @@
 \toprule
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
-September 21, 2025 & Ibrahim, Mohammad, Omar & Revision 0 \\
+September 22, 2025 & Ibrahim, Mahboob, Omar & Creation of revision 0\\
+September 22, 2025 & Virochaan, Ibrahim & Reflection and Review\\
+... & ... & ...\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -33,8 +35,8 @@ This document will outline the development plan for \textbf{\teamname}:
 handling of confidential information; IP protection and copyright licensing;
 team roles, collaboration, and organization guidelines; project development
 guidelines; project workflow and version control guidelines; and expected
-programming tools, technologies, and standards.
-\\
+programming tools, technologies, and standards.\\
+
 This project will be conducted in collaboration with two other Capstone teams
 to create one large unified product, and as such, the contents in these
 sections are subject to change based on updated requirements from the project
@@ -48,10 +50,8 @@ teams.
 \end{comment}
 
 \section{Confidential Information?}
-
 \begin{flushleft}
-The project will deal with information confidential to the McMaster Engineering Society (MES) and the Canadian Federation of Engineering Students (CFES). 
-This information includes program generated analytics and financial reports for events hosted by the MES through the proposed system, and results from surveys conducted by the CFES.
+This project is not expected to deal with any information confidential to the McMaster Engineering Society. 
 \end{flushleft}
 
 \section{IP to Protect}
@@ -76,7 +76,6 @@ This project will use the GNU General Public License version 3 (GPLv3). The
 license can be found \href{https://github.com/VirochaanRG/MES-Event-Management-System/blob/main/LICENSE}{here}.
 
 \section{Team Meeting Plan}
-
 \begin{flushleft}
 The members of the team are expected to meet at least once weekly virtually through Microsoft Teams. 
 The purpose of these meetings is to provide updates on current work, plan accordingly for submission of deliverables, discuss next steps, and distribute tasks among team members. 
@@ -105,17 +104,45 @@ If there are no significant updates within the week before the meeting (i.e. dur
 \section{Team Member Roles}
 
 \begin{flushleft}
-The following administrative roles will be assigned to team members:
+The following administrative and technical roles will be assigned to team members:
+
+\subsection{Rayyan Suhail}
 \begin{itemize}
-\item Team Liason: Main contact point between the team members and the supervisors. 
-This member is responsible for sending emails for communication between the team and supervisors as well as scheduling and leading the weekly sync meetings.
-\item Inter-Team Liason: Responsible for communication between capstone teams. 
-Since this project is a sub-component of a larger system for the MES with multiple teams working together, it is important to have a representative for the team who will be responsible for communication between teams to ensure consistency and compatibility between design decisions for the project.
-\item Meeting Leader: Responsible for facilitating the weekly meetings between team members. 
-Ensures that team meetings happen consistently and that team members are up to date with deliverables.
-\item Note Taker: Responsible for taking notes summarizing key points from every meeting, including team meetings and supervising meetings. 
-This member is also responsible for creating GitHub Issues for every meeting and providing a summary of attendance and key takeaways.
-\item Reviewer: Responsible for final review of any main deliverables before final submission to ensure they align with the course and supervisors’ expectations.
+  \item Team Liason: Main contact point between the team members and the supervisors. 
+  Responsible for sending emails for communication between the team and supervisors as well as scheduling and leading the weekly sync meetings.
+  \item Web UI/UX Developer (Admin Portal): Responsible for frontend design and development of the admin web portal.
+  \item Software Tester (Web): Handles software testing of the web portal logic and UI.
+\end{itemize}
+
+\subsection{Ibrahim Quraishi}
+\begin{itemize}
+  \item Inter-Team Liason: Responsible for communication between capstone teams. 
+  Since this project is a sub-component of a larger system for the MES with multiple teams working together, it is important to have a representative for the team who will be responsible for communication between teams to ensure consistency and compatibility between design decisions for the project.
+  \item Full Stack Developer (Mobile): Responsible for development of frontend to backend connections for the end-user mobile application.
+  \item Software Tester (Backend): Handles unit and integration testing of backend services.
+\end{itemize}
+
+\subsection{Virochaan Ravichandran Gowri}
+\begin{itemize}
+  \item Meeting Leader: Responsible for facilitating the weekly meetings between team members. 
+  Ensures that team meetings happen consistently and that team members are up to date with deliverables.
+  \item Full Stack Developer (Web): Responsible for development of frontend to backend connections for the admin web portal.
+  \item DevOps/Project Manager: Updated and manages the GitHub Project and GitHub Actions workflows
+\end{itemize}
+
+\subsection{Omar Al-Asfar}
+\begin{itemize}
+  \item Reviewer: Responsible for final review of any main deliverables before final submission to ensure they align with the course and supervisors’ expectations.
+  \item Mobile UI/UX Developer: Responsible for frontend design and development of the end-user mobile application.
+  \item Software Tester (Mobile): Handles software testing of the mobile application logic and UI.
+\end{itemize}
+
+\subsection{Mohammad Mahdi Mahboob}
+\begin{itemize}
+  \item Note Taker: Responsible for taking notes summarizing key points from every meeting, including team meetings and supervising meetings. 
+  This member is also responsible for creating GitHub Issues for every meeting and providing a summary of attendance and key takeaways.
+  \item Backend Developer: Responsible for development of the backend server for the admin web portal and end-user mobile application.
+  \item Database Designer: Responsible for design for structure of database tables and relations
 \end{itemize}
 \end{flushleft}
 
@@ -161,7 +188,7 @@ Issues will be managed through GitHub Issues. Through GitHub Project boards, iss
 % details. You will need to reproduce information that is in the course outline
 % for deadlines.}
 
-The project is hosted on GitHub at the following link: \url{}
+The project is hosted on GitHub at the following link: \url{https://github.com/users/VirochaanRG/projects/4}
 \\
 A Kanban Board project setup is currently being used to track the progress of the project. The board is divided into four columns: Meeting, To Do, In Progress, and Done. Each task is represented as a card that can be moved across the columns as it progresses through different stages of completion. This visual representation allows team members to easily see the status of each task and identify any bottlenecks in the workflow.
 \\\\
@@ -191,15 +218,8 @@ The project is scheduled to be completed over the course of two semesters. Howev
 \end{center}
 
 \section{Proof of Concept Demonstration Plan}
-
-\begin{comment}
-What is the main risk, or risks, for the success of your project?  What will you
-demonstrate during your proof of concept demonstration to convince yourself that
-you will be able to overcome this risk?
-
-Identify the risks + I.e some difficult features. What are we gonna do about these risks.  Talk about division of labour. 
-\end{comment}
-
+\begin{flushleft}
+  
 The main challenges we foresee for this project are creating the form builder
 and integrating user-side and admin-side interfaces for the application. The
 form-builder needs to be modular and track all data against a user to perform
@@ -207,12 +227,39 @@ analytics in order to minimize redundancy and improve user experience. The
 interface integration is also challenging because they demand an entirely
 different set of features for the client, yet they must interact with the same
 underlying system.
-\\
-To get a working proof-of-concept, we expect to demonstrate a simplified interface
-with at least singular interactions from either endpoints which can communicate
-correctly with the underlying database. If the database is correctly and
-efficiently track all data, then we can expect that the final product can be
-developed with confidence.
+  \newline
+  \newline
+The following are some significant risks we expect to encounter during development.
+\begin{enumerate}
+  \item \textbf{Implementation of Branching Logic} \\
+  We expect that the hardest part of the implementation for the custom form builder will be development of some sort of branching logic based on form answers. During development, we risk implementing this feature with too mcuh simplicity that does not meet the needs of the MES, or making the implementation too complicated and difficult to understand.
+  \newline
+  \newline
+  To mitigate this risk, we can study existing form building software that implements this functionality to gather ideas of how it should be implemented, as well as study previous forms created by the MES to gauge the required complexity and depth of the feature.
+  \item \textbf{Frontend and Backend Integration} \\
+  Our system is composed of many different subsystems, including the admin mobile and/or web application, end user web and/or mobile application, the backend server, and the database. A large volume of data such as user information, custom forms, user submissions, and analytical data will need to passed between multple subsystems. Due to this, there is a significant risk of data loss and innacuracies between each system.
+  \newline
+  \newline
+  To mitigate the risk, it is imperative that features that require development on two or more subsystems are completed as soon as possible, and that work on each subsystem is done simultaneously. This ensures that integration between systems can be completed as quickly as possible and that developers are on the same page when developing features that require integration. This allows more time to be alloted towards testing said features and earlier detection of integration issues.
+  \item \textbf{Application Scalability} \\
+  Our system will be required to deal with a large volume of data and simultaneous users. During development, we will likely only have the capacity to test the system with a few users and much smaller volume of data. Due to this, we risk our project not being scalable to the capacity required by the MES.
+  \newline
+  \newline
+  To mitigate this risk, we should follow and conduct research on scalable practices including but not limited to breaking the system into smaller and more maintainable services and using libraries or services with built in scalability.
+\end{enumerate}
+
+Some smaller risks associated with the project are as follows.
+
+\begin{enumerate}
+  \item \textbf{Integration Between Capstone Teams} 
+  Since our project is part of a larger system being developed by multiple capstone teams, we have been asked to work with other teams to integrate our solutions into one application. There are a lot of risks involved with working with so many independent developers on a larger project such as incompatibilities between systems or miscommunication between teams.
+  \newline
+  \newline
+  We can mitigate this risk by assigning an inter-team communications lead, who will stay in contact with other teams to ensure developers are on the same page.
+  
+\end{enumerate}
+
+\end{flushleft}
 
 \section{Expected Technology}
 
@@ -228,43 +275,97 @@ Additionally, the following programming languages, frameworks and libraries are 
 \begin{itemize}
     \item JavaScript along with Node.js may be used in development of the backend server for both the web portal and mobile application. 
     Additionally, Node.js modules such as node-postgres may be used to communicate with the database.
-    \item A styling library/framework such as Tailwind or Bootstrap may be used to simplify UI styling
+    \item A styling library/framework such as Tailwind or Bootstrap may be used to simplify UI styling.
+    \item Figma will be used for design and mockups of the mobile and web application UIs.
     \item A REST API will be used for communication between the frontend applications and the backend server. 
-    The default Fetch API provided within React and React Native may be used on the frontend, along with Node.js modules such as Express to handle requests on the backend server
+    The default Fetch API provided within React and React Native may be used on the frontend, along with Node.js modules such as Express to handle requests on the backend server.
     \item Jest will be used as the primary unit testing framework for testing both the frontend and backend code with JavaScript, including unit testing and code coverage. 
     Additionally, the React Testing Library may be used to test frontend components.
     \item A linter such as Prettier will be used to ensure the source code adheres to a specific standard.
 \end{itemize}
 
-GitHub will be used as the project repository for documentation, project planning and administration, and source code management.
+GitHub will be used as the project repository for documentation, project planning and administration, and source code management. The repository can be found here: \url{https://github.com/VirochaanRG/MES-Event-Management-System}.
 \begin{itemize}
     \item A GitHub Issue will be created for each attended lecture, tutorial, and team meeting outlining attendance, and key takeaways. 
-    \item A GitHub Issue will be created for each course deliverable, such as documentation, and code submissions
-    \item GitHub Projects will be used to host a Kanban Board of all GitHub Issues and their status
-    \item GitHub Actions will be used as the main CI platform. CI will be used to maintain code styling requirements and perform regression tests on pull requests before they can be merged. Additionally, GitHub actions may be used build and deploy source code into a staging environment.
+    \item A GitHub Issue will be created for each course deliverable, such as documentation, and code submissions.
+    \item GitHub Projects will be used to host a Kanban Board of all GitHub Issues and their status.
+    \item GitHub Actions will be used as the main CI platform. CI will be used to maintain code styling requirements and perform regression tests on pull requests before they can be merged. 
+    Additionally, GitHub Actions may be used build and deploy source code into a staging environment.
     \item Git will be used as the source code management platform for making code changes. The specific development environment in which these changes are made, such as the IDE, are subject to the preferences of the team members.
 \end{itemize}
 \end{flushleft}
 
 \section{Coding Standard}
 
-\wss{What coding standard will you adopt?}
+The source code for the project will be subject to the following standards.
+
+\subsection{Language Style}
+
+The \href{https://github.com/airbnb/javascript}{Airbnb JavaScript Style Guide} and \href{https://github.com/airbnb/javascript/tree/master/react}{Airbnb React/JSX Style Guide} will be used as the main styling convention for JavaScript code, as it is one of the most widely used styling conventions. This styling guide can be integrated into the CI/CD pipeline via ESLint and GitHub applications
+
+\subsection{Git Standards} 
+
+The following branching model should be used when commiting to the repository.
+\begin{itemize}
+  \item main branch: production ready code
+  \item Feature/Deliverable branch: Code for each new feature/deliverable being completed
+\end{itemize}
+
+Any code changes should be made under a sub-branch under the appropriate feature/deliverable branch and should only be merged in via a pull request containing a description of what was changes and why. Once a feature is complete, a final pull request requiring all members of the team to review should be made before pulling into main.
+\newline\newline
+A Git worktree should be used for the main branch and each feature/deliverable branch being worked on. This is to avoid constant switching of branches when pulling new changes and code stashes.
 
 \newpage{}
 
 \section*{Appendix --- Reflection}
 
-\input{../Reflection.tex}
-
+\subsubsection*{Virochaan Ravichandran Gowri's Reflection: }
 \begin{enumerate}
-    \item Why is it important to create a development plan prior to starting the
-    project?
-    \item In your opinion, what are the advantages and disadvantages of using
-    CI/CD?
-    \item What disagreements did your group have in this deliverable, if any,
-    and how did you resolve them?
+    \item \textbf{Why is it important to create a development plan prior to starting the
+    project?} \\ 
+    Creating a development plan prior to starting the project is important because it provides us with a structured roadmap of how we can deliver this project. By including deadlines as well as roles and responsibilities we are ensuring we have certain guidelines on how best to work as a group together and when be begin the technical parts of our project we have a general understanding of the components we are going to work on. Also by defining meeting communication structures we can ensure that our group understands their responsibilities to each other and if/when issues crop up, we are well equipped to deal with them. Finally we also including some Project Management and workflow considerations in this plan. This will be crucial when we start developing the project to ensure we don't end up conflicting with one another and actually keep a good track of the work being done. By having all of this defined at the start of the project we are able to work efficiently and have documentation to fall upon if we get stuck during the development of the project.
+    \item \textbf{In your opinion, what are the advantages and disadvantages of using CI/CD?} \\
+    By using CI/CD primarily through Gitub Actions we gain many benefits throguh automatic QA and easier integration. We can easily compile files and create workflows for testing different components and including linting that ensures that we maintain a high code quality. Through this system we can ensure that even if multiple developers are working on the code the system will remain stable as changes will only be implemented if they pass through the workflows without errors. The main disadvantages are that there could be a learning curve to understanding this new technology as sometimes it can not be the most intuitive. There is also extra effort required in creating and maintaining the workflows as well as debugging the failed builds to understand what went wrong. Overall if used effectively CI/CD can be a powerful tool that can help us work better as a group and ensure we have a stable development platform.
 \end{enumerate}
 
+\subsubsection*{Omar Al-Asfar's Reflection: }
+\begin{enumerate}
+    \item \textbf{Why is it important to create a development plan prior to starting the project?} \\ 
+    Creating a development plan prior to starting a project is crucial in defining structure and direction. This allows us to establish clear goals, roles, timelines, and milestones prior to working on the technical aspects of the project. It helps in aligning expectations and ensures that everyone is on the same page. This allows the team to stay organized, and divide responsibilities more effectively based on respective skill sets. Moreover, it helps in highlighting potential areas of concern which may not be as clear during brainstorming. Overall, a development plan acts as a guideline, enabling clear direction from the early stages of the project, while also serving as a reference point to revisit during confusion to remain on track.
+    \item \textbf{In your opinion, what are the advantages and disadvantages of using CI/CD?} \\
+    The primary advantage of CI/CD is that it streamlines the integration and deployment process. By automating testing, building, and deployment, it ensures that code changes are consistently validated, making it possible to discover and address issues quickly. In similarly collaborative environemnts, it allows for mulitple people to work on the same code with seamless integration, resulting in a more efficient workflow. At the same time, there are also some disadvantages to consider, mainly in the complexity involved. Setting it up can be very time-consuming and confusing for new users, or with complex projects. The time spent on maintaing the pipeline may be better spent on other taks for smaller scale projects.
+\end{enumerate}
+
+\subsubsection*{Ibrahim Quraishi}
+\begin{enumerate}
+    \item \textbf{Why is it important to create a development plan prior to starting the
+    project?}\\
+
+    It is important to create a development plan prior to starting the project so that the developers can set an agreed upon starting point for the project. If there are no rules or expectations set in place before beginning development, it will be extremely difficult to build up the momentum to get the project into a stable workflow due to disalignment between developer preferences stemming from disagreements or miscommunication. By having a solid development plan prior to starting the project, everyone will have an idea of where to start, what skills they are expected to have, and how to build onto that starting point.
+
+    \item \textbf{In your opinion, what are the advantages and disadvantages of using
+    CI/CD?}\\
+
+    Using CI/CD in a project provides several advantages, as it automates alot of monotonous work that would typically require a dedicated person to take on that role. For example, CI/CD can automate integration and regression testing, automate compilation and deployment of the software, and provide code analysis and style checking. Some disadvantage of CI/CD is that it may take alot of time and resources to setup initially, and also slows down the development process by requiring developers to wait for the CI/CD pipeline to complete for every small change they make.
+\end{enumerate}
+
+\subsubsection*{Rayyan Suhail}
+\begin{enumerate}
+    \item \textbf{Why is it important to create a development plan prior to starting the
+    project?}\\
+
+    Before starting a project, a development plan gives direction and structure. Without it, it's common for team members to misunderstand priorities. A plan makes it clear who is in charge of what and helps divide the work into manageable steps with reasonable deadlines. It also makes it simpler to make adjustments if circumstances change. In my experience, when a project begins without a plan, we typically spend more time figuring out what to do next rather than moving forward.
+
+    \item \textbf{In your opinion, what are the advantages and disadvantages of using
+    CI/CD?}\\
+
+    One of the main advantages of CI/CD, in my opinion, is that it significantly reduces the stress caused by integration. We can constantly test and deploy changes in smaller chunks rather than having to deal with a massive merge at the end, which keeps the project stable and reduces bugs. The disadvantage is that setting up CI/CD requires time and work, particularly in the beginning when you want to test something quickly. However, because it allows for collaboration and minimizes last-minute issues, I believe the advantages outweigh the disadvantages overall.
+\end{enumerate}
+\subsubsection*{Group Reflection: }
+\begin{enumerate}
+  \item \textbf{What disagreements did your group have in this deliverable, if any, and how did you resolve them?} \\ 
+  Our group experienced some minor disagreements during the development of this project primarily on the division and size of the roles and responsibilities and how best to structure the workflows. When discussing the technical roles we were unsure on how granular we wanted to be and how much responsibility we wanted to concentrate in each roles. We ended up splitting up the roles based on the interest of each group member and if they had prior experience. We also made sure that we didn't end up having anyone with too much responsibility as it would be unfair and could prove challenging for that person. We also had a discussion on the different technologies that we could use. Everyone had their own preferences and experiences using different technologies for full-stack development. To resolve this we researched what technology stacks worked best together and also had discussions with the supervisor to get his opinions as he also had a technical background. Then we got together and decided on the best stack for our use case. By having open and constant communication we managed to easily overcome these minor disagreements ensuring that we could have a succesful deliverable and set the standard for the rest of the project.
+\end{enumerate}
 \newpage{}
 
 \section*{Appendix --- Team Charter}
@@ -323,26 +424,55 @@ Our team's quality expectations are as follows:
 
 \subsubsection*{Attitude}
 
-\wss{What are your team's expectations regarding team members' ideas,
-interactions with the team, cooperation, attitudes, and anything else regarding
-team member contributions?  Do you want to introduce a code of conduct?  Do you
-want a conflict resolution plan?  Can adopt existing codes of conduct.}
+% \wss{What are your team's expectations regarding team members' ideas,
+% interactions with the team, cooperation, attitudes, and anything else regarding
+% team member contributions?  Do you want to introduce a code of conduct?  Do you
+% want a conflict resolution plan?  Can adopt existing codes of conduct.}
+Our team expects all members to maintain a positive and respectful attitude. We value open communication, active listening, honesty, and constructive feedback. At our first meeting, we discussed our goals and expectations. We agreed that while we aim for a complex project and a high grade, we also want this experience to be enjoyable. \\\\ 
+We recognize that not all members will feel as motivated or free to work as the rest, and we agreed to be flexible and understanding as long as everyone demonstrates a positive attitude and an honest effort. \\\\ 
+All members are expected to:
+\begin{itemize}
+  \item Contribute ideas in a respectful manner.
+  \item Maintain an open attitude to other opinions.
+  \item Complete work with a level of quality and effort up to the agreed upon standards. 
+  \item Exhibit honesty about challenges so the team can accomodate.
+\end{itemize} 
+In the event of conflicts or disagreements, we will address them through a conflict resolution plan: 
+\begin{itemize}
+  \item Initiate an open and respectful discussion.
+  \item Allow all members to voice their opinions and concerns.
+  \item Remain objective. The focus is on the issue, not the person.
+  \item If consensus can't be reached, a majority vote will be held.
+  \item Everyone will accept the results of the vote.
+  \item If necessary, we will seek the assistance of a neutral third party to help mediate.
+\end{itemize}
 
 \subsubsection*{Stay on Track}
 
-\wss{What methods will be used to keep the team on track? How will your team
-ensure that members contribute as expected to the team and that the team
-performs as expected? How will your team reward members who do well and manage
-members whose performance is below expectations?  What are the consequences for
-someone not contributing their fair share?}
+% \wss{What methods will be used to keep the team on track? How will your team
+% ensure that members contribute as expected to the team and that the team
+% performs as expected? How will your team reward members who do well and manage
+% members whose performance is below expectations?  What are the consequences for
+% someone not contributing their fair share?}
 
-\wss{You may wish to use the project management metrics collected for the TA and
-instructor for this.}
+% \wss{You may wish to use the project management metrics collected for the TA and
+% instructor for this.}
 
-\wss{You can set target metrics for attendance, commits, etc.  What are the
-consequences if someone doesn't hit their targets?  Do they need to bring the
-coffee to the next team meeting?  Does the team need to make an appointment with
-their TA, or the instructor?  Are there incentives for reaching targets early?}
+% \wss{You can set target metrics for attendance, commits, etc.  What are the
+% consequences if someone doesn't hit their targets?  Do they need to bring the
+% coffee to the next team meeting?  Does the team need to make an appointment with
+% their TA, or the instructor?  Are there incentives for reaching targets early?}
+To keep the team on track, we will employ the following methods:
+\begin{itemize}
+  \item Regular Meetings: We will hold weekly meetings to discuss progress, address challenges, and plan next steps. With this, we can ensure everyone is aware of their responsibilities and track progress.
+  \item Clear Roles and Responsibilities: Each member has defined roles and responsibilities, ensuring accountability for specific tasks. The team will aim to divide responsibilties as fairly as possible. 
+  \item Performance Metrics: We will set target metrics for attendance, commits, and task completion. We will use tools like GitHub Issues and Projects to track tasks, deadlines, and progress, making contributions transparent.
+  \item Feedback and Rewards:
+  \begin{itemize}
+    \item Above Expectations: Members who consistently meet or exceed expectations will be recognized by the team and to supervisors. We may also consider small rewards, such as choosing a team activity.
+    \item Below Expectations: Members who consistently fall short of expectations will be addressed privately. If this is a regular occurence, concequences may include being assigned more work, or approaching a TA or instructor.
+  \end{itemize}
+\end{itemize}
 
 \subsubsection*{Team Building}
 
@@ -354,5 +484,4 @@ To ensure team cohesion, we have decided to set up a Discord server for casual c
 % \wss{How will you make decisions in your group? Consensus?  Vote? How will you
 % handle disagreements? }
 Decisions will be made in our group by consensus whenever possible. A conclusion everyone agrees on is important to ensure all members are motivated to invest time and effort into the project. If a consensus cannot be reached, the differing opinons will initially justify their decision and attempt to convince the others. If that does not work, a majority vote will be held.\\\\ Disagreements will be handled through open discussion. All members will have equal opportunity to voice their opinoins, and will remain calm and respectful. The priority will be given to the project goals outlined at the beginning of the course as opposed to personal feelings. If necessary, a neutral third party may be consulted to help mediate and resolve conflicts.
-
 \end{document}

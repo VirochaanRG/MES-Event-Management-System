@@ -25,18 +25,20 @@
 09-18-2025 & Virochaan Ravichandran Gowri & First Rough Draft\\
 09-18-2025 & Rayyan Suhail & First Rough Draft\\
 09-21-2025 & Rayyan Suhail & Goals \& Strech Goals - Rev0\\
-Date2 & Name(s) & Description of changes\\
+09-21-2025 & Virochaan & Review and Reflection\\
 ... & ... & ...\\
 \bottomrule
 \end{tabularx}
 \end{table}
-
+\newpage
 \section{Problem Statement}
 
 \subsection{Problem}
-The Mcmaster Engineering Society (MES) hosts various large events throughout the year such as the Fireball Formal, Graduation Formal, and Pub Nights. Currently, the processes of registration, waiver collection, ticketing, and check-in are managed manually or across multiple platforms, resulting in unnecessary administrative burden for student organizers and a tough process for attendees. MES also makes surveys/forms to gather feedback from events, to aid registration processes and manages nationwide surveys gathering information on the experiences of undergratuate engineering students. These forms can often get very complex due to various branches and conditionals attempting to gain information from certain demographics or categories. Due to this complex nature the survey response rate is very low as many are put of from answering. Furthermore, there is very little data analytics that can be done from the current implementation making it difficult to actually gain information from both surveys and event registrations to improve future events and student experience.
-\\
-This project aims to develop a solution which can centralize the activities of the MES within a single platform with functionality for both admins and users.
+\hspace*{2em} The Mcmaster Engineering Society (MES) hosts various large events throughout the year such as the Fireball Formal, Graduation Formal, and Pub Nights. Currently, the processes of registration, waiver collection, ticketing, and check-in are managed manually or across multiple platforms, resulting in unnecessary administrative burden for student organizers and a tough process for attendees. Also there is no process for saving events and storing event data from past events. This meant that the process must be repeated for each new event which can become repetitive and unnecessary.\\
+\newline
+\hspace*{2em} MES also makes surveys/forms to gather feedback from events, to aid registration processes and manages nationwide surveys gathering information on the experiences of undergratuate engineering students. These forms can often get very complex due to various branches and conditionals attempting to gain information from certain demographics or categories. Designing and maintaining these form year after year can become a tedious process and due to the complex nature of the forms, the survey response rate is very low as many are put off from answering. Furthermore, there is very little data analytics that can be done from the current implementation making it difficult to actually gain information from both surveys and event registrations to improve future events and student experience. \\
+\newline
+\hspace*{2em} This project aims to develop a solution which can centralize the activities of the MES within a single platform with functionality for both admins and users. We will be looking to address the current shortfalls and provide an upgrade upon the current implementation. 
 \subsection{Inputs and Outputs}
 The inputs and outputs have been split into End Users and Admins since the way they interact with the app is very different.\\
 \textbf{Inputs}:
@@ -54,12 +56,12 @@ The inputs and outputs have been split into End Users and Admins since the way t
 \subsection{Stakeholders}
 The main stakeholders currently are:
 \begin{itemize}
-    \item \textbf{Luke Schuurman}: The project supervisor.\newline
-        Luke is a member of the McMaster Engineering Society and has first hand experience planning and hosting events. He will halep in integrating the project with current MES systems and provide us with feedback for improvements. 
+    \item \textbf{Luke Schuurman:} The project supervisor.\newline
+        Luke is a member of the McMaster Engineering Society and has first hand experience planning and hosting events. As the supervisor, he will play a key role in ensuring the project aligns with MES objectives and integrates seamlessly with existing systems. He will also provide feedback and guidance throughout the project.
     \item \textbf{MES Executives and Council Members}\newline
-        Students who will be utilizing the new platform to create events and surveys and use the analytics to help plan for future events.
+    These students are directly responsible for planning and executing MES events. They will be utilizing the new platform to create events and surveys and use the analytics to help plan for future events.
     \item \textbf{McMaster Engineering Students} \newline
-        Students who will be using the platform to register for events and answer surveys.
+    As one of the primary users of the platform, engineering students will interact with it for event registration, ticketing, check-in, and completing surveys. They are looking for a positive user experience and an upgrade on the current MES systems.
 \end{itemize}
 \subsection{Environment}
 The Software Environment will be compatible will all major browsers and will work with all computers that are connected to the internet. The mobile components will work with both IOS and Android environments. For development we will be using Github for CI/CD and for version control. We will be primarily using Visual Studio Code for our development environment and Figma for UI Design and Mockups.
@@ -134,18 +136,16 @@ The primary objective of this project is to create a centralized platform that s
 \section*{Appendix --- Reflection}
 
 
-% \input{../Reflection.tex}
-
-\textbf{Virochaan Ravichandran Gowri Reflection}
+\subsubsection*{Virochaan Ravichandran Gowri Reflection}
 \begin{enumerate}
     \item \textbf{What went well while writing this deliverable? } \\
     The writing of this deliverable went quite well in my opinion. From the original prompt from our supervisor we were able to glean many of the features and goals of the project which we then refined further through internal meetings and meetings with out supervisor. We also worked well to divide up the work equally between this document and the development plan ensuring we kept up to date with one another on the progress of our work. I found that the communication we had with one another 
     \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\ 
-    One part that we struggled with is the claddification of goals between stretch goals and goals as well as providing enough details to our goals. We didn't want to make it too detailed so it would be considered features or requirements but we also wanted to have enough details so that it could still be considered measureable. We gained good insight on this through our TA meeting and he offered us some suggestions on how we could improve our goals to better meet the criteria. We also had some issues in our version control such as using branches but we researched some potential ways to use it and have improved our process for the future deliverables.
+    One part that we struggled with is the classification of goals between stretch goals and goals as well as providing enough details to our goals. We didn't want to make it too detailed so it would be considered features or requirements but we also wanted to have enough details so that it could still be considered measureable. We gained good insight on this through our TA meeting and he offered us some suggestions on how we could improve our goals to better meet the criteria. We also had some issues in our version control such as using branches but we researched some potential ways to use it and have improved our process for the future deliverables.
     
-\end{enumerate}  
+\end{enumerate} 
 
-\textbf{Rayyan Suhail Reflection}
+\subsubsection*{Rayyan Suhail Reflection}
 \begin{enumerate}
     \item \textbf{What went well while writing this deliverable? } \\
     I was able to clearly structure the goals and stretch goals by connecting them directly to the problem statement. Breaking them down into explanation and reasoning made the writing more organized and easier to follow. It also helped me translate the technical details of the project into measurable outcomes, which improved the overall clarity of the deliverable.
@@ -154,7 +154,7 @@ The primary objective of this project is to create a centralized platform that s
     
 \end{enumerate} 
 
-\textbf{Ibrahim Quraishi Reflection}
+\subsection{Ibrahim Quraishi Reflection}
 \begin{enumerate}
     \item \textbf{What went well while writing this deliverable? } \\
     There were not many challenges when creating this document, which is due to the fact that we were provided with a very clear and well documented overview of the project and its features by our supervisor. Because the supervisor had a technical background, it made defining the problem and the goals of the project a lot easier and straightforward. 
@@ -162,7 +162,15 @@ The primary objective of this project is to create a centralized platform that s
     Defining the stakeholders for the project was a bit challenging due to how specific the project is. There were only a few obvious stakeholders we were able to name but it felt like there were a lot more that could have been included but did not feel relevant enough. Eventually we addressed this by thinking about the project in a less McMaster Engineering specific context and more in a general event management context.
 \end{enumerate}
 
-\textbf{Group Reflection:}
+\subsubsection*{Omar Al-Asfar Reflection}
+\begin{enumerate}
+    \item \textbf{What went well while writing this deliverable? } \\
+    This deliverable enabled us to clearly define the problem statement and goals with detailed justification. Whereas before we discussed the technical aspects of the project, with this deliverable we were able to define the project in terms of measurable outcomes, which improved the overall clarity of the idea. In addition, this deliverable served as the foundation of the supervisor meeting, allowing us to ask insighftul questions and learn more about how to meet expectations in the course.
+    \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\ 
+    A major point that we found challenging was defining measurable goals that were feasible considering the project constraints. Some of our goals were too ambitious or broad for the project scope. Moreover, the project supervisor made some changes to the structure and expectations, which only made it more difficult to resolve the ambiguity. This was solved mainly with the supervisor meeting, where we thoroughly dicussed the feasability of our goals, and suggested modifications. Another issue was formatting and complexity of our answers, which was resolved by breaking down the answers into smaller subpoints.
+\end{enumerate} 
+
+\subsubsection*{Group Reflection:}
 \begin{enumerate}
     \item \textbf{How did you and your team adjust the scope of your goals to ensure they are suitable for a Capstone project (not overly ambitious but also of appropriate complexity for a senior design project)?} \\
     We ensured that before the project started we understood the skillsets of each of the members in our group. We talked about the experience we had through both personal projects and in our co-op experiences. From this we decided upon a project that we all felt comfortable with accomplishing. Once a project was decided we realized that this project could become massive as there was endless features that we could add and build upon and there was natural room for expansion. Though we were excited about the potential we had to ensure that we tempered our expectations and did not get to carried away. To limit our scope we discussed with out supervisor what they valued the most and what features he considered essential. From this we developed our goals which would accomplish this while maintaining a scope that was actually feasible within the timeframe. 
