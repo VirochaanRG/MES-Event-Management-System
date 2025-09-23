@@ -1,4 +1,4 @@
-= {project-title}: Requirements Standard Plan
+= {project-title}: SRS Document
 include::metadata.adoc[]
 :revdate: {docdate}
 :sectlinks:
