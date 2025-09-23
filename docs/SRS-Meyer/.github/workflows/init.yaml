@@ -1,0 +1,704 @@
+name: Initialize project tracking
+
+on:
+  - fork
+  - workflow_dispatch
+
+permissions:
+  issues:   write
+  contents: read
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  # Fall 2025 deadlines for milestones (23:59 Toronto --> 03:59 UTC)
+  M1_DUE:    "2025-10-13T03:59:59.0Z"
+  M2_DUE:    "2025-11-10T03:59:59.0Z"
+  FINAL_DUE: "2025-12-05T03:59:59.0Z"
+  
+jobs:
+
+  init-milestones:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Milestone 1
+        run: |
+          MILESTONE_TITLE="Milestone 1"
+          EXISTS=$(gh api repos/${{ github.repository }}/milestones --jq ".[] | select(.title==\"$MILESTONE_TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            gh api \
+              repos/${{ github.repository }}/milestones \
+              -f title="$MILESTONE_TITLE" \
+              -f state="open" \
+              -f description="First Window of Opportunity for feedback" \
+              -f due_on="${{ env.M1_DUE }}"
+          else
+            echo "Milestone '$MILESTONE_TITLE' already exists (#$EXISTS)"
+          fi
+
+      - name: Create Milestone 2
+        run: |
+          MILESTONE_TITLE="Milestone 2"
+          EXISTS=$(gh api repos/${{ github.repository }}/milestones --jq ".[] | select(.title==\"$MILESTONE_TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            gh api \
+              repos/${{ github.repository }}/milestones \
+              -f title="$MILESTONE_TITLE" \
+              -f state="open" \
+              -f description="Second Window of Opportunity for feedback" \
+              -f due_on="${{ env.M1_DUE }}"
+          else
+            echo "Milestone '$MILESTONE_TITLE' already exists (#$EXISTS)"
+          fi
+
+      - name: Create Milestone 3
+        run: |
+          MILESTONE_TITLE="Milestone 3 - Final"
+          EXISTS=$(gh api repos/${{ github.repository }}/milestones --jq ".[] | select(.title==\"$MILESTONE_TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            gh api \
+              repos/${{ github.repository }}/milestones \
+              -f title="$MILESTONE_TITLE" \
+              -f state="open" \
+              -f description="Complete document due, delivered for grading" \
+              -f due_on="${{ env.M1_DUE }}"
+          else
+            echo "Milestone '$MILESTONE_TITLE' already exists (#$EXISTS)"
+          fi
+
+  get-milestones:
+    runs-on: ubuntu-latest
+    needs: init-milestones
+    outputs:
+      milestone1: ${{ steps.lookup.outputs.m1 }}
+      milestone2: ${{ steps.lookup.outputs.m2 }}
+      milestone3: ${{ steps.lookup.outputs.m3 }}
+    steps:
+      - name: Lookup milestone IDs
+        id: lookup
+        run: |
+          M1=$(gh api repos/${{ github.repository }}/milestones --jq '.[] | select(.title=="Milestone 1") | .number')
+          M2=$(gh api repos/${{ github.repository }}/milestones --jq '.[] | select(.title=="Milestone 2") | .number')
+          M3=$(gh api repos/${{ github.repository }}/milestones --jq '.[] | select(.title=="Milestone 3 - Final") | .number')
+
+          echo "m1=$M1" >> $GITHUB_OUTPUT
+          echo "m2=$M2" >> $GITHUB_OUTPUT
+          echo "m3=$M3" >> $GITHUB_OUTPUT
+  
+  create-tags:
+    runs-on: ubuntu-latest
+    steps:
+      - name: create tag - update
+        run: |
+          LABEL_NAME="update"
+          LABEL_COLOR="CCCCCC"
+          LABEL_DESCR="Updating a pre-existing section"
+          EXISTS=$(gh api repos/${{ github.repository }}/labels --jq ".[] | select(.name==\"$LABEL_NAME\") | .name")
+          if [ -z "$EXISTS" ]; then
+            gh api repos/${{ github.repository }}/labels \
+                  -f name="$LABEL_NAME" \
+                  -f color="$LABEL_COLOR" \
+                  -f description="$LABEL_DESCR"
+          else
+            echo "Label '$LABEL_NAME' already exists"
+          fi
+      - name: create tag - system
+        run: |
+          LABEL_NAME="system"
+          LABEL_COLOR="F4A582"
+          LABEL_DESCR="System-related sections"
+          EXISTS=$(gh api repos/${{ github.repository }}/labels --jq ".[] | select(.name==\"$LABEL_NAME\") | .name")
+          if [ -z "$EXISTS" ]; then
+            gh api repos/${{ github.repository }}/labels \
+                  -f name="$LABEL_NAME" \
+                  -f color="$LABEL_COLOR" \
+                  -f description="$LABEL_DESCR"
+          else
+            echo "Label '$LABEL_NAME' already exists"
+          fi
+      - name: create tag - project
+        run: |
+          LABEL_NAME="project"
+          LABEL_COLOR="CCCCCC"
+          LABEL_DESCR="Updating a pre-existing section"
+          EXISTS=$(gh api repos/${{ github.repository }}/labels --jq ".[] | select(.name==\"$LABEL_NAME\") | .name")
+          if [ -z "$EXISTS" ]; then
+            gh api repos/${{ github.repository }}/labels \
+                  -f name="$LABEL_NAME" \
+                  -f color="$LABEL_COLOR" \
+                  -f description="$LABEL_DESCR"
+          else
+            echo "Label '$LABEL_NAME' already exists"
+          fi
+      - name: create tag - environment
+        run: |
+          LABEL_NAME="environment"
+          LABEL_COLOR="92C5DE"
+          LABEL_DESCR="Environment-related sections"
+          EXISTS=$(gh api repos/${{ github.repository }}/labels --jq ".[] | select(.name==\"$LABEL_NAME\") | .name")
+          if [ -z "$EXISTS" ]; then
+            gh api repos/${{ github.repository }}/labels \
+                  -f name="$LABEL_NAME" \
+                  -f color="$LABEL_COLOR" \
+                  -f description="$LABEL_DESCR"
+          else
+            echo "Label '$LABEL_NAME' already exists"
+          fi
+      - name: create tag - goal
+        run: |
+          LABEL_NAME="goal"
+          LABEL_COLOR="0571B0"
+          LABEL_DESCR="Project-related sections"
+          EXISTS=$(gh api repos/${{ github.repository }}/labels --jq ".[] | select(.name==\"$LABEL_NAME\") | .name")
+          if [ -z "$EXISTS" ]; then
+            gh api repos/${{ github.repository }}/labels \
+                  -f name="$LABEL_NAME" \
+                  -f color="$LABEL_COLOR" \
+                  -f description="$LABEL_DESCR"
+          else
+            echo "Label '$LABEL_NAME' already exists"
+          fi
+        
+  init-goal-book:
+    runs-on: ubuntu-latest
+    needs: [get-milestones,create-tags]
+    env:
+      MILESTONE_1: ${{ needs.get-milestones.outputs.milestone1 }}
+      MILESTONE_2: ${{ needs.get-milestones.outputs.milestone2 }}
+      MILESTONE_3: ${{ needs.get-milestones.outputs.milestone3 }}
+    steps:
+      - name: Create G1
+        run: |
+          TITLE="G.1 - Context and Overall objectives"
+          DESCR="High-level view of the project: organizational context and reason for building a system. It explains why the project is needed, recalls the business context, and presents the general business objectives"
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=goal \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+
+      - name: Create G2
+        run: |
+          TITLE="G.2 - Current situation"
+          DESCR="Current state of processes to be addressed by the project and the resulting system. It describes the current situation, upon which the system is expected to improve"
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=goal \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+
+      - name: Create G3
+        run: |
+          TITLE="G.3 - Expected Benefits"
+          DESCR="New processes, or improvement to existing processes, made possible by the project's results. It presents the business benefits expected from the successful execution of the project. **This chapter is the core of the Goals book**, describing what the organization expects from the system. It ensures that the project remains focused: if at some stage it gets pushed in different directions, with “creeping featurism” threatening its integrity, a reminder about the original business goals stated in those chapters will help."
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=goal \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create G4
+        run: |
+          TITLE="G.4 - Functionality overview"
+          DESCR="Overview of the functions (behavior) of the system. Principal properties only (details are in the System book). It is a short overview of the functions of the future system, a kind of capsule version of book S, skipping details but enabling readers to get a quick grasp of what the system will do."
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=goal \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create G5
+        run: |
+          TITLE="G.5 - High-level usage scenarios"
+          DESCR="Fundamental usage paths through the system. It presents the main scenarios (use cases) that the system should cover. The scenarios chosen for appearing here, in the Goals book, should only be the **main usage patterns**, without details such as special and erroneous cases; they should be stated in user terms only, independently of the system's structure. Detailed usage scenarios, taking into account system details and special cases, will appear in the System book (S.4)"
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=goal \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create G6
+        run: |
+          TITLE="G.6 - Limitations and Exclusions"
+          DESCR="Aspects that the system need not address. It states what the system will not do. This chapter addresses a key quality attribute of good requirements: the requirements must be delimited (or 'scoped'). G.6 is not, however, the place for an analysis of risks and obstacles, which pertain to the project rather than the goals and correspondingly appears in chapter P.6"
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=goal \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create G7
+        run: |
+          TITLE="G.7 - Stakeholders and requirements sources"
+          DESCR="Groups of people who can affect the project or be affected by it, and other places to consider for information about the project and system. It lists stakeholders and other requirements sources. It should define stakeholders as categories of people, not individuals, even if such individuals are known at the time of writing. The main goal of chapter G7 is to avoid forgetting any category of people whose input is relevant to the project. It also lists documents and other information that the project, aside from soliciting input from stakeholders, can consult for requirements information"
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=goal \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+
+  init-system-book:
+    runs-on: ubuntu-latest
+    needs: [get-milestones, create-tags]
+    env:
+      MILESTONE_1: ${{ needs.get-milestones.outputs.milestone1 }}
+      MILESTONE_2: ${{ needs.get-milestones.outputs.milestone2 }}
+      MILESTONE_3: ${{ needs.get-milestones.outputs.milestone3 }}
+    steps:
+      - name: Create S1
+        run: |
+          TITLE="S.1 - Components"
+          DESCR="Overall structure expressed by the list of major software and, if applicable, hardware parts."
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=system \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create S2
+        run: |
+          TITLE="S.2 - Functionality"
+          DESCR="**This is the bulk of the System book, describing elements of functionality (behaviors)**. This chapter corresponds to the traditional view of requirements as defining \"**what the system does**\". It is organized as one section, S.2.n, for each of the components identified in S.1, describing the corresponding behaviors (functional and non-functional properties)."
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=system \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create S3
+        run: |
+          TITLE="S.3 - Interfaces"
+          DESCR="How the system makes the functionality of S.2 available to the rest of the world, particularly user interfaces and program interfaces (APIs). It specifies how that functionality will be made available to the rest of the world, including people (users) and other systems. These are interfaces provided by the system to the outside; the other way around, interfaces from other systems, which the system may use, are specified in E.2."
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=system \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create S4
+        run: |
+          TITLE="S.4 - Detailed usage scenarios"
+          DESCR="Examples of interaction between the environment (or human users) and the system, expressed as user stories. Such scenarios are not by themselves a substitute for precise descriptions of functionality (S.3), but provide an important complement by specifying cases that these behavior descriptions must support; they also serve as a basis for developing test cases. The scenarios most relevant for stakeholders are given in chapter G.5 in the Goals book, at a general level, as use cases; in contrast, S.4 can refer to system components and functionality (from other chapters of the System book) as well as special and erroneous cases, and introduce more specific scenarios."
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=system \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create S5
+        run: |
+          TITLE="S.5 - Prioritization"
+          DESCR="Classification of the behaviors, interfaces and scenarios (S.2, S.3, S.4) by their degree of criticality. It is useful in particular if during the course of the project various pressures force the team to drop certain functions"
+          MILESTONE="$MILESTONE_3"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=system \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create S6
+        run: |
+          TITLE="S.6 - Verification and acceptance criteria"
+          DESCR="Specification of the conditions under which an implementation will be deemed satisfactory. Here, \"verification\" as shorthand for what is more explicitly called \"Verification & Validation\" (V&V), covering several levels of testing — module testing, integration testing, system testing, user acceptance testing — as well as other techniques such as static analysis and, when applicable, program proving."
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=system \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+
+  init-environment-book:
+    runs-on: ubuntu-latest
+    needs: [get-milestones,create-tags]
+    env:
+      MILESTONE_1: ${{ needs.get-milestones.outputs.milestone1 }}
+      MILESTONE_2: ${{ needs.get-milestones.outputs.milestone2 }}
+      MILESTONE_3: ${{ needs.get-milestones.outputs.milestone3 }}
+    steps:
+      - name: Create E1
+        run: |
+          TITLE="E.1 - Glossary"
+          DESCR="Clear and precise definitions of all the vocabulary specific to the application domain, including technical terms, words from ordinary language used in a special meaning, and acronyms. It introduces the terminology of the project; not just of the environment in the strict sense, but of all its parts."
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=environment \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create E2
+        run: |
+          TITLE="E.2 - Components"
+          DESCR="List of elements of the environment that may affect or be affected by the system and project. It includes other systems to which the system must be interfaced. These components may include existing systems, particularly software systems, with which the system will interact — by using their APIs (program interfaces), or by providing APIs to them, or both. These are interfaces provided to the system from the outside world. They are distinct from both: interfaces provided by the system to the outside world (S.3); and technology elements that the system's development will require (P.5)."
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=environment \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create E3
+        run: |
+          TITLE="E.3 - Constraints"
+          DESCR="Obligations and limits imposed on the project and system by the environment. This chapter defines non-negotiable restrictions coming from the environment (business rules, physical laws, engineering decisions), which the development will have to take into account."
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=environment \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create E4
+        run: |
+          TITLE="E.4 - Assumptions"
+          DESCR="Properties of the environment that may be assumed, with the goal of facilitating the project and simplifying the system. It defines properties that are not imposed by the environment (like those in E.3) but assumed to hold, as an explicit decision meant to facilitate the system's construction."
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=environment \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create E5
+        run: |
+          TITLE="E.5 - Effects"
+          DESCR="Elements and properties of the environment that the system will affect. It defines effects of the system's operations on properties of the environment. Where the previous two categories (E.3, E.4) defined influences of the environment on the system, effects are influences in the reverse direction."
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=environment \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create E6
+        run: |
+          TITLE="E.6 - Invariants"
+          DESCR="Properties of the environment that the system's operation must preserve, i.e., properties of the environment that operations of the system may assume to hold when they start, and must maintain."
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=environment \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+
+  init-project-book:
+    runs-on: ubuntu-latest
+    needs: [get-milestones, create-tags]
+    env:
+      MILESTONE_1: ${{ needs.get-milestones.outputs.milestone1 }}
+      MILESTONE_2: ${{ needs.get-milestones.outputs.milestone2 }}
+      MILESTONE_3: ${{ needs.get-milestones.outputs.milestone3 }}
+    steps:
+      - name: Create P1
+        run: |
+          TITLE="P.1 - Roles & Personel"
+          DESCR="Main responsibilities in the project; required project staff and their needed qualifications. It defines the roles (as a human responsibility) involved in the project."
+          MILESTONE="$MILESTONE_3"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=project \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create P2
+        run: |
+          TITLE="P.2 - Imposed technical choices"
+          DESCR="Any a priori choices binding the project to specific tools, hardware, languages or other technical parameters. Not all technical choices in projects derive from a pure technical analysis; some result from company policies. While some project members may dislike non-strictly-technical decisions, they are a fact of project life and must be documented, in particular for the benefit of one of the quality factors for requirements: \"requirements must be justified\"."
+          MILESTONE="$MILESTONE_3"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=project \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create P3
+        run: |
+          TITLE="P.3 - Schedule and milestones"
+          DESCR="List of tasks to be carried out and their scheduling. It defines the project's key dates."
+          MILESTONE="$MILESTONE_3"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=project \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create P4
+        run: |
+          TITLE="P.4 - Tasks and deliverables"
+          DESCR="**This is the core of the Project book**. It details the individual tasks listed under P.3 and their expected outcomes. It define the project's main activities and the results they must produce, associated with the milestone dates defined in P.3."
+          MILESTONE="$MILESTONE_3"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=project \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create P5
+        run: |
+          TITLE="P.5 - Required technology elements"
+          DESCR="External systems, hardware and software, expected to be necessary for building the system. It lists external technology elements, such as program libraries and hardware devices, that the project is expected to require. Although the actual use of such products belongs to design and implementation rather than requirements, it is part of the requirements task to identify elements whose availability is critical to the success of the project — an important element of risk analysis (P.6)."
+          MILESTONE="$MILESTONE_3"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=project \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create P6
+        run: |
+          TITLE="P.6 - Risk and mitigation analysis"
+          DESCR="Potential obstacles to meeting the schedule of P.4, and measures for adapting the plan if they do arise. It is essential to be on the lookout for events that could derail the project, and devise mitigation strategies. It can include a SWOT analysis (Strengths, Weaknesses, Opportunities, Threats) for the project."
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=project \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create P7
+        run: |
+          TITLE="P.7 - Requirements process and report"
+          DESCR="Initially, description of what the requirements process will be; later, report on its steps. It starts out as a plan for conducting the requirements elicitation process, but is meant to be updated as part of that process so that it includes the key lessons of elicitation."
+          MILESTONE="$MILESTONE_1"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=project \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+
+  init-update-tasks:
+    runs-on: ubuntu-latest
+    needs: [get-milestones, create-tags]
+    env:
+      MILESTONE_1: ${{ needs.get-milestones.outputs.milestone1 }}
+      MILESTONE_2: ${{ needs.get-milestones.outputs.milestone2 }}
+      MILESTONE_3: ${{ needs.get-milestones.outputs.milestone3 }}
+    steps:
+      - name: Create E1 - Update
+        run: |
+          TITLE="E.1 Update - Glossary (Domain Model)"
+          DESCR="Use a class diagram to better represent your domain."
+          MILESTONE="$MILESTONE_2"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=environment \
+              -F labels[]=update \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+
+      - name: Create S6 - Update
+        run: |
+          TITLE="S.6 Update - Verification and Acceptance Criteria (Tests)"
+          DESCR="Select the most important scenario you have identified in S.4. For this scenario only, propose five tests (using the formalism of your choice) that would support its validation. Summarize your tests and the link to the requirements by defining a traceability matrix."
+          MILESTONE="$MILESTONE_3"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=system \
+              -F labels[]=update \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+      - name: Create P6 - Update
+        run: |
+          TITLE="P.6 - Risk and Mitigation Analysis (Threats)"
+          DESCR="Identify up to two threats, and describe mitigation mechanisms"
+          MILESTONE="$MILESTONE_3"
+          EXISTS=$(gh api repos/${{ github.repository }}/issues --jq ".[] | select(.title==\"$TITLE\") | .number")
+          if [ -z "$EXISTS" ]; then
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f body="$DESCR" \
+              -f milestone="$MILESTONE" \
+              -F labels[]=project \
+              -F labels[]=update \
+              --jq '.number')
+            echo "Created issue #$ISSUE_NUMBER"
+          else
+            echo "Issue '$TITLE' already exists (#$EXISTS)"
+          fi
+          

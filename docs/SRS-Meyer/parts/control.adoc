@@ -1,0 +1,59 @@
+== Control Information
+
+[cols="^1,^2,^2,^2,^2"]
+|===
+.2+| *Version* 2+| *Delivery* 2+| *Feedback*
+| _Deadline_ | _Delivered_ | _Received_ | _Integrated_ 
+
+| **V1** | | | |
+| **V2** | | | |
+| **V3** | | | |
+|===
+
+ifdef::author_1[]
+[discrete]
+==== {author_1}
+
+Here is a quick biography of **{author_1}**. You can contact them at **{email_1}**
+
+endif::[]
+
+ifdef::author_2[]
+[discrete]
+==== {author_2}
+
+Here is a quick biography of **{author_2}**. You can contact them at **{email_2}**
+
+endif::[]
+
+ifdef::author_3[]
+[discrete]
+==== {author_3}
+
+Here is a quick biography of **{author_3}**. You can contact them at **{email_3}**
+
+endif::[]
+
+ifdef::author_4[]
+[discrete]
+==== {author_4}
+
+Here is a quick biography of **{author_4}**. You can contact them at **{email_4}**
+
+endif::[]
+
+ifdef::author_5[]
+[discrete]
+==== {author_5}
+
+Here is a quick biography of **{author_5}**. You can contact them at **{email_5}**
+
+endif::[]
+
+ifdef::author_6[]
+[discrete]
+==== {author_6}
+
+Here is a quick biography of **{author_6}**. You can contact them at **{email_6}**
+
+endif::[]
