@@ -64,11 +64,28 @@ hazards.}
 
 \section{System Boundaries and Components}
 
-\wss{Dividing the system into components will help you brainstorm the hazards.
-You shouldn't do a full design of the components, just get a feel for the major
-ones.  For projects that involve hardware, the components will typically include
-each individual piece of hardware.  If your software will have a database, or an
-important library, these are also potential components.}
+The proposed platform will be utilized by the McMaster Engineering Society (MES)
+as a centralized event management system and survey feedback collection system.
+The system boundary includes all the functionality required to build and render
+custom forms, manage event registrations and waivers, check-ins, deliver
+notifications, and build analytics dashboards.
+
+\subsection{System Boundaries}
+
+\begin{itemize}
+    \item \textbf{In Scope}: Administrator and student web and mobile interfaces, 
+    form builder and renderer, registration and waiver processing, check-in and QR verification, 
+    attendee overview dashboard, analytics and reporting, notifications, authentication and authorization, 
+    and internal data storage.
+    
+    \item \textbf{Not Covered}: Third-party services like university single sign-on (SSO), 
+    third-party email/SMS portals, and payment sites. These are treated as outside dependencies, 
+    with interactions regulated through integration adapters.
+    
+    \item \textbf{Environment}: The system is web-based, compatible with major browsers, 
+    and supports portable devices (iOS and Android). Its operation requires steady internet connectivity, 
+    although it offers minimal offline capability for the check-in process.
+\end{itemize}
 
 \section{Critical Assumptions}
 
