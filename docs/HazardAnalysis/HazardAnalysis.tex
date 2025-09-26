@@ -95,34 +95,26 @@ The system can be divided into the following major components for hazard analysi
 Provides administrators with tools to build forms, configure events, manage attendees, and view analytics.
 
 \subsubsection{End-User Application (Web/Mobile)}
-Interface for students to register for events, complete waivers, and submit feedback surveys.
+Interface for students to register for events and submit feedback surveys.
 
-\subsubsection{Form Builder and Renderer}
-Schema-based system to define and display forms with branching and conditional logic.
+\subsubsection{Custom Form Builder and Renderer}
+Schema-based system to define and display registration and feedback forms, including branching and conditional logic.
 
-\subsubsection{Registration and Waiver Manager}
-Manages multi-step flows for event sign-up, waiver confirmation, and ticket generation.
-
-\subsubsection{Check-in and Verification Subsystem}
-Generates and validates QR codes for tickets, with offline sync support.
+\subsubsection{Registration Form Manager}
+Handles the creation and processing of registration forms, ensuring that event-specific data is collected accurately.
 
 \subsubsection{Attendee Overview Dashboard}
-Consolidated view of registrations, waiver status, payments, and check-in records.
-
-\subsubsection{Notifications Service}
-Sends confirmations, reminders, and follow-ups through email, SMS, or push notifications.
+Provides administrators with a consolidated view of registrations and attendee details for an event.
 
 \subsubsection{Analytics and Reporting}
-Provides data visualization and exportable reports on event attendance and survey feedback.
-
-\subsubsection{Authentication and Authorization}
-Manages access through university SSO and role-based permissions.
+Generates data visualizations and exportable reports based on registration and survey responses, enabling event planning and improvement.
 
 \subsubsection{Data Storage Layer}
-Databases for event/attendee data, JSON for form responses, and object storage for uploaded files.
+Stores form schemas, form responses, and attendee information using structured databases and JSON-based storage.
 
 \subsubsection{External Integration Adapters}
-Interfaces with SSO, email/SMS gateways, and payment systems.
+Interfaces with required external systems such as university single sign-on (SSO) and email services to support core functionality.
+
 
 
 
