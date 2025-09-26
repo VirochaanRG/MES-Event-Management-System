@@ -87,6 +87,45 @@ notifications, and build analytics dashboards.
     although it offers minimal offline capability for the check-in process.
 \end{itemize}
 
+\subsection{Component Overview}
+
+The system can be divided into the following major components for hazard analysis:
+
+\subsubsection{Admin Web Application}
+Provides administrators with tools to build forms, configure events, manage attendees, and view analytics.
+
+\subsubsection{End-User Application (Web/Mobile)}
+Interface for students to register for events, complete waivers, and submit feedback surveys.
+
+\subsubsection{Form Builder and Renderer}
+Schema-based system to define and display forms with branching and conditional logic.
+
+\subsubsection{Registration and Waiver Manager}
+Manages multi-step flows for event sign-up, waiver confirmation, and ticket generation.
+
+\subsubsection{Check-in and Verification Subsystem}
+Generates and validates QR codes for tickets, with offline sync support.
+
+\subsubsection{Attendee Overview Dashboard}
+Consolidated view of registrations, waiver status, payments, and check-in records.
+
+\subsubsection{Notifications Service}
+Sends confirmations, reminders, and follow-ups through email, SMS, or push notifications.
+
+\subsubsection{Analytics and Reporting}
+Provides data visualization and exportable reports on event attendance and survey feedback.
+
+\subsubsection{Authentication and Authorization}
+Manages access through university SSO and role-based permissions.
+
+\subsubsection{Data Storage Layer}
+Databases for event/attendee data, JSON for form responses, and object storage for uploaded files.
+
+\subsubsection{External Integration Adapters}
+Interfaces with SSO, email/SMS gateways, and payment systems.
+
+
+
 \section{Critical Assumptions}
 
 \wss{These assumptions that are made about the software or system.  You should
