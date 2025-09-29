@@ -4,7 +4,9 @@
 \usepackage{tabularx}
 \usepackage{hyperref}
 \usepackage{graphicx}
-\usepackage[a4paper, margin=0.7in]{geometry}
+\usepackage[a4paper, margin=0.75in]{geometry}
+\usepackage{subcaption}
+\usepackage{float}
 
 
 \hypersetup{
@@ -39,8 +41,8 @@
 \toprule
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
-Date1 & Name(s) & Description of changes\\
-Date2 & Name(s) & Description of changes\\
+09-25-2025 & Rayyan Suhail & Added Component Overview and Boundaries\\
+09-29-2025 & Rayyan Suhail & FMEA Added\\
 ... & ... & ...\\
 \bottomrule
 \end{tabularx}
@@ -130,25 +132,24 @@ this potential failure mode.}
 
 \section{Failure Mode and Effects Analysis (FMEA)}
 
-The following section outlines the potential hazards, failure modes, and recommended actions for the system. The tabular FMEA results are shown below.
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{FMEA_images/FMEA_1.png} 
+The following section provides a breakdown of the Failure Modes and Effects Analysis (FMEA) for the system. Each component is evaluated for potential failures, their impact on system operation, possible causes, methods of detection, and recommended actions. This analysis ensures that hazards affecting event registration, form processing, check-ins, and analytics are identified early and mitigated through targeted safety and reliability requirements.
+\begin{figure}[H]
+\begin{subfigure}{\textwidth}
+    \centering\includegraphics[width=\textwidth]{FMEA_images/FMEA_1.png} 
     \caption{Fig. 1: FMEA Table Part 1}
-\end{figure}
+\end{subfigure}
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{FMEA_images/FMEA_2.png}
+\begin{subfigure}{\textwidth}
+    \centering\includegraphics[width=\textwidth]{FMEA_images/FMEA_2.png}
     \caption{Fig. 2: FMEA Table Part 2}
+\end{subfigure}
+
+\begin{subfigure}{\textwidth}
+    \centering\includegraphics[width=\textwidth]{FMEA_images/FMEA_3.png}
+    \caption{Fig. 3: FMEA Table Part 3}
+\end{subfigure}
 \end{figure}
 
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth]{FMEA_images/FMEA_3.png}
-    \caption{Fig. 3: FMEA Table Part 3}
-\end{figure}
 
 
 \section{Safety and Security Requirements}
