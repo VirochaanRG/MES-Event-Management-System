@@ -3,6 +3,9 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[a4paper, margin=0.7in]{geometry}
+
 
 \hypersetup{
     colorlinks=true,       % false: boxed links; true: colored links
@@ -125,16 +128,28 @@ minimize the number of assumptions that remove potential hazards.  For instance,
 you could assume a part will never fail, but it is generally better to include
 this potential failure mode.}
 
-\section{Failure Mode and Effect Analysis}
+\section{Failure Mode and Effects Analysis (FMEA)}
 
-\wss{Include your FMEA table here. This is the most important part of this document.}
-\wss{The safety requirements in the table do not have to have the prefix SR.
-The most important thing is to show traceability to your SRS. You might trace to
-requirements you have already written, or you might need to add new
-requirements.}
-\wss{If no safety requirement can be devised, other mitigation strategies can be
-entered in the table, including strategies involving providing additional
-documentation, and/or test cases.}
+The following section outlines the potential hazards, failure modes, and recommended actions for the system. The tabular FMEA results are shown below.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{FMEA_images/FMEA_1.png} 
+    \caption{Fig. 1: FMEA Table Part 1}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{FMEA_images/FMEA_2.png}
+    \caption{Fig. 2: FMEA Table Part 2}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{FMEA_images/FMEA_3.png}
+    \caption{Fig. 3: FMEA Table Part 3}
+\end{figure}
+
 
 \section{Safety and Security Requirements}
 
