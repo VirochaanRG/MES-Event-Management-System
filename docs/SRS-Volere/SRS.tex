@@ -143,32 +143,127 @@ This section provides an overview of the high-level inputs and outputs between t
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{images/work_context.png}
-    \caption{Work context diagram of the form builder and event hosting system}
+    \caption{Work context diagram of the form builder and event hosting system}\label{workcontext}
 \end{figure}
 \end{center}
 
 \subsection{Work Partitioning}
 % split the workflow of the entire system into sub-workflows
 
+This section describes how the work done by the system can be partitioned into smaller and more manageable workflows. Below is a table describing each of the sub-workflows of the proposed systems. Note that event creation and survey creation have been grouped as a single workflow since they are nearly identical.
+
 {\renewcommand{\arraystretch}{1.2}
 \begin{table}[H]
 \centering
 \begin{tabular}{|l|l|l|l|l|}
 \hline
-Event No. & Event                       & Input                & Output(s)                                                                     & Requirements \\ \hline
-1         & User registers for event    & Registration data    & Event ticket                                                                  &              \\ \hline
-2         & User fills out a survey     & Survey responses     & Survey completion confirmation                                                &              \\ \hline
-3         & Admin creates a form module & Module question data & Reusable form module                                                          &              \\ \hline
-4         & Admin creates an event      & Event data           & \begin{tabular}[c]{@{}l@{}}Attendee overview\\ Financial reports\end{tabular} &              \\ \hline
-5         & Admin creates a survey      & Survey questions     & Survey response reports                                                       &              \\ \hline
+Event No. & Event                               & Input                & Output                                                                        & Requirements \\ \hline
+1         & User registers for event            & Registration data    & Event ticket                                                                  &              \\ \hline
+2         & User fills out a survey             & Survey responses     & Survey completion confirmation                                                &              \\ \hline
+3         & Admin creates a form module         & Module question data & Reusable form module                                                          &              \\ \hline
+4         & Admin creates an event/survey       & Event/survey data    & Event/survey creation confirmation                                            &              \\ \hline
+5         & Admin views survey/event statistics & Event/survey to view & Event/survey registration/response reports                                    &              \\ \hline
 \end{tabular}
 \captionof{table}{Partitioning of system workflows}\label{wfpart}
 \end{table}
 }
 
 \subsection{Specifying a Business Use Case (BUC)}
-\lips
 % provide a use case for each sub workflow
+
+\noindent\textbf{BUC 1: } User registers for an event \\
+\textbf{Input:} Registration data \\
+\textbf{Output:} Event tickets \\
+\textbf{Pre-condition:} User has downloaded the application and has created an account \\
+\textbf{Scenario:} \\
+\begin{enumerate}
+  \item The user application receives the registration data
+  \item The user application verifies the data is filled correctly
+  \item The user application sends the registration data to the backend server
+  \item The backend server verifies the event is not full and the deadline has not passed
+  \item The backend server adds the user to the list of attendees
+  \item The backend server generates an event ticket and sends it to the user application
+  \item The user application confirms with the user that the registration was successful and presents the user with the ticket
+\end{enumerate}
+\textbf{Sub variations:} \\
+2a. The submitted registration data has errors, the user application prompts the user to fix the errors and resubmit \\
+4a. The event is full or the deadline has passed, the backend sends an error code to the user application \\
+4b. The user application alerts the user of the error. \\
+
+\noindent\textbf{BUC 2: } User fills out a survey module \\
+\textbf{Input:} Survey responses \\
+\textbf{Output:} Survey completion confirmation \\
+\textbf{Pre-condition:} User has downloaded the application and has created an account \\
+\textbf{Scenario:} \\
+\begin{enumerate}
+  \item The user application receives the survey data
+  \item The user application verifies the data is filled correctly
+  \item The user application sends the survey data to the backend server
+  \item The backend server updates the survey database with the user’s data
+  \item The backend server sends a confirmation message to the user application
+  \item The user application confirms with the user that the survey data has been submitted
+\end{enumerate}
+\textbf{Sub variations:} \\
+2a. The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the user to fix the errors and resubmit \\
+
+\noindent\textbf{BUC 3: } Admin creates a form module \\
+\textbf{Input:} Form fields \\
+\textbf{Output:} Reusable form module \\
+\textbf{Pre-condition:} Admin has access to create custom form modules \\
+\textbf{Scenario:} \\
+\begin{enumerate}
+  \item The admin portal receives the list of form fields and questions from the admin user for the custom module
+  \item The admin portal verifies the custom module has been created correctly
+  \item The admin portal sends the custom module data to the backend server
+  \item The backend server authenticates the admin user
+  \item The backend server saves the custom module data to the template database
+  \item The backend server sends a confirmation message to the admin portal
+  \item The admin portal updates the list of custom modules with the completed module
+  \item The admin portal confirms with the admin user that the custom module has been created
+\end{enumerate}
+\textbf{Sub variations:} \\
+2a. The submitted form module has errors (i.e. unfinished fields), the admin user is prompted to fix these errors before resubmitting \\
+4a. Authentication of the admin fails, the admin portal is notified of the request denial \\
+
+\noindent\textbf{BUC 4: } Admin creates an event/survey \\
+\textbf{Input:} Event details \\
+\textbf{Output:} Event creation confirmation \\
+\textbf{Pre-condition:} Admin has access to create events \\
+\textbf{Scenario:} \\
+\begin{enumerate}
+  \item The admin portal receives the event/survey details
+  \item The admin portal verifies the event/survey details are correct
+  \item The admin portal sends the event/survey data to the backend server
+  \item The backend server authenticates the admin user
+  \item The backend server saves the event/survey data to the database of events/surveys
+  \item The backend server sends a message to the user application to notify users of the new event/survey
+  \item The backend server sends a confirmation message to the admin portal
+  \item The admin portal adds the created event/survey to the event/survey dashboard
+  \item The admin portal confirms with the admin user that the event/survey has been created
+\end{enumerate}
+\textbf{Sub variations:} \\
+2a. The submitted details have errors (i.e. event date has already passed), the admin user is prompted to fix these errors before resubmitting \\
+4a. Authentication of the admin fails, the admin portal is notified of the request denial \\
+
+\noindent\textbf{BUC 5: } Admin views event/survey statistics \\
+\textbf{Input:} Event/survey to view \\
+\textbf{Output:} Event registration/survey response report \\
+\textbf{Pre-condition:} Event/survey has been created, and users have registered/responded \\
+\textbf{Scenario:} \\
+\begin{enumerate}
+  \item The admin portal receives the request to view event/survey statistics
+  \item The admin portal sends a request to the backend server containing the identification for the event/survey to view
+  \item The backend server receives the request and authenticates the admin user
+  \item The backend server retrieves the registrant/response data for the requested event/survey from the database
+  \item The backend server generates a statistical report of all the data
+  \item The data is sent back to the admin portal
+  \item The admin portal formats all the data into a readable format
+  \item The admin user is presented with the event/survey statistics
+\end{enumerate}
+\textbf{Sub variations:} \\
+3a. Authentication of the admin fails, the admin portal is notified of the request denial \\
+
+
 \section{Business Data Model and Data Dictionary}
 \subsection{Business Data Model}
 \lips
