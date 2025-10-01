@@ -9,6 +9,7 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{enumerate}
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
       colorlinks=true,      % false: boxed links; true: colored links
@@ -195,7 +196,13 @@ involved in the Project}
 
 \subsection{Maintainability and Support Requirements}
 \subsubsection{Maintenance Requirements}
-\lips
+\begin{enumerate}[{MSR}1.] 
+  \item \label{MSR1} 
+  \begin{itemize}
+    \item Rationale:
+    \item Fit Criterion:
+  \end{itemize}
+\end{enumerate}
 \subsubsection{Supportability Requirements}
 \lips
 \subsubsection{Adaptability Requirements}
@@ -229,11 +236,18 @@ involved in the Project}
 
 \subsection{Off-the-Shelf Solutions}
 \subsubsection{Ready-Made Products}
-\lips
+There are some products that exists on the market which solve certain components of this product but no product exists that combines these components into one. For event management there are various tools such as EventBrite and Stubhub which can allow for the selling of tickets for events. The problem with these products are that they don't integrate well with current MES Systems and don't provide all the features as required such as collecting waivers and ensuring McMaster students attend university specific events. For general data collection Google Forms is the most used tool and it allows for the creation of complex forms and stores data in spreadsheets. For further data analysis it requires effort on the part of the form creator to actually go and analyze the data to gain actual insights. Also the forms can become hard to handle as they become complex and can become confusing for respondents. As mentioned before there is no tool that has a combination of the two components.
 \subsubsection{Reusable Components}
-\lips
+There are various components that we can use to help develop our application:
+\begin{itemize}
+  \item \textbf{Next.JS}: Provide us with a framework for developing web apps in \textbf{React} and provides built in routing behaviour. It also handles many built in libraries and packages that we can use for front-end styling such as \textbf{tailwind-css} and \textbf{shadcn/ui}. We can also integrate it with other libraries for authentication and for database management
+  \item \textbf{SurveyJS}: This is a potential tool we can use to develop the form builder as it provides us with some pre-built components we can use to develop and customize our own forms. 
+  \item \textbf{Recharts}: This could be potential charting tool we can use to develop our admin dashboard. Though there are other charting tools the benefit of Recharts is that it provides customization on top of the pre built charts.
+  \item \textbf{Drizzle}: We can use Drizzle as an ORM to map from our database to our web-app. Drizzle is useful since it is lightweight and is code first. Drizzle's simplicity allows for faster development and is perfect for our use case.
+\end{itemize}
+These components will allow us to develop our application faster and more efficiently as many of these products are already optimized. All the above products are free to use so do not incur any extra costs or require the handling of licenses.
 \subsubsection{Products That Can Be Copied}
-\lips
+\textit{There don't seem to be any products that can be copied which contain all the required components within a single product. Moreover the MES wants a product that doesn't require an external license and wants to be fully built in house so they have control over future development and usage.}
 
 \subsection{New Problems}
 \subsubsection{Effects on the Current Environment}
@@ -261,7 +275,7 @@ Inhibit the New Product}
 \lips
 
 \subsection{Costs}
-\lips
+We don't expect any costs to arise during the development of the project. We will be using free tools and libraries for development and for hosting we will look to host databases and the back-end locally. In production the hosting will be done by the MES so it is out of the scope of this capstone.
 \subsection{User Documentation and Training}
 \subsubsection{User Documentation Requirements}
 \lips
