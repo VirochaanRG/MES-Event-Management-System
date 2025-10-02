@@ -30,10 +30,10 @@
 
 \begin{document}
 
-\title{Software Requirements Specification for \progname: subtitle describing software} 
+\title{Software Requirements Specification for \progname: subtitle describing software}
 \author{\authname}
 \date{\today}
-	
+
 \maketitle
 
 ~\newpage
@@ -120,12 +120,12 @@ The purpose of the section is to define the expected scope of the project, inclu
 Currently, the MES uses plethora of different platforms to host events and conduct surveys such as tools for registration, signing of waivers, and checking in attendees. The main platforms used are a combination of Google Forms and Google Sheets. There are several pain points to address with the current system.
 
 \begin{itemize}
-  \item \textbf{Decentralized System Components} Registration and surverying is split across a plethora of tools and software which may not be compatible with each other. For example, Google Forms is used for registration forms and surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is done by email or social media. 
+  \item \textbf{Decentralized System Components} Registration and surverying is split across a plethora of tools and software which may not be compatible with each other. For example, Google Forms is used for registration forms and surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is done by email or social media.
   \item \textbf{Overly Complex Form Logic} The current CFES survey consists of 70 pages of questions linked together through complex branching logic. The Google Forms form building UI makes this very complicated as all form elements are displayed as a linear list of sections making it very hard to track paths through the form.
   \item \textbf{Disorganized Data Visualization} Form response data is currently stored using Google Sheets. While Google Form data is easily imported into Google Sheets, any analytics on the data must be done manually through equations and macros.
   \item \textbf{Lack of Reusability} Google Forms comes with a few templates that provide an initial starting point for many types of forms such as registrant information. However, after the first section of the form, each subsequent section must be made manually. Sections may be imported from other forms but this requires the user to have access to a form with the wanted section and to scour through an unorganized list of forms and sections.
   \item \textbf{Low Response Rates on Surveys} The response rates on the annual CFES survey of undergraduate engineering students have been decreasing due to the long length of the Google Form and the lack of ability to submit a partially completed form.
-  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the MES LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed. 
+  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the MES LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed.
 \end{itemize}
 % MES hosts lots of events per year
 % Their event management system is unorganized
@@ -134,7 +134,7 @@ Currently, the MES uses plethora of different platforms to host events and condu
 % Lots of steps to registration and split across too many platforms
 % The same thing is done for the annual CFES survey of undergrad eng students
 % long 70 page form of complex branching logic, low response rate
-% 
+%
 
 \subsection{The Context of the Work}
 
@@ -268,7 +268,7 @@ Event No. & Event                               & Input                & Output 
 \section{Business Data Model and Data Dictionary}
 \subsection{Business Data Model}
 \lips
-% Split the entire system into subsystems which the data passes through and the form it takes at each step 
+% Split the entire system into subsystems which the data passes through and the form it takes at each step
 % This is NOT the same as workflow partition. This deals with DATA and the other deals with PROCESSES
 \subsection{Data Dictionary}
 \lips
@@ -407,7 +407,7 @@ Event No. & Event                               & Input                & Output 
 
 \section{Open Issues}
 \lips
-% Any problems that remain unresolved and undefined 
+% Any problems that remain unresolved and undefined
 \section{Off-the-Shelf Solutions}
 \subsection{Ready-Made Products}
 \lips
