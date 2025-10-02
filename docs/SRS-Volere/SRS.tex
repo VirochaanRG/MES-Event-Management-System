@@ -11,6 +11,7 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage{enumitem}
 \usepackage{float}
 
 \hypersetup{
@@ -290,7 +291,28 @@ Event No. & Event                               & Input                & Output 
 % outcome - What happened as a result of the use case
 \section{Functional Requirements}
 \subsection{Functional Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  labelwidth=4em,
+  itemindent=0em,
+  label=\bfseries FR-\arabic*:]
+  \item The system shall allow admins to create forms with multiple fields types.
+  \item The system shall allow admins to organize forms for analytics, and specify how
+    the analysis should be done.
+  \item The system shall generate QR codes for confirmation and check-in integration.
+  \item The system shall provide an attendee dashboard for administrators with filters
+    for status updates on payments and waivers, event sign-ins, etc.
+  \item The system shall store all event data in a secure, centralized\\database.
+  \item The system shall store all questionnaire data in a secure, centralized database.
+  \item The system shall allow administrators to generate analytics dashboards and export
+    CSV/Excel reports.
+  \item The system shall provide event attendees with a medium to relay feedback for the
+    event.
+  \item The system shall provide administrators with a medium to view all event feedback
+    once an event has completed.
+  \item{The system shall store all questionnaire data in a secure, centralized database.}
+\end{enumerate}
 
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
@@ -312,13 +334,28 @@ Event No. & Event                               & Input                & Output 
 
 \section{Performance Requirements}
 \subsection{Speed and Latency Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  labelwidth=4em,
+  itemindent=0em,
+  label=\bfseries SL-\arabic*:]
+  \item The system shall have a maximum 2-second latency for form loading, optimized for
+    mobile devices.
+\end{enumerate}
 \subsection{Safety-Critical Requirements}
 \lips
 \subsection{Precision or Accuracy Requirements}
 \lips
 \subsection{Robustness or Fault-Tolerance Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  labelwidth=4em,
+  itemindent=0em,
+  label=\bfseries RF-\arabic*:]
+  \item The system shall support 1024 concurrent users during peak event times.
+\end{enumerate}
 \subsection{Capacity Requirements}
 \lips
 \subsection{Scalability or Extensibility Requirements}
