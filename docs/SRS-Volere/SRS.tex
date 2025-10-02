@@ -294,7 +294,6 @@ Event No. & Event                               & Input                & Output 
 \begin{enumerate}[align=left,
   leftmargin=*,
   labelsep=1em,
-  labelwidth=4em,
   itemindent=0em,
   label=\bfseries FR-\arabic*:]
   \item The system shall allow admins to create forms with multiple fields types.
@@ -322,7 +321,16 @@ Event No. & Event                               & Input                & Output 
 
 \section{Usability and Humanity Requirements}
 \subsection{Ease of Use Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries UE-\arabic*:]
+  \item The system shall allow first-time users to understand how to navigate the event
+    registration form within 3 minutes without prior training.
+  \item The system shall provide survey progress indicators to reduce form abandonment
+    rates.
+\end{enumerate}
 \subsection{Personalization and Internationalization Requirements}
 \lips
 \subsection{Learning Requirements}
@@ -337,7 +345,6 @@ Event No. & Event                               & Input                & Output 
 \begin{enumerate}[align=left,
   leftmargin=*,
   labelsep=1em,
-  labelwidth=4em,
   itemindent=0em,
   label=\bfseries SL-\arabic*:]
   \item The system shall have a maximum 2-second latency for form loading, optimized for
@@ -351,15 +358,25 @@ Event No. & Event                               & Input                & Output 
 \begin{enumerate}[align=left,
   leftmargin=*,
   labelsep=1em,
-  labelwidth=4em,
   itemindent=0em,
   label=\bfseries RF-\arabic*:]
-  \item The system shall support 1024 concurrent users during peak event times.
+  \item The system shall support 2047 concurrent users during peak event times.
+  \item The system shall auto-save partially completed surveys every 30 seconds.
+  \item The system shall recover from a server crash within 60 seconds without data loss.
+  \item The system shall allow new form modules to be added without any downtime.
+  \item The system shall allow administrators to update event templates without disruption
+    during ongoing events.
 \end{enumerate}
 \subsection{Capacity Requirements}
 \lips
 \subsection{Scalability or Extensibility Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SE-\arabic*:]
+  \item The system shall support up to 2047 registrations per event.
+\end{enumerate}
 \subsection{Longevity Requirements}
 \lips
 
@@ -377,8 +394,24 @@ Event No. & Event                               & Input                & Output 
 
 \section{Maintainability and Support Requirements}
 \subsection{Maintenance Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries MT-\arabic*:]
+  \item The system shall remain operational during the entirety of an event.
+  \item The system shall have scheduled maintenance performed before and after events.
+\end{enumerate}
 \subsection{Supportability Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SU-\arabic*:]
+  \item The system shall run as a native mobile application on Android and iOS devices.
+  \item The system shall run as a web app accessible through Chromium, Firefox, and
+    Safari browsers.
+\end{enumerate}
 \lips
 \subsection{Adaptability Requirements}
 \lips
@@ -401,7 +434,14 @@ Event No. & Event                               & Input                & Output 
 
 \section{Compliance Requirements}
 \subsection{Legal Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries LG-\arabic*:]
+  \item The system shall store and handle all sensitive personal data in compliance with
+    PIPEDA regulations.
+\end{enumerate}
 \subsection{Standards Compliance Requirements}
 \lips
 
