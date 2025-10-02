@@ -13,6 +13,7 @@
 \usepackage{caption}
 \usepackage{enumitem}
 \usepackage{float}
+\usepackage{enumitem}
 
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
@@ -330,30 +331,84 @@ This section describes how the work done by the system can be partitioned into s
 
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
-\lips
+\begin{enumerate}[label=LFR-AP.\arabic*, wide=0pt, leftmargin=*]
+  \item The interface shall comply with MES branding criteria (logo, colour scheme).\\[2mm]
+    {\bf Motivation:} Ensures that the product is recognizable as an official MES event registration platform.\\
+    {\bf Fit Criterion:} The MES representative shall certify that the product complies with the current standards.
+  \item The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
+    {\bf Motivation:} Increases accessibility and user productivity, and allows for consistency across different events.\\
+    {\bf Fit Criterion:} During usability testing across the MES events, at least 80\% of students rate the forums ease of use a 4+.
+  \item Admin dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
+    {\bf Motivation:} Improves organizer accessibility and readability, allowing for easier management during planning operations.\\
+    {\bf Fit Criterion:} The representative shall approve of the analytics layout.
+\end{enumerate}
+
 \subsection{Style Requirements}
-\lips
+\begin{enumerate}[label=LFR-S.\arabic*, wide=0pt, leftmargin=*]
+  \item The design shall be professional but approachable, accomodating all types of events.\\[2mm]
+    {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
+    {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
+  \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+    {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
+    {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
+\end{enumerate}
 
 \section{Usability and Humanity Requirements}
 \subsection{Ease of Use Requirements}
-\begin{enumerate}[align=left,
-  leftmargin=*,
-  labelsep=1em,
-  itemindent=0em,
-  label=\bfseries UE-\arabic*:]
-  \item The system shall allow first-time users to understand how to navigate the event
-    registration form within 3 minutes without prior training.
+
+\begin{enumerate}[label=UHR-EoU.\arabic*, wide=0pt, leftmargin=*]
+  \item Registration and feedback forms shall be easily and quickly filled out for anyone with no instruction.\\[2mm]
+    {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
+    {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
+  \item Users shall sign-up/sign-in to the app with no instruction. \\[2mm]
+    {\bf Motivation:} The registration process is the most important aspect of the platform, so the app should have a clear and simple layout.\\
+    {\bf Fit Criterion:} A sample of users shall register/login within 2 minutes without instruction.
+  \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+    {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
+    {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
   \item The system shall provide survey progress indicators to reduce form abandonment
     rates.
 \end{enumerate}
+
 \subsection{Personalization and Internationalization Requirements}
-\lips
+\begin{enumerate}[label=UHR-PIR.\arabic*, wide=0pt, leftmargin=*]
+  \item The custom form builder shall allow admin to create personalized forms with event-specific fields.\\[2mm]
+    {\bf Motivation:} Flexibility is essential to accomodate the diverse set of events as per the scope.\\
+    {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.
+  \item Admin dashboard shall support sorting and filtering of attendees by predefined metrics.\\[2mm]
+    {\bf Motivation:} Streamlines the attendee organizing process, allowing admin to categorize attendees as per the event requirements.\\
+    {\bf Fit Criterion:} Organizers shall filter attendees within 1 minute of use without instruction.
+\end{enumerate}
+
 \subsection{Learning Requirements}
-\lips
+\begin{enumerate}[label=UHR-LR.\arabic*, wide=0pt, leftmargin=*]
+  \item The app shall be easy for anyone with an intermediate level of English.\\[2mm]
+    {\bf Motivation:} Users should expect intuitive, concise ineteractions.\\
+    {\bf Fit Criterion:} 80\% of students successfully complete a form with no assistance.
+  \item Admin shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
+    {\bf Motivation:} Event organizers are constantly changing, so it is important to reduce dependency on technical training.\\
+    {\bf Fit Criterion:} 80\% of organizers shall complete a basic test form on their first attempt.
+\end{enumerate}
+
 \subsection{Understandability and Politeness Requirements}
-\lips
+\begin{enumerate}[label=UHR-UPR.\arabic*, wide=0pt, leftmargin=*]
+  \item Basic, non-technical language will be used (Sign-up instead of RSVP).\\[2mm]
+    {\bf Motivation:} Increases accessibility among non-technical users, or non-fluent English speakers.\\
+    {\bf Fit Criterion:} 80\% of students understand all wording without clarification.
+  \item The app shall communicate errors clearly and politely.\\[2mm]
+    {\bf Motivation:} Clear error messages reduce frustration and improve user experience.\\
+    {\bf Fit Criterion:} Feedback suggests that 80\% of students found the experience satisfying.
+  \item The app shall hide sensitive and confidential information from users.\\[2mm]
+    {\bf Motivation:} Enhances security and confidence of organizations in the product.\\
+    {\bf Fit Criterion:} Approval from MES representative.
+\end{enumerate}
+
 \subsection{Accessibility Requirements}
-\lips
+\begin{enumerate}[label=UHR-AR.\arabic*, wide=0pt, leftmargin=*]
+  \item The app shall conform to WCAG 2.1 AA standards, improving visibility for impaired users.\\[2mm]
+    {\bf Motivation:} Ensures accessibility for users with visual disabilities and impairments.\\
+    {\bf Fit Criterion:} Approval from a sample of students with impairments, and evaluation tools (WAVE Web Accessibility).
+\end{enumerate}
 
 \section{Performance Requirements}
 \subsection{Speed and Latency Requirements}
