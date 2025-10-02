@@ -11,6 +11,7 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage{enumitem}
 \usepackage{float}
 
 \hypersetup{
@@ -23,16 +24,18 @@
 }
 
 \newcommand{\lips}{\textit{Insert your content here.}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 \input{../Comments}
 \input{../Common}
 
 \begin{document}
 
-\title{Software Requirements Specification for \progname: subtitle describing software} 
+\title{Software Requirements Specification for \progname: subtitle describing software}
 \author{\authname}
 \date{\today}
-	
+
 \maketitle
 
 ~\newpage
@@ -130,12 +133,12 @@ The purpose of the section is to define the expected scope of the project, inclu
 Currently, the MES uses plethora of different platforms to host events and conduct surveys such as tools for registration, signing of waivers, and checking in attendees. The main platforms used are a combination of Google Forms and Google Sheets. There are several pain points to address with the current system.
 
 \begin{itemize}
-  \item \textbf{Decentralized System Components} Registration and surverying is split across a plethora of tools and software which may not be compatible with each other. For example, Google Forms is used for registration forms and surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is done by email or social media. 
+  \item \textbf{Decentralized System Components} Registration and surverying is split across a plethora of tools and software which may not be compatible with each other. For example, Google Forms is used for registration forms and surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is done by email or social media.
   \item \textbf{Overly Complex Form Logic} The current CFES survey consists of 70 pages of questions linked together through complex branching logic. The Google Forms form building UI makes this very complicated as all form elements are displayed as a linear list of sections making it very hard to track paths through the form.
   \item \textbf{Disorganized Data Visualization} Form response data is currently stored using Google Sheets. While Google Form data is easily imported into Google Sheets, any analytics on the data must be done manually through equations and macros.
   \item \textbf{Lack of Reusability} Google Forms comes with a few templates that provide an initial starting point for many types of forms such as registrant information. However, after the first section of the form, each subsequent section must be made manually. Sections may be imported from other forms but this requires the user to have access to a form with the wanted section and to scour through an unorganized list of forms and sections.
   \item \textbf{Low Response Rates on Surveys} The response rates on the annual CFES survey of undergraduate engineering students have been decreasing due to the long length of the Google Form and the lack of ability to submit a partially completed form.
-  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the MES LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed. 
+  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the MES LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed.
 \end{itemize}
 % MES hosts lots of events per year
 % Their event management system is unorganized
@@ -144,7 +147,7 @@ Currently, the MES uses plethora of different platforms to host events and condu
 % Lots of steps to registration and split across too many platforms
 % The same thing is done for the annual CFES survey of undergrad eng students
 % long 70 page form of complex branching logic, low response rate
-% 
+%
 
 \subsection{The Context of the Work}
 
@@ -163,20 +166,22 @@ This section provides an overview of the high-level inputs and outputs between t
 
 This section describes how the work done by the system can be partitioned into smaller and more manageable workflows. Below is a table describing each of the sub-workflows of the proposed systems. Note that event creation and survey creation have been grouped as a single workflow since they are nearly identical.
 
-{\renewcommand{\arraystretch}{1.2}
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|l|l|l|l|}
-\hline
-Event No. & Event                               & Input                & Output                                                                        & Requirements \\ \hline
-1         & User registers for event            & Registration data    & Event ticket                                                                  &              \\ \hline
-2         & User fills out a survey             & Survey responses     & Survey completion confirmation                                                &              \\ \hline
-3         & Admin creates a form module         & Module question data & Reusable form module                                                          &              \\ \hline
-4         & Admin creates an event/survey       & Event/survey data    & Event/survey creation confirmation                                            &              \\ \hline
-5         & Admin views survey/event statistics & Event/survey to view & Event/survey registration/response reports                                    &              \\ \hline
-\end{tabular}
-\captionof{table}{Partitioning of system workflows}\label{wfpart}
-\end{table}
+{
+  \setlength{\tabcolsep}{0.125em}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|P{2.5em}|Y|Y|Y|Y|}
+      \hline
+      \textbf{No.} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
+      1 & User registers for event & Registration data & Event ticket & \\ \hline
+      2 & User fills out a survey & Survey responses & Survey completion confirmation & \\ \hline
+      3 & Admin creates a form module & Module question data & Reusable form module & \\ \hline
+      4 & Admin creates an event/survey & Event/survey data & Event/survey creation confirmation & \\ \hline
+      5 & Admin views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \\ \hline
+    \end{tabularx}
+    \captionof{table}{Partitioning of system workflows}\label{wfpart}
+  \end{table}
 }
 
 \subsection{Specifying a Business Use Case (BUC)}
@@ -278,7 +283,7 @@ Event No. & Event                               & Input                & Output 
 \section{Business Data Model and Data Dictionary}
 \subsection{Business Data Model}
 \lips
-% Split the entire system into subsystems which the data passes through and the form it takes at each step 
+% Split the entire system into subsystems which the data passes through and the form it takes at each step
 % This is NOT the same as workflow partition. This deals with DATA and the other deals with PROCESSES
 \subsection{Data Dictionary}
 \lips
@@ -301,7 +306,27 @@ Event No. & Event                               & Input                & Output 
 % outcome - What happened as a result of the use case
 \section{Functional Requirements}
 \subsection{Functional Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries FR-\arabic*:]
+  \item The system shall allow admins to create forms with multiple fields types.
+  \item The system shall allow admins to organize forms for analytics, and specify how
+    the analysis should be done.
+  \item The system shall generate QR codes for confirmation and check-in integration.
+  \item The system shall provide an attendee dashboard for administrators with filters
+    for status updates on payments and waivers, event sign-ins, etc.
+  \item The system shall store all event data in a secure, centralized\\database.
+  \item The system shall store all questionnaire data in a secure, centralized database.
+  \item The system shall allow administrators to generate analytics dashboards and export
+    CSV/Excel reports.
+  \item The system shall provide event attendees with a medium to relay feedback for the
+    event.
+  \item The system shall provide administrators with a medium to view all event feedback
+    once an event has completed.
+  \item{The system shall store all questionnaire data in a secure, centralized database.}
+\end{enumerate}
 
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
@@ -311,7 +336,16 @@ Event No. & Event                               & Input                & Output 
 
 \section{Usability and Humanity Requirements}
 \subsection{Ease of Use Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries UE-\arabic*:]
+  \item The system shall allow first-time users to understand how to navigate the event
+    registration form within 3 minutes without prior training.
+  \item The system shall provide survey progress indicators to reduce form abandonment
+    rates.
+\end{enumerate}
 \subsection{Personalization and Internationalization Requirements}
 \lips
 \subsection{Learning Requirements}
@@ -323,17 +357,41 @@ Event No. & Event                               & Input                & Output 
 
 \section{Performance Requirements}
 \subsection{Speed and Latency Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SL-\arabic*:]
+  \item The system shall have a maximum 2-second latency for form loading, optimized for
+    mobile devices.
+\end{enumerate}
 \subsection{Safety-Critical Requirements}
 \lips
 \subsection{Precision or Accuracy Requirements}
 \lips
 \subsection{Robustness or Fault-Tolerance Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries RF-\arabic*:]
+  \item The system shall support 2047 concurrent users during peak event times.
+  \item The system shall auto-save partially completed surveys every 30 seconds.
+  \item The system shall recover from a server crash within 60 seconds without data loss.
+  \item The system shall allow new form modules to be added without any downtime.
+  \item The system shall allow administrators to update event templates without disruption
+    during ongoing events.
+\end{enumerate}
 \subsection{Capacity Requirements}
 \lips
 \subsection{Scalability or Extensibility Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SE-\arabic*:]
+  \item The system shall support up to 2047 registrations per event.
+\end{enumerate}
 \subsection{Longevity Requirements}
 \lips
 
@@ -351,8 +409,24 @@ Event No. & Event                               & Input                & Output 
 
 \section{Maintainability and Support Requirements}
 \subsection{Maintenance Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries MT-\arabic*:]
+  \item The system shall remain operational during the entirety of an event.
+  \item The system shall have scheduled maintenance performed before and after events.
+\end{enumerate}
 \subsection{Supportability Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SU-\arabic*:]
+  \item The system shall run as a native mobile application on Android and iOS devices.
+  \item The system shall run as a web app accessible through Chromium, Firefox, and
+    Safari browsers.
+\end{enumerate}
 \lips
 \subsection{Adaptability Requirements}
 \lips
@@ -375,13 +449,20 @@ Event No. & Event                               & Input                & Output 
 
 \section{Compliance Requirements}
 \subsection{Legal Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries LG-\arabic*:]
+  \item The system shall store and handle all sensitive personal data in compliance with
+    PIPEDA regulations.
+\end{enumerate}
 \subsection{Standards Compliance Requirements}
 \lips
 
 \section{Open Issues}
 \lips
-% Any problems that remain unresolved and undefined 
+% Any problems that remain unresolved and undefined
 \section{Off-the-Shelf Solutions}
 \subsection{Ready-Made Products}
 There are some products that exists on the market which solve certain components of this product but no product exists that combines these components into one. For event management there are various tools such as EventBrite and Stubhub which can allow for the selling of tickets for events. The problem with these products are that they don't integrate well with current MES Systems and don't provide all the features as required such as collecting waivers and ensuring McMaster students attend university specific events. For general data collection Google Forms is the most used tool and it allows for the creation of complex forms and stores data in spreadsheets. For further data analysis it requires effort on the part of the form creator to actually go and analyze the data to gain actual insights. Also the forms can become hard to handle as they become complex and can become confusing for respondents. As mentioned before there is no tool that has a combination of the two components.
