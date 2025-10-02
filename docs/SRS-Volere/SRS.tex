@@ -33,7 +33,7 @@
 
 \begin{document}
 
-\title{Software Requirements Specification for \progname: subtitle describing software}
+\title{Software Requirements Specification for \progname: Form builder and event manager for the McMaster Engineering Society}
 \author{\authname}
 \date{\today}
 
@@ -60,6 +60,7 @@ Date 2 & 1.1 & Notes\\
 ~\\
 
 ~\newpage
+
 \section{Purpose of the Project}
 \subsection{User Business}
 \lips
@@ -280,12 +281,17 @@ This section describes how the work done by the system can be partitioned into s
 \textbf{Sub variations:} \\
 3a. Authentication of the admin fails, the admin portal is notified of the request denial \\
 
-
 \section{Business Data Model and Data Dictionary}
 \subsection{Business Data Model}
-\lips
 % Split the entire system into subsystems which the data passes through and the form it takes at each step
 % This is NOT the same as workflow partition. This deals with DATA and the other deals with PROCESSES
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/business_data_model.png}
+    \caption{Diagram of the interactions between main system components}\label{businessdata}
+\end{figure}
+\end{center}
 \subsection{Data Dictionary}
 \lips
 % Definition of each subsystem defined above
