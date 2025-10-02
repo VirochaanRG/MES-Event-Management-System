@@ -12,6 +12,7 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{float}
+\usepackage{enumitem}
 
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
@@ -307,7 +308,14 @@ Event No. & Event                               & Input                & Output 
 \end{enumerate}
 
 \subsection{Style Requirements}
-\lips
+\begin{enumerate}[label=LFR-S.\arabic*, wide=0pt, leftmargin=*]
+  \item The design shall be professional but approachable, accomodating all types of events.\\[2mm]
+    {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
+    {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
+  \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+    {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
+    {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
+\end{enumerate}
 
 \section{Usability and Humanity Requirements}
 \subsection{Ease of Use Requirements}
