@@ -24,6 +24,8 @@
 }
 
 \newcommand{\lips}{\textit{Insert your content here.}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 \input{../Comments}
 \input{../Common}
@@ -153,20 +155,22 @@ This section provides an overview of the high-level inputs and outputs between t
 
 This section describes how the work done by the system can be partitioned into smaller and more manageable workflows. Below is a table describing each of the sub-workflows of the proposed systems. Note that event creation and survey creation have been grouped as a single workflow since they are nearly identical.
 
-{\renewcommand{\arraystretch}{1.2}
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|l|l|l|l|}
-\hline
-Event No. & Event                               & Input                & Output                                                                        & Requirements \\ \hline
-1         & User registers for event            & Registration data    & Event ticket                                                                  &              \\ \hline
-2         & User fills out a survey             & Survey responses     & Survey completion confirmation                                                &              \\ \hline
-3         & Admin creates a form module         & Module question data & Reusable form module                                                          &              \\ \hline
-4         & Admin creates an event/survey       & Event/survey data    & Event/survey creation confirmation                                            &              \\ \hline
-5         & Admin views survey/event statistics & Event/survey to view & Event/survey registration/response reports                                    &              \\ \hline
-\end{tabular}
-\captionof{table}{Partitioning of system workflows}\label{wfpart}
-\end{table}
+{
+  \setlength{\tabcolsep}{0.125em}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{|P{2.5em}|Y|Y|Y|Y|}
+      \hline
+      \textbf{No.} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
+      1 & User registers for event & Registration data & Event ticket & \\ \hline
+      2 & User fills out a survey & Survey responses & Survey completion confirmation & \\ \hline
+      3 & Admin creates a form module & Module question data & Reusable form module & \\ \hline
+      4 & Admin creates an event/survey & Event/survey data & Event/survey creation confirmation & \\ \hline
+      5 & Admin views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \\ \hline
+    \end{tabularx}
+    \captionof{table}{Partitioning of system workflows}\label{wfpart}
+  \end{table}
 }
 
 \subsection{Specifying a Business Use Case (BUC)}
