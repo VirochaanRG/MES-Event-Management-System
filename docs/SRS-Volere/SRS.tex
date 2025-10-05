@@ -61,10 +61,33 @@ Date 2 & 1.1 & Notes\\
 
 ~\newpage
 \section{Purpose of the Project}
+
+The purpose of this project is to create a centralized platform for the McMaster Engineering Society (MES) that simplifies how large-scale events are managed. By consolidating event registration, form creation, attendee tracking, and data analytics into a single system, the platform aims to reduce administrative workload, eliminate fragmented workflows, and enhance the overall experience for both event organizers and attendees.
+
 \subsection{User Business}
-\lips
+
+The primary users of this system are members of the McMaster Engineering Society, including executives and event organizers, as well as McMaster engineering students who attend MES events.  
+
+\begin{itemize}
+    \item \textbf{Administrators (MES Executives and Organizers):} Responsible for creating events, designing registration and feedback forms, managing attendee information, and analyzing data through the dashboard. They will use the platform to reduce manual work and improve event coordination.
+    \item \textbf{End Users (Students and Attendees):} Students will use the platform to register for events, complete waivers or feedback forms, and receive event confirmations and updates. The goal is to create a seamless and engaging experience that encourages participation.
+\end{itemize}
+
+By serving both groups through a single platform, the system eliminates redundant workflows and ensures continuity of data across multiple events.
+
 \subsection{Goals of the Project}
-\lips
+
+The primary goals of this project are as follows:
+
+\begin{enumerate}
+    \item \textbf{Develop a Custom Form Builder:} Build an intuitive tool that lets administrators design and manage event or feedback forms with different question types and conditional logic, without needing third-party software.
+    \item \textbf{Implement a Unified Registration and Feedback System:} Create a simple, centralized process for students to register for events, complete waivers, and share feedback—all in one place.
+    \item \textbf{Create an Attendee Overview Dashboard:} Give administrators a clear view of event participation by displaying key details such as registration status, payments, and waiver completion in real time.
+    \item \textbf{Integrate Backend Analytics:} Include tools that help MES organizers analyze event data, track trends, and use insights to plan and improve future events more effectively.
+\end{enumerate}
+
+
+
 \section{Stakeholders}
 \subsection{Client}
 The client for this project is the supervisor, Luke Schuurman. He is a member of the MES and has first hand experience plannig and hosting events with the MES. As the supervisor he will play a crucial role by ensuring the project aligns with objective of the MES and integrate the platform seamlessly with existing systems. He will also provide us with feedback and guidance throughout the project and will help define the project requirements in this document.
@@ -117,13 +140,42 @@ involved in the Project}
 \begin{itemize}
   \item \textbf{MES}: McMaster Engineering Society
 \end{itemize}
-\section{Relevant Facts And Assumptions}
+
+\section{Relevant Facts and Assumptions}
+
+This section outlines the key facts, business rules, and assumptions that guide the design and development of Project A — which focuses on the Custom Form Builder, Registration and Feedback Forms, Attendee Overview, and Backend Analytics components of the larger MES Event Management System.
+
 \subsection{Relevant Facts}
-\lips
+
+\begin{itemize}
+    \item The McMaster Engineering Society (MES) currently manages events such as Fireball Formal and the CALE Conference using several disconnected tools like Google Forms and Google Sheets, which creates inefficiencies and limits data analysis.
+    \item Each MES event involves registration, waiver collection, and feedback surveys that must comply with university data privacy and accessibility standards.
+    \item The system will be used by both administrators and students on a wide range of devices and browsers, so responsive and cross-platform design is required.
+    \item The overall Event Management System is being co-developed by three Capstone teams. Project A must maintain compatibility and shared data models with the other two teams’ components.
+    \item The project’s frontend stack was recently updated from \textbf{Next.js} to \textbf{Vite + TanStack Router + TanStack Create} to improve development speed, hot reloading performance, and flexibility for building a Single Page Application (SPA) with integrated admin dashboards and authentication.
+    \item PostgreSQL remains the chosen database technology for data storage and analytics.
+\end{itemize}
+
 \subsection{Business Rules}
-\lips
+
+\begin{itemize}
+    \item Only verified MES administrators can create, edit, or delete forms and view backend analytics.
+    \item Event data, form responses, and attendee details must be securely stored and retrievable for future event reviews.
+    \item All user input will be validated to prevent incomplete or invalid submissions before being stored in the database.
+    \item A consistent data format must be maintained across all events to support accurate analytics and report generation.
+    \item Administrators can export data such as attendee lists or analytics summaries in standard formats (e.g., CSV, PDF).
+\end{itemize}
+
 \subsection{Assumptions}
-\lips
+
+\begin{itemize}
+    \item The MES will provide sample event and registration data to support development and testing.
+    \item Users will have stable internet access when using the platform, as it relies on real-time connectivity.
+    \item Collaborating teams (Projects B and C) will follow the agreed API and database specifications to ensure system integration works smoothly.
+    \item Authentication and authorization will be handled securely within the shared platform using standardized methods.
+    \item Future MES administrators and developers will continue maintaining the project using the provided GitHub repository, documentation, and CI/CD workflows.
+\end{itemize}
+
 
 \section{The Scope of the Work}
 
