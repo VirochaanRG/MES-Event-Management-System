@@ -140,13 +140,42 @@ involved in the Project}
 \begin{itemize}
   \item \textbf{MES}: McMaster Engineering Society
 \end{itemize}
-\section{Relevant Facts And Assumptions}
+
+\section{Relevant Facts and Assumptions}
+
+This section outlines the key facts, business rules, and assumptions that guide the design and development of Project A — which focuses on the Custom Form Builder, Registration and Feedback Forms, Attendee Overview, and Backend Analytics components of the larger MES Event Management System.
+
 \subsection{Relevant Facts}
-\lips
+
+\begin{itemize}
+    \item The McMaster Engineering Society (MES) currently manages events such as Fireball Formal and the CALE Conference using several disconnected tools like Google Forms and Google Sheets, which creates inefficiencies and limits data analysis.
+    \item Each MES event involves registration, waiver collection, and feedback surveys that must comply with university data privacy and accessibility standards.
+    \item The system will be used by both administrators and students on a wide range of devices and browsers, so responsive and cross-platform design is required.
+    \item The overall Event Management System is being co-developed by three Capstone teams. Project A must maintain compatibility and shared data models with the other two teams’ components.
+    \item The project’s frontend stack was recently updated from \textbf{Next.js} to \textbf{Vite + TanStack Router + TanStack Create} to improve development speed, hot reloading performance, and flexibility for building a Single Page Application (SPA) with integrated admin dashboards and authentication.
+    \item PostgreSQL remains the chosen database technology for data storage and analytics.
+\end{itemize}
+
 \subsection{Business Rules}
-\lips
+
+\begin{itemize}
+    \item Only verified MES administrators can create, edit, or delete forms and view backend analytics.
+    \item Event data, form responses, and attendee details must be securely stored and retrievable for future event reviews.
+    \item All user input will be validated to prevent incomplete or invalid submissions before being stored in the database.
+    \item A consistent data format must be maintained across all events to support accurate analytics and report generation.
+    \item Administrators can export data such as attendee lists or analytics summaries in standard formats (e.g., CSV, PDF).
+\end{itemize}
+
 \subsection{Assumptions}
-\lips
+
+\begin{itemize}
+    \item The MES will provide sample event and registration data to support development and testing.
+    \item Users will have stable internet access when using the platform, as it relies on real-time connectivity.
+    \item Collaborating teams (Projects B and C) will follow the agreed API and database specifications to ensure system integration works smoothly.
+    \item Authentication and authorization will be handled securely within the shared platform using standardized methods.
+    \item Future MES administrators and developers will continue maintaining the project using the provided GitHub repository, documentation, and CI/CD workflows.
+\end{itemize}
+
 
 \section{The Scope of the Work}
 
