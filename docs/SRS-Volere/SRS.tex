@@ -51,7 +51,7 @@
 
 \begin{document}
 
-\title{Software Requirements Specification for \progname: \prjdesc}
+\title{Software Requirements Specification for \progname: A Platform for Event Management }
 \author{\authname}
 \date{\today}
 
@@ -108,10 +108,10 @@ The primary goals of this project are as follows:
 \section{Stakeholders}
 \subsection{Client}
 The client for this project is the supervisor, Luke Schuurman. He is a member of the MES and has first hand experience plannig and hosting events with the MES. As the supervisor he will play a crucial role by ensuring the project aligns with objective of the MES and integrate the platform seamlessly with existing systems. He will also provide us with feedback and guidance throughout the project and will help define the project requirements in this document.
-\subsection{Customer}
-\lips
-\subsection{Other Stakeholders}
-\lips
+% \subsection{Customer}
+% \lips
+% \subsection{Other Stakeholders}
+% \lips
 \subsection{Hands-On Users of the Project}
 \textbf{MES Executives and Council Members}: They will be utilizing this system to create and manage events, configure forms and surveys, monitor event data and generate data analytics reports. They can be characterized as primarily undergraduate students who value their time greatly. They aim to reduce the time taken to do administrative tasks as well as provide a better experience during MES events. Their experience with systems like this can range from Journeyman - Master as they can be experienced in event planning and student engagement. There may be a slight learning curve to utilizing the new technology but these users have experience performing these functions.\\
 \newline
@@ -130,8 +130,8 @@ The client for this project is the supervisor, Luke Schuurman. He is a member of
 \subsection{User Participation}
 Our requirements will primarily be derived through meetings with our supervisor Luke Schuurman. If we have the need to clarify or elicit more requirements we will look to engage other MES members either through our supervisor or directly.
 
-\subsection{Maintenance Users and Service Technicians}
-\lips
+% \subsection{Maintenance Users and Service Technicians}
+% \lips
 
 \section{Mandated Constraints}
 \subsection{Solution Constraints}
@@ -538,8 +538,9 @@ This section describes how the work done by the system can be partitioned into s
   labelsep=1em,
   itemindent=0em,
   label=\bfseries MT-\arabic*:]
-  \item The system shall remain operational during the entirety of an event.
-  \item The system shall have scheduled maintenance performed before and after events.
+  \item The system shall provide updated documentation upon every release and be accessible to all developers\\[2mm]
+    {\bf Motivation:} Allows for developers to understand the changes made on each release and will be easily be able to modify the code to fix errors or make updates. \\ 
+    {\bf Fit Criterion:} Updated documentation will be included with the release of each version.
 \end{enumerate}
 \subsection{Supportability Requirements}
 \begin{enumerate}[align=left,
@@ -547,13 +548,23 @@ This section describes how the work done by the system can be partitioned into s
   labelsep=1em,
   itemindent=0em,
   label=\bfseries SU-\arabic*:]
-  \item The system shall run as a native mobile application on Android and iOS devices.
-  \item The system shall run as a web app accessible through Chromium, Firefox, and
-    Safari browsers.
+  \item The system shall include a FAQ section to help clarify or answer common questions.\\[2mm]
+    {\bf Motivation:} Will allow for a better user experience as they can solve their own problems quickly and will make it easier for MES support teams. \\ 
+    {\bf Fit Criterion:} Ensure a FAQ with common questions obtained from stakeholders (supervisor and MES council members) is included within the system.
 \end{enumerate}
-\lips
 \subsection{Adaptability Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries AD-\arabic*:]
+  \item The system shall run as a web app accessible through Chromium, Firefox, and Safari browsers. \\[2mm]
+    {\bf Motivation:} This will allow users to use whatever browser they want and will make the application more accessible. \\ 
+    {\bf Fit Criterion:} Test for compatibility of the application to ensure it runs on all specified browsers.
+  \item The mobile app components will work on both IOS and Android platforms. \\[2mm]
+    {\bf Motivation:} Allows users on both mobile ecosystems to use the app making the application more accessible. \\ 
+    {\bf Fit Criterion:} Test the application in both the IOS and Android Environment ensuring correct functionality of all components.
+\end{enumerate}
 
 \section{Security Requirements}
 \subsection{Access Requirements}
@@ -562,17 +573,54 @@ This section describes how the work done by the system can be partitioned into s
   labelsep=1em,
   itemindent=0em,
   label=\bfseries AC-\arabic*:]
-  \item The system shall allow \glspl{adm} to have privileged access to \gls{atd} records.
-  \item The system shall restrict event \glspl{atd} from accessing information that is not associated with them.
+  \item The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
+    {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\ 
+    {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.
+  \item Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
+    {\bf Motivation:} Prevents unauthorized users from viewing sensitive event and user data.  \\ 
+    {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins
 \end{enumerate}
 \subsection{Integrity Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries IG-\arabic*:]
+  \item The system shall provide input validation for all user submitted data \\[2mm]
+    {\bf Motivation:} Ensures the safety of our application by ensuring only the required input types are entering our database. Protects us from SQL injection and data corruption in our database.  \\ 
+    {\bf Fit Criterion:} All inputs will include checks to ensure only the correct type is entering our database. Perform testing to ensure that all inputs have validation checks. 
+  \item The system shall only use HTTPS for communication between clients and servers \\[2mm]
+    {\bf Motivation:} Ensures a secure connection between our client and server and protects against the interception or tampering of data during data transmission. \\ 
+    {\bf Fit Criterion:} All requests will be done through HTTPS and if an HTTP request is done we will redirect it to HTTPS. \\
+\end{enumerate}
 \subsection{Privacy Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries PV-\arabic*:]
+  \item Users shall have the ability to request for the deletion of their stored personal data\\[2mm]
+    {\bf Motivation:} Increases transparency and control over their own data for users. Provides reassurances for users that their data can be removed if neccesary.    \\ 
+    {\bf Fit Criterion:} Ensure a mechanism exists for users to delete their data. Peform testing so that the mechanism actually removes all related data from the database.
+  \item The system shall only store sensitive data after obtaining the consent of the user \\[2mm]
+    {\bf Motivation:} Keeps us legally sound as we are not storing user data without first obtaining consent. Also provides users with information on what their data is actually being used for.  \\ 
+    {\bf Fit Criterion:} Ensure that all sections which require inputting sensitive information have consent checks where we explicitly explain what is being stored and how it may be used. \\
+  \item All sensitive user information such as student numbers, names and emails shall be encrypted in storage using AES-256\\[2mm]
+    {\bf Motivation:} Protects user's information from unauthorized viewing and ensures that even if a breach were to occur sensitive information will not be leaked.   \\ 
+    {\bf Fit Criterion:} Inspect database to show that the required fields are stored encrypted and not in plaintext. \\
+\end{enumerate}
 \subsection{Audit Requirements}
-\lips
-\subsection{Immunity Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries AU-\arabic*:]
+  \item The system shall track admin action inside an audit log\\[2mm]
+    {\bf Motivation:} Ensures traceability of admin actions and allows other admins to know who performed what.  \\ 
+    {\bf Fit Criterion:} 100\% of actions will be in a log with tracking of user who did the action, timestamp and action commited. Testing will be done to ensure all actions are being logged and logs should be exportable for review.
+\end{enumerate}
+% \subsection{Immunity Requirements}
+% \textit{No relevant requirements}
 
 \section{Cultural Requirements}
 \subsection{Cultural Requirements}
@@ -600,8 +648,9 @@ There are some products that exists on the market which solve certain components
 \subsection{Reusable Components}
 There are various components that we can use to help develop our application:
 \begin{itemize}
-  \item \textbf{Next.JS}: Provide us with a framework for developing web apps in \textbf{React} and provides built in routing behaviour. It also handles many built in libraries and packages that we can use for front-end styling such as \textbf{tailwind-css} and \textbf{shadcn/ui}. We can also integrate it with other libraries for authentication and for database management
-  \item \textbf{SurveyJS}: This is a potential tool we can use to develop the form builder as it provides us with some pre-built components we can use to develop and customize our own forms.
+  \item \textbf{Vite}: Provides us with a framework for developing web apps in \textbf{React} and provides built in routing behaviour. It also handles many built in libraries and packages that we can use for front-end styling such as \textbf{tailwind-css}. We can also integrate it with other libraries for authentication and for database management
+  \item \textbf{TanStack}: Provides us with a powerfull middleware to connect backend and front-end services. Will primarily be used for routing but also offers data visualization capabilities. Offers many libraries for working with data and state management that we can leverage.
+  \item \textbf{SurveyJS}: This is a potential tool we can use to develop the form builder as it provides us with some pre-built components we can use to develop and customize our own forms. 
   \item \textbf{Recharts}: This could be potential charting tool we can use to develop our admin dashboard. Though there are other charting tools the benefit of Recharts is that it provides customization on top of the pre built charts.
   \item \textbf{Drizzle}: We can use Drizzle as an ORM to map from our database to our web-app. Drizzle is useful since it is lightweight and is code first. Drizzle's simplicity allows for faster development and is perfect for our use case.
 \end{itemize}
