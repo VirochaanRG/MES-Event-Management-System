@@ -254,11 +254,11 @@ This section describes how the work done by the system can be partitioned into s
 \subsection{Specifying a Business Use Case (BUC)}
 % provide a use case for each sub workflow
 
-\noindent\textbf{BUC 1: } User registers for an event \\
+\subsubsection*{BUC 1: User registers for an event}
 \textbf{Input:} Registration data \\
 \textbf{Output:} Event tickets \\
 \textbf{Pre-condition:} User has downloaded the application and has created an account \\
-\textbf{Scenario:} \\
+\textbf{Scenario:}
 \begin{enumerate}
   \item The user application receives the registration data
   \item The user application verifies the data is filled correctly
@@ -268,12 +268,14 @@ This section describes how the work done by the system can be partitioned into s
   \item The backend server generates an event ticket and sends it to the user application
   \item The user application confirms with the user that the registration was successful and presents the user with the ticket
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted registration data has errors, the user application prompts the user to fix the errors and resubmit \\
-4a. The event is full or the deadline has passed, the backend sends an error code to the user application \\
-4b. The user application alerts the user of the error. \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted registration data has errors: the user application prompts the user to fix the errors and resubmit.
+  \item [4a.] The event is full, or the deadline has passed: the backend sends an error code to the user application.
+  \item [4b.] The user application alerts the user of the error.
+\end{itemize}
 
-\noindent\textbf{BUC 2: } User fills out a survey module \\
+\subsubsection*{BUC 2: User fills out a survey module}
 \textbf{Input:} Survey responses \\
 \textbf{Output:} Survey completion confirmation \\
 \textbf{Pre-condition:} User has downloaded the application and has created an account \\
@@ -289,7 +291,7 @@ This section describes how the work done by the system can be partitioned into s
 \textbf{Sub variations:} \\
 2a. The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the user to fix the errors and resubmit \\
 
-\noindent\textbf{BUC 3: } \Gls{adm} creates a form module \\
+\subsubsection*{BUC 3: \Gls{adm} creates a form module}
 \textbf{Input:} Form fields \\
 \textbf{Output:} Reusable form module \\
 \textbf{Pre-condition:} \Gls{adm} has access to create custom form modules \\
@@ -308,7 +310,7 @@ This section describes how the work done by the system can be partitioned into s
 2a. The submitted form module has errors (i.e. unfinished fields), the \gls{adm} user is prompted to fix these errors before resubmitting \\
 4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
 
-\noindent\textbf{BUC 4: } \Gls{adm} creates an event/survey \\
+\subsubsection*{BUC 4: \Gls{adm} creates an event/survey}
 \textbf{Input:} Event details \\
 \textbf{Output:} Event creation confirmation \\
 \textbf{Pre-condition:} \Gls{adm} has access to create events \\
@@ -328,11 +330,11 @@ This section describes how the work done by the system can be partitioned into s
 2a. The submitted details have errors (i.e. event date has already passed), the \gls{adm} user is prompted to fix these errors before resubmitting \\
 4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
 
-\noindent\textbf{BUC 5: } \Gls{adm} views event/survey statistics \\
+\subsubsection*{BUC 5: \Gls{adm} views event/survey statistics}
 \textbf{Input:} Event/survey to view \\
 \textbf{Output:} Event registration/survey response report \\
 \textbf{Pre-condition:} Event/survey has been created, and users have registered/responded \\
-\textbf{Scenario:} \\
+\textbf{Scenario:}
 \begin{enumerate}
   \item The \gls{adm} portal receives the request to view event/survey statistics
   \item The \gls{adm} portal sends a request to the backend server containing the identification for the event/survey to view
