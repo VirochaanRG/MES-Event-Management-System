@@ -14,6 +14,7 @@
 \usepackage{enumitem}
 \usepackage{float}
 \usepackage{enumitem}
+\usepackage[acronym,xindy]{glossaries}
 
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
@@ -22,6 +23,22 @@
     citecolor=green,        % color of links to bibliography
     filecolor=magenta,      % color of file links
     urlcolor=cyan           % color of external links
+}
+
+\makeglossaries
+\newacronym{mes}{MES}{McMaster Engineering Society}
+\newacronym{cfes}{CFES}{Canadian Federation of Engineering Students}
+\newglossaryentry{adm}{
+  name=admin,
+  description={A privileged system user affiliated with \gls{mes} who can access survey, event, and attendee records;
+  track finances; and update event statuses.}
+  plural=admins,
+}
+\newglossaryentry{atd}{
+  name=attendee,
+  description={An individual who attends an \gls{mes} event, and uses the system to register, receive event updates,
+  provide feedback, or fill out survey responses.}
+  plural=attendees,
 }
 
 \newcommand{\lips}{\textit{Insert your content here.}}
@@ -33,7 +50,7 @@
 
 \begin{document}
 
-\title{Software Requirements Specification for \progname: subtitle describing software}
+\title{Software Requirements Specification for \progname: \prjdesc}
 \author{\authname}
 \date{\today}
 
@@ -137,9 +154,7 @@ Our requirements will primarily be derived through meetings with our supervisor 
 \section{Naming Conventions and Terminology}
 \subsection{Glossary of All Terms, Including Acronyms, Used by Stakeholders
 involved in the Project}
-\begin{itemize}
-  \item \textbf{MES}: McMaster Engineering Society
-\end{itemize}
+\printglossaries
 
 \section{Relevant Facts and Assumptions}
 
@@ -183,7 +198,7 @@ The purpose of the section is to define the expected scope of the project, inclu
 
 \subsection{The Current Situation}
 
-Currently, the MES uses plethora of different platforms to host events and conduct surveys such as tools for registration, signing of waivers, and checking in attendees. The main platforms used are a combination of Google Forms and Google Sheets. There are several pain points to address with the current system.
+Currently, the \gls{mes} uses plethora of different platforms to host events and conduct surveys such as tools for registration, signing of waivers, and checking in \glspl{atd}. The main platforms used are a combination of Google Forms and Google Sheets. There are several pain points to address with the current system.
 
 \begin{itemize}
   \item \textbf{Decentralized System Components} Registration and surverying is split across a plethora of tools and software which may not be compatible with each other. For example, Google Forms is used for registration forms and surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is done by email or social media.
@@ -191,9 +206,9 @@ Currently, the MES uses plethora of different platforms to host events and condu
   \item \textbf{Disorganized Data Visualization} Form response data is currently stored using Google Sheets. While Google Form data is easily imported into Google Sheets, any analytics on the data must be done manually through equations and macros.
   \item \textbf{Lack of Reusability} Google Forms comes with a few templates that provide an initial starting point for many types of forms such as registrant information. However, after the first section of the form, each subsequent section must be made manually. Sections may be imported from other forms but this requires the user to have access to a form with the wanted section and to scour through an unorganized list of forms and sections.
   \item \textbf{Low Response Rates on Surveys} The response rates on the annual CFES survey of undergraduate engineering students have been decreasing due to the long length of the Google Form and the lack of ability to submit a partially completed form.
-  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the MES LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed.
+  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the \gls{mes} LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed.
 \end{itemize}
-% MES hosts lots of events per year
+% \gls{mes} hosts lots of events per year
 % Their event management system is unorganized
 % Consists of google forms, google sheets
 % No template form to work with redundant info between forms like name, number email, etc
@@ -229,9 +244,9 @@ This section describes how the work done by the system can be partitioned into s
       \textbf{No.} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
       1 & User registers for event & Registration data & Event ticket & \\ \hline
       2 & User fills out a survey & Survey responses & Survey completion confirmation & \\ \hline
-      3 & Admin creates a form module & Module question data & Reusable form module & \\ \hline
-      4 & Admin creates an event/survey & Event/survey data & Event/survey creation confirmation & \\ \hline
-      5 & Admin views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \\ \hline
+      3 & \Gls{adm} creates a form module & Module question data & Reusable form module & \\ \hline
+      4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \\ \hline
+      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \\ \hline
     \end{tabularx}
     \captionof{table}{Partitioning of system workflows}\label{wfpart}
   \end{table}
@@ -250,7 +265,7 @@ This section describes how the work done by the system can be partitioned into s
   \item The user application verifies the data is filled correctly
   \item The user application sends the registration data to the backend server
   \item The backend server verifies the event is not full and the deadline has not passed
-  \item The backend server adds the user to the list of attendees
+  \item The backend server adds the user to the list of \glspl{atd}
   \item The backend server generates an event ticket and sends it to the user application
   \item The user application confirms with the user that the registration was successful and presents the user with the ticket
 \end{enumerate}
@@ -275,62 +290,62 @@ This section describes how the work done by the system can be partitioned into s
 \textbf{Sub variations:} \\
 2a. The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the user to fix the errors and resubmit \\
 
-\noindent\textbf{BUC 3: } Admin creates a form module \\
+\noindent\textbf{BUC 3: } \Gls{adm} creates a form module \\
 \textbf{Input:} Form fields \\
 \textbf{Output:} Reusable form module \\
-\textbf{Pre-condition:} Admin has access to create custom form modules \\
+\textbf{Pre-condition:} \Gls{adm} has access to create custom form modules \\
 \textbf{Scenario:} \\
 \begin{enumerate}
-  \item The admin portal receives the list of form fields and questions from the admin user for the custom module
-  \item The admin portal verifies the custom module has been created correctly
-  \item The admin portal sends the custom module data to the backend server
-  \item The backend server authenticates the admin user
+  \item The \gls{adm} portal receives the list of form fields and questions from the \gls{adm} user for the custom module
+  \item The \gls{adm} portal verifies the custom module has been created correctly
+  \item The \gls{adm} portal sends the custom module data to the backend server
+  \item The backend server authenticates the \gls{adm} user
   \item The backend server saves the custom module data to the template database
-  \item The backend server sends a confirmation message to the admin portal
-  \item The admin portal updates the list of custom modules with the completed module
-  \item The admin portal confirms with the admin user that the custom module has been created
+  \item The backend server sends a confirmation message to the \gls{adm} portal
+  \item The \gls{adm} portal updates the list of custom modules with the completed module
+  \item The \gls{adm} portal confirms with the \gls{adm} user that the custom module has been created
 \end{enumerate}
 \textbf{Sub variations:} \\
-2a. The submitted form module has errors (i.e. unfinished fields), the admin user is prompted to fix these errors before resubmitting \\
-4a. Authentication of the admin fails, the admin portal is notified of the request denial \\
+2a. The submitted form module has errors (i.e. unfinished fields), the \gls{adm} user is prompted to fix these errors before resubmitting \\
+4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
 
-\noindent\textbf{BUC 4: } Admin creates an event/survey \\
+\noindent\textbf{BUC 4: } \Gls{adm} creates an event/survey \\
 \textbf{Input:} Event details \\
 \textbf{Output:} Event creation confirmation \\
-\textbf{Pre-condition:} Admin has access to create events \\
+\textbf{Pre-condition:} \Gls{adm} has access to create events \\
 \textbf{Scenario:} \\
 \begin{enumerate}
-  \item The admin portal receives the event/survey details
-  \item The admin portal verifies the event/survey details are correct
-  \item The admin portal sends the event/survey data to the backend server
-  \item The backend server authenticates the admin user
+  \item The \gls{adm} portal receives the event/survey details
+  \item The \gls{adm} portal verifies the event/survey details are correct
+  \item The \gls{adm} portal sends the event/survey data to the backend server
+  \item The backend server authenticates the \gls{adm} user
   \item The backend server saves the event/survey data to the database of events/surveys
   \item The backend server sends a message to the user application to notify users of the new event/survey
-  \item The backend server sends a confirmation message to the admin portal
-  \item The admin portal adds the created event/survey to the event/survey dashboard
-  \item The admin portal confirms with the admin user that the event/survey has been created
+  \item The backend server sends a confirmation message to the \gls{adm} portal
+  \item The \gls{adm} portal adds the created event/survey to the event/survey dashboard
+  \item The \gls{adm} portal confirms with the \gls{adm} user that the event/survey has been created
 \end{enumerate}
 \textbf{Sub variations:} \\
-2a. The submitted details have errors (i.e. event date has already passed), the admin user is prompted to fix these errors before resubmitting \\
-4a. Authentication of the admin fails, the admin portal is notified of the request denial \\
+2a. The submitted details have errors (i.e. event date has already passed), the \gls{adm} user is prompted to fix these errors before resubmitting \\
+4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
 
-\noindent\textbf{BUC 5: } Admin views event/survey statistics \\
+\noindent\textbf{BUC 5: } \Gls{adm} views event/survey statistics \\
 \textbf{Input:} Event/survey to view \\
 \textbf{Output:} Event registration/survey response report \\
 \textbf{Pre-condition:} Event/survey has been created, and users have registered/responded \\
 \textbf{Scenario:} \\
 \begin{enumerate}
-  \item The admin portal receives the request to view event/survey statistics
-  \item The admin portal sends a request to the backend server containing the identification for the event/survey to view
-  \item The backend server receives the request and authenticates the admin user
+  \item The \gls{adm} portal receives the request to view event/survey statistics
+  \item The \gls{adm} portal sends a request to the backend server containing the identification for the event/survey to view
+  \item The backend server receives the request and authenticates the \gls{adm} user
   \item The backend server retrieves the registrant/response data for the requested event/survey from the database
   \item The backend server generates a statistical report of all the data
-  \item The data is sent back to the admin portal
-  \item The admin portal formats all the data into a readable format
-  \item The admin user is presented with the event/survey statistics
+  \item The data is sent back to the \gls{adm} portal
+  \item The \gls{adm} portal formats all the data into a readable format
+  \item The \gls{adm} user is presented with the event/survey statistics
 \end{enumerate}
 \textbf{Sub variations:} \\
-3a. Authentication of the admin fails, the admin portal is notified of the request denial \\
+3a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
 
 
 \section{Business Data Model and Data Dictionary}
@@ -364,19 +379,19 @@ This section describes how the work done by the system can be partitioned into s
   labelsep=1em,
   itemindent=0em,
   label=\bfseries FR-\arabic*:]
-  \item The system shall allow admins to create forms with multiple fields types.
-  \item The system shall allow admins to organize forms for analytics, and specify how
+  \item The system shall allow \glspl{adm} to create forms with multiple fields types.
+  \item The system shall allow \glspl{adm} to organize forms for analytics, and specify how
     the analysis should be done.
   \item The system shall generate QR codes for confirmation and check-in integration.
-  \item The system shall provide an attendee dashboard for administrators with filters
+  \item The system shall provide an \gls{atd} dashboard for \glspl{adm} with filters
     for status updates on payments and waivers, event sign-ins, etc.
   \item The system shall store all event data in a secure, centralized\\database.
   \item The system shall store all questionnaire data in a secure, centralized database.
-  \item The system shall allow administrators to generate analytics dashboards and export
+  \item The system shall allow \glspl{adm} to generate analytics dashboards and export
     CSV/Excel reports.
-  \item The system shall provide event attendees with a medium to relay feedback for the
+  \item The system shall provide event \glspl{atd} with a medium to relay feedback for the
     event.
-  \item The system shall provide administrators with a medium to view all event feedback
+  \item The system shall provide \glspl{adm} with a medium to view all event feedback
     once an event has completed.
   \item{The system shall store all questionnaire data in a secure, centralized database.}
 \end{enumerate}
@@ -486,7 +501,7 @@ This section describes how the work done by the system can be partitioned into s
   \item The system shall auto-save partially completed surveys every 30 seconds.
   \item The system shall recover from a server crash within 60 seconds without data loss.
   \item The system shall allow new form modules to be added without any downtime.
-  \item The system shall allow administrators to update event templates without disruption
+  \item The system shall allow \glspl{adm} to update event templates without disruption
     during ongoing events.
 \end{enumerate}
 \subsection{Capacity Requirements}
