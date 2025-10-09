@@ -13,6 +13,7 @@
 \usepackage{caption}
 \usepackage{enumitem}
 \usepackage{float}
+\usepackage{longtable}
 \usepackage[english]{babel}
 \usepackage[acronym,nonumberlist]{glossaries}
 
@@ -397,17 +398,319 @@ Below is a table defining each of the system components shown in \hyperref[fig:b
 \lips
 % Produce a Product Boundary Diagram which shows what happens inside of the system and how it happens, and what comes from/goes outside the system
 \subsection{Product Use Case Table}
-\lips
 % Label each product use case from the diagram and map them to actors, inputs/outputs, and requirement numbers
+
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+{
+\setlength{\tabcolsep}{0.3em}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}[H]{p{0.03\linewidth}p{0.22\linewidth}p{0.12\linewidth}p{0.43\linewidth}p{0.2\linewidth}}
+\toprule
+\textbf{\#}     & \textbf{Name}                  & \textbf{Actor} & \textbf{Input/Output}                                                                                                       & \textbf{Requirements} \\ \midrule
+1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and fields (in)\\Reusable form module (out)\end{tabular}                        &                       \\ \midrule
+2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 &                       \\ \midrule
+3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           &                       \\ \midrule
+4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         &                       \\ \midrule
+5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          &                       \\ \midrule
+6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and questions (in)\\Fillable survey (out)\end{tabular}                            &                       \\ \midrule
+7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       &                       \\ \midrule
+8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           &                       \\ \midrule
+9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         &                       \\ \midrule
+10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            &                       \\ \midrule
+11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  &                       \\ \midrule
+12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 &                       \\ \midrule
+13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       &                       \\ \midrule
+14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           &                       \\ \midrule
+15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     &                       \\ \midrule
+16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        &                       \\ \midrule
+17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  &                       \\ \midrule
+18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                &                       \\ \midrule
+19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            &                       \\ \midrule
+20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion confirmation (out)\end{tabular} &                       \\ \midrule
+21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update confirmation (out)\end{tabular}           &                       \\ \midrule
+22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        &                       \\ \bottomrule
+\end{longtable}
+}
+
 \subsection{Individual Product Use Cases (PUC's)}
-\lips
-% Take each Product user case and define it further with the following
-% Trigger - what caused this use case to execute
-% Actors - what actors caused the trigger
-% Preconditions - what properties hold before the use case occurs
-% Input - input to the use case
-% output - output of the use case
-% outcome - What happened as a result of the use case
+
+{\setlength{\parindent}{0pt}
+\textbf{PUC 1: Create a custom form module} \\
+\textbf{Trigger:} The \gls{adm} requests to create a new form module \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to create form modules
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} A form module is created which \glspl{adm} can use in any event registration/survey form \\
+\textbf{Input:} Form module name and fields \\
+\textbf{Output:} Reusable form module \\[1em]
+
+\textbf{PUC 2: Edit an existing form module} \\
+\textbf{Trigger:} The \gls{adm} selects a form module to edit \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to edit form modules
+  \item At least one form module is available for editing
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The selected form module is updated with the \gls{adm}’s changes \\
+\textbf{Input:} Selected form module and updated fields \\
+\textbf{Output:} Edited form module \\[1em]
+
+\textbf{PUC 3: Create an event} \\
+\textbf{Trigger:} The \gls{adm} requests to create a new event \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to create events
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} An event is created and \glspl{atd} are notified of a new upcoming event \\
+\textbf{Input:} Event details (e.g. title, date, location, cost) \\
+\textbf{Output:} Scheduled event \\[1em]
+
+\textbf{PUC 4: Edit an event} \\
+\textbf{Trigger:} The \gls{adm} requests to edit an event \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to edit events
+  \item At least one upcoming event is scheduled
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The event details are updated and \glspl{atd} are notified of a change \\
+\textbf{Input:} Selected event and              edited details \\
+\textbf{Output:} Edited event \\[1em]
+
+\textbf{PUC 5: Cancel an event} \\
+\textbf{Trigger:} The \gls{adm} requests to cancel an event \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to cancel events
+  \item At least one upcoming event is scheduled
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The event is cancelled and the \glspl{atd} are notified of the change \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Cancelled event \\[1em]
+
+\textbf{PUC 6: Create a survey} \\
+\textbf{Trigger:} The \gls{adm} requests to create a new survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to create surveys
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey is created and \glspl{atd} are notified of a new survey \\
+\textbf{Input:} Survey details (e.g. title, questions) \\
+\textbf{Output:} Fillable survey \\[1em]
+
+\textbf{PUC 7: Edit a survey} \\
+\textbf{Trigger:} The \gls{adm} requests to edit a survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to edit surveys
+  \item At least one survey is open to responses
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey is updated and \glspl{atd} are notified of the change \\
+\textbf{Input:} Survey to update and              updated survey details \\
+\textbf{Output:} Updated survey \\[1em]
+
+\textbf{PUC 8: Close a survey} \\
+\textbf{Trigger:} The \gls{adm} requests to close a survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to close surveys
+  \item At least one survey is open to responses
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey is closed \\
+\textbf{Input:} Selected survey \\
+\textbf{Output:} Cancelled event \\[1em]
+
+\textbf{PUC 9: View financial reports} \\
+\textbf{Trigger:} The \gls{adm} requests to view a financial report \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view financial reports
+  \item At least one event has been scheduled or completed
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} A financial report of the selected event is generated and displayed \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Financial report of the selected event \\[1em]
+
+\textbf{PUC 10: View event attendee overview} \\
+\textbf{Trigger:} The \gls{adm} requests to view an event attendee overview \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view attendee overviews
+  \item At least one event has been scheduled or completed
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} An overview of registered \glspl{atd} is generated and displayed \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Attendee overview of the selected event \\[1em]
+
+\textbf{PUC 11: View survey response reports} \\
+\textbf{Trigger:} The \gls{adm} requests to view a survey response report \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view survey responses
+  \item At least one survey has been released and at least one \gls{atd} has responded
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} An overview of all survey responses is generated and displayed \\
+\textbf{Input:} Selected survey \\
+\textbf{Output:} Response report of the survey \\[1em]
+
+\textbf{PUC 12: Filter survey responses} \\
+\textbf{Trigger:} The \gls{adm} selects criterion to filter survey data by \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view survey responses
+  \item At least one survey has been released and at least one \gls{atd} has responded
+  \item The \gls{adm} has a survey response report open
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey data is filtered and the updated report is generated \\
+\textbf{Input:} Criteria to filter by \\
+\textbf{Output:} Filtered survey response data \\[1em]
+
+\textbf{PUC 13: View Upcoming Events} \\
+\textbf{Trigger:} The \gls{atd} requests to view a list of upcoming events \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item There is at least one upcoming event
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd} is shown a list of all future events \\
+\textbf{Input:} View request \\
+\textbf{Output:} Upcoming events list \\[1em]
+
+\textbf{PUC 14: View Past Events} \\
+\textbf{Trigger:} The \gls{atd} requests to view a list of past events \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item At least one event has completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd} is presented with a list of past events \\
+\textbf{Input:} View request \\
+\textbf{Output:} List of past events \\[1em]
+
+\textbf{PUC 15: View Registered Events} \\
+\textbf{Trigger:} The \gls{atd} requests to see events they are registered for \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} is registered for at least one event that has not completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The system displays all events the \gls{atd} has registered for \\
+\textbf{Input:} View request \\
+\textbf{Output:} Registered events list \\[1em]
+
+\textbf{PUC 16: Register for Upcoming Event} \\
+\textbf{Trigger:} The \gls{atd} selects an event and submits registration details \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The selected event is open for registration
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd}’s registration is confirmed, and an admission ticket is issued \\
+\textbf{Input:} Selected event and registration details \\
+\textbf{Output:} Event admission ticket \\[1em]
+
+\textbf{PUC 17: Update Event Registration} \\
+\textbf{Trigger:} The \gls{atd} requests to update their registration information \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} has registered for at least one event that has not completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The registration details are successfully updated \\
+\textbf{Input:} Selected event and updated details \\
+\textbf{Output:} Update confirmation \\[1em]
+
+\textbf{PUC 18: Cancel Event Registration} \\
+\textbf{Trigger:} The \gls{atd} requests to cancel a registration \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} is registered for at least one event which has not completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The registration is cancelled and the system confirms the cancellation \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Cancellation confirmation \\[1em]
+
+\textbf{PUC 19: View Fillable Surveys} \\
+\textbf{Trigger:} The \gls{atd} requests to view available surveys \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item At least one survey is open for responses
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd} sees a list of surveys they can complete \\
+\textbf{Input:} View request \\
+\textbf{Output:} List of surveys \\[1em]
+
+\textbf{PUC 20: Complete a Survey} \\
+\textbf{Trigger:} The \gls{atd} requests to fill out a survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item At least one survey is open for responses
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd}’s responses are submitted and the application confirms the submission \\
+\textbf{Input:} Selected survey and question responses \\
+\textbf{Output:} Survey completion confirmation \\[1em]
+
+\textbf{PUC 21: Edit a Survey Response} \\
+\textbf{Trigger:} The \gls{atd} requests to edit a survey response \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} has completed at least one survey which is still open for responses
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The survey response is updated successfully \\
+\textbf{Input:} Selected survey and edited answers \\
+\textbf{Output:} Survey update confirmation \\[1em]
+
+\textbf{PUC 22: View Previous Survey Responses} \\
+\textbf{Trigger:} The \gls{atd} requests to view their past survey responses \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} has completed at least one survey
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The system displays the \gls{atd}’s responses for the selected survey \\
+\textbf{Input:} Selected survey \\
+\textbf{Output:} Survey responses \\
+}
+
 \section{Functional Requirements}
 \subsection{Functional Requirements}
 \begin{enumerate}[align=left,
