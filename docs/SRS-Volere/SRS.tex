@@ -207,14 +207,6 @@ Currently, the \Gls{mes} uses a plethora of different platforms to host events a
   \item \textbf{Low Response Rates on Surveys} The response rates on the annual \Gls{cfes} survey of undergraduate engineering students have been decreasing due to the long length of the Google Form and the lack of ability to submit a partially completed form.
   \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the MES LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed.
 \end{itemize}
-% MES hosts lots of events per year
-% Their event management system is unorganized
-% Consists of google forms, google sheets
-% No template form to work with redundant info between forms like name, number email, etc
-% Lots of steps to registration and split across too many platforms
-% The same thing is done for the annual CFES survey of undergrad eng students
-% long 70 page form of complex branching logic, low response rate
-%
 
 \subsection{The Context of the Work}
 
@@ -238,7 +230,6 @@ The system is split into two perspectives, the \gls{atd} perspective shown in \h
 \end{center}
 
 \subsection{Work Partitioning}
-% split the workflow of the entire system into sub-workflows
 
 This section describes how the work done by the system can be partitioned into smaller and more manageable workflows. Below is a table describing each of the sub-workflows of the proposed systems. Note that event creation and survey creation have been grouped as a single workflow since they are nearly identical.
 
@@ -261,7 +252,6 @@ This section describes how the work done by the system can be partitioned into s
 }
 
 \subsection{Specifying a Business Use Case (BUC)}
-% provide a use case for each sub workflow
 
 \noindent\textbf{BUC 1: } \Gls{atd} registers for an event \\
 \textbf{Input:} Registration data \\
@@ -277,10 +267,13 @@ This section describes how the work done by the system can be partitioned into s
   \item The backend server generates an event ticket and sends it to the user application
   \item The user application confirms with the \gls{atd} that the registration was successful and presents the user with the ticket
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted registration data has errors, the user application prompts the \gls{atd} to fix the errors and resubmit \\
-4a. The event is full or the deadline has passed, the backend sends an error code to the user application \\
-4b. The user application alerts the \gls{atd} of the error. \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted registration data has errors, the user application prompts the \gls{atd} to fix the errors and resubmit
+  \item [4a.] The event is full or the deadline has passed, the backend sends an error code to the user application
+  \item [4b.] The user application alerts the \gls{atd} of the error.
+\end{itemize}
+
 
 \noindent\textbf{BUC 2: } \Gls{atd} fills out a survey module \\
 \textbf{Input:} Survey responses \\
@@ -295,8 +288,11 @@ This section describes how the work done by the system can be partitioned into s
   \item The backend server sends a confirmation message to the user application
   \item The user application confirms with the \gls{atd} that the survey data has been submitted
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the \gls{atd} to fix the errors and resubmit \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the \gls{atd} to fix the errors and resubmit 
+
+\end{itemize}
 
 \noindent\textbf{BUC 3: } \Gls{adm} creates a form module \\
 \textbf{Input:} Form fields \\
@@ -313,9 +309,11 @@ This section describes how the work done by the system can be partitioned into s
   \item The admin portal updates the list of custom modules with the completed module
   \item The admin portal confirms with the \gls{adm} that the custom module has been created
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted form module has errors (i.e. unfinished fields), the \gls{adm} is prompted to fix these errors before resubmitting \\
-4a. Authentication of the \gls{adm} fails, the admin portal is notified of the request denial \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted form module has errors (i.e. unfinished fields), the \gls{adm} is prompted to fix these errors before resubmitting 
+  \item [4a.] Authentication of the \gls{adm} fails, the admin portal is notified of the request denial 
+\end{itemize}
 
 \noindent\textbf{BUC 4: } \Gls{adm} creates an event/survey \\
 \textbf{Input:} Event details \\
@@ -333,9 +331,12 @@ This section describes how the work done by the system can be partitioned into s
   \item The admin portal adds the created event/survey to the event/survey dashboard
   \item The admin portal confirms with the \gls{adm} that the event/survey has been created
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted details have errors (i.e. event date has already passed), the \gls{adm} is prompted to fix these errors before resubmitting \\
-4a. Authentication of the \gls{adm} fails, the admin portal is notified of the request denial \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted details have errors (i.e. event date has already passed), the \gls{adm} is prompted to fix these errors before resubmitting
+  \item [4a.] Authentication of the \gls{adm} fails, the admin portal is notified of the request denial \\
+
+\end{itemize}
 
 \noindent\textbf{BUC 5: } \Gls{adm} views event/survey statistics \\
 \textbf{Input:} Event/survey to view \\
@@ -352,15 +353,18 @@ This section describes how the work done by the system can be partitioned into s
   \item The admin portal formats all the data into a readable format
   \item The \gls{adm} is presented with the event/survey statistics
 \end{enumerate}
-\textbf{Sub variations:} \\
-3a. Authentication of the \gls{adm} fails, the admin portal is notified of the request denial \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [3a.] Authentication of the \gls{adm} fails, the admin portal is notified of the request denial
+\end{itemize}
 
 \section{Business Data Model and Data Dictionary}
-\subsection{Business Data Model}
-% Split the entire system into subsystems which the data passes through and the form it takes at each step
-% This is NOT the same as workflow partition. This deals with DATA and the other deals with PROCESSES
 
-This section illustrates the flow of data throughout the system. \hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into into well defined subsystems and outlines the interactions between subsystems. 
+The purpose of this section is to illustrate the flow of data throughout the system. 
+
+\subsection{Business Data Model}
+
+\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into into well defined subsystems and outlines the interactions between subsystems. 
 
 \begin{center}
 \begin{figure}[H]
@@ -370,9 +374,8 @@ This section illustrates the flow of data throughout the system. \hyperref[fig:b
 \end{figure}
 \end{center}
 \subsection{Data Dictionary}
-% Definition of each subsystem defined above
 
-Below is a table defining each of the system components shown in \hyperref[fig:businessdata]{Figure \ref{fig:businessdata}}.
+\hyperref[table:datadictionary]{Table \ref{table:datadictionary}} defines each of the system components shown in \hyperref[fig:businessdata]{Figure \ref{fig:businessdata}}.
 {
 \setlength{\tabcolsep}{0.3em}
 \renewcommand{\arraystretch}{1.2}
@@ -393,47 +396,61 @@ Below is a table defining each of the system components shown in \hyperref[fig:b
     \captionof{table}{Data dictionary table}\label{table:datadictionary}
 \end{table}
 }
-\section{The Scope of the Product}
-\subsection{Product Boundary}
-\lips
-% Produce a Product Boundary Diagram which shows what happens inside of the system and how it happens, and what comes from/goes outside the system
-\subsection{Product Use Case Table}
-% Label each product use case from the diagram and map them to actors, inputs/outputs, and requirement numbers
 
-% Please add the following required packages to your document preamble:
-% \usepackage{booktabs}
+\section{The Scope of the Product}
+
+The purpose of this section is to define the scope of the product by defining the boundaries of each major component of the system as well as their functionalities, interfaces for external actors, and interactions with each other.
+
+\subsection{Product Boundary}
+
+\hyperref[fig:productusecase]{Figure \ref{fig:productusecase}} outlines the main components of the system, how they interact with each other, and their related use cases.
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.89\linewidth]{images/product_use_case.png}
+    \caption{Product use case diagram}\label{fig:productusecase}
+\end{figure}
+\end{center}
+\subsection{Product Use Case Table}
+
+\hyperref[table:productusecase]{Table \ref{table:productusecase}} further defines each of the individual use cases of the system, outlining the specific inputs and outputs and related requirements.
+
 {
 \setlength{\tabcolsep}{0.3em}
 \renewcommand{\arraystretch}{1.2}
-\begin{longtable}[H]{p{0.03\linewidth}p{0.22\linewidth}p{0.12\linewidth}p{0.43\linewidth}p{0.2\linewidth}}
-\toprule
-\textbf{\#}     & \textbf{Name}                  & \textbf{Actor} & \textbf{Input/Output}                                                                                                       & \textbf{Requirements} \\ \midrule
-1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and fields (in)\\Reusable form module (out)\end{tabular}                        &                       \\ \midrule
-2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 &                       \\ \midrule
-3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           &                       \\ \midrule
-4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         &                       \\ \midrule
-5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          &                       \\ \midrule
-6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and questions (in)\\Fillable survey (out)\end{tabular}                            &                       \\ \midrule
-7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       &                       \\ \midrule
-8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           &                       \\ \midrule
-9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         &                       \\ \midrule
-10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            &                       \\ \midrule
-11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  &                       \\ \midrule
-12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 &                       \\ \midrule
-13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       &                       \\ \midrule
-14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           &                       \\ \midrule
-15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     &                       \\ \midrule
-16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        &                       \\ \midrule
-17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  &                       \\ \midrule
-18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                &                       \\ \midrule
-19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            &                       \\ \midrule
-20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion confirmation (out)\end{tabular} &                       \\ \midrule
-21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update confirmation (out)\end{tabular}           &                       \\ \midrule
-22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        &                       \\ \bottomrule
+\begin{longtable}[H]{p{0.04\linewidth}p{0.22\linewidth}p{0.13\linewidth}p{0.43\linewidth}p{0.22\linewidth}}
+  \toprule
+  \textbf{\#}     & \textbf{Name}                  & \textbf{Actor} & \textbf{Input/Output}                                                                                                       & \textbf{Requirements} \\ \midrule
+  1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and fields (in)\\Reusable form module (out)\end{tabular}                        &                       \\ \midrule
+  2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 &                       \\ \midrule
+  3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           &                       \\ \midrule
+  4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         &                       \\ \midrule
+  5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          &                       \\ \midrule
+  6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and questions (in)\\Fillable survey (out)\end{tabular}                            &                       \\ \midrule
+  7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       &                       \\ \midrule
+  8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           &                       \\ \midrule
+  9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         &                       \\ \midrule
+  10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            &                       \\ \midrule
+  11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  &                       \\ \midrule
+  12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 &                       \\ \midrule
+  13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       &                       \\ \midrule
+  14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           &                       \\ \midrule
+  15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     &                       \\ \midrule
+  16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        &                       \\ \midrule
+  17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  &                       \\ \midrule
+  18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                &                       \\ \midrule
+  19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            &                       \\ \midrule
+  20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion confirmation (out)\end{tabular} &                       \\ \midrule
+  21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update confirmation (out)\end{tabular}           &                       \\ \midrule
+  22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        &                       \\ \bottomrule
+  \caption{Product use case table}\label{table:productusecase}
 \end{longtable}
 }
 
 \subsection{Individual Product Use Cases (PUC's)}
+
+This section further expands on the use cases defined in \hyperref[table:productusecase]{Table \ref{table:productusecase}} by defining specific triggers, preconditions, and outcomes of each use case. \\
 
 {\setlength{\parindent}{0pt}
 \textbf{PUC 1: Create a custom form module} \\
