@@ -540,7 +540,14 @@ This section describes how the work done by the system can be partitioned into s
 
 \section{Security Requirements}
 \subsection{Access Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries AC-\arabic*:]
+  \item The system shall allow \glspl{adm} to have privileged access to \gls{atd} records.
+  \item The system shall restrict event \glspl{atd} from accessing information that is not associated with them.
+\end{enumerate}
 \subsection{Integrity Requirements}
 \lips
 \subsection{Privacy Requirements}
