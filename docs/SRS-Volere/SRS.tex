@@ -13,7 +13,7 @@
 \usepackage{caption}
 \usepackage{enumitem}
 \usepackage{float}
-\usepackage{enumitem}
+\usepackage{longtable}
 \usepackage[english]{babel}
 \usepackage[acronym,nonumberlist]{glossaries}
 
@@ -30,13 +30,13 @@
 \newacronym{mes}{MES}{McMaster Engineering Society}
 \newacronym{cfes}{CFES}{Canadian Federation of Engineering Students}
 \newglossaryentry{adm}{
-  name=admin,
+  name=Admin,
   description={A privileged system user affiliated with \gls{mes} who can access survey, event, and attendee records;
   track finances; and update event statuses.}
   plural=admins,
 }
 \newglossaryentry{atd}{
-  name=attendee,
+  name=Attendee,
   description={An individual who attends an \gls{mes} event, and uses the system to register, receive event updates,
   provide feedback, or fill out survey responses.}
   plural=attendees,
@@ -52,7 +52,7 @@
 
 \begin{document}
 
-\title{Software Requirements Specification for \progname: \prjdesc}
+\title{Software Requirements Specification for \progname: A Platform for Event Management }
 \author{\authname}
 \date{\today}
 
@@ -84,7 +84,7 @@ The purpose of this project is to create a centralized platform for the McMaster
 
 \subsection{User Business}
 
-The primary users of this system are members of the McMaster Engineering Society, including executives and event organizers, as well as McMaster engineering students who attend MES events.  
+The primary users of this system are members of the McMaster Engineering Society, including executives and event organizers, as well as McMaster engineering students who attend MES events.
 
 \begin{itemize}
     \item \textbf{Administrators (MES Executives and Organizers):} Responsible for creating events, designing registration and feedback forms, managing attendee information, and analyzing data through the dashboard. They will use the platform to reduce manual work and improve event coordination.
@@ -109,10 +109,10 @@ The primary goals of this project are as follows:
 \section{Stakeholders}
 \subsection{Client}
 The client for this project is the supervisor, Luke Schuurman. He is a member of the MES and has first hand experience plannig and hosting events with the MES. As the supervisor he will play a crucial role by ensuring the project aligns with objective of the MES and integrate the platform seamlessly with existing systems. He will also provide us with feedback and guidance throughout the project and will help define the project requirements in this document.
-\subsection{Customer}
-\lips
-\subsection{Other Stakeholders}
-\lips
+% \subsection{Customer}
+% \lips
+% \subsection{Other Stakeholders}
+% \lips
 \subsection{Hands-On Users of the Project}
 \textbf{MES Executives and Council Members}: They will be utilizing this system to create and manage events, configure forms and surveys, monitor event data and generate data analytics reports. They can be characterized as primarily undergraduate students who value their time greatly. They aim to reduce the time taken to do administrative tasks as well as provide a better experience during MES events. Their experience with systems like this can range from Journeyman - Master as they can be experienced in event planning and student engagement. There may be a slight learning curve to utilizing the new technology but these users have experience performing these functions.\\
 \newline
@@ -131,8 +131,8 @@ The client for this project is the supervisor, Luke Schuurman. He is a member of
 \subsection{User Participation}
 Our requirements will primarily be derived through meetings with our supervisor Luke Schuurman. If we have the need to clarify or elicit more requirements we will look to engage other MES members either through our supervisor or directly.
 
-\subsection{Maintenance Users and Service Technicians}
-\lips
+% \subsection{Maintenance Users and Service Technicians}
+% \lips
 
 \section{Mandated Constraints}
 \subsection{Solution Constraints}
@@ -158,9 +158,7 @@ involved in the Project}
 \glsaddall
 \printnoidxglossaries
 
-\section{Relevant Facts and Assumptions}
-
-This section outlines the key facts, business rules, and assumptions that guide the design and development of Project A — which focuses on the Custom Form Builder, Registration and Feedback Forms, Attendee Overview, and Backend Analytics components of the larger MES Event Management System.
+\section{Relevant Facts And Assumptions}
 
 \subsection{Relevant Facts}
 
@@ -193,23 +191,23 @@ This section outlines the key facts, business rules, and assumptions that guide 
     \item Future MES administrators and developers will continue maintaining the project using the provided GitHub repository, documentation, and CI/CD workflows.
 \end{itemize}
 
-
 \section{The Scope of the Work}
 
 The purpose of the section is to define the expected scope of the project, including specifications on how the system is partitioned, business data models, and business use cases.
 
 \subsection{The Current Situation}
 
-Currently, the \gls{mes} uses plethora of different platforms to host events and conduct surveys such as tools for registration, signing of waivers, and checking in \glspl{atd}. The main platforms used are a combination of Google Forms and Google Sheets. There are several pain points to address with the current system.
+Currently, the \Gls{mes} uses a plethora of different platforms to host events and conduct surveys such as tools for registration, signing of waivers, and checking in attendees. The main platforms used are a combination of Google Forms and Google Sheets. There are several pain points to address with the current system.
 
 \begin{itemize}
   \item \textbf{Decentralized System Components} Registration and surverying is split across a plethora of tools and software which may not be compatible with each other. For example, Google Forms is used for registration forms and surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is done by email or social media.
-  \item \textbf{Overly Complex Form Logic} The current CFES survey consists of 70 pages of questions linked together through complex branching logic. The Google Forms form building UI makes this very complicated as all form elements are displayed as a linear list of sections making it very hard to track paths through the form.
+  \item \textbf{Overly Complex Form Logic} The current \Gls{cfes} survey consists of 70 pages of questions linked together through complex branching logic. The Google Forms form building UI makes this very complicated as all form elements are displayed as a linear list of sections making it very hard to track paths through the form.
   \item \textbf{Disorganized Data Visualization} Form response data is currently stored using Google Sheets. While Google Form data is easily imported into Google Sheets, any analytics on the data must be done manually through equations and macros.
   \item \textbf{Lack of Reusability} Google Forms comes with a few templates that provide an initial starting point for many types of forms such as registrant information. However, after the first section of the form, each subsequent section must be made manually. Sections may be imported from other forms but this requires the user to have access to a form with the wanted section and to scour through an unorganized list of forms and sections.
-  \item \textbf{Low Response Rates on Surveys} The response rates on the annual CFES survey of undergraduate engineering students have been decreasing due to the long length of the Google Form and the lack of ability to submit a partially completed form.
-  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the \gls{mes} LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed.
+  \item \textbf{Low Response Rates on Surveys} The response rates on the annual \Gls{cfes} survey of undergraduate engineering students have been decreasing due to the long length of the Google Form and the lack of ability to submit a partially completed form.
+  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the MES LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed.
 \end{itemize}
+
 % \gls{mes} hosts lots of events per year
 % Their event management system is unorganized
 % Consists of google forms, google sheets
@@ -219,20 +217,29 @@ Currently, the \gls{mes} uses plethora of different platforms to host events and
 % long 70 page form of complex branching logic, low response rate
 %
 
+
 \subsection{The Context of the Work}
 
-This section provides an overview of the high-level inputs and outputs between the system and external systems or actors. Figure X illustrates a work context diagram showing the interactions between the system components and external elements.
+This section provides an overview of the high-level inputs and outputs between the system and external systems or actors.
+The system is split into two perspectives, the \gls{atd} perspective shown in \hyperref[fig:workcontextuser]{Figure \ref{fig:workcontextuser}}, and the \gls{adm} perspective shown in \hyperref[fig:workcontextadmin]{Figure \ref{fig:workcontextadmin}}. 
 
 \begin{center}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{images/work_context.png}
-    \caption{Work context diagram of the form builder and event hosting system}\label{workcontext}
+    \includegraphics[width=1\linewidth]{images/work_context_user.png}
+    \caption{Work context diagram of the \gls{atd} side application}\label{fig:workcontextuser}
+\end{figure}
+\end{center}
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/work_context_admin.png}
+    \caption{Work context diagram of the \gls{adm} side application}\label{fig:workcontextadmin}
 \end{figure}
 \end{center}
 
 \subsection{Work Partitioning}
-% split the workflow of the entire system into sub-workflows
 
 This section describes how the work done by the system can be partitioned into smaller and more manageable workflows. Below is a table describing each of the sub-workflows of the proposed systems. Note that event creation and survey creation have been grouped as a single workflow since they are nearly identical.
 
@@ -244,8 +251,8 @@ This section describes how the work done by the system can be partitioned into s
     \begin{tabularx}{\textwidth}{|P{2.5em}|Y|Y|Y|Y|}
       \hline
       \textbf{No.} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
-      1 & User registers for event & Registration data & Event ticket & \\ \hline
-      2 & User fills out a survey & Survey responses & Survey completion confirmation & \\ \hline
+      1 & \Gls{atd} registers for event & Registration data & Event ticket & \\ \hline
+      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \\ \hline
       3 & \Gls{adm} creates a form module & Module question data & Reusable form module & \\ \hline
       4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \\ \hline
       5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \\ \hline
@@ -255,42 +262,47 @@ This section describes how the work done by the system can be partitioned into s
 }
 
 \subsection{Specifying a Business Use Case (BUC)}
-% provide a use case for each sub workflow
 
-\noindent\textbf{BUC 1: } User registers for an event \\
+\noindent\textbf{BUC 1: } \Gls{atd} registers for an event \\
 \textbf{Input:} Registration data \\
 \textbf{Output:} Event tickets \\
-\textbf{Pre-condition:} User has downloaded the application and has created an account \\
+\textbf{Pre-condition:} \Gls{atd} has downloaded the application and has created an account \\
 \textbf{Scenario:} \\
 \begin{enumerate}
   \item The user application receives the registration data
   \item The user application verifies the data is filled correctly
   \item The user application sends the registration data to the backend server
   \item The backend server verifies the event is not full and the deadline has not passed
-  \item The backend server adds the user to the list of \glspl{atd}
+  \item The backend server adds the \gls{atd} to the list of \glspl{atd}
   \item The backend server generates an event ticket and sends it to the user application
-  \item The user application confirms with the user that the registration was successful and presents the user with the ticket
+  \item The user application confirms with the \gls{atd} that the registration was successful and presents the user with the ticket
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted registration data has errors, the user application prompts the user to fix the errors and resubmit \\
-4a. The event is full or the deadline has passed, the backend sends an error code to the user application \\
-4b. The user application alerts the user of the error. \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted registration data has errors, the user application prompts the \gls{atd} to fix the errors and resubmit
+  \item [4a.] The event is full or the deadline has passed, the backend sends an error code to the user application
+  \item [4b.] The user application alerts the \gls{atd} of the error.
+\end{itemize}
 
-\noindent\textbf{BUC 2: } User fills out a survey module \\
+
+\noindent\textbf{BUC 2: } \Gls{atd} fills out a survey module \\
 \textbf{Input:} Survey responses \\
 \textbf{Output:} Survey completion confirmation \\
-\textbf{Pre-condition:} User has downloaded the application and has created an account \\
+\textbf{Pre-condition:} \Gls{atd} has downloaded the application and has created an account \\
 \textbf{Scenario:} \\
 \begin{enumerate}
   \item The user application receives the survey data
   \item The user application verifies the data is filled correctly
   \item The user application sends the survey data to the backend server
-  \item The backend server updates the survey database with the user’s data
+  \item The backend server updates the survey database with the \gls{atd}'s data
   \item The backend server sends a confirmation message to the user application
-  \item The user application confirms with the user that the survey data has been submitted
+  \item The user application confirms with the \gls{atd} that the survey data has been submitted
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the user to fix the errors and resubmit \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the \gls{atd} to fix the errors and resubmit 
+
+\end{itemize}
 
 \noindent\textbf{BUC 3: } \Gls{adm} creates a form module \\
 \textbf{Input:} Form fields \\
@@ -334,46 +346,415 @@ This section describes how the work done by the system can be partitioned into s
 \noindent\textbf{BUC 5: } \Gls{adm} views event/survey statistics \\
 \textbf{Input:} Event/survey to view \\
 \textbf{Output:} Event registration/survey response report \\
-\textbf{Pre-condition:} Event/survey has been created, and users have registered/responded \\
+\textbf{Pre-condition:} Event/survey has been created, and \glspl{atd} have registered/responded \\
 \textbf{Scenario:} \\
 \begin{enumerate}
-  \item The \gls{adm} portal receives the request to view event/survey statistics
-  \item The \gls{adm} portal sends a request to the backend server containing the identification for the event/survey to view
-  \item The backend server receives the request and authenticates the \gls{adm} user
+  \item The admin portal receives the request to view event/survey statistics
+  \item The admin portal sends a request to the backend server containing the identification for the event/survey to view
+  \item The backend server receives the request and authenticates the \gls{adm}
   \item The backend server retrieves the registrant/response data for the requested event/survey from the database
   \item The backend server generates a statistical report of all the data
-  \item The data is sent back to the \gls{adm} portal
-  \item The \gls{adm} portal formats all the data into a readable format
-  \item The \gls{adm} user is presented with the event/survey statistics
+  \item The data is sent back to the admin portal
+  \item The admin portal formats all the data into a readable format
+  \item The \gls{adm} is presented with the event/survey statistics
 \end{enumerate}
-\textbf{Sub variations:} \\
-3a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
-
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [3a.] Authentication of the \gls{adm} fails, the admin portal is notified of the request denial
+\end{itemize}
 
 \section{Business Data Model and Data Dictionary}
+
+The purpose of this section is to illustrate the flow of data throughout the system. 
+
 \subsection{Business Data Model}
-\lips
-% Split the entire system into subsystems which the data passes through and the form it takes at each step
-% This is NOT the same as workflow partition. This deals with DATA and the other deals with PROCESSES
+
+\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into into well defined subsystems and outlines the interactions between subsystems. 
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/business_data_model.png}
+    \caption{Diagram of the interactions between main system components}\label{fig:businessdata}
+\end{figure}
+\end{center}
 \subsection{Data Dictionary}
-\lips
-% Definition of each subsystem defined above
+
+\hyperref[table:datadictionary]{Table \ref{table:datadictionary}} defines each of the system components shown in \hyperref[fig:businessdata]{Figure \ref{fig:businessdata}}.
+{
+\setlength{\tabcolsep}{0.3em}
+\renewcommand{\arraystretch}{1.2}
+\begin{table}[H]
+    \begin{tabular}{p{0.25\linewidth}p{0.6\linewidth}p{0.2\linewidth}}
+      \toprule
+      \textbf{Component Name}              & \textbf{Description}                                                                                                                                       & \textbf{Type} \\ \midrule
+        \gls{mes} Event/Survey Manager             & The application handling the \gls{adm} side of the system, including event/survey creation, and data analytics                                                 & Application   \\ \midrule
+        Event Builder                        & Contains tools for creating, publishing, and managing events                                                                                               & Module        \\ \midrule
+        Survey Builder                       & Contains tools for creating, publishing, and managing surveys                                                                                              & Module        \\ \midrule
+        Admin Controller                     & Handles the flow of execution of \gls{mes} Event/Survey Manager modules and data flow between the event/survey builders, data analyzers, and the user controller & Module        \\ \midrule
+        Financial Analyzer                   & Automates analysis and visualization of finances from event attendee data                                                                                  & Module        \\ \midrule 
+        Survey Analyzer                      & Automates analysis and visualization of survey response data                                                                                               & Module        \\ \midrule
+        \gls{mes} Event Registration/Survey Filler & The application handling the \gls{atd} side of the system, including event registration and survey responses                                                    & Application   \\ \midrule
+        Form Filler                          & Handles input and validation of form responses                                                                                                             & Module        \\ \midrule
+        User Controller                      & Controls the flow of execution of the form filler and handles communication with the admin controller                                                      & Module        \\ \midrule
+    \end{tabular}
+    \captionof{table}{Data dictionary table}\label{table:datadictionary}
+\end{table}
+}
+
 \section{The Scope of the Product}
+
+The purpose of this section is to define the scope of the product by defining the boundaries of each major component of the system as well as their functionalities, interfaces for external actors, and interactions with each other.
+
 \subsection{Product Boundary}
-\lips
-% Produce a Product Boundary Diagram which shows what happens inside of the system and how it happens, and what comes from/goes outside the system
+
+\hyperref[fig:productusecase]{Figure \ref{fig:productusecase}} outlines the main components of the system, how they interact with each other, and their related use cases.
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.89\linewidth]{images/product_use_case.png}
+    \caption{Product use case diagram}\label{fig:productusecase}
+\end{figure}
+\end{center}
 \subsection{Product Use Case Table}
-\lips
-% Label each product use case from the diagram and map them to actors, inputs/outputs, and requirement numbers
+
+\hyperref[table:productusecase]{Table \ref{table:productusecase}} further defines each of the individual use cases of the system, outlining the specific inputs and outputs and related requirements.
+
+{
+\setlength{\tabcolsep}{0.3em}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}[H]{p{0.04\linewidth}p{0.22\linewidth}p{0.13\linewidth}p{0.43\linewidth}p{0.22\linewidth}}
+  \toprule
+  \textbf{\#}     & \textbf{Name}                  & \textbf{Actor} & \textbf{Input/Output}                                                                                                       & \textbf{Requirements} \\ \midrule
+  1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and fields (in)\\Reusable form module (out)\end{tabular}                        &                       \\ \midrule
+  2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 &                       \\ \midrule
+  3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           &                       \\ \midrule
+  4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         &                       \\ \midrule
+  5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          &                       \\ \midrule
+  6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and questions (in)\\Fillable survey (out)\end{tabular}                            &                       \\ \midrule
+  7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       &                       \\ \midrule
+  8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           &                       \\ \midrule
+  9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         &                       \\ \midrule
+  10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            &                       \\ \midrule
+  11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  &                       \\ \midrule
+  12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 &                       \\ \midrule
+  13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       &                       \\ \midrule
+  14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           &                       \\ \midrule
+  15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     &                       \\ \midrule
+  16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        &                       \\ \midrule
+  17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  &                       \\ \midrule
+  18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                &                       \\ \midrule
+  19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            &                       \\ \midrule
+  20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion confirmation (out)\end{tabular} &                       \\ \midrule
+  21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update confirmation (out)\end{tabular}           &                       \\ \midrule
+  22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        &                       \\ \bottomrule
+  \caption{Product use case table}\label{table:productusecase}
+\end{longtable}
+}
+
 \subsection{Individual Product Use Cases (PUC's)}
-\lips
-% Take each Product user case and define it further with the following
-% Trigger - what caused this use case to execute
-% Actors - what actors caused the trigger
-% Preconditions - what properties hold before the use case occurs
-% Input - input to the use case
-% output - output of the use case
-% outcome - What happened as a result of the use case
+
+This section further expands on the use cases defined in \hyperref[table:productusecase]{Table \ref{table:productusecase}} by defining specific triggers, preconditions, and outcomes of each use case. \\
+
+{\setlength{\parindent}{0pt}
+\textbf{PUC 1: Create a custom form module} \\
+\textbf{Trigger:} The \gls{adm} requests to create a new form module \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to create form modules
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} A form module is created which \glspl{adm} can use in any event registration/survey form \\
+\textbf{Input:} Form module name and fields \\
+\textbf{Output:} Reusable form module \\[1em]
+
+\textbf{PUC 2: Edit an existing form module} \\
+\textbf{Trigger:} The \gls{adm} selects a form module to edit \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to edit form modules
+  \item At least one form module is available for editing
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The selected form module is updated with the \gls{adm}’s changes \\
+\textbf{Input:} Selected form module and updated fields \\
+\textbf{Output:} Edited form module \\[1em]
+
+\textbf{PUC 3: Create an event} \\
+\textbf{Trigger:} The \gls{adm} requests to create a new event \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to create events
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} An event is created and \glspl{atd} are notified of a new upcoming event \\
+\textbf{Input:} Event details (e.g. title, date, location, cost) \\
+\textbf{Output:} Scheduled event \\[1em]
+
+\textbf{PUC 4: Edit an event} \\
+\textbf{Trigger:} The \gls{adm} requests to edit an event \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to edit events
+  \item At least one upcoming event is scheduled
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The event details are updated and \glspl{atd} are notified of a change \\
+\textbf{Input:} Selected event and              edited details \\
+\textbf{Output:} Edited event \\[1em]
+
+\textbf{PUC 5: Cancel an event} \\
+\textbf{Trigger:} The \gls{adm} requests to cancel an event \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to cancel events
+  \item At least one upcoming event is scheduled
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The event is cancelled and the \glspl{atd} are notified of the change \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Cancelled event \\[1em]
+
+\textbf{PUC 6: Create a survey} \\
+\textbf{Trigger:} The \gls{adm} requests to create a new survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to create surveys
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey is created and \glspl{atd} are notified of a new survey \\
+\textbf{Input:} Survey details (e.g. title, questions) \\
+\textbf{Output:} Fillable survey \\[1em]
+
+\textbf{PUC 7: Edit a survey} \\
+\textbf{Trigger:} The \gls{adm} requests to edit a survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to edit surveys
+  \item At least one survey is open to responses
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey is updated and \glspl{atd} are notified of the change \\
+\textbf{Input:} Survey to update and              updated survey details \\
+\textbf{Output:} Updated survey \\[1em]
+
+\textbf{PUC 8: Close a survey} \\
+\textbf{Trigger:} The \gls{adm} requests to close a survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to close surveys
+  \item At least one survey is open to responses
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey is closed \\
+\textbf{Input:} Selected survey \\
+\textbf{Output:} Cancelled event \\[1em]
+
+\textbf{PUC 9: View financial reports} \\
+\textbf{Trigger:} The \gls{adm} requests to view a financial report \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view financial reports
+  \item At least one event has been scheduled or completed
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} A financial report of the selected event is generated and displayed \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Financial report of the selected event \\[1em]
+
+\textbf{PUC 10: View event attendee overview} \\
+\textbf{Trigger:} The \gls{adm} requests to view an event attendee overview \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view attendee overviews
+  \item At least one event has been scheduled or completed
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} An overview of registered \glspl{atd} is generated and displayed \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Attendee overview of the selected event \\[1em]
+
+\textbf{PUC 11: View survey response reports} \\
+\textbf{Trigger:} The \gls{adm} requests to view a survey response report \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view survey responses
+  \item At least one survey has been released and at least one \gls{atd} has responded
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} An overview of all survey responses is generated and displayed \\
+\textbf{Input:} Selected survey \\
+\textbf{Output:} Response report of the survey \\[1em]
+
+\textbf{PUC 12: Filter survey responses} \\
+\textbf{Trigger:} The \gls{adm} selects criterion to filter survey data by \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view survey responses
+  \item At least one survey has been released and at least one \gls{atd} has responded
+  \item The \gls{adm} has a survey response report open
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey data is filtered and the updated report is generated \\
+\textbf{Input:} Criteria to filter by \\
+\textbf{Output:} Filtered survey response data \\[1em]
+
+\textbf{PUC 13: View Upcoming Events} \\
+\textbf{Trigger:} The \gls{atd} requests to view a list of upcoming events \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item There is at least one upcoming event
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd} is shown a list of all future events \\
+\textbf{Input:} View request \\
+\textbf{Output:} Upcoming events list \\[1em]
+
+\textbf{PUC 14: View Past Events} \\
+\textbf{Trigger:} The \gls{atd} requests to view a list of past events \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item At least one event has completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd} is presented with a list of past events \\
+\textbf{Input:} View request \\
+\textbf{Output:} List of past events \\[1em]
+
+\textbf{PUC 15: View Registered Events} \\
+\textbf{Trigger:} The \gls{atd} requests to see events they are registered for \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} is registered for at least one event that has not completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The system displays all events the \gls{atd} has registered for \\
+\textbf{Input:} View request \\
+\textbf{Output:} Registered events list \\[1em]
+
+\textbf{PUC 16: Register for Upcoming Event} \\
+\textbf{Trigger:} The \gls{atd} selects an event and submits registration details \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The selected event is open for registration
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd}’s registration is confirmed, and an admission ticket is issued \\
+\textbf{Input:} Selected event and registration details \\
+\textbf{Output:} Event admission ticket \\[1em]
+
+\textbf{PUC 17: Update Event Registration} \\
+\textbf{Trigger:} The \gls{atd} requests to update their registration information \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} has registered for at least one event that has not completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The registration details are successfully updated \\
+\textbf{Input:} Selected event and updated details \\
+\textbf{Output:} Update confirmation \\[1em]
+
+\textbf{PUC 18: Cancel Event Registration} \\
+\textbf{Trigger:} The \gls{atd} requests to cancel a registration \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} is registered for at least one event which has not completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The registration is cancelled and the system confirms the cancellation \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Cancellation confirmation \\[1em]
+
+\textbf{PUC 19: View Fillable Surveys} \\
+\textbf{Trigger:} The \gls{atd} requests to view available surveys \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item At least one survey is open for responses
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd} sees a list of surveys they can complete \\
+\textbf{Input:} View request \\
+\textbf{Output:} List of surveys \\[1em]
+
+\textbf{PUC 20: Complete a Survey} \\
+\textbf{Trigger:} The \gls{atd} requests to fill out a survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item At least one survey is open for responses
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd}’s responses are submitted and the application confirms the submission \\
+\textbf{Input:} Selected survey and question responses \\
+\textbf{Output:} Survey completion confirmation \\[1em]
+
+\textbf{PUC 21: Edit a Survey Response} \\
+\textbf{Trigger:} The \gls{atd} requests to edit a survey response \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} has completed at least one survey which is still open for responses
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The survey response is updated successfully \\
+\textbf{Input:} Selected survey and edited answers \\
+\textbf{Output:} Survey update confirmation \\[1em]
+
+\textbf{PUC 22: View Previous Survey Responses} \\
+\textbf{Trigger:} The \gls{atd} requests to view their past survey responses \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} has completed at least one survey
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The system displays the \gls{atd}’s responses for the selected survey \\
+\textbf{Input:} Selected survey \\
+\textbf{Output:} Survey responses \\
+}
+
+\subsection{State Diagrams}
+
+Below are formal state diagrams showing the different states of the system and the transitions between them. [fig:stateadmin]{Figure \ref{fig:stateadmin}} shows the state diagram of the \gls{adm} side of the system and [fig:stateattendee]{Figure \ref{fig:stateattendee}} shows the \gls{atd} side. 
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/state_diagram_admin.png}
+    \caption{State diagram of the \gls{adm} side of the system}\label{fig:stateadmin}
+\end{figure}
+\end{center}
+\subsection{Data Dictionary}
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/state_diagram_attendee.png}
+    \caption{State diagram of the \gls{atd} side of the system}\label{fig:stateattendee}
+\end{figure}
+\end{center}
+\subsection{Data Dictionary}
+
 \section{Functional Requirements}
 \subsection{Functional Requirements}
 \begin{enumerate}[align=left,
@@ -381,21 +762,22 @@ This section describes how the work done by the system can be partitioned into s
   labelsep=1em,
   itemindent=0em,
   label=\bfseries FR-\arabic*:]
-  \item The system shall allow \glspl{adm} to create forms with multiple fields types.
+  \item The system shall allow \glspl{adm} to create forms with multiple fields types. \{\textbf{G-1}, \textbf{G-5}\}
   \item The system shall allow \glspl{adm} to organize forms for analytics, and specify how
-    the analysis should be done.
-  \item The system shall generate QR codes for confirmation and check-in integration.
+    the analysis should be done. \{\textbf{G-1}, \textbf{G-3}\}
+  \item The system shall generate QR codes for confirmation and check-in integration. \{\textbf{G-2}\}
   \item The system shall provide an \gls{atd} dashboard for \glspl{adm} with filters
-    for status updates on payments and waivers, event sign-ins, etc.
-  \item The system shall store all event data in a secure, centralized\\database.
+    for status updates on payments and waivers, event sign-ins, etc. \{\textbf{G-4}\}
+  \item The system shall store all event data in a secure, centralized database.
+    \{\textbf{G-6}, \textbf{G-5}, \textbf{G-2}\}
   \item The system shall store all questionnaire data in a secure, centralized database.
+    \{\textbf{G-1}, \textbf{G-3}, \textbf{G-6}\}
   \item The system shall allow \glspl{adm} to generate analytics dashboards and export
-    CSV/Excel reports.
+    CSV/Excel reports. \{\textbf{G-3}\}
   \item The system shall provide event \glspl{atd} with a medium to relay feedback for the
-    event.
+    event. \{\textbf{G-5}\}
   \item The system shall provide \glspl{adm} with a medium to view all event feedback
-    once an event has completed.
-  \item{The system shall store all questionnaire data in a secure, centralized database.}
+    once an event has completed. \{\textbf{G-5}, \textbf{G-4}, \textbf{G-3}\}
 \end{enumerate}
 
 \section{Look and Feel Requirements}
@@ -538,8 +920,9 @@ This section describes how the work done by the system can be partitioned into s
   labelsep=1em,
   itemindent=0em,
   label=\bfseries MT-\arabic*:]
-  \item The system shall remain operational during the entirety of an event.
-  \item The system shall have scheduled maintenance performed before and after events.
+  \item The system shall provide updated documentation upon every release and be accessible to all developers\\[2mm]
+    {\bf Motivation:} Allows for developers to understand the changes made on each release and will be easily be able to modify the code to fix errors or make updates. \\ 
+    {\bf Fit Criterion:} Updated documentation will be included with the release of each version.
 \end{enumerate}
 \subsection{Supportability Requirements}
 \begin{enumerate}[align=left,
@@ -547,13 +930,23 @@ This section describes how the work done by the system can be partitioned into s
   labelsep=1em,
   itemindent=0em,
   label=\bfseries SU-\arabic*:]
-  \item The system shall run as a native mobile application on Android and iOS devices.
-  \item The system shall run as a web app accessible through Chromium, Firefox, and
-    Safari browsers.
+  \item The system shall include a FAQ section to help clarify or answer common questions.\\[2mm]
+    {\bf Motivation:} Will allow for a better user experience as they can solve their own problems quickly and will make it easier for MES support teams. \\ 
+    {\bf Fit Criterion:} Ensure a FAQ with common questions obtained from stakeholders (supervisor and MES council members) is included within the system.
 \end{enumerate}
-\lips
 \subsection{Adaptability Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries AD-\arabic*:]
+  \item The system shall run as a web app accessible through Chromium, Firefox, and Safari browsers. \\[2mm]
+    {\bf Motivation:} This will allow users to use whatever browser they want and will make the application more accessible. \\ 
+    {\bf Fit Criterion:} Test for compatibility of the application to ensure it runs on all specified browsers.
+  \item The mobile app components will work on both IOS and Android platforms. \\[2mm]
+    {\bf Motivation:} Allows users on both mobile ecosystems to use the app making the application more accessible. \\ 
+    {\bf Fit Criterion:} Test the application in both the IOS and Android Environment ensuring correct functionality of all components.
+\end{enumerate}
 
 \section{Security Requirements}
 \subsection{Access Requirements}
@@ -562,17 +955,54 @@ This section describes how the work done by the system can be partitioned into s
   labelsep=1em,
   itemindent=0em,
   label=\bfseries AC-\arabic*:]
-  \item The system shall allow \glspl{adm} to have privileged access to \gls{atd} records.
-  \item The system shall restrict event \glspl{atd} from accessing information that is not associated with them.
+  \item The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
+    {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\ 
+    {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.
+  \item Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
+    {\bf Motivation:} Prevents unauthorized users from viewing sensitive event and user data.  \\ 
+    {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins
 \end{enumerate}
 \subsection{Integrity Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries IG-\arabic*:]
+  \item The system shall provide input validation for all user submitted data \\[2mm]
+    {\bf Motivation:} Ensures the safety of our application by ensuring only the required input types are entering our database. Protects us from SQL injection and data corruption in our database.  \\ 
+    {\bf Fit Criterion:} All inputs will include checks to ensure only the correct type is entering our database. Perform testing to ensure that all inputs have validation checks. 
+  \item The system shall only use HTTPS for communication between clients and servers \\[2mm]
+    {\bf Motivation:} Ensures a secure connection between our client and server and protects against the interception or tampering of data during data transmission. \\ 
+    {\bf Fit Criterion:} All requests will be done through HTTPS and if an HTTP request is done we will redirect it to HTTPS. \\
+\end{enumerate}
 \subsection{Privacy Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries PV-\arabic*:]
+  \item Users shall have the ability to request for the deletion of their stored personal data\\[2mm]
+    {\bf Motivation:} Increases transparency and control over their own data for users. Provides reassurances for users that their data can be removed if neccesary.    \\ 
+    {\bf Fit Criterion:} Ensure a mechanism exists for users to delete their data. Peform testing so that the mechanism actually removes all related data from the database.
+  \item The system shall only store sensitive data after obtaining the consent of the user \\[2mm]
+    {\bf Motivation:} Keeps us legally sound as we are not storing user data without first obtaining consent. Also provides users with information on what their data is actually being used for.  \\ 
+    {\bf Fit Criterion:} Ensure that all sections which require inputting sensitive information have consent checks where we explicitly explain what is being stored and how it may be used. \\
+  \item All sensitive user information such as student numbers, names and emails shall be encrypted in storage using AES-256\\[2mm]
+    {\bf Motivation:} Protects user's information from unauthorized viewing and ensures that even if a breach were to occur sensitive information will not be leaked.   \\ 
+    {\bf Fit Criterion:} Inspect database to show that the required fields are stored encrypted and not in plaintext. \\
+\end{enumerate}
 \subsection{Audit Requirements}
-\lips
-\subsection{Immunity Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries AU-\arabic*:]
+  \item The system shall track admin action inside an audit log\\[2mm]
+    {\bf Motivation:} Ensures traceability of admin actions and allows other admins to know who performed what.  \\ 
+    {\bf Fit Criterion:} 100\% of actions will be in a log with tracking of user who did the action, timestamp and action commited. Testing will be done to ensure all actions are being logged and logs should be exportable for review.
+\end{enumerate}
+% \subsection{Immunity Requirements}
+% \textit{No relevant requirements}
 
 \section{Cultural Requirements}
 \subsection{Cultural Requirements}
@@ -600,7 +1030,8 @@ There are some products that exists on the market which solve certain components
 \subsection{Reusable Components}
 There are various components that we can use to help develop our application:
 \begin{itemize}
-  \item \textbf{Next.JS}: Provide us with a framework for developing web apps in \textbf{React} and provides built in routing behaviour. It also handles many built in libraries and packages that we can use for front-end styling such as \textbf{tailwind-css} and \textbf{shadcn/ui}. We can also integrate it with other libraries for authentication and for database management
+  \item \textbf{Vite}: Provides us with a framework for developing web apps in \textbf{React} and provides built in routing behaviour. It also handles many built in libraries and packages that we can use for front-end styling such as \textbf{tailwind-css}. We can also integrate it with other libraries for authentication and for database management
+  \item \textbf{TanStack}: Provides us with a powerfull middleware to connect backend and front-end services. Will primarily be used for routing but also offers data visualization capabilities. Offers many libraries for working with data and state management that we can leverage.
   \item \textbf{SurveyJS}: This is a potential tool we can use to develop the form builder as it provides us with some pre-built components we can use to develop and customize our own forms. 
   \item \textbf{Recharts}: This could be potential charting tool we can use to develop our admin dashboard. Though there are other charting tools the benefit of Recharts is that it provides customization on top of the pre built charts.
   \item \textbf{Drizzle}: We can use Drizzle as an ORM to map from our database to our web-app. Drizzle is useful since it is lightweight and is code first. Drizzle's simplicity allows for faster development and is perfect for our use case.
