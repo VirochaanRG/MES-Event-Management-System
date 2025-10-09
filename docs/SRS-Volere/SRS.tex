@@ -78,25 +78,58 @@ Date 2 & 1.1 & Notes\\
 
 ~\newpage
 \section{Purpose of the Project}
+
+The purpose of this project is to create a centralized platform for the McMaster Engineering Society (MES) that simplifies how large-scale events are managed. By consolidating event registration, form creation, attendee tracking, and data analytics into a single system, the platform aims to reduce administrative workload, eliminate fragmented workflows, and enhance the overall experience for both event organizers and attendees.
+
 \subsection{User Business}
-\lips
+
+The primary users of this system are members of the McMaster Engineering Society, including executives and event organizers, as well as McMaster engineering students who attend MES events.  
+
+\begin{itemize}
+    \item \textbf{Administrators (MES Executives and Organizers):} Responsible for creating events, designing registration and feedback forms, managing attendee information, and analyzing data through the dashboard. They will use the platform to reduce manual work and improve event coordination.
+    \item \textbf{End Users (Students and Attendees):} Students will use the platform to register for events, complete waivers or feedback forms, and receive event confirmations and updates. The goal is to create a seamless and engaging experience that encourages participation.
+\end{itemize}
+
+By serving both groups through a single platform, the system eliminates redundant workflows and ensures continuity of data across multiple events.
+
 \subsection{Goals of the Project}
-\lips
+
+The primary goals of this project are as follows:
+
+\begin{enumerate}
+    \item \textbf{Develop a Custom Form Builder:} Build an intuitive tool that lets administrators design and manage event or feedback forms with different question types and conditional logic, without needing third-party software.
+    \item \textbf{Implement a Unified Registration and Feedback System:} Create a simple, centralized process for students to register for events, complete waivers, and share feedback—all in one place.
+    \item \textbf{Create an Attendee Overview Dashboard:} Give administrators a clear view of event participation by displaying key details such as registration status, payments, and waiver completion in real time.
+    \item \textbf{Integrate Backend Analytics:} Include tools that help MES organizers analyze event data, track trends, and use insights to plan and improve future events more effectively.
+\end{enumerate}
+
+
+
 \section{Stakeholders}
 \subsection{Client}
-\lips
+The client for this project is the supervisor, Luke Schuurman. He is a member of the MES and has first hand experience plannig and hosting events with the MES. As the supervisor he will play a crucial role by ensuring the project aligns with objective of the MES and integrate the platform seamlessly with existing systems. He will also provide us with feedback and guidance throughout the project and will help define the project requirements in this document.
 \subsection{Customer}
 \lips
 \subsection{Other Stakeholders}
 \lips
 \subsection{Hands-On Users of the Project}
-\lips
+\textbf{MES Executives and Council Members}: They will be utilizing this system to create and manage events, configure forms and surveys, monitor event data and generate data analytics reports. They can be characterized as primarily undergraduate students who value their time greatly. They aim to reduce the time taken to do administrative tasks as well as provide a better experience during MES events. Their experience with systems like this can range from Journeyman - Master as they can be experienced in event planning and student engagement. There may be a slight learning curve to utilizing the new technology but these users have experience performing these functions.\\
+\newline
+\textbf{McMaster Engineering Students}: They will be utilizing this app to to register for events, purchase tickets, sign waivers, check in at venues, and complete feedback surveys. They want to enjoy their university experience and connect with other students, They are also very busy and value their time greatly so are looking for an intuitive and straightforward user experience. Their general experience with systems like this is Journeyman as they may have used similar systems for other use cases. \\
+\newline
+\textbf{Other Students and Guest Event Attendees}: This group includes non-engineering students, alumni, and invited guests who participate in large-scale MES events such as the Fireball Formal and Graduation Formal, which extend beyond the core engineering community. It could also include students and guests from other universities as well as industry which attend the engineering conferences that the MES helps host. They are generally looking for an easy and seamless experience registering and attending these events. Their general experience with systems like this is Journeyman as they may have used similar systems for other use cases.
 \subsection{Personas}
-\lips
+\begin{enumerate}
+  \item \textbf{Matthew Cruise (Engineering Student)}: Matthew is a 20-year-old second-year Mechanical Engineering student at McMaster University. He lives in a shared house near campus with two close friends. He enjoys attending MES events like pub nights and the Fireball Formal as a way to balance his heavy academic workload with some enjoyment and entertainment. He usually hears about events through word-of-mouth or social media and would prefer an easy and effortless way to find and register for events. Matthew is generally tech savvy and is comfortable using online platforms but doesn't want to be bothered by too many notifications and forms. He has many ideas on how he can generally improve his university experience but doesn't believe he has an outlet to convey them. For Matthew his priority is convenience as he wants to enjoy himself but doesn't want to spend too much time or effort doing so.
+  \item \textbf{Adam Clooney (MES Executive)}: Adam Clooney is a 22-year-old final-year Civil Engineering student who currently serves as VP Social on the MES. He is responsible for coordinating large-scale events like Fireball Formal, working closely with other council members to handle logistics, advertising, and student engagement. Adam is outgoing and enjoys bringing people together, but often feels the strain of balancing his role with academic responsibilities. He is proficient with common digital tools such as Google Drive, spreadsheets, and design platforms for promotions, but he’s not highly technical. Adam appreciates structure and tools that keep things organized because he dislikes wasting time fixing errors or repeating work. He is motivated by the sense of accomplishment that comes from hosting a successful event and wants tools that help him stay on top of details.
+  \item \textbf{Margot Watson (McMaster Student)}: Margot Watson is a 21-year-old undergraduate student in Political Science at McMaster University. Although she is not part of the engineering faculty, she often attends large MES-hosted events such as the Fireball Formal and other socials because many of her friends are in engineering. Margot lives in an off-campus apartment with two roommates and enjoys being involved in student life across faculties. She has a relaxed attitude toward technology since she uses her phone daily for social media and messaging but she prefers things to be straightforward and intuitive. She is cautious with her money, balancing tuition and living expenses, but she’s willing to spend on experiences with friends. She is motivated by spending time with her friends and having good experiences to have a fullfiling student life.
+\end{enumerate}
 \subsection{Priorities Assigned to Users}
-\lips
+\textbf{Key Users:} Luke Schuurman, MES Council Members and Executives, McMaster Engineering Students. \\
+\textbf{Secondary Users:} Other Students and Guest Event Attendees.
 \subsection{User Participation}
-\lips
+Our requirements will primarily be derived through meetings with our supervisor Luke Schuurman. If we have the need to clarify or elicit more requirements we will look to engage other MES members either through our supervisor or directly.
+
 \subsection{Maintenance Users and Service Technicians}
 \lips
 
@@ -124,13 +157,37 @@ involved in the Project}
 \glsaddall
 \printnoidxglossaries
 
-\section{Relevant Facts And Assumptions}
 \subsection{Relevant Facts}
-\lips
+
+\begin{itemize}
+    \item The McMaster Engineering Society (MES) currently manages events such as Fireball Formal and the CALE Conference using several disconnected tools like Google Forms and Google Sheets, which creates inefficiencies and limits data analysis.
+    \item Each MES event involves registration, waiver collection, and feedback surveys that must comply with university data privacy and accessibility standards.
+    \item The system will be used by both administrators and students on a wide range of devices and browsers, so responsive and cross-platform design is required.
+    \item The overall Event Management System is being co-developed by three Capstone teams. Project A must maintain compatibility and shared data models with the other two teams’ components.
+    \item The project’s frontend stack was recently updated from \textbf{Next.js} to \textbf{Vite + TanStack Router + TanStack Create} to improve development speed, hot reloading performance, and flexibility for building a Single Page Application (SPA) with integrated admin dashboards and authentication.
+    \item PostgreSQL remains the chosen database technology for data storage and analytics.
+\end{itemize}
+
 \subsection{Business Rules}
-\lips
+
+\begin{itemize}
+    \item Only verified MES administrators can create, edit, or delete forms and view backend analytics.
+    \item Event data, form responses, and attendee details must be securely stored and retrievable for future event reviews.
+    \item All user input will be validated to prevent incomplete or invalid submissions before being stored in the database.
+    \item A consistent data format must be maintained across all events to support accurate analytics and report generation.
+    \item Administrators can export data such as attendee lists or analytics summaries in standard formats (e.g., CSV, PDF).
+\end{itemize}
+
 \subsection{Assumptions}
-\lips
+
+\begin{itemize}
+    \item The MES will provide sample event and registration data to support development and testing.
+    \item Users will have stable internet access when using the platform, as it relies on real-time connectivity.
+    \item Collaborating teams (Projects B and C) will follow the agreed API and database specifications to ensure system integration works smoothly.
+    \item Authentication and authorization will be handled securely within the shared platform using standardized methods.
+    \item Future MES administrators and developers will continue maintaining the project using the provided GitHub repository, documentation, and CI/CD workflows.
+\end{itemize}
+
 
 \section{The Scope of the Work}
 
@@ -338,30 +395,84 @@ This section describes how the work done by the system can be partitioned into s
 
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
-\lips
+\begin{enumerate}[label=LFR-AP.\arabic*, wide=0pt, leftmargin=*]
+  \item The interface shall comply with MES branding criteria (logo, colour scheme).\\[2mm]
+    {\bf Motivation:} Ensures that the product is recognizable as an official MES event registration platform.\\
+    {\bf Fit Criterion:} The MES representative shall certify that the product complies with the current standards.
+  \item The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
+    {\bf Motivation:} Increases accessibility and user productivity, and allows for consistency across different events.\\
+    {\bf Fit Criterion:} During usability testing across the MES events, at least 80\% of students rate the forums ease of use a 4+.
+  \item Admin dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
+    {\bf Motivation:} Improves organizer accessibility and readability, allowing for easier management during planning operations.\\
+    {\bf Fit Criterion:} The representative shall approve of the analytics layout.
+\end{enumerate}
+
 \subsection{Style Requirements}
-\lips
+\begin{enumerate}[label=LFR-S.\arabic*, wide=0pt, leftmargin=*]
+  \item The design shall be professional but approachable, accomodating all types of events.\\[2mm]
+    {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
+    {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
+  \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+    {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
+    {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
+\end{enumerate}
 
 \section{Usability and Humanity Requirements}
 \subsection{Ease of Use Requirements}
-\begin{enumerate}[align=left,
-  leftmargin=*,
-  labelsep=1em,
-  itemindent=0em,
-  label=\bfseries UE-\arabic*:]
-  \item The system shall allow first-time users to understand how to navigate the event
-    registration form within 3 minutes without prior training.
+
+\begin{enumerate}[label=UHR-EoU.\arabic*, wide=0pt, leftmargin=*]
+  \item Registration and feedback forms shall be easily and quickly filled out for anyone with no instruction.\\[2mm]
+    {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
+    {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
+  \item Users shall sign-up/sign-in to the app with no instruction. \\[2mm]
+    {\bf Motivation:} The registration process is the most important aspect of the platform, so the app should have a clear and simple layout.\\
+    {\bf Fit Criterion:} A sample of users shall register/login within 2 minutes without instruction.
+  \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+    {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
+    {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
   \item The system shall provide survey progress indicators to reduce form abandonment
     rates.
 \end{enumerate}
+
 \subsection{Personalization and Internationalization Requirements}
-\lips
+\begin{enumerate}[label=UHR-PIR.\arabic*, wide=0pt, leftmargin=*]
+  \item The custom form builder shall allow admin to create personalized forms with event-specific fields.\\[2mm]
+    {\bf Motivation:} Flexibility is essential to accomodate the diverse set of events as per the scope.\\
+    {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.
+  \item Admin dashboard shall support sorting and filtering of attendees by predefined metrics.\\[2mm]
+    {\bf Motivation:} Streamlines the attendee organizing process, allowing admin to categorize attendees as per the event requirements.\\
+    {\bf Fit Criterion:} Organizers shall filter attendees within 1 minute of use without instruction.
+\end{enumerate}
+
 \subsection{Learning Requirements}
-\lips
+\begin{enumerate}[label=UHR-LR.\arabic*, wide=0pt, leftmargin=*]
+  \item The app shall be easy for anyone with an intermediate level of English.\\[2mm]
+    {\bf Motivation:} Users should expect intuitive, concise ineteractions.\\
+    {\bf Fit Criterion:} 80\% of students successfully complete a form with no assistance.
+  \item Admin shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
+    {\bf Motivation:} Event organizers are constantly changing, so it is important to reduce dependency on technical training.\\
+    {\bf Fit Criterion:} 80\% of organizers shall complete a basic test form on their first attempt.
+\end{enumerate}
+
 \subsection{Understandability and Politeness Requirements}
-\lips
+\begin{enumerate}[label=UHR-UPR.\arabic*, wide=0pt, leftmargin=*]
+  \item Basic, non-technical language will be used (Sign-up instead of RSVP).\\[2mm]
+    {\bf Motivation:} Increases accessibility among non-technical users, or non-fluent English speakers.\\
+    {\bf Fit Criterion:} 80\% of students understand all wording without clarification.
+  \item The app shall communicate errors clearly and politely.\\[2mm]
+    {\bf Motivation:} Clear error messages reduce frustration and improve user experience.\\
+    {\bf Fit Criterion:} Feedback suggests that 80\% of students found the experience satisfying.
+  \item The app shall hide sensitive and confidential information from users.\\[2mm]
+    {\bf Motivation:} Enhances security and confidence of organizations in the product.\\
+    {\bf Fit Criterion:} Approval from MES representative.
+\end{enumerate}
+
 \subsection{Accessibility Requirements}
-\lips
+\begin{enumerate}[label=UHR-AR.\arabic*, wide=0pt, leftmargin=*]
+  \item The app shall conform to WCAG 2.1 AA standards, improving visibility for impaired users.\\[2mm]
+    {\bf Motivation:} Ensures accessibility for users with visual disabilities and impairments.\\
+    {\bf Fit Criterion:} Approval from a sample of students with impairments, and evaluation tools (WAVE Web Accessibility).
+\end{enumerate}
 
 \section{Performance Requirements}
 \subsection{Speed and Latency Requirements}
@@ -480,11 +591,18 @@ This section describes how the work done by the system can be partitioned into s
 % Any problems that remain unresolved and undefined
 \section{Off-the-Shelf Solutions}
 \subsection{Ready-Made Products}
-\lips
+There are some products that exists on the market which solve certain components of this product but no product exists that combines these components into one. For event management there are various tools such as EventBrite and Stubhub which can allow for the selling of tickets for events. The problem with these products are that they don't integrate well with current MES Systems and don't provide all the features as required such as collecting waivers and ensuring McMaster students attend university specific events. For general data collection Google Forms is the most used tool and it allows for the creation of complex forms and stores data in spreadsheets. For further data analysis it requires effort on the part of the form creator to actually go and analyze the data to gain actual insights. Also the forms can become hard to handle as they become complex and can become confusing for respondents. As mentioned before there is no tool that has a combination of the two components.
 \subsection{Reusable Components}
-\lips
+There are various components that we can use to help develop our application:
+\begin{itemize}
+  \item \textbf{Next.JS}: Provide us with a framework for developing web apps in \textbf{React} and provides built in routing behaviour. It also handles many built in libraries and packages that we can use for front-end styling such as \textbf{tailwind-css} and \textbf{shadcn/ui}. We can also integrate it with other libraries for authentication and for database management
+  \item \textbf{SurveyJS}: This is a potential tool we can use to develop the form builder as it provides us with some pre-built components we can use to develop and customize our own forms. 
+  \item \textbf{Recharts}: This could be potential charting tool we can use to develop our admin dashboard. Though there are other charting tools the benefit of Recharts is that it provides customization on top of the pre built charts.
+  \item \textbf{Drizzle}: We can use Drizzle as an ORM to map from our database to our web-app. Drizzle is useful since it is lightweight and is code first. Drizzle's simplicity allows for faster development and is perfect for our use case.
+\end{itemize}
+These components will allow us to develop our application faster and more efficiently as many of these products are already optimized. All the above products are free to use so do not incur any extra costs or require the handling of licenses.
 \subsection{Products That Can Be Copied}
-\lips
+\textit{There don't seem to be any products that can be copied which contain all the required components within a single product. Moreover the MES wants a product that doesn't require an external license and wants to be fully built in house so they have control over future development and usage.}
 
 \section{New Problems}
 \subsection{Effects on the Current Environment}
@@ -512,7 +630,7 @@ Inhibit the New Product}
 \lips
 
 \section{Costs}
-\lips
+We don't expect any costs to arise during the development of the project. We will be using free tools and libraries for development and for hosting we will look to host databases and the back-end locally. In production the hosting will be done by the MES so it is out of the scope of this capstone.
 \section{User Documentation and Training}
 \subsection{User Documentation Requirements}
 \lips
