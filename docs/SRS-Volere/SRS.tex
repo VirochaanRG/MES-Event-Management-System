@@ -51,7 +51,7 @@
 
 \begin{document}
 
-\title{Software Requirements Specification for \progname: Form builder and event manager for the McMaster Engineering Society}
+\title{Software Requirements Specification for \progname: Form Builder and Event Manager for the McMaster Engineering Society}
 \author{\authname}
 \date{\today}
 
@@ -69,8 +69,7 @@
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\textbf{Date}} & {\textbf{Version}} & {\textbf{Notes}}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+October 10, 2025 & 1.0 & Initial draft of Revision 0 \\
 \bottomrule
 \end{tabularx}
 
@@ -217,13 +216,22 @@ Currently, the \gls{mes} uses plethora of different platforms to host events and
 
 \subsection{The Context of the Work}
 
-This section provides an overview of the high-level inputs and outputs between the system and external systems or actors. Figure X illustrates a work context diagram showing the interactions between the system components and external elements.
+This section provides an overview of the high-level inputs and outputs between the system and external systems or actors.
+The system is split into two perspectives, the user perspective shown in \hyperref[fig:workcontextuser]{Figure \ref{fig:workcontextuser}}, and the admin perspective shown in \hyperref[fig:workcontextadmin]{Figure \ref{fig:workcontextadmin}}. 
 
 \begin{center}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{images/work_context.png}
-    \caption{Work context diagram of the form builder and event hosting system}\label{workcontext}
+    \includegraphics[width=1\linewidth]{images/work_context_user.png}
+    \caption{Work context diagram of the user side application}\label{fig:workcontextuser}
+\end{figure}
+\end{center}
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/work_context_admin.png}
+    \caption{Work context diagram of the admin side application}\label{fig:workcontextadmin}
 \end{figure}
 \end{center}
 
@@ -350,16 +358,41 @@ This section describes how the work done by the system can be partitioned into s
 \subsection{Business Data Model}
 % Split the entire system into subsystems which the data passes through and the form it takes at each step
 % This is NOT the same as workflow partition. This deals with DATA and the other deals with PROCESSES
+
+This section illustrates the flow of data throughout the system. \hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into into well defined subsystems and outlines the interactions between subsystems. 
+
 \begin{center}
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{images/business_data_model.png}
-    \caption{Diagram of the interactions between main system components}\label{businessdata}
+    \caption{Diagram of the interactions between main system components}\label{fig:businessdata}
 \end{figure}
 \end{center}
 \subsection{Data Dictionary}
-\lips
 % Definition of each subsystem defined above
+
+Below is a table defining each of the system components shown in \hyperref[fig:businessdata]{Figure \ref{fig:businessdata}}.
+{
+\setlength{\tabcolsep}{0.3em}
+\renewcommand{\arraystretch}{1.2}
+\begin{table}[H]
+    \begin{tabular}{p{0.25\linewidth}p{0.6\linewidth}p{0.2\linewidth}}
+      \toprule
+      \textbf{Component Name}              & \textbf{Description}                                                                                                                                       & \textbf{Type} \\ \midrule
+        MES Event/Survey Manager             & The application handling the admin side of the system, including event/survey creation, and data analytics                                                 & Application   \\ \midrule
+        Event Builder                        & Contains tools for creating, publishing, and managing events                                                                                               & Module        \\ \midrule
+        Survey Builder                       & Contains tools for creating, publishing, and managing surveys                                                                                              & Module        \\ \midrule
+        Admin Controller                     & Handles the flow of execution of MES Event/Survey Manager modules and data flow between the event/survey builders, data analyzers, and the user controller & Module        \\ \midrule
+        Financial Analyzer                   & Automates analysis and visualization of finances from event attendee data                                                                                  & Module        \\ \midrule 
+        Survey Analyzer                      & Automates analysis and visualization of survey response data                                                                                               & Module        \\ \midrule
+        MES Event Registration/Survey Filler & The application handling the user side of the system, including event registration and survey responses                                                    & Application   \\ \midrule
+        Form Filler                          & Handles input and validation of form responses                                                                                                             & Module        \\ \midrule
+        User Controller                      & Controls the flow of execution of the form filler and handles communication with the admin controller                                                      & Module        \\ \midrule
+    \end{tabular}
+    \captionof{table}{Data dictionary table}\label{table:datadictionary}
+\end{table}
+}
+
 \section{The Scope of the Product}
 \subsection{Product Boundary}
 \lips
