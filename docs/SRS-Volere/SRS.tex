@@ -15,7 +15,7 @@
 \usepackage{float}
 \usepackage{enumitem}
 \usepackage[english]{babel}
-\usepackage[acronym]{glossaries}
+\usepackage[acronym,nonumberlist]{glossaries}
 
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
@@ -57,7 +57,6 @@
 \date{\today}
 
 \maketitle
-
 ~\newpage
 
 \pagenumbering{roman}
@@ -156,6 +155,7 @@ Our requirements will primarily be derived through meetings with our supervisor 
 \section{Naming Conventions and Terminology}
 \subsection{Glossary of All Terms, Including Acronyms, Used by Stakeholders
 involved in the Project}
+\glsaddall
 \printnoidxglossaries
 
 \section{Relevant Facts and Assumptions}
