@@ -375,23 +375,62 @@ This section describes how the work done by the system can be partitioned into s
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries FR-\arabic*:]
-  \item The system shall allow \glspl{adm} to create forms with multiple fields types. \{\textbf{G-1}, \textbf{G-5}\}
-  \item The system shall allow \glspl{adm} to organize forms for analytics, and specify how
-    the analysis should be done. \{\textbf{G-1}, \textbf{G-3}\}
-  \item The system shall generate QR codes for confirmation and check-in integration. \{\textbf{G-2}\}
-  \item The system shall provide an \gls{atd} dashboard for \glspl{adm} with filters
-    for status updates on payments and waivers, event sign-ins, etc. \{\textbf{G-4}\}
-  \item The system shall store all event data in a secure, centralized database.
-    \{\textbf{G-6}, \textbf{G-5}, \textbf{G-2}\}
-  \item The system shall store all questionnaire data in a secure, centralized database.
-    \{\textbf{G-1}, \textbf{G-3}, \textbf{G-6}\}
-  \item The system shall allow \glspl{adm} to generate analytics dashboards and export
-    CSV/Excel reports. \{\textbf{G-3}\}
-  \item The system shall provide event \glspl{atd} with a medium to relay feedback for the
-    event. \{\textbf{G-5}\}
-  \item The system shall provide \glspl{adm} with a medium to view all event feedback
-    once an event has completed. \{\textbf{G-5}, \textbf{G-4}, \textbf{G-3}\}
+  label=\bfseries FR-\arabic*:,
+  ref=\bfseries FR-\arabic*]
+  \item \label{FR1} The system shall allow \glspl{adm} to create forms with multiple field types.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-5}\}. \Gls{mes} wants to be able to create forms for their surveys,
+    especially \gls{cfes} surveys, with different response option types.\\
+    {\bf Fit Criterion:} Forms can be created with different response styles (e.g., single choice, multiple choice,
+    numeric scales) and response data is correctly stored in databases.
+  \item \label{FR2} The system shall allow \glspl{adm} to organize forms for analytics, and specify how
+    the analysis should be done.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-3}\}. \Gls{mes} wants to use different metrics to view survey data,
+    and wants to combine multiple forms in a singular analysis.\\
+    {\bf Fit Criterion:} \Glspl{adm} can combine results from multiple forms together in one analysis query, and can
+    compare data points as they wish.
+  \item \label{FR3} The system shall provide \glspl{atd} a method to register for events and view event information.
+    \\[2mm]
+    {\bf Motivation:} \{\textbf{G-2}\}. \Glspl{atd} must have a way to register for events and view event information.\\
+    {\bf Fit Criterion:} \Glspl{atd} can fill out event registration forms and receive and view notifications about
+    the events, and their registration is recorded in the database.
+  \item \label{FR4} The system shall generate QR codes for confirmation and check-in integration.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-2}\}. \Glspl{atd} should be able to provide proof of registration to have easy
+    access to events.\\
+    {\bf Fit Criterion:} A QR code is generated and stored in the dashboard for the \gls{atd}.
+  \item \label{FR5} The system shall provide an event dashboard for \glspl{adm} with filters
+    for status updates on payments, waivers, event sign-ins, etc.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-4}\}. \Glspl{adm} must have a way to track the event and relay updates as needed.\\
+    {\bf Fit Criterion:} The \gls{adm} dashboard provides trackers for sign-ins, and provides a medium to notify
+    \glspl{atd} of any changes.
+  \item \label{FR6} The system shall store all event data in a secure, centralized database.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-6}, \textbf{G-5}, \textbf{G-2}\}. Event and survey data can contain sensitive data
+    from \glspl{atd}, and should only be accessed by authorized users.\\
+    {\bf Fit Criterion:} Only relevant \glspl{adm} can access stored user data unrelated to their account.
+  \item \label{FR7} The system shall store all questionnaire data in a secure, centralized database.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-3}, \textbf{G-6}\}. See \ref{FR6}.\\
+    {\bf Fit Criterion:} See \ref{FR6}.
+  \item \label{FR8} The system shall allow \glspl{adm} to generate analytics visualizations and export
+    CSV/Excel reports.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-3}\}. \Glspl{adm} should have a way of viewing and exporting survey data.\\
+    {\bf Fit Criterion:} The \gls{adm} can export queried data as CSVs or Excel-compatible files, and can view
+    metrics of their choosing in the admin dashboard after specifying which metrics to plot.
+  \item \label{FR9} The system shall provide event \glspl{atd} with a medium to relay feedback for the
+    event.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-5}\}. \Gls{mes} wants to gather feedback from events and incorporate them in future
+    events.\\
+    {\bf Fit Criterion:} \Glspl{adm} can create feedback forms which \glspl{atd} are provided during the event which
+    they can fill out, and their responses are stored in the database and are available for \glspl{adm} to access
+    during or after the event.
+  \item \label{FR10} The system shall provide \glspl{adm} with a medium to view all event feedback
+    once an event has completed.\\[2mm]
+  {\bf Motivation:} \{\textbf{G-5}, \textbf{G-4}, \textbf{G-3}\}. See \ref{FR9}.\\
+  {\bf Fit Criterion:} See \ref{FR9}.
+  \item \label{FR11} The system shall implement a roles-based feature access system which ensures that only relevant
+    functionality and information is made available to the user.\\[2mm]
+    {\bf Motivation:} \{{\bf G-4}, {\bf G-6}, {\bf G-2}\}. \Gls{mes} wants access to be restricted and ensure that
+    only authorized personnel can view relevant information.\\
+    {\bf Fit Criterion:} Users assigned roles can access information and features specified by those roles, and cannot
+    see irrelevant features or information.
 \end{enumerate}
 
 \section{Look and Feel Requirements}
