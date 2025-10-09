@@ -13,7 +13,8 @@
 \usepackage{caption}
 \usepackage{enumitem}
 \usepackage{float}
-\usepackage[acronym,xindy]{glossaries}
+\usepackage[english]{babel}
+\usepackage[acronym]{glossaries}
 
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
@@ -24,7 +25,7 @@
     urlcolor=cyan           % color of external links
 }
 
-\makeglossaries
+\makenoidxglossaries
 \newacronym{mes}{MES}{McMaster Engineering Society}
 \newacronym{cfes}{CFES}{Canadian Federation of Engineering Students}
 \newglossaryentry{adm}{
@@ -43,6 +44,7 @@
 \newcommand{\lips}{\textit{Insert your content here.}}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\renewcommand{\glossarysection}[2][]{}
 
 \input{../Comments}
 \input{../Common}
@@ -120,7 +122,7 @@ Date 2 & 1.1 & Notes\\
 \section{Naming Conventions and Terminology}
 \subsection{Glossary of All Terms, Including Acronyms, Used by Stakeholders
 involved in the Project}
-\printglossaries
+\printnoidxglossaries
 
 \section{Relevant Facts And Assumptions}
 \subsection{Relevant Facts}
