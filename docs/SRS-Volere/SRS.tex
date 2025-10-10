@@ -379,7 +379,7 @@ creation have been grouped as a single workflow since they are nearly identical.
 \textbf{Input:} Survey responses \\
 \textbf{Output:} Survey completion confirmation \\
 \textbf{Pre-condition:} \Gls{atd} has downloaded the application and has created an account \\
-\textbf{Scenario:} \\
+\textbf{Scenario:}
 \begin{enumerate}
   \item The user application receives the survey data
   \item The user application verifies the data is filled correctly
@@ -391,14 +391,13 @@ creation have been grouped as a single workflow since they are nearly identical.
 \textbf{Sub variations:}
 \begin{itemize}
   \item [2a.] The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the \gls{atd} to fix the errors and resubmit
-
 \end{itemize}
 
 \subsubsection*{BUC 3: \Gls{adm} creates a form module}
 \textbf{Input:} Form fields \\
 \textbf{Output:} Reusable form module \\
 \textbf{Pre-condition:} \Gls{adm} has access to create custom form modules \\
-\textbf{Scenario:} \\
+\textbf{Scenario:}
 \begin{enumerate}
   \item The \gls{adm} portal receives the list of form fields and questions from the \gls{adm} user for the custom module
   \item The \gls{adm} portal verifies the custom module has been created correctly
@@ -409,15 +408,17 @@ creation have been grouped as a single workflow since they are nearly identical.
   \item The \gls{adm} portal updates the list of custom modules with the completed module
   \item The \gls{adm} portal confirms with the \gls{adm} user that the custom module has been created
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted form module has errors (i.e. unfinished fields), the \gls{adm} user is prompted to fix these errors before resubmitting \\
-4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted form module has errors (i.e. unfinished fields), the \gls{adm} user is prompted to fix these errors before resubmitting
+  \item [4a.] Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial
+\end{itemize}
 
 \subsubsection*{BUC 4: \Gls{adm} creates an event/survey}
 \textbf{Input:} Event details \\
 \textbf{Output:} Event creation confirmation \\
 \textbf{Pre-condition:} \Gls{adm} has access to create events \\
-\textbf{Scenario:} \\
+\textbf{Scenario:}
 \begin{enumerate}
   \item The \gls{adm} portal receives the event/survey details
   \item The \gls{adm} portal verifies the event/survey details are correct
@@ -429,9 +430,11 @@ creation have been grouped as a single workflow since they are nearly identical.
   \item The \gls{adm} portal adds the created event/survey to the event/survey dashboard
   \item The \gls{adm} portal confirms with the \gls{adm} user that the event/survey has been created
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted details have errors (i.e. event date has already passed), the \gls{adm} user is prompted to fix these errors before resubmitting \\
-4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted details have errors (i.e. event date has already passed), the \gls{adm} user is prompted to fix these errors before resubmitting
+  \item [4a.] Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial
+\end{itemize}
 
 \subsubsection*{BUC 5: \Gls{adm} views event/survey statistics}
 \textbf{Input:} Event/survey to view \\
@@ -1320,7 +1323,22 @@ The application itself will serve as the guide, helping users learn by doing rat
 
 
 \section{Waiting Room}
-\lips
+
+This section outlines extra features to consider that may or be not be implemented depending on time constraints.
+
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries WR-\arabic*:,
+  ref=\bfseries WR-\arabic*]
+  \item \label{FR1} The system shall allow for full customization of system to allow adopt to the \\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-5}\}. \Gls{mes} wants to be able to create forms for their surveys,
+    especially \gls{cfes} surveys, with different response option types.\\
+    {\bf Fit Criterion:} Forms can be created with different response styles (e.g., single choice, multiple choice,
+    numeric scales) and response data is correctly stored in databases.
+\end{enumerate}
+
 
 \section{Ideas for Solution}
 \lips
