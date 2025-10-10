@@ -333,22 +333,18 @@ Below is a table describing each of the sub-workflows of the proposed systems. N
 creation have been grouped as a single workflow since they are nearly identical.
 
 {
-  \setlength{\tabcolsep}{0.125em}
+  \setlength{\tabcolsep}{0.2em}
   \renewcommand{\arraystretch}{1.2}
-  \begin{table}[H]
-    \centering
-    \begin{tabularx}{\textwidth}{|P{2.5em}|Y|Y|Y|Y|}
-      \hline
-      \textbf{No.} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
-      1 & \Gls{atd} registers for event & Registration data & Event ticket & \ref{FR3}, \ref{FR4}, \ref{FR5} \\ \hline
-      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \ref{FR3}, \ref{FR4}, \ref{FR5}\\ \hline
-      3 & \Gls{adm} creates a form module & Module question data & Reusable form module & \\ \hline
-      4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \\ \hline
-      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports &
+\begin{longtable}[H]{p{0.03\linewidth}p{0.21\linewidth}p{0.25\linewidth}p{0.25\linewidth}p{0.28\linewidth}}
+      \textbf{\#} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
+      1 & \Gls{atd} registers for event & Registration data & Event ticket & \ref{FR3} \ref{FR4} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{SIR2} \ref{UHEUR1} \ref{UHEUR2} \ref{UHUPR1} \ref{UHUPR2} \ref{UHUPR3} \ref{UHAR1} \ref{PSLR1} \ref{PSER1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \ref{MSAR1} \ref{MSAR2} \\ \hline
+      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{FR9} \ref{SIR1} \ref{SIR2} \ref{PTFR2} \ref{UHEUR1} \ref{UHEUR4} \ref{UHUPR1} \ref{UHUPR2} \ref{UHUPR3} \ref{UHAR1} \ref{PSLR1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \\ \hline
+      3 & \Gls{adm} creates a form module & Module questions & Reusable form module & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{UHPIR1} \ref{UHLR2} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{PTFR4} \ref{PTFR5} \ref{MSMR1} \ref{LFSR2} \ref{UHEUR3} \ref{UHUPR3}\\ \hline
+      4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \ref{FR1} \ref{FR3} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR9} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{SIR2} \ref{SAuR1} \ref{UHPIR2} \ref{UHEUR3} \ref{UHLR2} \ref{PTFR4} \ref{PTFR5} \ref{MSAR1} \ref{MSAR2} \ref{MSMR1}\\ \hline
+      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \ref{FR2} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR8} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SAuR1} \ref{UHPIR2} \ref{LFAR3} \ref{UHEUR3} \ref{UHLR2} \ref{UHUPR3}
       \\ \hline
-    \end{tabularx}
-    \captionof{table}{Partitioning of system workflows}\label{wfpart}
-  \end{table}
+    \caption{Partitioning of system workflows}\label{wfpart}
+  \end{longtable}
 }
 
 \subsection{Specifying a Business Use Case (BUC)}
@@ -515,33 +511,32 @@ The purpose of this section is to define the scope of the product by defining th
 \hyperref[table:productusecase]{Table \ref{table:productusecase}} further defines each of the individual use cases of the system, outlining the specific inputs and outputs and related requirements.
 
 {
-\setlength{\tabcolsep}{0.3em}
-\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{0.2em}
 \begin{longtable}[H]{p{0.04\linewidth}p{0.22\linewidth}p{0.13\linewidth}p{0.43\linewidth}p{0.22\linewidth}}
   \toprule
   \textbf{\#}     & \textbf{Name}                  & \textbf{Actor} & \textbf{Input/Output}                                                                                                       & \textbf{Requirements} \\ \midrule
-  1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and fields (in)\\Reusable form module (out)\end{tabular}                        &                       \\ \midrule
-  2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 &                       \\ \midrule
-  3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           &                       \\ \midrule
-  4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         &                       \\ \midrule
-  5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          &                       \\ \midrule
-  6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and questions (in)\\Fillable survey (out)\end{tabular}                            &                       \\ \midrule
-  7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       &                       \\ \midrule
-  8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           &                       \\ \midrule
-  9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         &                       \\ \midrule
-  10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            &                       \\ \midrule
-  11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  &                       \\ \midrule
-  12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 &                       \\ \midrule
-  13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       &                       \\ \midrule
-  14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           &                       \\ \midrule
-  15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     &                       \\ \midrule
-  16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        &                       \\ \midrule
-  17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  &                       \\ \midrule
-  18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                &                       \\ \midrule
-  19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            &                       \\ \midrule
-  20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion confirmation (out)\end{tabular} &                       \\ \midrule
-  21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update confirmation (out)\end{tabular}           &                       \\ \midrule
-  22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        &                       \\ \bottomrule
+  1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and \\fields (in)\\Reusable form module (out)\end{tabular}                        & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{UHEUR3} \\ \midrule
+  2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{UHEUR3} \\ \midrule
+  3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           & \ref{FR3} \ref{FR4} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{UHLR2} \\ \midrule
+  4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         & \ref{FR4} \ref{FR6} \ref{SAR2} \ref{SIR1} \ref{MSMR1} \ref{UHEUR3} \\ \midrule
+  5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{UHLR2} \\ \midrule
+  6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and \\questions (in)\\Fillable survey (out)\end{tabular}                            & \ref{FR1} \ref{FR2} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{UHEUR3} \\ \midrule
+  7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{UHEUR3} \\ \midrule
+  8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{UHLR2} \\ \midrule
+  9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         & \ref{FR5} \ref{FR6} \ref{SAR2} \ref{SAuR1} \ref{UHLR2} \ref{UHPIR2} \\ \midrule
+  10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SAuR1} \ref{UHEUR3} \ref{UHLR2} \\ \midrule
+  11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  & \ref{FR6} \ref{FR8} \ref{SAR1} \ref{SAuR1} \ref{UHPIR2} \ref{UHEUR3} \\ \midrule
+  12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 & \ref{FR7} \ref{FR8} \ref{UHEUR3} \ref{UHLR2} \ref{PSLR1} \ref{PSER1} \\ \midrule
+  13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       & \ref{FR3} \ref{FR4} \ref{FR9} \ref{UHEUR1} \ref{UHUPR1} \ref{UHAR1} \\ \midrule
+  14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           & \ref{FR5} \ref{FR6} \ref{UHEUR1} \ref{UHUPR2} \ref{UHAR1} \ref{UHLR2} \\ \midrule
+  15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     & \ref{FR3} \ref{FR6} \ref{FR9} \ref{UHEUR1} \ref{UHUPR1} \ref{UHAR1} \\ \midrule
+  16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        & \ref{FR3} \ref{FR4} \ref{SAR1} \ref{SIR1} \ref{PSLR1} \ref{UHEUR1} \\ \midrule
+  17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  & \ref{FR3} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSMR1} \ref{UHEUR1} \\ \midrule
+  18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSAR2} \ref{UHEUR1} \\ \midrule
+  19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            & \ref{FR1} \ref{FR2} \ref{FR6} \ref{UHEUR1} \ref{UHUPR1} \ref{UHAR1} \\ \midrule
+  20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion \\confirmation (out)\end{tabular} & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SIR1} \ref{PSLR1} \ref{UHEUR4} \\ \midrule
+  21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update\\ confirmation (out)\end{tabular}           & \ref{FR2} \ref{FR6} \ref{SIR1} \ref{MSMR1} \ref{UHEUR3} \ref{UHUPR2} \\ \midrule
+  22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        & \ref{FR2} \ref{FR6} \ref{UHEUR1} \ref{UHLR2} \ref{UHAR1} \ref{UHUPR2} \\ \bottomrule
   \caption{Product use case table}\label{table:productusecase}
 \end{longtable}
 }
@@ -912,7 +907,8 @@ Below are formal state diagrams showing the different states of the system and t
 
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
-\begin{enumerate}[label=LFR-AP.\arabic*, wide=0pt, leftmargin=*]
+\begin{enumerate}[label=LFR-AP.\arabic*, wide=0pt, leftmargin=*, 
+  ref=\bfseries LFR-AP.\arabic*]
   \item \label{LFAR1} The interface shall comply with \gls{mes} branding criteria (logo, colour scheme).\\[2mm]
     {\bf Motivation:} Ensures that the product is recognizable as an official \gls{mes} event registration platform.\\
     {\bf Fit Criterion:} The \gls{mes} representative shall certify that the product complies with the current standards.
@@ -925,7 +921,8 @@ Below are formal state diagrams showing the different states of the system and t
 \end{enumerate}
 
 \subsection{Style Requirements}
-\begin{enumerate}[label=LFR-S.\arabic*, wide=0pt, leftmargin=*]
+\begin{enumerate}[label=LFR-S.\arabic*, wide=0pt, leftmargin=*, 
+  ref=\bfseries LFR-S.\arabic*]
   \item \label{LFSR1} The design shall be professional but approachable, accommodating all types of events.\\[2mm]
     {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
     {\bf Fit Criterion:} After use in some \gls{mes} events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
@@ -937,7 +934,8 @@ Below are formal state diagrams showing the different states of the system and t
 \section{Usability and Humanity Requirements}
 \subsection{Ease of Use Requirements}
 
-\begin{enumerate}[label=UHR-EoU.\arabic*, wide=0pt, leftmargin=*]
+\begin{enumerate}[label=UHR-EoU.\arabic*, wide=0pt, leftmargin=*, 
+  ref=\bfseries UHR-EoU.\arabic*]
   \item \label{UHEUR1} Registration and feedback forms shall be easily and quickly filled out for anyone with no instruction.\\[2mm]
     {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
     {\bf Fit Criterion:} After use in some \gls{mes} events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
@@ -952,7 +950,7 @@ Below are formal state diagrams showing the different states of the system and t
 \end{enumerate}
 
 \subsection{Personalization and Internationalization Requirements}
-\begin{enumerate}[label=UHR-PIR.\arabic*, wide=0pt, leftmargin=*]
+\begin{enumerate}[label=UHR-PIR.\arabic*, wide=0pt, leftmargin=*,ref=\bfseries UHR-PIR\arabic*]
   \item \label{UHPIR1} The custom form builder shall allow admin to create personalized forms with event-specific fields.\\[2mm]
     {\bf Motivation:} Flexibility is essential to accommodate the diverse set of events as per the scope.\\
     {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.
@@ -962,7 +960,7 @@ Below are formal state diagrams showing the different states of the system and t
 \end{enumerate}
 
 \subsection{Learning Requirements}
-\begin{enumerate}[label=UHR-LR.\arabic*, wide=0pt, leftmargin=*]
+\begin{enumerate}[label=UHR-LR.\arabic*, wide=0pt, leftmargin=*,ref=\bfseries UHR-LR\arabic*]
   \item \label{UHLR1} The app shall be easy for anyone with an intermediate level of English.\\[2mm]
     {\bf Motivation:} Users should expect intuitive, concise interactions.\\
     {\bf Fit Criterion:} 80\% of students successfully complete a form with no assistance.
@@ -972,7 +970,7 @@ Below are formal state diagrams showing the different states of the system and t
 \end{enumerate}
 
 \subsection{Understandability and Politeness Requirements}
-\begin{enumerate}[label=UHR-UPR.\arabic*, wide=0pt, leftmargin=*]
+\begin{enumerate}[label=UHR-UPR.\arabic*, wide=0pt, leftmargin=*,,ref=\bfseries UHR-UPR\arabic*]
   \item \label{UHUPR1} Basic, non-technical language will be used (Sign up instead of RSVP).\\[2mm]
     {\bf Motivation:} Increases accessibility among non-technical users, or non-fluent English speakers.\\
     {\bf Fit Criterion:} 80\% of students understand all wording without clarification.
@@ -985,7 +983,7 @@ Below are formal state diagrams showing the different states of the system and t
 \end{enumerate}
 
 \subsection{Accessibility Requirements}
-\begin{enumerate}[label=UHR-AR.\arabic*, wide=0pt, leftmargin=*]
+\begin{enumerate}[label=UHR-AR.\arabic*, wide=0pt, leftmargin=*,ref=\bfseries UHR-AR\arabic*]
   \item \label{UHAR1} The app shall conform to WCAG 2.1 AA standards, improving visibility for impaired users.\\[2mm]
     {\bf Motivation:} Ensures accessibility for users with visual disabilities and impairments.\\
     {\bf Fit Criterion:} Approval from a sample of students with impairments, and evaluation tools (WAVE Web Accessibility).
@@ -997,7 +995,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries SL-\arabic*:]
+  label=\bfseries SL-\arabic*:
+  ,ref=\bfseries SL-\arabic*]
   \item \label{PSLR1} The system shall have a maximum 2-second latency for form loading, optimized for
     mobile devices.
 \end{enumerate}
@@ -1010,7 +1009,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries RF-\arabic*:]
+  label=\bfseries RF-\arabic*:
+  ,ref=\bfseries RF-\arabic*]
   \item \label{PTFR1} The system shall support 2047 concurrent users during peak event times.
   \item \label{PTFR2} The system shall auto-save partially completed surveys every 30 seconds.
   \item \label{PTFR3} The system shall recover from a server crash within 60 seconds without data loss.
@@ -1025,8 +1025,9 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries SE-\arabic*:]
-  \item \label{PSER} The system shall support up to 2047 registrations per event.
+  label=\bfseries SE-\arabic*:
+  ,ref=\bfseries SE-\arabic*]
+  \item \label{PSER1} The system shall support up to 2047 registrations per event.
 \end{enumerate}
 \subsection{Longevity Requirements}
 \lips
@@ -1049,7 +1050,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries MT-\arabic*:]
+  label=\bfseries MT-\arabic*:,
+  ref=\bfseries MT-\arabic*]
   \item \label{MSMR1} The system shall provide updated documentation upon every release and be accessible to all developers\\[2mm]
     {\bf Motivation:} Allows for developers to understand the changes made on each release and will be easily be able to modify the code to fix errors or make updates. \\
     {\bf Fit Criterion:} Updated documentation will be included with the release of each version.
@@ -1059,7 +1061,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries SU-\arabic*:]
+  label=\bfseries SU-\arabic*:,
+  ref=\bfseries SU-\arabic*]
   \item \label{MSSR1} The system shall include a FAQ section to help clarify or answer common questions.\\[2mm]
     {\bf Motivation:} Will allow for a better user experience as they can solve their own problems quickly and will make it easier for MES support teams. \\
     {\bf Fit Criterion:} Ensure a FAQ with common questions obtained from stakeholders (supervisor and MES council members) is included within the system.
@@ -1069,7 +1072,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries AD-\arabic*:]
+  label=\bfseries AD-\arabic*:,
+  ref=\bfseries AD-\arabic*]
   \item \label{MSAR1} The system shall run as a web app accessible through Chromium, Firefox, and Safari browsers. \\[2mm]
     {\bf Motivation:} This will allow users to use whatever browser they want and will make the application more accessible. \\
     {\bf Fit Criterion:} Test for compatibility of the application to ensure it runs on all specified browsers.
@@ -1084,7 +1088,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries AC-\arabic*:]
+  label=\bfseries AC-\arabic*:,
+  ref=\bfseries AC-\arabic*]
   \item \label{SAR1} The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
     {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\
     {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.
@@ -1097,7 +1102,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries IG-\arabic*:]
+  label=\bfseries IG-\arabic*:,
+  ref=\bfseries IG-\arabic*]
   \item \label{SIR1} The system shall provide input validation for all user submitted data \\[2mm]
     {\bf Motivation:} Ensures the safety of our application by ensuring only the required input types are entering our database. Protects us from SQL injection and data corruption in our database.  \\
     {\bf Fit Criterion:} All inputs will include checks to ensure only the correct type is entering our database. Perform testing to ensure that all inputs have validation checks.
@@ -1110,7 +1116,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries PV-\arabic*:]
+  label=\bfseries PV-\arabic*:,
+  ref=\bfseries PV-\arabic*]
   \item \label{SPR1} Users shall have the ability to request for the deletion of their stored personal data\\[2mm]
     {\bf Motivation:} Increases transparency and control over their own data for users. Provides reassurances for users that their data can be removed if neccesary.    \\
     {\bf Fit Criterion:} Ensure a mechanism exists for users to delete their data. Peform testing so that the mechanism actually removes all related data from the database.
@@ -1126,7 +1133,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries AU-\arabic*:]
+  label=\bfseries AU-\arabic*:,
+  ref=\bfseries AU-\arabic*]
   \item \label{SAuR1} The system shall track admin action inside an audit log\\[2mm]
     {\bf Motivation:} Ensures traceability of admin actions and allows other admins to know who performed what.  \\
     {\bf Fit Criterion:} 100\% of actions will be in a log with tracking of user who did the action, timestamp and action commited. Testing will be done to ensure all actions are being logged and logs should be exportable for review.
@@ -1140,7 +1148,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries CL-\arabic*:]
+  label=\bfseries CL-\arabic*:,
+  ref=\bfseries CL-\arabic*]
   \item \label{CR1} The system shall use Canadian English spelling.\\[2mm]
     {\bf Motivation:} \Gls{mes} is an organization located in Canada.\\
     {\bf Fit Criterion:} All rendered text provided by the system passes a Canadian English spell-checker.\\
@@ -1152,7 +1161,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries LG-\arabic*:]
+  label=\bfseries LG-\arabic*:,
+  ref=\bfseries LG-\arabic*]
   \item \label{CLR1} The system shall store and handle all sensitive personal data in compliance with PIPEDA regulations.\\[2mm]
     {\bf Motivation:} The system will store private personal information, which must be done responsibly.\\
     {\bf Fit Criterion:} The system meets all PIPEDA regulation requirements.\\
@@ -1162,7 +1172,8 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries ST-\arabic*:]
+  label=\bfseries ST-\arabic*:,
+  ref=\bfseries ST-\arabic*]
   \item \label{CSCR1} The system code shall conform to the \textit{Airbnb JavaScript Style Guide} and \textit{Airbnb React/JSX
     Style Guide}.\\[2mm]
     {\bf Motivation:} Specified in Development Plan \S \ 11.\\
