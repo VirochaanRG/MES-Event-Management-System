@@ -1135,7 +1135,15 @@ Below are formal state diagrams showing the different states of the system and t
 
 \section{Cultural Requirements}
 \subsection{Cultural Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries CL-\arabic*:]
+  \item The system shall use Canadian English spelling.\\[2mm]
+    {\bf Motivation:} \Gls{mes} is an organization located in Canada.\\
+    {\bf Fit Criterion:} All rendered text provided by the system passes a Canadian English spell-checker.\\
+\end{enumerate}
 
 \section{Compliance Requirements}
 \subsection{Legal Requirements}
@@ -1144,10 +1152,21 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries LG-\arabic*:]
-  \item The system shall store and handle all sensitive personal data in compliance with PIPEDA regulations.
+  \item The system shall store and handle all sensitive personal data in compliance with PIPEDA regulations.\\[2mm]
+    {\bf Motivation:} The system will store private personal information, which must be done responsibly.\\
+    {\bf Fit Criterion:} The system meets all PIPEDA regulation requirements.\\
 \end{enumerate}
 \subsection{Standards Compliance Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries ST-\arabic*:]
+  \item The system code shall conform to the \textit{Airbnb JavaScript Style Guide} and \textit{Airbnb React/JSX
+    Style Guide}.\\[2mm]
+    {\bf Motivation:} Specified in Development Plan \S \ 11.\\
+    {\bf Fit Criterion:} The system code passes all CI/CD checks related to formatting compliance.\\
+\end{enumerate}
 
 \section{Open Issues}
 There are currently no open issues which need to be considered at this stage of the development cycle.
