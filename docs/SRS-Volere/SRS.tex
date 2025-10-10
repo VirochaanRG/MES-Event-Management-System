@@ -340,8 +340,8 @@ creation have been grouped as a single workflow since they are nearly identical.
     \begin{tabularx}{\textwidth}{|P{2.5em}|Y|Y|Y|Y|}
       \hline
       \textbf{No.} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
-      1 & \Gls{atd} registers for event & Registration data & Event ticket & \\ \hline
-      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \\ \hline
+      1 & \Gls{atd} registers for event & Registration data & Event ticket & \ref{FR3}, \ref{FR4}, \ref{FR5} \\ \hline
+      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \ref{FR3}, \ref{FR4}, \ref{FR5}\\ \hline
       3 & \Gls{adm} creates a form module & Module question data & Reusable form module & \\ \hline
       4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \\ \hline
       5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports &
@@ -913,23 +913,23 @@ Below are formal state diagrams showing the different states of the system and t
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
 \begin{enumerate}[label=LFR-AP.\arabic*, wide=0pt, leftmargin=*]
-  \item The interface shall comply with \gls{mes} branding criteria (logo, colour scheme).\\[2mm]
+  \item \label{LFAR1} The interface shall comply with \gls{mes} branding criteria (logo, colour scheme).\\[2mm]
     {\bf Motivation:} Ensures that the product is recognizable as an official \gls{mes} event registration platform.\\
     {\bf Fit Criterion:} The \gls{mes} representative shall certify that the product complies with the current standards.
-  \item The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
+  \item \label{LFAR2} The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
     {\bf Motivation:} Increases accessibility and user productivity, and allows for consistency across different events.\\
     {\bf Fit Criterion:} During usability testing across the \gls{mes} events, at least 80\% of students rate the forums ease of use a 4+.
-  \item Admin dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
+  \item \label{LFAR3} Admin dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
     {\bf Motivation:} Improves organizer accessibility and readability, allowing for easier management during planning operations.\\
     {\bf Fit Criterion:} The representative shall approve of the analytics layout.
 \end{enumerate}
 
 \subsection{Style Requirements}
 \begin{enumerate}[label=LFR-S.\arabic*, wide=0pt, leftmargin=*]
-  \item The design shall be professional but approachable, accommodating all types of events.\\[2mm]
+  \item \label{LFSR1} The design shall be professional but approachable, accommodating all types of events.\\[2mm]
     {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
     {\bf Fit Criterion:} After use in some \gls{mes} events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
-  \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+  \item \label{LFSR2} The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
     {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
     {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
 \end{enumerate}
@@ -938,55 +938,55 @@ Below are formal state diagrams showing the different states of the system and t
 \subsection{Ease of Use Requirements}
 
 \begin{enumerate}[label=UHR-EoU.\arabic*, wide=0pt, leftmargin=*]
-  \item Registration and feedback forms shall be easily and quickly filled out for anyone with no instruction.\\[2mm]
+  \item \label{UHEUR1} Registration and feedback forms shall be easily and quickly filled out for anyone with no instruction.\\[2mm]
     {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
     {\bf Fit Criterion:} After use in some \gls{mes} events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
-  \item Users shall sign up/sign-in to the app with no instruction. \\[2mm]
+  \item \label{UHEUR2} Users shall sign up/sign-in to the app with no instruction. \\[2mm]
     {\bf Motivation:} The registration process is the most important aspect of the platform, so the app should have a clear and simple layout.\\
     {\bf Fit Criterion:} A sample of users shall register/login within 2 minutes without instruction.
-  \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+  \item \label{UHEUR3} The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
     {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
     {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
-  \item The system shall provide survey progress indicators to reduce form abandonment
+  \item \label{UHEUR4} The system shall provide survey progress indicators to reduce form abandonment
     rates.
 \end{enumerate}
 
 \subsection{Personalization and Internationalization Requirements}
 \begin{enumerate}[label=UHR-PIR.\arabic*, wide=0pt, leftmargin=*]
-  \item The custom form builder shall allow admin to create personalized forms with event-specific fields.\\[2mm]
+  \item \label{UHPIR1} The custom form builder shall allow admin to create personalized forms with event-specific fields.\\[2mm]
     {\bf Motivation:} Flexibility is essential to accommodate the diverse set of events as per the scope.\\
     {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.
-  \item Admin dashboard shall support sorting and filtering of attendees by predefined metrics.\\[2mm]
+  \item \label{UHPIR2} Admin dashboard shall support sorting and filtering of attendees by predefined metrics.\\[2mm]
     {\bf Motivation:} Streamlines the attendee organizing process, allowing admin to categorize attendees as per the event requirements.\\
     {\bf Fit Criterion:} Organizers shall filter attendees within 1 minute of use without instruction.
 \end{enumerate}
 
 \subsection{Learning Requirements}
 \begin{enumerate}[label=UHR-LR.\arabic*, wide=0pt, leftmargin=*]
-  \item The app shall be easy for anyone with an intermediate level of English.\\[2mm]
+  \item \label{UHLR1} The app shall be easy for anyone with an intermediate level of English.\\[2mm]
     {\bf Motivation:} Users should expect intuitive, concise interactions.\\
     {\bf Fit Criterion:} 80\% of students successfully complete a form with no assistance.
-  \item Admin shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
+  \item \label{UHLR2} Admin shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
     {\bf Motivation:} Event organizers are constantly changing, so it is important to reduce dependency on technical training.\\
     {\bf Fit Criterion:} 80\% of organizers shall complete a basic test form on their first attempt.
 \end{enumerate}
 
 \subsection{Understandability and Politeness Requirements}
 \begin{enumerate}[label=UHR-UPR.\arabic*, wide=0pt, leftmargin=*]
-  \item Basic, non-technical language will be used (Sign up instead of RSVP).\\[2mm]
+  \item \label{UHUPR1} Basic, non-technical language will be used (Sign up instead of RSVP).\\[2mm]
     {\bf Motivation:} Increases accessibility among non-technical users, or non-fluent English speakers.\\
     {\bf Fit Criterion:} 80\% of students understand all wording without clarification.
-  \item The app shall communicate errors clearly and politely.\\[2mm]
+  \item \label{UHUPR2} The app shall communicate errors clearly and politely.\\[2mm]
     {\bf Motivation:} Clear error messages reduce frustration and improve user experience.\\
     {\bf Fit Criterion:} Feedback suggests that 80\% of students found the experience satisfying.
-  \item The app shall hide sensitive and confidential information from users.\\[2mm]
+  \item \label{UHUPR3} The app shall hide sensitive and confidential information from users.\\[2mm]
     {\bf Motivation:} Enhances security and confidence of organizations in the product.\\
     {\bf Fit Criterion:} Approval from \gls{mes} representative.
 \end{enumerate}
 
 \subsection{Accessibility Requirements}
 \begin{enumerate}[label=UHR-AR.\arabic*, wide=0pt, leftmargin=*]
-  \item The app shall conform to WCAG 2.1 AA standards, improving visibility for impaired users.\\[2mm]
+  \item \label{UHAR1} The app shall conform to WCAG 2.1 AA standards, improving visibility for impaired users.\\[2mm]
     {\bf Motivation:} Ensures accessibility for users with visual disabilities and impairments.\\
     {\bf Fit Criterion:} Approval from a sample of students with impairments, and evaluation tools (WAVE Web Accessibility).
 \end{enumerate}
@@ -998,7 +998,7 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries SL-\arabic*:]
-  \item The system shall have a maximum 2-second latency for form loading, optimized for
+  \item \label{PSLR1} The system shall have a maximum 2-second latency for form loading, optimized for
     mobile devices.
 \end{enumerate}
 \subsection{Safety-Critical Requirements}
@@ -1011,11 +1011,11 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries RF-\arabic*:]
-  \item The system shall support 2047 concurrent users during peak event times.
-  \item The system shall auto-save partially completed surveys every 30 seconds.
-  \item The system shall recover from a server crash within 60 seconds without data loss.
-  \item The system shall allow new form modules to be added without any downtime.
-  \item The system shall allow \glspl{adm} to update event templates without disruption
+  \item \label{PTFR1} The system shall support 2047 concurrent users during peak event times.
+  \item \label{PTFR2} The system shall auto-save partially completed surveys every 30 seconds.
+  \item \label{PTFR3} The system shall recover from a server crash within 60 seconds without data loss.
+  \item \label{PTFR4} The system shall allow new form modules to be added without any downtime.
+  \item \label{PTFR5} The system shall allow \glspl{adm} to update event templates without disruption
     during ongoing events.
 \end{enumerate}
 \subsection{Capacity Requirements}
@@ -1026,7 +1026,7 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries SE-\arabic*:]
-  \item The system shall support up to 2047 registrations per event.
+  \item \label{PSER} The system shall support up to 2047 registrations per event.
 \end{enumerate}
 \subsection{Longevity Requirements}
 \lips
@@ -1050,7 +1050,7 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries MT-\arabic*:]
-  \item The system shall provide updated documentation upon every release and be accessible to all developers\\[2mm]
+  \item \label{MSMR1} The system shall provide updated documentation upon every release and be accessible to all developers\\[2mm]
     {\bf Motivation:} Allows for developers to understand the changes made on each release and will be easily be able to modify the code to fix errors or make updates. \\
     {\bf Fit Criterion:} Updated documentation will be included with the release of each version.
 \end{enumerate}
@@ -1060,7 +1060,7 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries SU-\arabic*:]
-  \item The system shall include a FAQ section to help clarify or answer common questions.\\[2mm]
+  \item \label{MSSR1} The system shall include a FAQ section to help clarify or answer common questions.\\[2mm]
     {\bf Motivation:} Will allow for a better user experience as they can solve their own problems quickly and will make it easier for MES support teams. \\
     {\bf Fit Criterion:} Ensure a FAQ with common questions obtained from stakeholders (supervisor and MES council members) is included within the system.
 \end{enumerate}
@@ -1070,10 +1070,10 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries AD-\arabic*:]
-  \item The system shall run as a web app accessible through Chromium, Firefox, and Safari browsers. \\[2mm]
+  \item \label{MSAR1} The system shall run as a web app accessible through Chromium, Firefox, and Safari browsers. \\[2mm]
     {\bf Motivation:} This will allow users to use whatever browser they want and will make the application more accessible. \\
     {\bf Fit Criterion:} Test for compatibility of the application to ensure it runs on all specified browsers.
-  \item The mobile app components will work on both IOS and Android platforms. \\[2mm]
+  \item \label{MSAR2} The mobile app components will work on both IOS and Android platforms. \\[2mm]
     {\bf Motivation:} Allows users on both mobile ecosystems to use the app making the application more accessible. \\
     {\bf Fit Criterion:} Test the application in both the IOS and Android Environment ensuring correct functionality of all components.
 \end{enumerate}
@@ -1085,10 +1085,10 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries AC-\arabic*:]
-  \item The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
+  \item \label{SAR1} The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
     {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\
     {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.
-  \item Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
+  \item \label{SAR2} Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
     {\bf Motivation:} Prevents unauthorized users from viewing sensitive event and user data.  \\
     {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins
 \end{enumerate}
@@ -1098,10 +1098,10 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries IG-\arabic*:]
-  \item The system shall provide input validation for all user submitted data \\[2mm]
+  \item \label{SIR1} The system shall provide input validation for all user submitted data \\[2mm]
     {\bf Motivation:} Ensures the safety of our application by ensuring only the required input types are entering our database. Protects us from SQL injection and data corruption in our database.  \\
     {\bf Fit Criterion:} All inputs will include checks to ensure only the correct type is entering our database. Perform testing to ensure that all inputs have validation checks.
-  \item The system shall only use HTTPS for communication between clients and servers \\[2mm]
+  \item \label{SIR2} The system shall only use HTTPS for communication between clients and servers \\[2mm]
     {\bf Motivation:} Ensures a secure connection between our client and server and protects against the interception or tampering of data during data transmission. \\
     {\bf Fit Criterion:} All requests will be done through HTTPS and if an HTTP request is done we will redirect it to HTTPS. \\
 \end{enumerate}
@@ -1111,13 +1111,13 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries PV-\arabic*:]
-  \item Users shall have the ability to request for the deletion of their stored personal data\\[2mm]
+  \item \label{SPR1} Users shall have the ability to request for the deletion of their stored personal data\\[2mm]
     {\bf Motivation:} Increases transparency and control over their own data for users. Provides reassurances for users that their data can be removed if neccesary.    \\
     {\bf Fit Criterion:} Ensure a mechanism exists for users to delete their data. Peform testing so that the mechanism actually removes all related data from the database.
-  \item The system shall only store sensitive data after obtaining the consent of the user \\[2mm]
+  \item \label{SPR2} The system shall only store sensitive data after obtaining the consent of the user \\[2mm]
     {\bf Motivation:} Keeps us legally sound as we are not storing user data without first obtaining consent. Also provides users with information on what their data is actually being used for.  \\
     {\bf Fit Criterion:} Ensure that all sections which require inputting sensitive information have consent checks where we explicitly explain what is being stored and how it may be used. \\
-  \item All sensitive user information such as student numbers, names and emails shall be encrypted in storage using AES-256\\[2mm]
+  \item \label{SPR3} All sensitive user information such as student numbers, names and emails shall be encrypted in storage using AES-256\\[2mm]
     {\bf Motivation:} Protects user's information from unauthorized viewing and ensures that even if a breach were to occur sensitive information will not be leaked.   \\
     {\bf Fit Criterion:} Inspect database to show that the required fields are stored encrypted and not in plaintext. \\
 \end{enumerate}
@@ -1127,7 +1127,7 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries AU-\arabic*:]
-  \item The system shall track admin action inside an audit log\\[2mm]
+  \item \label{SAuR1} The system shall track admin action inside an audit log\\[2mm]
     {\bf Motivation:} Ensures traceability of admin actions and allows other admins to know who performed what.  \\
     {\bf Fit Criterion:} 100\% of actions will be in a log with tracking of user who did the action, timestamp and action commited. Testing will be done to ensure all actions are being logged and logs should be exportable for review.
 \end{enumerate}
@@ -1141,7 +1141,7 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries CL-\arabic*:]
-  \item The system shall use Canadian English spelling.\\[2mm]
+  \item \label{CR1} The system shall use Canadian English spelling.\\[2mm]
     {\bf Motivation:} \Gls{mes} is an organization located in Canada.\\
     {\bf Fit Criterion:} All rendered text provided by the system passes a Canadian English spell-checker.\\
 \end{enumerate}
@@ -1153,7 +1153,7 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries LG-\arabic*:]
-  \item The system shall store and handle all sensitive personal data in compliance with PIPEDA regulations.\\[2mm]
+  \item \label{CLR1} The system shall store and handle all sensitive personal data in compliance with PIPEDA regulations.\\[2mm]
     {\bf Motivation:} The system will store private personal information, which must be done responsibly.\\
     {\bf Fit Criterion:} The system meets all PIPEDA regulation requirements.\\
 \end{enumerate}
@@ -1163,7 +1163,7 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries ST-\arabic*:]
-  \item The system code shall conform to the \textit{Airbnb JavaScript Style Guide} and \textit{Airbnb React/JSX
+  \item \label{CSCR1} The system code shall conform to the \textit{Airbnb JavaScript Style Guide} and \textit{Airbnb React/JSX
     Style Guide}.\\[2mm]
     {\bf Motivation:} Specified in Development Plan \S \ 11.\\
     {\bf Fit Criterion:} The system code passes all CI/CD checks related to formatting compliance.\\
