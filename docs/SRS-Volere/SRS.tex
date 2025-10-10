@@ -1003,70 +1003,71 @@ Below are formal state diagrams showing the different states of the system and t
 \section{Performance Requirements}
 \subsection{Speed and Latency Requirements}
 \begin{enumerate}[label=\bfseries PR-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall have a maximum 2-second latency for form loading, optimized for mobile devices.
+  \item The system shall have a maximum 2-second latency for form loading, optimized for mobile devices.\\
   {\bf Motivation:} Allows for faster registration process and avoids user abandonment.\\
   {\bf Fit Criterion:} Conduct a load test on different devices to ensure it meets the threshold.
-  \item Attendee information and backend analytics shall have a maximum 4-second latency.
+  \item Attendee information and backend analytics shall have a maximum 4-second latency.\\
   {\bf Motivation:} Admins and organizers require responsive timing to stay on track.\\
   {\bf Fit Criterion:} Performance test show that results load within threshold.
 \end{enumerate}
 
 \subsection{Safety-Critical Requirements}
 \begin{enumerate}[label=\bfseries SC-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall ensure that no errors are introduced that could result in data leaks, violating privacy laws.
+  \item The system shall ensure that no errors are introduced that could result in data leaks, violating privacy laws.\\
   {\bf Motivation:} Crucial to ensure the security of the product to build confidence in users and avoid liability to violations.\\
   {\bf Fit Criterion:} Conduct security tests to ensure no data leaks occur.
 \end{enumerate}
 
 \subsection{Precision or Accuracy Requirements}
 \begin{enumerate}[label=\bfseries PC-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall display all backend analytics accurate to the decimal.
+  \item The system shall display all backend analytics accurate to the decimal.\\
   {\bf Motivation:} Admin depends on accurate analytics for logisitcs, and organizing events. Since we are dealing with discrete data, such as attendee count, there should be no issue having it 100\% accurate.\\
   {\bf Fit Criterion:} Conduct performance test and compare records to displayed analytics.
 \end{enumerate}
 
 \subsection{Robustness or Fault-Tolerance Requirements}
 \begin{enumerate}[label=\bfseries FT-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall auto-save incomplete surveys every 30 seconds.
+  \item The system shall auto-save incomplete surveys every 30 seconds.\\
   {\bf Motivation:} Prevents loss of progress from mistakes or connectivity issues.\\
   {\bf Fit Criterion:} Make new changes, wait 30 seconds, and refresh the page. The changes should still be present.
-  \item The system shall locally queue changes and re-apply them after disconnects within 60 seconds.
+  \item The system shall locally queue changes and re-apply them after disconnects within 60 seconds.\\
   {\bf Motivation:} Maintains progress to a degree to avoid user frustration. Mobile users often lose their connection depending on location, so this is highly relevant.\\
   {\bf Fit Criterion:}Make changes to the form while offline, and then go back online. The changes should be saved and applied within 60 seconds.
-  \item The system shall allow new form modules to be added without any downtime.
+  \item The system shall allow new form modules to be added without any downtime.\\
   {\bf Motivation:} Ensures that different organizers can add forms for their respective events without disrupting other ongoing events.\\
   {\bf Fit Criterion:} Add a new form module while an event is ongoing, and ensure no downtime or data loss occurs.
   \item The system shall allow \glspl{adm} to update event templates without disruption
-    during ongoing events.
+    during ongoing events.\\
   {\bf Motivation:} Ensures that organizers can make live changes without disrupting the event.\\
   {\bf Fit Criterion:} Update an event template while an event is ongoing, and ensure no downtime or data loss occurs.
-  \item The system shall display a last updated signifier for all analytics.
+  \item The system shall display a last updated signifier for all analytics.\\
   {\bf Motivation:} Ensures that organizers can trust the data they are viewing.\\
   {\bf Fit Criterion:} Record time of live analytics as they are updated, then wait and go offline. Compare and make sure the last updated timestamp is accurate.
   \end{enumerate}
 
 \subsection{Capacity Requirements}
 \begin{enumerate}[label=\bfseries CR-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall support 2047 concurrent users during peak event times.
+  \item The system shall support 2047 concurrent users during peak event times.\\
   {\bf Motivation:} Ensures workflow is maintained during surges in usage.\\
   {\bf Fit Criterion:} Conduct performance test with 100 concurrent users with minimal error rate and latency meeting PR-1 and PR-2.
-  \item The system database shall support up to 50,000 total user entries.
+  \item The system database shall support up to 50,000 total user entries.\\
   {\bf Motivation:} Large events over the scope of the year require large tables. Ensures that the product can scale with the growing number of MES events and users.\\
   {\bf Fit Criterion:} Create 50,000 test rows in the database. Check that they are stored correctly and that table interactions (filter, search) exhibit latency according to PR-1 and PR-2.
+\end{enumerate}
 
 \subsection{Scalability or Extensibility Requirements}
 \begin{enumerate}[label=\bfseries SE-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall be designed to allow for new analytic modules to be added in the future.
+  \item The system shall be designed to allow for new analytic modules to be added in the future.\\
   {\bf Motivation:} As MES events evolve, new analytics may be required. Ensures that the product can adapt to future needs.\\
   {\bf Fit Criterion:} Design the system to allow for easy integration of new modules without major refactoring.
 \end{enumerate}
 
 \subsection{Longevity Requirements}
 \begin{enumerate}[label=\bfseries LG-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall be maintainable to fit future changes in \textit{React} or coding standards.
+  \item The system shall be maintainable to fit future changes in \textit{React} or coding standards.\\
     {\bf Motivation:} Ensures the tool can be updated easily to maintain usage over time.\\
     {\bf Fit Criterion:} Thorough documentation, and modular coding practices.
-  \item The system shall support data portability.
+  \item The system shall support data portability.\\
     {\bf Motivation:} Exporting the data and storing is elsewhere allows to maintain space for future events.\\
     {\bf Fit Criterion:} Successfully exporting data to CSV/Excel formats.
 \end{enumerate}
@@ -1074,7 +1075,7 @@ Below are formal state diagrams showing the different states of the system and t
 \section{Operational and Environmental Requirements}
 \subsection{Expected Physical Environment}
 \begin{enumerate}[label=\bfseries PE-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall be used in convential device conditions (connection, temperature, humidity).
+  \item The system shall be used in convential device conditions (connection, temperature, humidity).\\
     {\bf Motivation:} Clarifies the system is expected to be used in typical environmental conditions for a mobile device. If in an environment with extreme conditions where the device will not function, the system will naturally not function either.\\
     {\bf Fit Criterion:} The device functions normally and can use other apps.
 \end{enumerate}
@@ -1084,27 +1085,27 @@ Not Applicable.
 
 \subsection{Requirements for Interfacing with Adjacent Systems}
 \begin{enumerate}[label=\bfseries IR-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall work on recent releases of the most popular browsers.
+  \item The system shall work on recent releases of the most popular browsers.\\
     {\bf Motivation:} Ensures that all users using a variety of devices and browsers can freely use the system.\\
     {\bf Fit Criterion:} Test system on two versions of each of: Chrome, Safari, Edge, Firefox.
-  \item The system shall be compatible with both iOS and Android as an app.
+  \item The system shall be compatible with both iOS and Android as an app.\\
     {\bf Motivation:} Attendees will mostly use the mobile version, so app compatibility is a crucial element.\\
     {\bf Fit Criterion:} Test of two versions of both an Apple and Android device. 
 \end{enumerate}
 
 \subsection{Productization Requirements}
 \begin{enumerate}[label=\bfseries PD-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall be distributed as a secure webiste accessible under the predefined link/domain.
+  \item The system shall be distributed as a secure webiste accessible under the predefined link/domain.\\
     {\bf Motivation:} Keeps the system easily accessible at all times.\\
     {\bf Fit Criterion:} Test that the HTTPS link is freely accessible with a TLS certificate.
-  \item The system shall be distributed as an app via popular app stores.
+  \item The system shall be distributed as an app via popular app stores.\\
     {\bf Motivation:} Attendees will benefit from mobile registration, and the freedom it brings.\\
     {\bf Fit Criterion:} App can be installed on both iOS and Android devices.
 \end{enumerate}
 
 \subsection{Release Requirements}
 \begin{enumerate}[label=\bfseries RR-\arabic*:, wide=0pt, leftmargin=*]
-  \item The primary features specified in the goals and requirements must be implemented in a testable prototype by January, 2026.
+  \item The primary features specified in the goals and requirements must be implemented in a testable prototype by January, 2026.\\
     {\bf Motivation:} Ensures that the system can be tested in the 2026 MES eventsand improved.\\
     {\bf Fit Criterion:} Prototype approved by MES representative.
 \end{enumerate}
