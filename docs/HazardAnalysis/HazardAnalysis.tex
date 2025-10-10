@@ -219,21 +219,27 @@ The hazard analysis identified several safety and security requirements. Within 
 
 \section*{Appendix --- Reflection}
 
-\wss{Not required for CAS 741}
-
-\input{../Reflection.tex}
-
+\subsection*{Rayyan Suhail's Reflection}
 \begin{enumerate}
-    \item What went well while writing this deliverable? 
-    \item What pain points did you experience during this deliverable, and how
-    did you resolve them?
-    \item Which of your listed risks had your team thought of before this
-    deliverable, and which did you think of while doing this deliverable? For
-    the latter ones (ones you thought of while doing the Hazard Analysis), how
-    did they come about?
-    \item Other than the risk of physical harm (some projects may not have any
-    appreciable risks of this form), list at least 2 other types of risk in
-    software products. Why are they important to consider?
+    \item \textbf{What went well while writing this deliverable?} \\
+
+    This deliverable went smoothly because our previous documents such as the Problem Statement and Development Plan, gave us a strong foundation to build on. Having already defined the system components helped us structure the hazard analysis efficiently and also the collaboration within the team was smooth, as we divided the sections based on individual strengths. 
+
+    \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+
+    The main challenge we faced was translating general project risks into specific failure modes. Initially, the process felt abstract, but once we began linking each potential failure to real system components (such as form rendering or data storage), it became clearer. Another pain point was determining the appropriate level of detail for each failure mode, we wanted to be detailed without making the table unnecessarily long. We resolved this by focusing on measurable hazards, refining them together as a team. 
+
+    \item \textbf{Which of your listed risks had your team thought of before this deliverable, and which did you think of while doing this deliverable? For the latter ones (ones you thought of while doing the Hazard Analysis), how did they come about?} \\
+
+    Several of the high-level risks, such as data loss, scalability, and inter-team integration, had already been identified in our Development Plan. However, this deliverable pushed us to identify some hidden operational hazards that were not initially obvious, such as, inconsistent database synchronization during check-in or form schema mismatches between frontend and backend logic. These were discovered as we analyzed how real failures could occur during event operations. This exercise helped us shift our mindset from purely technical issues to reliability and user experience hazards that directly impact the system’s safety.
+
+    \item \textbf{Other than the risk of physical harm (some projects may not have any appreciable risks of this form), list at least 2 other types of risk in software products. Why are they important to consider?} \\
+
+    \textbf{Data Integrity Risks:} These occur when information becomes corrupted or lost due to synchronization issues, incorrect logic, or human error. Data integrity is important in systems like this as even small inaccuracies, can harm user trust and disrupt event management operations. \\
+
+    \textbf{Security and Privacy Risks:} These involve breaches that expose sensitive user data, addressing them early ensures proper authentication and access control are in place. Given that the system stores student and event information, this is essential to maintain confidentiality to comply with university policies. \\
+
 \end{enumerate}
+
 
 \end{document}
