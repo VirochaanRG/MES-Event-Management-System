@@ -30,13 +30,13 @@
 \newacronym{mes}{MES}{McMaster Engineering Society}
 \newacronym{cfes}{CFES}{Canadian Federation of Engineering Students}
 \newglossaryentry{adm}{
-  name=Admin,
+  name=admin,
   description={A privileged system user affiliated with \gls{mes} who can access survey, event, and attendee records;
   track finances; and update event statuses.}
   plural=admins,
 }
 \newglossaryentry{atd}{
-  name=Attendee,
+  name=attendee,
   description={An individual who attends an \gls{mes} event, and uses the system to register, receive event updates,
   provide feedback, or fill out survey responses.}
   plural=attendees,
@@ -59,8 +59,6 @@
 \maketitle
 ~\newpage
 
-\pagenumbering{roman}
-
 \tableofcontents
 
 ~\newpage
@@ -80,56 +78,110 @@ Date 2 & 1.1 & Notes\\
 ~\newpage
 \section{Purpose of the Project}
 
-The purpose of this project is to create a centralized platform for the McMaster Engineering Society (MES) that simplifies how large-scale events are managed. By consolidating event registration, form creation, attendee tracking, and data analytics into a single system, the platform aims to reduce administrative workload, eliminate fragmented workflows, and enhance the overall experience for both event organizers and attendees.
+The purpose of this project is to create a centralized platform for the \gls{mes} that simplifies how large-scale events
+are managed. By consolidating event registration, form creation, attendee tracking, and data analytics into a single
+system, the platform aims to reduce administrative workload, eliminate fragmented workflows, and enhance the overall
+experience for both event organizers and attendees.
 
 \subsection{User Business}
 
-The primary users of this system are members of the McMaster Engineering Society, including executives and event organizers, as well as McMaster engineering students who attend MES events.
+The primary users of this system are members of the McMaster Engineering Society, including executives and event
+organizers, as well as McMaster engineering students who attend \gls{mes} events.
 
 \begin{itemize}
-    \item \textbf{Administrators (MES Executives and Organizers):} Responsible for creating events, designing registration and feedback forms, managing attendee information, and analyzing data through the dashboard. They will use the platform to reduce manual work and improve event coordination.
-    \item \textbf{End Users (Students and Attendees):} Students will use the platform to register for events, complete waivers or feedback forms, and receive event confirmations and updates. The goal is to create a seamless and engaging experience that encourages participation.
+    \item \textbf{Administrators (\gls{mes} Executives and Organizers):} Responsible for creating events, designing
+      registration and feedback forms, managing attendee information, and analyzing data through the dashboard. They
+      will use the platform to reduce manual work and improve event coordination.
+    \item \textbf{End Users (Students and Attendees):} Students will use the platform to register for events, complete
+      waivers or feedback forms, and receive event confirmations and updates. The goal is to create a seamless and
+      engaging experience that encourages participation.
 \end{itemize}
 
-By serving both groups through a single platform, the system eliminates redundant workflows and ensures continuity of data across multiple events.
+By serving both groups through a single platform, the system eliminates redundant workflows and ensures continuity of
+data across multiple events.
 
 \subsection{Goals of the Project}
 
 The primary goals of this project are as follows:
 
 \begin{enumerate}
-    \item \textbf{Develop a Custom Form Builder:} Build an intuitive tool that lets administrators design and manage event or feedback forms with different question types and conditional logic, without needing third-party software.
-    \item \textbf{Implement a Unified Registration and Feedback System:} Create a simple, centralized process for students to register for events, complete waivers, and share feedback—all in one place.
-    \item \textbf{Create an Attendee Overview Dashboard:} Give administrators a clear view of event participation by displaying key details such as registration status, payments, and waiver completion in real time.
-    \item \textbf{Integrate Backend Analytics:} Include tools that help MES organizers analyze event data, track trends, and use insights to plan and improve future events more effectively.
+    \item \textbf{Develop a Custom Form Builder:} Build an intuitive tool that lets administrators design and manage
+      event or feedback forms with different question types and conditional logic, without needing third-party software.
+    \item \textbf{Implement a Unified Registration and Feedback System:} Create a simple, centralized process for
+      students to register for events, complete waivers, and share feedback—all in one place.
+    \item \textbf{Create an Attendee Overview Dashboard:} Give administrators a clear view of event participation by
+      displaying key details such as registration status, payments, and waiver completion in real time.
+    \item \textbf{Integrate Backend Analytics:} Include tools that help \gls{mes} organizers analyze event data, track
+      trends, and use insights to plan and improve future events more effectively.
 \end{enumerate}
 
 
 
 \section{Stakeholders}
 \subsection{Client}
-The client for this project is the supervisor, Luke Schuurman. He is a member of the MES and has first hand experience plannig and hosting events with the MES. As the supervisor he will play a crucial role by ensuring the project aligns with objective of the MES and integrate the platform seamlessly with existing systems. He will also provide us with feedback and guidance throughout the project and will help define the project requirements in this document.
+The client for this project is the supervisor, Luke Schuurman. He is a member of the \gls{mes} and has first-hand
+experience planning and hosting events with the \gls{mes}. As the supervisor he will play a crucial role by ensuring the
+project aligns with objective of the \gls{mes} and integrate the platform seamlessly with existing systems. He will also
+provide us with feedback and guidance throughout the project and will help define the project requirements in this
+document.
 % \subsection{Customer}
 % \lips
 % \subsection{Other Stakeholders}
 % \lips
 \subsection{Hands-On Users of the Project}
-\textbf{MES Executives and Council Members}: They will be utilizing this system to create and manage events, configure forms and surveys, monitor event data and generate data analytics reports. They can be characterized as primarily undergraduate students who value their time greatly. They aim to reduce the time taken to do administrative tasks as well as provide a better experience during MES events. Their experience with systems like this can range from Journeyman - Master as they can be experienced in event planning and student engagement. There may be a slight learning curve to utilizing the new technology but these users have experience performing these functions.\\
+\textbf{\gls{mes} Executives and Council Members}: They will be utilizing this system to create and manage events,
+configure forms and surveys, monitor event data and generate data analytics reports. They can be characterized as
+primarily undergraduate students who value their time greatly. They aim to reduce the time taken to do administrative
+tasks as well as provide a better experience during \gls{mes} events. Their experience with systems like this can range
+from Journeyman - Master as they can be experienced in event planning and student engagement. There may be a slight
+learning curve to utilizing the new technology, but these users have experience performing these functions.\\
 \newline
-\textbf{McMaster Engineering Students}: They will be utilizing this app to to register for events, purchase tickets, sign waivers, check in at venues, and complete feedback surveys. They want to enjoy their university experience and connect with other students, They are also very busy and value their time greatly so are looking for an intuitive and straightforward user experience. Their general experience with systems like this is Journeyman as they may have used similar systems for other use cases. \\
+\textbf{McMaster Engineering Students}: They will be utilizing this app to register for events, purchase tickets, sign
+waivers, check in at venues, and complete feedback surveys. They want to enjoy their university experience and connect
+with other students, They are also very busy and value their time greatly so are looking for an intuitive and
+straightforward user experience. Their general experience with systems like this is Journeyman as they may have used
+similar systems for other use cases. \\
 \newline
-\textbf{Other Students and Guest Event Attendees}: This group includes non-engineering students, alumni, and invited guests who participate in large-scale MES events such as the Fireball Formal and Graduation Formal, which extend beyond the core engineering community. It could also include students and guests from other universities as well as industry which attend the engineering conferences that the MES helps host. They are generally looking for an easy and seamless experience registering and attending these events. Their general experience with systems like this is Journeyman as they may have used similar systems for other use cases.
+\textbf{Other Students and Guest Event Attendees}: This group includes non-engineering students, alumni, and invited
+guests who participate in large-scale \gls{mes} events such as the Fireball Formal and Graduation Formal, which extend
+beyond the core engineering community. It could also include students and guests from other universities as well as
+industry which attend the engineering conferences that the \gls{mes} helps host. They are generally looking for an easy
+and seamless experience registering and attending these events. Their general experience with systems like this is
+Journeyman as they may have used similar systems for other use cases.
 \subsection{Personas}
 \begin{enumerate}
-  \item \textbf{Matthew Cruise (Engineering Student)}: Matthew is a 20-year-old second-year Mechanical Engineering student at McMaster University. He lives in a shared house near campus with two close friends. He enjoys attending MES events like pub nights and the Fireball Formal as a way to balance his heavy academic workload with some enjoyment and entertainment. He usually hears about events through word-of-mouth or social media and would prefer an easy and effortless way to find and register for events. Matthew is generally tech savvy and is comfortable using online platforms but doesn't want to be bothered by too many notifications and forms. He has many ideas on how he can generally improve his university experience but doesn't believe he has an outlet to convey them. For Matthew his priority is convenience as he wants to enjoy himself but doesn't want to spend too much time or effort doing so.
-  \item \textbf{Adam Clooney (MES Executive)}: Adam Clooney is a 22-year-old final-year Civil Engineering student who currently serves as VP Social on the MES. He is responsible for coordinating large-scale events like Fireball Formal, working closely with other council members to handle logistics, advertising, and student engagement. Adam is outgoing and enjoys bringing people together, but often feels the strain of balancing his role with academic responsibilities. He is proficient with common digital tools such as Google Drive, spreadsheets, and design platforms for promotions, but he’s not highly technical. Adam appreciates structure and tools that keep things organized because he dislikes wasting time fixing errors or repeating work. He is motivated by the sense of accomplishment that comes from hosting a successful event and wants tools that help him stay on top of details.
-  \item \textbf{Margot Watson (McMaster Student)}: Margot Watson is a 21-year-old undergraduate student in Political Science at McMaster University. Although she is not part of the engineering faculty, she often attends large MES-hosted events such as the Fireball Formal and other socials because many of her friends are in engineering. Margot lives in an off-campus apartment with two roommates and enjoys being involved in student life across faculties. She has a relaxed attitude toward technology since she uses her phone daily for social media and messaging but she prefers things to be straightforward and intuitive. She is cautious with her money, balancing tuition and living expenses, but she’s willing to spend on experiences with friends. She is motivated by spending time with her friends and having good experiences to have a fullfiling student life.
+  \item \textbf{Matthew Cruise (Engineering Student)}: Matthew is a 20-year-old second-year Mechanical Engineering
+    student at McMaster University. He lives in a shared house near campus with two close friends. He enjoys attending
+    \gls{mes} events like pub nights and the Fireball Formal as a way to balance his heavy academic workload with some
+    enjoyment and entertainment. He usually hears about events through word-of-mouth or social media and would prefer an
+    easy and effortless way to find and register for events. Matthew is generally tech-savvy and is comfortable using
+    online platforms but doesn't want to be bothered by too many notifications and forms. He has many ideas on how he
+    can generally improve his university experience but doesn't believe he has an outlet to convey them. For Matthew his
+    priority is convenience as he wants to enjoy himself but doesn't want to spend too much time or effort doing so.
+  \item \textbf{Adam Clooney (\gls{mes} Executive)}: Adam Clooney is a 22-year-old final-year Civil Engineering student
+    who currently serves as VP Social on the \gls{mes}. He is responsible for coordinating large-scale events like
+    Fireball Formal, working closely with other council members to handle logistics, advertising, and student
+    engagement. Adam is outgoing and enjoys bringing people together, but often feels the strain of balancing his role
+    with academic responsibilities. He is proficient with common digital tools such as Google Drive, spreadsheets, and
+    design platforms for promotions, but he’s not highly technical. Adam appreciates structure and tools that keep
+    things organized because he dislikes wasting time fixing errors or repeating work. He is motivated by the sense of
+    accomplishment that comes from hosting a successful event and wants tools that help him stay on top of details.
+  \item \textbf{Margot Watson (McMaster Student)}: Margot Watson is a 21-year-old undergraduate student in Political
+    Science at McMaster University. Although she is not part of the engineering faculty, she often attends large
+    \gls{mes}-hosted events such as the Fireball Formal and other socials because many of her friends are in
+    engineering. Margot lives in an off-campus apartment with two roommates and enjoys being involved in student life
+    across faculties. She has a relaxed attitude toward technology since she uses her phone daily for social media and
+    messaging, but she prefers things to be straightforward and intuitive. She is cautious with her money, balancing
+    tuition and living expenses, but she’s willing to spend on experiences with friends. She is motivated by spending
+    time with her friends and having good experiences to have a fulfilling student life.
 \end{enumerate}
 \subsection{Priorities Assigned to Users}
-\textbf{Key Users:} Luke Schuurman, MES Council Members and Executives, McMaster Engineering Students. \\
+\textbf{Key Users:} Luke Schuurman, \gls{mes} Council Members and Executives, McMaster Engineering Students. \\
 \textbf{Secondary Users:} Other Students and Guest Event Attendees.
 \subsection{User Participation}
-Our requirements will primarily be derived through meetings with our supervisor Luke Schuurman. If we have the need to clarify or elicit more requirements we will look to engage other MES members either through our supervisor or directly.
+Our requirements will primarily be derived through meetings with our supervisor Luke Schuurman. If we have the need to
+clarify or elicit more requirements we will look to engage other \gls{mes} members either through our supervisor or
+directly.
 
 % \subsection{Maintenance Users and Service Technicians}
 % \lips
@@ -163,49 +215,81 @@ involved in the Project}
 \subsection{Relevant Facts}
 
 \begin{itemize}
-    \item The McMaster Engineering Society (MES) currently manages events such as Fireball Formal and the CALE Conference using several disconnected tools like Google Forms and Google Sheets, which creates inefficiencies and limits data analysis.
-    \item Each MES event involves registration, waiver collection, and feedback surveys that must comply with university data privacy and accessibility standards.
-    \item The system will be used by both administrators and students on a wide range of devices and browsers, so responsive and cross-platform design is required.
-    \item The overall Event Management System is being co-developed by three Capstone teams. Project A must maintain compatibility and shared data models with the other two teams’ components.
-    \item The project’s frontend stack was recently updated from \textbf{Next.js} to \textbf{Vite + TanStack Router + TanStack Create} to improve development speed, hot reloading performance, and flexibility for building a Single Page Application (SPA) with integrated admin dashboards and authentication.
+    \item The McMaster Engineering Society currently manages events such as Fireball Formal and the CALE Conference
+      using several disconnected tools like Google Forms and Google Sheets, which creates inefficiencies and limits data
+      analysis.
+    \item Each \gls{mes} event involves registration, waiver collection, and feedback surveys that must comply with
+      university data privacy and accessibility standards.
+    \item The system will be used by both administrators and students on a wide range of devices and browsers, so
+      responsive and cross-platform design is required.
+    \item The overall Event Management System is being co-developed by three Capstone teams. Project A must maintain
+      compatibility and shared data models with the other two teams’ components.
+    \item The project’s frontend stack was recently updated from \textbf{Next.js} to \textbf{Vite + TanStack Router +
+      TanStack Create} to improve development speed, hot reloading performance, and flexibility for building a Single
+      Page Application (SPA) with integrated admin dashboards and authentication.
     \item PostgreSQL remains the chosen database technology for data storage and analytics.
 \end{itemize}
 
 \subsection{Business Rules}
 
 \begin{itemize}
-    \item Only verified MES administrators can create, edit, or delete forms and view backend analytics.
-    \item Event data, form responses, and attendee details must be securely stored and retrievable for future event reviews.
-    \item All user input will be validated to prevent incomplete or invalid submissions before being stored in the database.
-    \item A consistent data format must be maintained across all events to support accurate analytics and report generation.
-    \item Administrators can export data such as attendee lists or analytics summaries in standard formats (e.g., CSV, PDF).
+    \item Only verified \gls{mes} administrators can create, edit, or delete forms and view backend analytics.
+    \item Event data, form responses, and attendee details must be securely stored and retrievable for future event
+      reviews.
+    \item All user input will be validated to prevent incomplete or invalid submissions before being stored in the
+      database.
+    \item A consistent data format must be maintained across all events to support accurate analytics and report
+      generation.
+    \item Administrators can export data such as attendee lists or analytics summaries in standard formats (e.g., CSV,
+      PDF).
 \end{itemize}
 
 \subsection{Assumptions}
 
 \begin{itemize}
-    \item The MES will provide sample event and registration data to support development and testing.
+    \item The \gls{mes} will provide sample event and registration data to support development and testing.
     \item Users will have stable internet access when using the platform, as it relies on real-time connectivity.
-    \item Collaborating teams (Projects B and C) will follow the agreed API and database specifications to ensure system integration works smoothly.
-    \item Authentication and authorization will be handled securely within the shared platform using standardized methods.
-    \item Future MES administrators and developers will continue maintaining the project using the provided GitHub repository, documentation, and CI/CD workflows.
+    \item Collaborating teams (Projects B and C) will follow the agreed API and database specifications to ensure system
+      integration works smoothly.
+    \item Authentication and authorization will be handled securely within the shared platform using standardized
+      methods.
+    \item Future \gls{mes} administrators and developers will continue maintaining the project using the provided GitHub
+      repository, documentation, and CI/CD workflows.
 \end{itemize}
 
 \section{The Scope of the Work}
 
-The purpose of the section is to define the expected scope of the project, including specifications on how the system is partitioned, business data models, and business use cases.
+The purpose of the section is to define the expected scope of the project, including specifications on how the system is
+partitioned, business data models, and business use cases.
 
 \subsection{The Current Situation}
 
-Currently, the \Gls{mes} uses a plethora of different platforms to host events and conduct surveys such as tools for registration, signing of waivers, and checking in attendees. The main platforms used are a combination of Google Forms and Google Sheets. There are several pain points to address with the current system.
+Currently, the \gls{mes} uses plethora of different platforms to host events and conduct surveys such as tools for
+registration, signing of waivers, and checking in \glspl{atd}. The main platforms used are a combination of Google Forms
+and Google Sheets. There are several pain points to address with the current system.
 
 \begin{itemize}
-  \item \textbf{Decentralized System Components} Registration and surverying is split across a plethora of tools and software which may not be compatible with each other. For example, Google Forms is used for registration forms and surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is done by email or social media.
-  \item \textbf{Overly Complex Form Logic} The current \Gls{cfes} survey consists of 70 pages of questions linked together through complex branching logic. The Google Forms form building UI makes this very complicated as all form elements are displayed as a linear list of sections making it very hard to track paths through the form.
-  \item \textbf{Disorganized Data Visualization} Form response data is currently stored using Google Sheets. While Google Form data is easily imported into Google Sheets, any analytics on the data must be done manually through equations and macros.
-  \item \textbf{Lack of Reusability} Google Forms comes with a few templates that provide an initial starting point for many types of forms such as registrant information. However, after the first section of the form, each subsequent section must be made manually. Sections may be imported from other forms but this requires the user to have access to a form with the wanted section and to scour through an unorganized list of forms and sections.
-  \item \textbf{Low Response Rates on Surveys} The response rates on the annual \Gls{cfes} survey of undergraduate engineering students have been decreasing due to the long length of the Google Form and the lack of ability to submit a partially completed form.
-  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instragram, Google Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the MES LinkTree. This solution lacks automation since a new Google Form must be made for every event and links have to be manually added and removed for each form when registration is opened or closed.
+  \item \textbf{Decentralized System Components} Registration and surveying is split across a plethora of tools and
+    software which may not be compatible with each other. For example, Google Forms is used for registration forms and
+    surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is
+    done by email or social media.
+  \item \textbf{Overly Complex Form Logic} The current \gls{cfes} survey consists of 70 pages of questions linked
+    together through complex branching logic. The Google Forms form building UI makes this very complicated as all form
+    elements are displayed as a linear list of sections making it very hard to track paths through the form.
+  \item \textbf{Disorganized Data Visualization} Form response data is currently stored using Google Sheets. While
+    Google Form data is easily imported into Google Sheets, any analytics on the data must be done manually through
+    equations and macros.
+  \item \textbf{Lack of Reusability} Google Forms comes with a few templates that provide an initial starting point for
+    many types of forms such as registrant information. However, after the first section of the form, each subsequent
+    section must be made manually. Sections may be imported from other forms, but this requires the user to have access
+    to a form with the wanted section and to scour through an unorganized list of forms and sections.
+  \item \textbf{Low Response Rates on Surveys} The response rates on the annual \gls{cfes} survey of undergraduate engineering
+    students have been decreasing due to the long length of the Google Form and the lack of ability to submit a
+    partially completed form.
+  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instagram, Google
+    Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the
+    \gls{mes} LinkTree. This solution lacks automation since a new Google Form must be made for every event and links
+    have to be manually added and removed for each form when registration is opened or closed.
 \end{itemize}
 
 % \gls{mes} hosts lots of events per year
@@ -213,15 +297,18 @@ Currently, the \Gls{mes} uses a plethora of different platforms to host events a
 % Consists of google forms, google sheets
 % No template form to work with redundant info between forms like name, number email, etc
 % Lots of steps to registration and split across too many platforms
-% The same thing is done for the annual CFES survey of undergrad eng students
+% The same thing is done for the annual \gls{cfes} survey of undergrad eng students
 % long 70 page form of complex branching logic, low response rate
 %
 
 
 \subsection{The Context of the Work}
 
-This section provides an overview of the high-level inputs and outputs between the system and external systems or actors.
-The system is split into two perspectives, the \gls{atd} perspective shown in \hyperref[fig:workcontextuser]{Figure \ref{fig:workcontextuser}}, and the \gls{adm} perspective shown in \hyperref[fig:workcontextadmin]{Figure \ref{fig:workcontextadmin}}. 
+This section provides an overview of the high-level inputs and outputs between the system and external systems or
+actors.
+The system is split into two perspectives, the \gls{atd} perspective shown in \hyperref[fig:workcontextuser]{Figure
+\ref{fig:workcontextuser}}, and the \gls{adm} perspective shown in \hyperref[fig:workcontextadmin]{Figure
+\ref{fig:workcontextadmin}}.
 
 \begin{center}
 \begin{figure}[H]
@@ -241,7 +328,9 @@ The system is split into two perspectives, the \gls{atd} perspective shown in \h
 
 \subsection{Work Partitioning}
 
-This section describes how the work done by the system can be partitioned into smaller and more manageable workflows. Below is a table describing each of the sub-workflows of the proposed systems. Note that event creation and survey creation have been grouped as a single workflow since they are nearly identical.
+This section describes how the work done by the system can be partitioned into smaller and more manageable workflows.
+Below is a table describing each of the sub-workflows of the proposed systems. Note that event creation and survey
+creation have been grouped as a single workflow since they are nearly identical.
 
 {
   \setlength{\tabcolsep}{0.125em}
@@ -255,7 +344,8 @@ This section describes how the work done by the system can be partitioned into s
       2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \\ \hline
       3 & \Gls{adm} creates a form module & Module question data & Reusable form module & \\ \hline
       4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \\ \hline
-      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \\ \hline
+      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports &
+      \\ \hline
     \end{tabularx}
     \captionof{table}{Partitioning of system workflows}\label{wfpart}
   \end{table}
@@ -263,29 +353,29 @@ This section describes how the work done by the system can be partitioned into s
 
 \subsection{Specifying a Business Use Case (BUC)}
 
-\noindent\textbf{BUC 1: } \Gls{atd} registers for an event \\
+\subsubsection*{BUC 1: User registers for an event}
 \textbf{Input:} Registration data \\
 \textbf{Output:} Event tickets \\
-\textbf{Pre-condition:} \Gls{atd} has downloaded the application and has created an account \\
-\textbf{Scenario:} \\
+\textbf{Pre-condition:} User has downloaded the application and has created an account \\
+\textbf{Scenario:}
 \begin{enumerate}
   \item The user application receives the registration data
   \item The user application verifies the data is filled correctly
   \item The user application sends the registration data to the backend server
-  \item The backend server verifies the event is not full and the deadline has not passed
-  \item The backend server adds the \gls{atd} to the list of \glspl{atd}
+  \item The backend server verifies the event is not full, and the deadline has not passed
+  \item The backend server adds the user to the list of \glspl{atd}
   \item The backend server generates an event ticket and sends it to the user application
-  \item The user application confirms with the \gls{atd} that the registration was successful and presents the user with the ticket
+  \item The user application confirms with the user that the registration was successful and presents the user with the
+    ticket
 \end{enumerate}
 \textbf{Sub variations:}
 \begin{itemize}
-  \item [2a.] The submitted registration data has errors, the user application prompts the \gls{atd} to fix the errors and resubmit
-  \item [4a.] The event is full or the deadline has passed, the backend sends an error code to the user application
-  \item [4b.] The user application alerts the \gls{atd} of the error.
+  \item [2a.] The submitted registration data has errors: the user application prompts the user to fix the errors and resubmit.
+  \item [4a.] The event is full, or the deadline has passed: the backend sends an error code to the user application.
+  \item [4b.] The user application alerts the user of the error.
 \end{itemize}
 
-
-\noindent\textbf{BUC 2: } \Gls{atd} fills out a survey module \\
+\subsubsection*{BUC 2: User fills out a survey module}
 \textbf{Input:} Survey responses \\
 \textbf{Output:} Survey completion confirmation \\
 \textbf{Pre-condition:} \Gls{atd} has downloaded the application and has created an account \\
@@ -300,11 +390,11 @@ This section describes how the work done by the system can be partitioned into s
 \end{enumerate}
 \textbf{Sub variations:}
 \begin{itemize}
-  \item [2a.] The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the \gls{atd} to fix the errors and resubmit 
+  \item [2a.] The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the \gls{atd} to fix the errors and resubmit
 
 \end{itemize}
 
-\noindent\textbf{BUC 3: } \Gls{adm} creates a form module \\
+\subsubsection*{BUC 3: \Gls{adm} creates a form module}
 \textbf{Input:} Form fields \\
 \textbf{Output:} Reusable form module \\
 \textbf{Pre-condition:} \Gls{adm} has access to create custom form modules \\
@@ -323,7 +413,7 @@ This section describes how the work done by the system can be partitioned into s
 2a. The submitted form module has errors (i.e. unfinished fields), the \gls{adm} user is prompted to fix these errors before resubmitting \\
 4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
 
-\noindent\textbf{BUC 4: } \Gls{adm} creates an event/survey \\
+\subsubsection*{BUC 4: \Gls{adm} creates an event/survey}
 \textbf{Input:} Event details \\
 \textbf{Output:} Event creation confirmation \\
 \textbf{Pre-condition:} \Gls{adm} has access to create events \\
@@ -343,7 +433,7 @@ This section describes how the work done by the system can be partitioned into s
 2a. The submitted details have errors (i.e. event date has already passed), the \gls{adm} user is prompted to fix these errors before resubmitting \\
 4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
 
-\noindent\textbf{BUC 5: } \Gls{adm} views event/survey statistics \\
+\subsubsection*{BUC 5: \Gls{adm} views event/survey statistics}
 \textbf{Input:} Event/survey to view \\
 \textbf{Output:} Event registration/survey response report \\
 \textbf{Pre-condition:} Event/survey has been created, and \glspl{atd} have registered/responded \\
@@ -365,11 +455,11 @@ This section describes how the work done by the system can be partitioned into s
 
 \section{Business Data Model and Data Dictionary}
 
-The purpose of this section is to illustrate the flow of data throughout the system. 
+The purpose of this section is to illustrate the flow of data throughout the system.
 
 \subsection{Business Data Model}
 
-\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into into well defined subsystems and outlines the interactions between subsystems. 
+\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into into well defined subsystems and outlines the interactions between subsystems.
 
 \begin{center}
 \begin{figure}[H]
@@ -392,7 +482,7 @@ The purpose of this section is to illustrate the flow of data throughout the sys
         Event Builder                        & Contains tools for creating, publishing, and managing events                                                                                               & Module        \\ \midrule
         Survey Builder                       & Contains tools for creating, publishing, and managing surveys                                                                                              & Module        \\ \midrule
         Admin Controller                     & Handles the flow of execution of \gls{mes} Event/Survey Manager modules and data flow between the event/survey builders, data analyzers, and the user controller & Module        \\ \midrule
-        Financial Analyzer                   & Automates analysis and visualization of finances from event attendee data                                                                                  & Module        \\ \midrule 
+        Financial Analyzer                   & Automates analysis and visualization of finances from event attendee data                                                                                  & Module        \\ \midrule
         Survey Analyzer                      & Automates analysis and visualization of survey response data                                                                                               & Module        \\ \midrule
         \gls{mes} Event Registration/Survey Filler & The application handling the \gls{atd} side of the system, including event registration and survey responses                                                    & Application   \\ \midrule
         Form Filler                          & Handles input and validation of form responses                                                                                                             & Module        \\ \midrule
@@ -735,7 +825,7 @@ This section further expands on the use cases defined in \hyperref[table:product
 
 \subsection{State Diagrams}
 
-Below are formal state diagrams showing the different states of the system and the transitions between them. [fig:stateadmin]{Figure \ref{fig:stateadmin}} shows the state diagram of the \gls{adm} side of the system and [fig:stateattendee]{Figure \ref{fig:stateattendee}} shows the \gls{atd} side. 
+Below are formal state diagrams showing the different states of the system and the transitions between them. [fig:stateadmin]{Figure \ref{fig:stateadmin}} shows the state diagram of the \gls{adm} side of the system and [fig:stateattendee]{Figure \ref{fig:stateattendee}} shows the \gls{atd} side.
 
 \begin{center}
 \begin{figure}[H]
@@ -761,34 +851,73 @@ Below are formal state diagrams showing the different states of the system and t
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries FR-\arabic*:]
-  \item The system shall allow \glspl{adm} to create forms with multiple fields types. \{\textbf{G-1}, \textbf{G-5}\}
-  \item The system shall allow \glspl{adm} to organize forms for analytics, and specify how
-    the analysis should be done. \{\textbf{G-1}, \textbf{G-3}\}
-  \item The system shall generate QR codes for confirmation and check-in integration. \{\textbf{G-2}\}
-  \item The system shall provide an \gls{atd} dashboard for \glspl{adm} with filters
-    for status updates on payments and waivers, event sign-ins, etc. \{\textbf{G-4}\}
-  \item The system shall store all event data in a secure, centralized database.
-    \{\textbf{G-6}, \textbf{G-5}, \textbf{G-2}\}
-  \item The system shall store all questionnaire data in a secure, centralized database.
-    \{\textbf{G-1}, \textbf{G-3}, \textbf{G-6}\}
-  \item The system shall allow \glspl{adm} to generate analytics dashboards and export
-    CSV/Excel reports. \{\textbf{G-3}\}
-  \item The system shall provide event \glspl{atd} with a medium to relay feedback for the
-    event. \{\textbf{G-5}\}
-  \item The system shall provide \glspl{adm} with a medium to view all event feedback
-    once an event has completed. \{\textbf{G-5}, \textbf{G-4}, \textbf{G-3}\}
+  label=\bfseries FR-\arabic*:,
+  ref=\bfseries FR-\arabic*]
+  \item \label{FR1} The system shall allow \glspl{adm} to create forms with multiple field types.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-5}\}. \Gls{mes} wants to be able to create forms for their surveys,
+    especially \gls{cfes} surveys, with different response option types.\\
+    {\bf Fit Criterion:} Forms can be created with different response styles (e.g., single choice, multiple choice,
+    numeric scales) and response data is correctly stored in databases.
+  \item \label{FR2} The system shall allow \glspl{adm} to organize forms for analytics, and specify how
+    the analysis should be done.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-3}\}. \Gls{mes} wants to use different metrics to view survey data,
+    and wants to combine multiple forms in a singular analysis.\\
+    {\bf Fit Criterion:} \Glspl{adm} can combine results from multiple forms together in one analysis query, and can
+    compare data points as they wish.
+  \item \label{FR3} The system shall provide \glspl{atd} a method to register for events and view event information.
+    \\[2mm]
+    {\bf Motivation:} \{\textbf{G-2}\}. \Glspl{atd} must have a way to register for events and view event information.\\
+    {\bf Fit Criterion:} \Glspl{atd} can fill out event registration forms and receive and view notifications about
+    the events, and their registration is recorded in the database.
+  \item \label{FR4} The system shall generate QR codes for confirmation and check-in integration.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-2}\}. \Glspl{atd} should be able to provide proof of registration to have easy
+    access to events.\\
+    {\bf Fit Criterion:} A QR code is generated and stored in the dashboard for the \gls{atd}.
+  \item \label{FR5} The system shall provide an event dashboard for \glspl{adm} with filters
+    for status updates on payments, waivers, event sign-ins, etc.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-4}\}. \Glspl{adm} must have a way to track the event and relay updates as needed.\\
+    {\bf Fit Criterion:} The \gls{adm} dashboard provides trackers for sign-ins, and provides a medium to notify
+    \glspl{atd} of any changes.
+  \item \label{FR6} The system shall store all event data in a secure, centralized database.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-6}, \textbf{G-5}, \textbf{G-2}\}. Event and survey data can contain sensitive data
+    from \glspl{atd}, and should only be accessed by authorized users.\\
+    {\bf Fit Criterion:} Only relevant \glspl{adm} can access stored user data unrelated to their account.
+  \item \label{FR7} The system shall store all questionnaire data in a secure, centralized database.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-3}, \textbf{G-6}\}. See \ref{FR6}.\\
+    {\bf Fit Criterion:} See \ref{FR6}.
+  \item \label{FR8} The system shall allow \glspl{adm} to generate analytics visualizations and export
+    CSV/Excel reports.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-3}\}. \Glspl{adm} should have a way of viewing and exporting survey data.\\
+    {\bf Fit Criterion:} The \gls{adm} can export queried data as CSVs or Excel-compatible files, and can view
+    metrics of their choosing in the admin dashboard after specifying which metrics to plot.
+  \item \label{FR9} The system shall provide event \glspl{atd} with a medium to relay feedback for the
+    event.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-5}\}. \Gls{mes} wants to gather feedback from events and incorporate them in future
+    events.\\
+    {\bf Fit Criterion:} \Glspl{adm} can create feedback forms which \glspl{atd} are provided during the event which
+    they can fill out, and their responses are stored in the database and are available for \glspl{adm} to access
+    during or after the event.
+  \item \label{FR10} The system shall provide \glspl{adm} with a medium to view all event feedback
+    once an event has completed.\\[2mm]
+  {\bf Motivation:} \{\textbf{G-5}, \textbf{G-4}, \textbf{G-3}\}. See \ref{FR9}.\\
+  {\bf Fit Criterion:} See \ref{FR9}.
+  \item \label{FR11} The system shall implement a roles-based feature access system which ensures that only relevant
+    functionality and information is made available to the user.\\[2mm]
+    {\bf Motivation:} \{{\bf G-4}, {\bf G-6}, {\bf G-2}\}. \Gls{mes} wants access to be restricted and ensure that
+    only authorized personnel can view relevant information.\\
+    {\bf Fit Criterion:} Users assigned roles can access information and features specified by those roles, and cannot
+    see irrelevant features or information.
 \end{enumerate}
 
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
 \begin{enumerate}[label=LFR-AP.\arabic*, wide=0pt, leftmargin=*]
-  \item The interface shall comply with MES branding criteria (logo, colour scheme).\\[2mm]
-    {\bf Motivation:} Ensures that the product is recognizable as an official MES event registration platform.\\
-    {\bf Fit Criterion:} The MES representative shall certify that the product complies with the current standards.
+  \item The interface shall comply with \gls{mes} branding criteria (logo, colour scheme).\\[2mm]
+    {\bf Motivation:} Ensures that the product is recognizable as an official \gls{mes} event registration platform.\\
+    {\bf Fit Criterion:} The \gls{mes} representative shall certify that the product complies with the current standards.
   \item The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
     {\bf Motivation:} Increases accessibility and user productivity, and allows for consistency across different events.\\
-    {\bf Fit Criterion:} During usability testing across the MES events, at least 80\% of students rate the forums ease of use a 4+.
+    {\bf Fit Criterion:} During usability testing across the \gls{mes} events, at least 80\% of students rate the forums ease of use a 4+.
   \item Admin dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
     {\bf Motivation:} Improves organizer accessibility and readability, allowing for easier management during planning operations.\\
     {\bf Fit Criterion:} The representative shall approve of the analytics layout.
@@ -796,9 +925,9 @@ Below are formal state diagrams showing the different states of the system and t
 
 \subsection{Style Requirements}
 \begin{enumerate}[label=LFR-S.\arabic*, wide=0pt, leftmargin=*]
-  \item The design shall be professional but approachable, accomodating all types of events.\\[2mm]
+  \item The design shall be professional but approachable, accommodating all types of events.\\[2mm]
     {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
-    {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
+    {\bf Fit Criterion:} After use in some \gls{mes} events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
   \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
     {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
     {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
@@ -810,8 +939,8 @@ Below are formal state diagrams showing the different states of the system and t
 \begin{enumerate}[label=UHR-EoU.\arabic*, wide=0pt, leftmargin=*]
   \item Registration and feedback forms shall be easily and quickly filled out for anyone with no instruction.\\[2mm]
     {\bf Motivation:} The app should have a friendly vibe for casual student use, but maintain a sense of maturity for the more formal uses.\\
-    {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
-  \item Users shall sign-up/sign-in to the app with no instruction. \\[2mm]
+    {\bf Fit Criterion:} After use in some \gls{mes} events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.
+  \item Users shall sign up/sign-in to the app with no instruction. \\[2mm]
     {\bf Motivation:} The registration process is the most important aspect of the platform, so the app should have a clear and simple layout.\\
     {\bf Fit Criterion:} A sample of users shall register/login within 2 minutes without instruction.
   \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
@@ -824,7 +953,7 @@ Below are formal state diagrams showing the different states of the system and t
 \subsection{Personalization and Internationalization Requirements}
 \begin{enumerate}[label=UHR-PIR.\arabic*, wide=0pt, leftmargin=*]
   \item The custom form builder shall allow admin to create personalized forms with event-specific fields.\\[2mm]
-    {\bf Motivation:} Flexibility is essential to accomodate the diverse set of events as per the scope.\\
+    {\bf Motivation:} Flexibility is essential to accommodate the diverse set of events as per the scope.\\
     {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.
   \item Admin dashboard shall support sorting and filtering of attendees by predefined metrics.\\[2mm]
     {\bf Motivation:} Streamlines the attendee organizing process, allowing admin to categorize attendees as per the event requirements.\\
@@ -834,7 +963,7 @@ Below are formal state diagrams showing the different states of the system and t
 \subsection{Learning Requirements}
 \begin{enumerate}[label=UHR-LR.\arabic*, wide=0pt, leftmargin=*]
   \item The app shall be easy for anyone with an intermediate level of English.\\[2mm]
-    {\bf Motivation:} Users should expect intuitive, concise ineteractions.\\
+    {\bf Motivation:} Users should expect intuitive, concise interactions.\\
     {\bf Fit Criterion:} 80\% of students successfully complete a form with no assistance.
   \item Admin shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
     {\bf Motivation:} Event organizers are constantly changing, so it is important to reduce dependency on technical training.\\
@@ -843,7 +972,7 @@ Below are formal state diagrams showing the different states of the system and t
 
 \subsection{Understandability and Politeness Requirements}
 \begin{enumerate}[label=UHR-UPR.\arabic*, wide=0pt, leftmargin=*]
-  \item Basic, non-technical language will be used (Sign-up instead of RSVP).\\[2mm]
+  \item Basic, non-technical language will be used (Sign up instead of RSVP).\\[2mm]
     {\bf Motivation:} Increases accessibility among non-technical users, or non-fluent English speakers.\\
     {\bf Fit Criterion:} 80\% of students understand all wording without clarification.
   \item The app shall communicate errors clearly and politely.\\[2mm]
@@ -851,7 +980,7 @@ Below are formal state diagrams showing the different states of the system and t
     {\bf Fit Criterion:} Feedback suggests that 80\% of students found the experience satisfying.
   \item The app shall hide sensitive and confidential information from users.\\[2mm]
     {\bf Motivation:} Enhances security and confidence of organizations in the product.\\
-    {\bf Fit Criterion:} Approval from MES representative.
+    {\bf Fit Criterion:} Approval from \gls{mes} representative.
 \end{enumerate}
 
 \subsection{Accessibility Requirements}
@@ -921,7 +1050,7 @@ Below are formal state diagrams showing the different states of the system and t
   itemindent=0em,
   label=\bfseries MT-\arabic*:]
   \item The system shall provide updated documentation upon every release and be accessible to all developers\\[2mm]
-    {\bf Motivation:} Allows for developers to understand the changes made on each release and will be easily be able to modify the code to fix errors or make updates. \\ 
+    {\bf Motivation:} Allows for developers to understand the changes made on each release and will be easily be able to modify the code to fix errors or make updates. \\
     {\bf Fit Criterion:} Updated documentation will be included with the release of each version.
 \end{enumerate}
 \subsection{Supportability Requirements}
@@ -931,7 +1060,7 @@ Below are formal state diagrams showing the different states of the system and t
   itemindent=0em,
   label=\bfseries SU-\arabic*:]
   \item The system shall include a FAQ section to help clarify or answer common questions.\\[2mm]
-    {\bf Motivation:} Will allow for a better user experience as they can solve their own problems quickly and will make it easier for MES support teams. \\ 
+    {\bf Motivation:} Will allow for a better user experience as they can solve their own problems quickly and will make it easier for MES support teams. \\
     {\bf Fit Criterion:} Ensure a FAQ with common questions obtained from stakeholders (supervisor and MES council members) is included within the system.
 \end{enumerate}
 \subsection{Adaptability Requirements}
@@ -941,10 +1070,10 @@ Below are formal state diagrams showing the different states of the system and t
   itemindent=0em,
   label=\bfseries AD-\arabic*:]
   \item The system shall run as a web app accessible through Chromium, Firefox, and Safari browsers. \\[2mm]
-    {\bf Motivation:} This will allow users to use whatever browser they want and will make the application more accessible. \\ 
+    {\bf Motivation:} This will allow users to use whatever browser they want and will make the application more accessible. \\
     {\bf Fit Criterion:} Test for compatibility of the application to ensure it runs on all specified browsers.
   \item The mobile app components will work on both IOS and Android platforms. \\[2mm]
-    {\bf Motivation:} Allows users on both mobile ecosystems to use the app making the application more accessible. \\ 
+    {\bf Motivation:} Allows users on both mobile ecosystems to use the app making the application more accessible. \\
     {\bf Fit Criterion:} Test the application in both the IOS and Android Environment ensuring correct functionality of all components.
 \end{enumerate}
 
@@ -956,10 +1085,10 @@ Below are formal state diagrams showing the different states of the system and t
   itemindent=0em,
   label=\bfseries AC-\arabic*:]
   \item The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
-    {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\ 
+    {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\
     {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.
   \item Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
-    {\bf Motivation:} Prevents unauthorized users from viewing sensitive event and user data.  \\ 
+    {\bf Motivation:} Prevents unauthorized users from viewing sensitive event and user data.  \\
     {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins
 \end{enumerate}
 \subsection{Integrity Requirements}
@@ -969,10 +1098,10 @@ Below are formal state diagrams showing the different states of the system and t
   itemindent=0em,
   label=\bfseries IG-\arabic*:]
   \item The system shall provide input validation for all user submitted data \\[2mm]
-    {\bf Motivation:} Ensures the safety of our application by ensuring only the required input types are entering our database. Protects us from SQL injection and data corruption in our database.  \\ 
-    {\bf Fit Criterion:} All inputs will include checks to ensure only the correct type is entering our database. Perform testing to ensure that all inputs have validation checks. 
+    {\bf Motivation:} Ensures the safety of our application by ensuring only the required input types are entering our database. Protects us from SQL injection and data corruption in our database.  \\
+    {\bf Fit Criterion:} All inputs will include checks to ensure only the correct type is entering our database. Perform testing to ensure that all inputs have validation checks.
   \item The system shall only use HTTPS for communication between clients and servers \\[2mm]
-    {\bf Motivation:} Ensures a secure connection between our client and server and protects against the interception or tampering of data during data transmission. \\ 
+    {\bf Motivation:} Ensures a secure connection between our client and server and protects against the interception or tampering of data during data transmission. \\
     {\bf Fit Criterion:} All requests will be done through HTTPS and if an HTTP request is done we will redirect it to HTTPS. \\
 \end{enumerate}
 \subsection{Privacy Requirements}
@@ -982,13 +1111,13 @@ Below are formal state diagrams showing the different states of the system and t
   itemindent=0em,
   label=\bfseries PV-\arabic*:]
   \item Users shall have the ability to request for the deletion of their stored personal data\\[2mm]
-    {\bf Motivation:} Increases transparency and control over their own data for users. Provides reassurances for users that their data can be removed if neccesary.    \\ 
+    {\bf Motivation:} Increases transparency and control over their own data for users. Provides reassurances for users that their data can be removed if neccesary.    \\
     {\bf Fit Criterion:} Ensure a mechanism exists for users to delete their data. Peform testing so that the mechanism actually removes all related data from the database.
   \item The system shall only store sensitive data after obtaining the consent of the user \\[2mm]
-    {\bf Motivation:} Keeps us legally sound as we are not storing user data without first obtaining consent. Also provides users with information on what their data is actually being used for.  \\ 
+    {\bf Motivation:} Keeps us legally sound as we are not storing user data without first obtaining consent. Also provides users with information on what their data is actually being used for.  \\
     {\bf Fit Criterion:} Ensure that all sections which require inputting sensitive information have consent checks where we explicitly explain what is being stored and how it may be used. \\
   \item All sensitive user information such as student numbers, names and emails shall be encrypted in storage using AES-256\\[2mm]
-    {\bf Motivation:} Protects user's information from unauthorized viewing and ensures that even if a breach were to occur sensitive information will not be leaked.   \\ 
+    {\bf Motivation:} Protects user's information from unauthorized viewing and ensures that even if a breach were to occur sensitive information will not be leaked.   \\
     {\bf Fit Criterion:} Inspect database to show that the required fields are stored encrypted and not in plaintext. \\
 \end{enumerate}
 \subsection{Audit Requirements}
@@ -998,7 +1127,7 @@ Below are formal state diagrams showing the different states of the system and t
   itemindent=0em,
   label=\bfseries AU-\arabic*:]
   \item The system shall track admin action inside an audit log\\[2mm]
-    {\bf Motivation:} Ensures traceability of admin actions and allows other admins to know who performed what.  \\ 
+    {\bf Motivation:} Ensures traceability of admin actions and allows other admins to know who performed what.  \\
     {\bf Fit Criterion:} 100\% of actions will be in a log with tracking of user who did the action, timestamp and action commited. Testing will be done to ensure all actions are being logged and logs should be exportable for review.
 \end{enumerate}
 % \subsection{Immunity Requirements}
@@ -1006,7 +1135,15 @@ Below are formal state diagrams showing the different states of the system and t
 
 \section{Cultural Requirements}
 \subsection{Cultural Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries CL-\arabic*:]
+  \item The system shall use Canadian English spelling.\\[2mm]
+    {\bf Motivation:} \Gls{mes} is an organization located in Canada.\\
+    {\bf Fit Criterion:} All rendered text provided by the system passes a Canadian English spell-checker.\\
+\end{enumerate}
 
 \section{Compliance Requirements}
 \subsection{Legal Requirements}
@@ -1015,30 +1152,61 @@ Below are formal state diagrams showing the different states of the system and t
   labelsep=1em,
   itemindent=0em,
   label=\bfseries LG-\arabic*:]
-  \item The system shall store and handle all sensitive personal data in compliance with
-    PIPEDA regulations.
+  \item The system shall store and handle all sensitive personal data in compliance with PIPEDA regulations.\\[2mm]
+    {\bf Motivation:} The system will store private personal information, which must be done responsibly.\\
+    {\bf Fit Criterion:} The system meets all PIPEDA regulation requirements.\\
 \end{enumerate}
 \subsection{Standards Compliance Requirements}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries ST-\arabic*:]
+  \item The system code shall conform to the \textit{Airbnb JavaScript Style Guide} and \textit{Airbnb React/JSX
+    Style Guide}.\\[2mm]
+    {\bf Motivation:} Specified in Development Plan \S \ 11.\\
+    {\bf Fit Criterion:} The system code passes all CI/CD checks related to formatting compliance.\\
+\end{enumerate}
 
 \section{Open Issues}
-\lips
+There are currently no open issues which need to be considered at this stage of the development cycle.
 % Any problems that remain unresolved and undefined
 \section{Off-the-Shelf Solutions}
 \subsection{Ready-Made Products}
-There are some products that exists on the market which solve certain components of this product but no product exists that combines these components into one. For event management there are various tools such as EventBrite and Stubhub which can allow for the selling of tickets for events. The problem with these products are that they don't integrate well with current MES Systems and don't provide all the features as required such as collecting waivers and ensuring McMaster students attend university specific events. For general data collection Google Forms is the most used tool and it allows for the creation of complex forms and stores data in spreadsheets. For further data analysis it requires effort on the part of the form creator to actually go and analyze the data to gain actual insights. Also the forms can become hard to handle as they become complex and can become confusing for respondents. As mentioned before there is no tool that has a combination of the two components.
+There are some products that exist on the market which solve certain components of this product but no product exists
+that combines these components into one. For event management there are various tools such as EventBrite and Stubhub
+which can allow for the selling of tickets for events. The problem with these products are that they don't integrate
+well with current \gls{mes} Systems and don't provide all the features as required such as collecting waivers and
+ensuring McMaster students attend university specific events. For general data collection Google Forms is the most used
+tool, and it allows for the creation of complex forms and stores data in spreadsheets. For further data analysis it
+requires effort on the part of the form creator to actually go and analyze the data to gain actual insights. Also, the
+forms can become hard to handle as they become complex and can become confusing for respondents. As mentioned before
+there is no tool that has a combination of the two components.
 \subsection{Reusable Components}
 There are various components that we can use to help develop our application:
 \begin{itemize}
-  \item \textbf{Vite}: Provides us with a framework for developing web apps in \textbf{React} and provides built in routing behaviour. It also handles many built in libraries and packages that we can use for front-end styling such as \textbf{tailwind-css}. We can also integrate it with other libraries for authentication and for database management
-  \item \textbf{TanStack}: Provides us with a powerfull middleware to connect backend and front-end services. Will primarily be used for routing but also offers data visualization capabilities. Offers many libraries for working with data and state management that we can leverage.
-  \item \textbf{SurveyJS}: This is a potential tool we can use to develop the form builder as it provides us with some pre-built components we can use to develop and customize our own forms. 
-  \item \textbf{Recharts}: This could be potential charting tool we can use to develop our admin dashboard. Though there are other charting tools the benefit of Recharts is that it provides customization on top of the pre built charts.
-  \item \textbf{Drizzle}: We can use Drizzle as an ORM to map from our database to our web-app. Drizzle is useful since it is lightweight and is code first. Drizzle's simplicity allows for faster development and is perfect for our use case.
+  \item \textbf{Vite}: Provides us with a framework for developing web apps in \textbf{React} and provides built in
+    routing behaviour. It also handles many built in libraries and packages that we can use for front-end styling such
+    as \textbf{tailwind-css}. We can also integrate it with other libraries for authentication and for database
+    management
+  \item \textbf{TanStack}: Provides us with a powerful middleware to connect backend and front-end services. Will
+    primarily be used for routing but also offers data visualization capabilities. Offers many libraries for working
+    with data and state management that we can leverage.
+  \item \textbf{SurveyJS}: This is a potential tool we can use to develop the form builder as it provides us with some
+    pre-built components we can use to develop and customize our own forms.
+  \item \textbf{Recharts}: This could be potential charting tool we can use to develop our admin dashboard. Though there
+    are other charting tools the benefit of Recharts is that it provides customization on top of the pre-built charts.
+  \item \textbf{Drizzle}: We can use Drizzle as an ORM to map from our database to our web-app. Drizzle is useful since
+    it is lightweight and is code first. Drizzle's simplicity allows for faster development and is perfect for our use
+    case.
 \end{itemize}
-These components will allow us to develop our application faster and more efficiently as many of these products are already optimized. All the above products are free to use so do not incur any extra costs or require the handling of licenses.
+These components will allow us to develop our application faster and more efficiently as many of these products are
+already optimized. All the above products are free to use so do not incur any extra costs or require the handling of
+licenses.
 \subsection{Products That Can Be Copied}
-\textit{There don't seem to be any products that can be copied which contain all the required components within a single product. Moreover the MES wants a product that doesn't require an external license and wants to be fully built in house so they have control over future development and usage.}
+\textit{There don't seem to be any products that can be copied which contain all the required components within a single
+product. Moreover, the \gls{mes} wants a product that doesn't require an external license and wants to be fully built in
+house, so they have control over future development and usage.}
 
 \section{New Problems}
 \subsection{Effects on the Current Environment}
@@ -1057,45 +1225,45 @@ Inhibit the New Product}
 \subsection{Project Planning }
 
 \begin{itemize}
-    \item \textbf{Task Assignment:} Tasks are divided based on each member’s technical strengths and defined roles.  
+    \item \textbf{Task Assignment:} Tasks are divided based on each member’s technical strengths and defined roles.
     Rayyan leads the admin web UI, Virochaan handles full-stack web and DevOps, Ibrahim focuses on backend and mobile integration, Omar develops mobile UI components, and Mahdi manages backend logic and database design.
-    \item \textbf{Collaboration:} Weekly meetings are held to review progress, plan upcoming work, and prepare for supervisor syncs.  
+    \item \textbf{Collaboration:} Weekly meetings are held to review progress, plan upcoming work, and prepare for supervisor syncs.
     Daily communication occurs over Discord, while GitHub Issues serve as the main hub for technical updates.
-    \item \textbf{Quality Control:} All new code must pass automated linting and testing via GitHub Actions before merging.  
+    \item \textbf{Quality Control:} All new code must pass automated linting and testing via GitHub Actions before merging.
     Peer reviews on pull requests ensure consistency and prevent regressions.
 \end{itemize}
 
 \subsection{Planning of Development Phases}
 
-Development is organized into five phases, each with clear goals and deliverables.  
+Development is organized into five phases, each with clear goals and deliverables.
 The primary objective is to have a fully functional \textbf{Minimum Viable Product (MVP)} by the end of \textbf{December 2025}, where all four core features work at a basic level before refinement begins.
 
 \begin{enumerate}
-    \item \textbf{Phase 1 – Requirements and Design (September–October 2025)}  
-    Finalize system requirements, architecture, and UI mockups for the Admin Portal and Custom Form Builder.  
+    \item \textbf{Phase 1 – Requirements and Design (September–October 2025)}
+    Finalize system requirements, architecture, and UI mockups for the Admin Portal and Custom Form Builder.
     Deliverables include the SRS, Hazard Analysis, and shared API specifications with Projects B and C.
-    
-    \item \textbf{Phase 2 – Core Functionality and MVP (Mid October–December 2025)}  
+
+    \item \textbf{Phase 2 – Core Functionality and MVP (Mid October–December 2025)}
     Implement the main system features for a working MVP:
     \begin{itemize}
-        \item Basic \textbf{Custom Form Builder} for creating and saving modular forms.  
-        \item Functional \textbf{Registration and Feedback Forms} linked to the backend.  
-        \item Simple \textbf{Attendee Overview Dashboard} showing registration data.  
+        \item Basic \textbf{Custom Form Builder} for creating and saving modular forms.
+        \item Functional \textbf{Registration and Feedback Forms} linked to the backend.
+        \item Simple \textbf{Attendee Overview Dashboard} showing registration data.
         \item Initial \textbf{Backend Analytics} for event and submission counts.
     \end{itemize}
     The MVP will demonstrate a complete flow—from form creation to submission and viewing results.
-    
-    \item \textbf{Phase 3 – Integration and Refinement (January 2026)}  
-    Improve performance, UI/UX, and backend data handling.  
+
+    \item \textbf{Phase 3 – Integration and Refinement (January 2026)}
+    Improve performance, UI/UX, and backend data handling.
     Begin integration testing with Projects B and C to ensure smooth database and API interaction.
-    
-    \item \textbf{Phase 4 – Analytics and Dashboard Expansion (February–March 2026)}  
-    Enhance analytics and administrative tools with filtering, charts, and export options (CSV/PDF).  
+
+    \item \textbf{Phase 4 – Analytics and Dashboard Expansion (February–March 2026)}
+    Enhance analytics and administrative tools with filtering, charts, and export options (CSV/PDF).
     The dashboard will evolve into a production-ready tool for MES event organizers.
-    
-    \item \textbf{Phase 5 – Testing and Deployment (March–April 2026)}  
-    Conduct final testing, bug fixes, and documentation updates.  
-    Complete cross-team integration and deploy the system for real MES events such as Fireball Formal or CALE Conference.  
+
+    \item \textbf{Phase 5 – Testing and Deployment (March–April 2026)}
+    Conduct final testing, bug fixes, and documentation updates.
+    Complete cross-team integration and deploy the system for real MES events such as Fireball Formal or CALE Conference.
     Prepare final deliverables and the Capstone Expo presentation.
 \end{enumerate}
 
@@ -1106,46 +1274,48 @@ The primary objective is to have a fully functional \textbf{Minimum Viable Produ
 \lips
 
 \section{Costs}
-We don't expect any costs to arise during the development of the project. We will be using free tools and libraries for development and for hosting we will look to host databases and the back-end locally. In production the hosting will be done by the MES so it is out of the scope of this capstone.
+We don't expect any costs to arise during the development of the project. We will be using free tools and libraries for
+development and for hosting we will look to host databases and the back-end locally. In production the hosting will be
+done by the \gls{mes}, so it is out of the scope of this Capstone.
 
 \section{User Documentation and Training}
 
 \subsection{User Documentation Requirements}
 
-No separate written documentation or manuals are planned for this system.  
-Instead, all user guidance will be built directly into the application to create a more natural and seamless learning experience.  
+No separate written documentation or manuals are planned for this system.
+Instead, all user guidance will be built directly into the application to create a more natural and seamless learning experience.
 This approach ensures that both attendees and administrators can quickly understand how to use the platform without leaving the interface.
 
 The system will include:
 \begin{itemize}
-    \item \textbf{Interactive Onboarding:}  
+    \item \textbf{Interactive Onboarding:}
     Step-by-step tutorial pop-ups and tooltips that appear during first-time use to introduce users to key features such as event registration, check-in, and analytics.
-    
-    \item \textbf{Guided Walkthroughs:}  
+
+    \item \textbf{Guided Walkthroughs:}
     Contextual highlights that show users where to click and how to complete common actions directly within the interface.
-    
-    \item \textbf{Short Visual Aids:}  
+
+    \item \textbf{Short Visual Aids:}
     Optional embedded videos or animations explaining how to perform important tasks, such as creating an event or submitting a form.
 \end{itemize}
 
-These interactive elements replace the need for formal documentation and are designed to make the system self-explanatory and easy to learn.  
+These interactive elements replace the need for formal documentation and are designed to make the system self-explanatory and easy to learn.
 Users will be able to replay the onboarding sequence or revisit tips at any time from within the application.
 
 \subsection{Training Requirements}
 
-No formal training sessions or written instructions are required for this system.  
+No formal training sessions or written instructions are required for this system.
 The design prioritizes simplicity, discoverability, and self-learning through interactive guidance.
 
 \begin{itemize}
-    \item \textbf{End Users (Attendees):}  
-    Will learn the system through in-app pop-ups and short guided tutorials shown during their first login.  
+    \item \textbf{End Users (Attendees):}
+    Will learn the system through in-app pop-ups and short guided tutorials shown during their first login.
     These tutorials will walk users through tasks such as signing up for an event, filling out a form, or checking in.
 
-    \item \textbf{Administrators and Event Organizers:}  
+    \item \textbf{Administrators and Event Organizers:}
     Will be guided through core management workflows using the same interactive approach, supported by optional short videos or animations that explain advanced features such as creating forms or viewing analytics.
 \end{itemize}
 
-Overall, training and documentation will be fully integrated into the user experience.  
+Overall, training and documentation will be fully integrated into the user experience.
 The application itself will serve as the guide, helping users learn by doing rather than reading external instructions.
 
 
