@@ -188,21 +188,112 @@ directly.
 
 \section{Mandated Constraints}
 \subsection{Solution Constraints}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SOC-\arabic*:]
+  \item The solution must provide web and mobile apps with \gls{adm} and \gls{atd} interfaces.\\[2mm]
+    {\bf Motivation:} Mandated by the client.
+\end{enumerate}
+
 \subsection{Implementation Environment of the Current System}
-\lips
+The current \gls{mes} system is manual, decentralized, and fragmented, relying on:
+\begin{itemize}
+  \item Google Forms for registration and feedback
+  \item Google Sheets for data and attendee management
+  \item Email and Discord for communication
+  \item Manual payment reconciliation for ticketing
+  \item Third-party services for waiver management
+\end{itemize}
+
+There are currently no integrated or centralized backend systems or databases. The system will be implemented in a
+fresh environment with no legacy migration necessary; however, it must import past event data from spreadsheets or
+other logs if necessary.
+
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries IEC-\arabic*:]
+  \item The system shall be implemented in a new environment with no pre-existing infrastructure.\\[2mm]
+    {\bf Motivation:} See above.
+\end{enumerate}
+
 \subsection{Partner or Collaborative Applications}
-\lips
+This project is to be integrated alongside two others for \gls{mes}. Since this project is done in partial
+collaboration with two other Capstone groups, measures need to be implemented to ensure interoperability.
+
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries PCC-\arabic*:]
+  \item The system must facilitate interoperability between projects and ensure collaborating projects can access
+    necessary APIs, components, or database schemas.\\[2mm]
+    {\bf Motivation:} Data and components created in this project will be integrated with other projects to
+    create a unified application.
+\end{enumerate}
+
 \subsection{Off-the-Shelf Software}
-\lips
-\subsection{Anticipated Workplace Environment}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries OSC-\arabic*:]
+  \item The system must implement a bespoke and original form-builder application.\\[2mm]
+    {\bf Motivation:} Mandated by the client.
+\end{enumerate}
+
+There are no other constraints regarding the use of pre-existing solutions, though the use of open-source components and
+solutions is encouraged.
+\subsection{Development Environment Constraints}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries DEC-\arabic*:]
+  \item The system must be developed using the Git submodule structure outlined by the client.\\[2mm]
+    {\bf Motivation:} Mandated by the client; the development process is currently being created by the client.
+  \item The system must use the {\bf Vite + TanStack + PostgreSQL} technology stack.\\[2mm]
+    {\bf Motivation:} Mandated by the client.
+\end{enumerate}
+
 \subsection{Schedule Constraints}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SCC-\arabic*:]
+  \item A working prototype of the system must be made available by January.\\[2mm]
+    {\bf Motivation:} The client wishes to use the system for events happening in Winter 2026.
+  \item All documentation deliverables must be submitted in accordance to course deadlines as outline in Development
+    Plan \S \ 8, subject to changes as updated by course instructors.\\[2mm]
+    {\bf Motivation:} Course requirement.
+\end{enumerate}
+
 \subsection{Budget Constraints}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries BGC-\arabic*:]
+  \item There is no budget allocated for the project. All hosting services will be provided by the client on behalf of
+    \gls{mes}.\\[2mm]
+    {\bf Motivation:} Mandated by the client.
+\end{enumerate}
+
 \subsection{Enterprise Constraints}
-\lips
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries EPC-\arabic*:]
+  \item All intellectual property produced during the project will be made available under the GPLv3 license as
+    outlined in the Development Plan \S \ 3.\\[2mm]
+    {\bf Motivation:} Selected license for the project. This also allows the client to maintain and improve the
+    IP as required after the completion of this project.
+\end{enumerate}
 
 \section{Naming Conventions and Terminology}
 \subsection{Glossary of All Terms, Including Acronyms, Used by Stakeholders
