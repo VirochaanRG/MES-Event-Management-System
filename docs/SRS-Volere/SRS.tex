@@ -837,7 +837,6 @@ Below are formal state diagrams showing the different states of the system and t
     \caption{State diagram of the \gls{adm} side of the system}\label{fig:stateadmin}
 \end{figure}
 \end{center}
-\subsection{Data Dictionary}
 
 \begin{center}
 \begin{figure}[H]
@@ -846,7 +845,6 @@ Below are formal state diagrams showing the different states of the system and t
     \caption{State diagram of the \gls{atd} side of the system}\label{fig:stateattendee}
 \end{figure}
 \end{center}
-\subsection{Data Dictionary}
 
 \section{Functional Requirements}
 \subsection{Functional Requirements}
@@ -1332,11 +1330,26 @@ This section outlines extra features to consider that may or be not be implement
   itemindent=0em,
   label=\bfseries WR-\arabic*:,
   ref=\bfseries WR-\arabic*]
-  \item \label{FR1} The system shall allow for full customization of system to allow adopt to the \\[2mm]
-    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-5}\}. \Gls{mes} wants to be able to create forms for their surveys,
-    especially \gls{cfes} surveys, with different response option types.\\
-    {\bf Fit Criterion:} Forms can be created with different response styles (e.g., single choice, multiple choice,
-    numeric scales) and response data is correctly stored in databases.
+  \item \label{WR1} The entire system shall be redistributable, customizable, and deployable for use by any organization. \\[2mm]
+    {\bf Motivation:} The system being built for the \gls{mes} can be expanded into a Software-as-a-Service (SaaS) for any organization looking for a centralized event or survey management system. \\
+    {\bf Fit Criterion:} At least two isolated copies of the system should be able to run simultaneously without any connections or interference between systems.
+  
+  \item \label{WR2} All forms of branding in the system shall be substitutable for a different branding through an easily accessible interface.\\[2mm]
+  {\bf Motivation:} If the system shall be expanded for use by any organization, the organization should be able to customize all branding of the system without requiring changes to the source code.\\
+  {\bf Fit Criterion:} All \gls{mes} branding should be removable and replaceable with seperate branding throughout the \gls{adm} and \gls{atd} systems without making any edits to source code.
+
+  \item \label{WR3} The system shall allow for live polling of all \glspl{atd} registered for a given event. \\[2mm]
+  {\bf Motivation:} Allowing for live polling of \glspl{atd} during an event can increase \gls{atd} engagement and further integrate the \gls{mes}'s suite of required tools into the centralized system\\
+  {\bf Fit Criterion:} The feature shall be tested during an event with at least 10 registered \glspl{atd}. All registered \glspl{atd} should receive the poll, submit a reponse, and an \gls{adm} shall be able to view all reponses within 5 minutes.
+
+  \item \label{WR4} The system shall provide the \gls{adm} with a report of recommendations to improve survey reponse rates and event turnout.\\[2mm]
+  {\bf Motivation:} Improving event turnout and survey reposnse rates is one of the main goals of the \gls{mes} for the proposed system. Adding intelligent recommendations based on previous survey and event data to improve this will increase the satisfaction of associated stakeholders.\\
+  {\bf Fit Criterion:} Upon creation of an event or survey, the system should inform the \gls{adm} of at least one parameter that can be changed to improve event turnout or response rates.
+
+  \item \label{WR5} The system shall provide the \gls{adm} with a reasonable prediction of the turnout of any given event.\\[2mm]
+  {\bf Motivation:} Predicting the turnout of an event can better prepare the \gls{mes} for event planning, finance management, and resource allocation.\\
+  {\bf Fit Criterion:} Upon creation of an event should inform the \gls{adm} of a predicted turnout of the event which is within 20\% of the actual turnout.
+  
 \end{enumerate}
 
 
