@@ -64,16 +64,18 @@
 ~\newpage
 
 \section*{Revision History}
-
-\begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
-\toprule {\textbf{Date}} & {\textbf{Version}} & {\textbf{Notes}}\\
+\begin{table}[hp]
+\caption{Revision History} \label{TblRevisionHistory}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+10/10/2025 & All & Rev0 of SRS\\
+... & ... & ...\\
 \bottomrule
 \end{tabularx}
+\end{table}
 
-~\\
 
 ~\newpage
 \section{Purpose of the Project}
@@ -424,22 +426,18 @@ Below is a table describing each of the sub-workflows of the proposed systems. N
 creation have been grouped as a single workflow since they are nearly identical.
 
 {
-  \setlength{\tabcolsep}{0.125em}
+  \setlength{\tabcolsep}{0.2em}
   \renewcommand{\arraystretch}{1.2}
-  \begin{table}[H]
-    \centering
-    \begin{tabularx}{\textwidth}{|P{2.5em}|Y|Y|Y|Y|}
-      \hline
-      \textbf{No.} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
-      1 & \Gls{atd} registers for event & Registration data & Event ticket & \\ \hline
-      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \\ \hline
-      3 & \Gls{adm} creates a form module & Module question data & Reusable form module & \\ \hline
-      4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \\ \hline
-      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports &
+\begin{longtable}[H]{p{0.03\linewidth}p{0.21\linewidth}p{0.25\linewidth}p{0.25\linewidth}p{0.28\linewidth}}
+      \textbf{\#} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
+      1 & \Gls{atd} registers for event & Registration data & Event ticket & \ref{FR3} \ref{FR4} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{SIR2} \ref{UHEUR1} \ref{UHEUR2} \ref{UHUPR1} \ref{UHUPR2} \ref{UHUPR3} \ref{UHAR1} \ref{PSLR1} \ref{PSER1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \ref{MSAR1} \ref{MSAR2} \\ \hline
+      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{FR9} \ref{SIR1} \ref{SIR2} \ref{PTFR2} \ref{UHEUR1} \ref{UHEUR4} \ref{UHUPR1} \ref{UHUPR2} \ref{UHUPR3} \ref{UHAR1} \ref{PSLR1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \\ \hline
+      3 & \Gls{adm} creates a form module & Module questions & Reusable form module & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{UHPIR1} \ref{UHLR2} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{PTFR4} \ref{PTFR5} \ref{MSMR1} \ref{LFSR2} \ref{UHEUR3} \ref{UHUPR3}\\ \hline
+      4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \ref{FR1} \ref{FR3} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR9} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{SIR2} \ref{SAuR1} \ref{UHPIR2} \ref{UHEUR3} \ref{UHLR2} \ref{PTFR4} \ref{PTFR5} \ref{MSAR1} \ref{MSAR2} \ref{MSMR1}\\ \hline
+      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \ref{FR2} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR8} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SAuR1} \ref{UHPIR2} \ref{LFAR3} \ref{UHEUR3} \ref{UHLR2} \ref{UHUPR3}
       \\ \hline
-    \end{tabularx}
-    \captionof{table}{Partitioning of system workflows}\label{wfpart}
-  \end{table}
+    \caption{Partitioning of system workflows}\label{wfpart}
+  \end{longtable}
 }
 
 \subsection{Specifying a Business Use Case (BUC)}
@@ -470,7 +468,7 @@ creation have been grouped as a single workflow since they are nearly identical.
 \textbf{Input:} Survey responses \\
 \textbf{Output:} Survey completion confirmation \\
 \textbf{Pre-condition:} \Gls{atd} has downloaded the application and has created an account \\
-\textbf{Scenario:} \\
+\textbf{Scenario:}
 \begin{enumerate}
   \item The user application receives the survey data
   \item The user application verifies the data is filled correctly
@@ -482,14 +480,13 @@ creation have been grouped as a single workflow since they are nearly identical.
 \textbf{Sub variations:}
 \begin{itemize}
   \item [2a.] The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the \gls{atd} to fix the errors and resubmit
-
 \end{itemize}
 
 \subsubsection*{BUC 3: \Gls{adm} creates a form module}
 \textbf{Input:} Form fields \\
 \textbf{Output:} Reusable form module \\
 \textbf{Pre-condition:} \Gls{adm} has access to create custom form modules \\
-\textbf{Scenario:} \\
+\textbf{Scenario:}
 \begin{enumerate}
   \item The \gls{adm} portal receives the list of form fields and questions from the \gls{adm} user for the custom module
   \item The \gls{adm} portal verifies the custom module has been created correctly
@@ -500,15 +497,17 @@ creation have been grouped as a single workflow since they are nearly identical.
   \item The \gls{adm} portal updates the list of custom modules with the completed module
   \item The \gls{adm} portal confirms with the \gls{adm} user that the custom module has been created
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted form module has errors (i.e. unfinished fields), the \gls{adm} user is prompted to fix these errors before resubmitting \\
-4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted form module has errors (i.e. unfinished fields), the \gls{adm} user is prompted to fix these errors before resubmitting
+  \item [4a.] Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial
+\end{itemize}
 
 \subsubsection*{BUC 4: \Gls{adm} creates an event/survey}
 \textbf{Input:} Event details \\
 \textbf{Output:} Event creation confirmation \\
 \textbf{Pre-condition:} \Gls{adm} has access to create events \\
-\textbf{Scenario:} \\
+\textbf{Scenario:}
 \begin{enumerate}
   \item The \gls{adm} portal receives the event/survey details
   \item The \gls{adm} portal verifies the event/survey details are correct
@@ -520,9 +519,11 @@ creation have been grouped as a single workflow since they are nearly identical.
   \item The \gls{adm} portal adds the created event/survey to the event/survey dashboard
   \item The \gls{adm} portal confirms with the \gls{adm} user that the event/survey has been created
 \end{enumerate}
-\textbf{Sub variations:} \\
-2a. The submitted details have errors (i.e. event date has already passed), the \gls{adm} user is prompted to fix these errors before resubmitting \\
-4a. Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial \\
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted details have errors (i.e. event date has already passed), the \gls{adm} user is prompted to fix these errors before resubmitting
+  \item [4a.] Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial
+\end{itemize}
 
 \subsubsection*{BUC 5: \Gls{adm} views event/survey statistics}
 \textbf{Input:} Event/survey to view \\
@@ -603,33 +604,32 @@ The purpose of this section is to define the scope of the product by defining th
 \hyperref[table:productusecase]{Table \ref{table:productusecase}} further defines each of the individual use cases of the system, outlining the specific inputs and outputs and related requirements.
 
 {
-\setlength{\tabcolsep}{0.3em}
-\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{0.2em}
 \begin{longtable}[H]{p{0.04\linewidth}p{0.22\linewidth}p{0.13\linewidth}p{0.43\linewidth}p{0.22\linewidth}}
   \toprule
   \textbf{\#}     & \textbf{Name}                  & \textbf{Actor} & \textbf{Input/Output}                                                                                                       & \textbf{Requirements} \\ \midrule
-  1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and fields (in)\\Reusable form module (out)\end{tabular}                        &                       \\ \midrule
-  2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 &                       \\ \midrule
-  3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           &                       \\ \midrule
-  4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         &                       \\ \midrule
-  5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          &                       \\ \midrule
-  6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and questions (in)\\Fillable survey (out)\end{tabular}                            &                       \\ \midrule
-  7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       &                       \\ \midrule
-  8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           &                       \\ \midrule
-  9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         &                       \\ \midrule
-  10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            &                       \\ \midrule
-  11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  &                       \\ \midrule
-  12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 &                       \\ \midrule
-  13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       &                       \\ \midrule
-  14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           &                       \\ \midrule
-  15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     &                       \\ \midrule
-  16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        &                       \\ \midrule
-  17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  &                       \\ \midrule
-  18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                &                       \\ \midrule
-  19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            &                       \\ \midrule
-  20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion confirmation (out)\end{tabular} &                       \\ \midrule
-  21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update confirmation (out)\end{tabular}           &                       \\ \midrule
-  22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        &                       \\ \bottomrule
+  1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and \\fields (in)\\Reusable form module (out)\end{tabular}                        & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{UHEUR3} \\ \midrule
+  2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{UHEUR3} \\ \midrule
+  3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           & \ref{FR3} \ref{FR4} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{UHLR2} \\ \midrule
+  4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         & \ref{FR4} \ref{FR6} \ref{SAR2} \ref{SIR1} \ref{MSMR1} \ref{UHEUR3} \\ \midrule
+  5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{UHLR2} \\ \midrule
+  6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and \\questions (in)\\Fillable survey (out)\end{tabular}                            & \ref{FR1} \ref{FR2} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{UHEUR3} \\ \midrule
+  7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{UHEUR3} \\ \midrule
+  8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{UHLR2} \\ \midrule
+  9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         & \ref{FR5} \ref{FR6} \ref{SAR2} \ref{SAuR1} \ref{UHLR2} \ref{UHPIR2} \\ \midrule
+  10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SAuR1} \ref{UHEUR3} \ref{UHLR2} \\ \midrule
+  11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  & \ref{FR6} \ref{FR8} \ref{SAR1} \ref{SAuR1} \ref{UHPIR2} \ref{UHEUR3} \\ \midrule
+  12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 & \ref{FR7} \ref{FR8} \ref{UHEUR3} \ref{UHLR2} \ref{PSLR1} \ref{PSER1} \\ \midrule
+  13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       & \ref{FR3} \ref{FR4} \ref{FR9} \ref{UHEUR1} \ref{UHUPR1} \ref{UHAR1} \\ \midrule
+  14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           & \ref{FR5} \ref{FR6} \ref{UHEUR1} \ref{UHUPR2} \ref{UHAR1} \ref{UHLR2} \\ \midrule
+  15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     & \ref{FR3} \ref{FR6} \ref{FR9} \ref{UHEUR1} \ref{UHUPR1} \ref{UHAR1} \\ \midrule
+  16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        & \ref{FR3} \ref{FR4} \ref{SAR1} \ref{SIR1} \ref{PSLR1} \ref{UHEUR1} \\ \midrule
+  17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  & \ref{FR3} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSMR1} \ref{UHEUR1} \\ \midrule
+  18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSAR2} \ref{UHEUR1} \\ \midrule
+  19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            & \ref{FR1} \ref{FR2} \ref{FR6} \ref{UHEUR1} \ref{UHUPR1} \ref{UHAR1} \\ \midrule
+  20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion \\confirmation (out)\end{tabular} & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SIR1} \ref{PSLR1} \ref{UHEUR4} \\ \midrule
+  21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update\\ confirmation (out)\end{tabular}           & \ref{FR2} \ref{FR6} \ref{SIR1} \ref{MSMR1} \ref{UHEUR3} \ref{UHUPR2} \\ \midrule
+  22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        & \ref{FR2} \ref{FR6} \ref{UHEUR1} \ref{UHLR2} \ref{UHAR1} \ref{UHUPR2} \\ \bottomrule
   \caption{Product use case table}\label{table:productusecase}
 \end{longtable}
 }
@@ -925,7 +925,6 @@ Below are formal state diagrams showing the different states of the system and t
     \caption{State diagram of the \gls{adm} side of the system}\label{fig:stateadmin}
 \end{figure}
 \end{center}
-\subsection{Data Dictionary}
 
 \begin{center}
 \begin{figure}[H]
@@ -934,7 +933,6 @@ Below are formal state diagrams showing the different states of the system and t
     \caption{State diagram of the \gls{atd} side of the system}\label{fig:stateattendee}
 \end{figure}
 \end{center}
-\subsection{Data Dictionary}
 
 \section{Functional Requirements}
 \subsection{Functional Requirements}
@@ -1002,28 +1000,30 @@ Below are formal state diagrams showing the different states of the system and t
 
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
-\begin{enumerate}[label=\bfseries AR-\arabic*:, wide=0pt, leftmargin=*]
-  \item The interface shall comply with MES branding criteria (logo, imagse, colour scheme).\\[2mm]
+\begin{enumerate}[label=\bfseries AR-\arabic*:, wide=0pt, leftmargin=*, 
+  ref=\bfseries LFR-AP.\arabic*]
+  \item \label{LFAR1} The interface shall comply with MES branding criteria (logo, imagse, colour scheme).\\[2mm]
     {\bf Motivation:} Ensures that the product is recognizable as an official MES event registration platform.\\
     {\bf Fit Criterion:} The client from MES shall act as a mediator to request apperance specifications and ensure the product complies with the current standards.\\
     {\bf Goals:} G-1
-  \item The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
+  \item \label{LFAR2} The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
     {\bf Motivation:} Increases accessibility and user productivity, and allows for consistency across different events.\\
     {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree it was \textit{clean} and \textit{professional}.
     {\bf Goals:} G-1, G-5
-  \item Admin dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
+  \item \label{LFAR3} Admin dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
     {\bf Motivation:} Improves organizer accessibility and readability, allowing for easier management during planning operations.\\
     {\bf Fit Criterion:} The client shall approve of the analytics layout.
     {\bf Goals:} G-3, G-4
 \end{enumerate}
 
 \subsection{Style Requirements}
-\begin{enumerate}[label=\bfseries SR-\arabic*:, wide=0pt, leftmargin=*]
-  \item The design shall be professional but approachable, accomodating all types of events.\\[2mm]
+\begin{enumerate}[label=\bfseries SR-\arabic*:, wide=0pt, leftmargin=*, 
+  ref=\bfseries LFR-S.\arabic*]
+  \item \label{LFSR1} The design shall be professional but approachable, accomodating all types of events.\\[2mm]
     {\bf Motivation:} The app should have a friendly vibe for casual student use, yet maintain a sense of maturity for the more formal uses.\\
     {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.\\
     {\bf Goals:} G-1, G-5
-  \item The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+  \item \label{LFSR2} The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
     {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
     {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
     {\bf Goals:} G-3
@@ -1032,51 +1032,53 @@ Below are formal state diagrams showing the different states of the system and t
 \section{Usability and Humanity Requirements}
 \subsection{Ease of Use Requirements}
 
-\begin{enumerate}[label=\bfseries ER-\arabic*:, wide=0pt, leftmargin=*]
-  \item Registration and feedback forms shall be intiutive and require no clarification.\\[2mm]
+\begin{enumerate}[label=\bfseries ER-\arabic*:, wide=0pt, leftmargin=*, 
+  ref=\bfseries UHR-EoU.\arabic*]
+  \item \label{UHEUR1} Registration and feedback forms shall be intiutive and require no clarification.\\[2mm]
     {\bf Motivation:} Attendees should have clear direction and be able to fill it out on their first attempt with no instruction or training.\\
     {\bf Fit Criterion:} During usability testing across the MES events, at least 80\% of students rate the platform's \textit{ease of use} a 4+.\\
     {\bf Goals:} G-2, G-5
-  \item Users shall sign-up/sign-in to the app with no instruction. \\[2mm]
+  \item \label{UHEUR2} Users shall sign-up/sign-in to the app with no instruction. \\[2mm]
     {\bf Motivation:} The registration process is the most important aspect of the platform, so the app should have a clear and simple layout.\\
     {\bf Fit Criterion:} A sample of users shall register/login within 2 minutes without instruction.\\
     {\bf Goals:} G-2
-  \item Admins shall interact with dashboard, create a custom form, and visualize analytics with minimal instruction.\\[2mm]
+  \item \label{UHEUR3} Admins shall interact with dashboard, create a custom form, and visualize analytics with minimal instruction.\\[2mm]
     {\bf Motivation:} The admin dashboard should be intuitive so that any new admins can immediately work out how to use it.\\
     {\bf Fit Criterion:} A sample of event organizers are able to interpret all analytics without prior explanation.\\
     {\bf Goals:} G-3
-  
+  \item \label{UHEUR4} The system shall provide survey progress indicators to reduce form abandonment
+    rates.
 \end{enumerate}
 
 \subsection{Personalization and Internationalization Requirements}
-\begin{enumerate}[label=\bfseries PR-\arabic*:, wide=0pt, leftmargin=*]
-  \item The custom form builder shall allow admin to create personalized forms with event-specific fields.\\[2mm]
-    {\bf Motivation:} Flexibility is essential to accomodate the diverse set of events as per the scope.\\
+\begin{enumerate}[label=UHR-PIR.\arabic*, wide=0pt, leftmargin=*]
+  \item \label{UHPIR1}The custom form builder shall allow admin to create personalized forms with event-specific fields.\\[2mm]
+    {\bf Motivation:} Flexibility is essential to accommodate the diverse set of events as per the scope.\\
     {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.
-  \item Admin dashboard shall support sorting and filtering of attendees by predefined metrics.\\[2mm]
+  \item \label{UHPIR2} Admin dashboard shall support sorting and filtering of attendees by predefined metrics.\\[2mm]
     {\bf Motivation:} Streamlines the attendee organizing process, allowing admin to categorize attendees as per the event requirements.\\
     {\bf Fit Criterion:} Organizers shall filter attendees within 1 minute of use without instruction.
 \end{enumerate}
 
 \subsection{Learning Requirements}
-\begin{enumerate}[label=\bfseries LR-\arabic*:, wide=0pt, leftmargin=*]
-  \item The app shall be easy for anyone with an intermediate level of English.\\[2mm]
+\begin{enumerate}[label=\bfseries LR-\arabic*:, wide=0pt, leftmargin=*,ref=\bfseries UHR-LR\arabic*]
+  \item \label{UHLR1} The app shall be easy for anyone with an intermediate level of English.\\[2mm]
     {\bf Motivation:} Users should expect intuitive, concise ineteractions.\\
     {\bf Fit Criterion:} 80\% of students successfully complete a form with no assistance.
-  \item Admin shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
+  \item \label{UHLR2} Admin shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
     {\bf Motivation:} Event organizers are constantly changing, so it is important to reduce dependency on technical training.\\
     {\bf Fit Criterion:} 80\% of organizers shall complete a basic test form on their first attempt.
 \end{enumerate}
 
 \subsection{Understandability and Politeness Requirements}
-\begin{enumerate}[label=\bfseries UR-\arabic*:, wide=0pt, leftmargin=*]
-  \item Basic, non-technical language will be used (Sign-up instead of RSVP).\\[2mm]
+\begin{enumerate}[label=\bfseries UR-\arabic*:, wide=0pt, leftmargin=*,,ref=\bfseries UHR-UPR\arabic*]
+  \item \label{UHUPR1} Basic, non-technical language will be used (Sign-up instead of RSVP).\\[2mm]
     {\bf Motivation:} Increases accessibility among non-technical users, or non-fluent English speakers.\\
     {\bf Fit Criterion:} 80\% of students understand all wording without clarification.
-  \item The app shall communicate errors clearly and politely.\\[2mm]
+  \item \label{UHUPR2} The app shall communicate errors clearly and politely.\\[2mm]
     {\bf Motivation:} Clear error messages reduce frustration and improve user experience.\\
     {\bf Fit Criterion:} Feedback suggests that 80\% of students found the experience satisfying.
-  \item The app shall hide sensitive and confidential information from users.\\[2mm]
+  \item \label{UHUPR3} The app shall hide sensitive and confidential information from users.\\[2mm]
     {\bf Motivation:} Enhances security and confidence of organizations in the product.\\
     {\bf Fit Criterion:} Approval from MES representative.
   \item Progress bars and confirmations shall be used to inform users of their status.\\[2mm]
@@ -1085,8 +1087,8 @@ Below are formal state diagrams showing the different states of the system and t
 \end{enumerate}
 
 \subsection{Accessibility Requirements}
-\begin{enumerate}[label=\bfseries AC-\arabic*:, wide=0pt, leftmargin=*]
-  \item The app shall conform to WCAG 2.0 AA standards, improving visibility for impaired users.\\[2mm]
+\begin{enumerate}[label=\bfseries AC-\arabic*:, wide=0pt, leftmargin=*,ref=\bfseries UHR-AR\arabic*]
+  \item \label{UHAR1} The app shall conform to WCAG 2.0 AA standards, improving visibility for impaired users.\\[2mm]
     {\bf Motivation:} Ensures accessibility for users with visual disabilities and impairments.\\
     {\bf Fit Criterion:} Approval from a sample of students with impairments, and evaluation tools (WAVE Web Accessibility).
 \end{enumerate}
@@ -1097,7 +1099,7 @@ Below are formal state diagrams showing the different states of the system and t
   \item The system shall have a maximum 2-second latency for form loading, optimized for mobile devices.\\
   {\bf Motivation:} Allows for faster registration process and avoids user abandonment.\\
   {\bf Fit Criterion:} Conduct a load test on different devices to ensure it meets the threshold.
-  \item Attendee information and backend analytics shall have a maximum 4-second latency.\\
+  \item \label{PSLR2} Attendee information and backend analytics shall have a maximum 4-second latency.\\
   {\bf Motivation:} Admins and organizers require responsive timing to stay on track.\\
   {\bf Fit Criterion:} Performance test show that results load within threshold.
 \end{enumerate}
@@ -1118,20 +1120,20 @@ Below are formal state diagrams showing the different states of the system and t
 
 \subsection{Robustness or Fault-Tolerance Requirements}
 \begin{enumerate}[label=\bfseries FT-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall auto-save incomplete surveys every 30 seconds.\\
+  \item \label{PTFR1} The system shall auto-save incomplete surveys every 30 seconds.\\
   {\bf Motivation:} Prevents loss of progress from mistakes or connectivity issues.\\
   {\bf Fit Criterion:} Make new changes, wait 30 seconds, and refresh the page. The changes should still be present.
-  \item The system shall locally queue changes and re-apply them after disconnects within 60 seconds.\\
+  \item \label{PTFR2} The system shall locally queue changes and re-apply them after disconnects within 60 seconds.\\
   {\bf Motivation:} Maintains progress to a degree to avoid user frustration. Mobile users often lose their connection depending on location, so this is highly relevant.\\
   {\bf Fit Criterion:}Make changes to the form while offline, and then go back online. The changes should be saved and applied within 60 seconds.
-  \item The system shall allow new form modules to be added without any downtime.\\
+  \item \label{PTFR3} The system shall allow new form modules to be added without any downtime.\\
   {\bf Motivation:} Ensures that different organizers can add forms for their respective events without disrupting other ongoing events.\\
   {\bf Fit Criterion:} Add a new form module while an event is ongoing, and ensure no downtime or data loss occurs.
-  \item The system shall allow \glspl{adm} to update event templates without disruption
+  \item \label{PTFR4} The system shall allow \glspl{adm} to update event templates without disruption
     during ongoing events.\\
   {\bf Motivation:} Ensures that organizers can make live changes without disrupting the event.\\
   {\bf Fit Criterion:} Update an event template while an event is ongoing, and ensure no downtime or data loss occurs.
-  \item The system shall display a last updated signifier for all analytics.\\
+  \item \label{PTFR5} The system shall display a last updated signifier for all analytics.\\
   {\bf Motivation:} Ensures that organizers can trust the data they are viewing.\\
   {\bf Fit Criterion:} Record time of live analytics as they are updated, then wait and go offline. Compare and make sure the last updated timestamp is accurate.
   \end{enumerate}
@@ -1148,7 +1150,8 @@ Below are formal state diagrams showing the different states of the system and t
 
 \subsection{Scalability or Extensibility Requirements}
 \begin{enumerate}[label=\bfseries SE-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall be designed to allow for new analytic modules to be added in the future.\\
+  \item \label{PSER1} The system shall support up to 2047 registrations per event.
+  \item \label{PSER2} The system shall be designed to allow for new analytic modules to be added in the future.\\
   {\bf Motivation:} As MES events evolve, new analytics may be required. Ensures that the product can adapt to future needs.\\
   {\bf Fit Criterion:} Design the system to allow for easy integration of new modules without major refactoring.
 \end{enumerate}
@@ -1207,8 +1210,9 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries MT-\arabic*:]
-  \item The system shall provide updated documentation upon every release and be accessible to all developers\\[2mm]
+  label=\bfseries MT-\arabic*:,
+  ref=\bfseries MT-\arabic*]
+  \item \label{MSMR1} The system shall provide updated documentation upon every release and be accessible to all developers\\[2mm]
     {\bf Motivation:} Allows for developers to understand the changes made on each release and will be easily be able to modify the code to fix errors or make updates. \\
     {\bf Fit Criterion:} Updated documentation will be included with the release of each version.
 \end{enumerate}
@@ -1217,8 +1221,9 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries SU-\arabic*:]
-  \item The system shall include a FAQ section to help clarify or answer common questions.\\[2mm]
+  label=\bfseries SU-\arabic*:,
+  ref=\bfseries SU-\arabic*]
+  \item \label{MSSR1} The system shall include a FAQ section to help clarify or answer common questions.\\[2mm]
     {\bf Motivation:} Will allow for a better user experience as they can solve their own problems quickly and will make it easier for MES support teams. \\
     {\bf Fit Criterion:} Ensure a FAQ with common questions obtained from stakeholders (supervisor and MES council members) is included within the system.
 \end{enumerate}
@@ -1227,11 +1232,12 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries AD-\arabic*:]
-  \item The system shall run as a web app accessible through Chromium, Firefox, and Safari browsers. \\[2mm]
+  label=\bfseries AD-\arabic*:,
+  ref=\bfseries AD-\arabic*]
+  \item \label{MSAR1} The system shall run as a web app accessible through Chromium, Firefox, and Safari browsers. \\[2mm]
     {\bf Motivation:} This will allow users to use whatever browser they want and will make the application more accessible. \\
     {\bf Fit Criterion:} Test for compatibility of the application to ensure it runs on all specified browsers.
-  \item The mobile app components will work on both IOS and Android platforms. \\[2mm]
+  \item \label{MSAR2} The mobile app components will work on both IOS and Android platforms. \\[2mm]
     {\bf Motivation:} Allows users on both mobile ecosystems to use the app making the application more accessible. \\
     {\bf Fit Criterion:} Test the application in both the IOS and Android Environment ensuring correct functionality of all components.
 \end{enumerate}
@@ -1242,11 +1248,12 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries AC-\arabic*:]
-  \item The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
+  label=\bfseries AC-\arabic*:,
+  ref=\bfseries AC-\arabic*]
+  \item \label{SAR1} The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
     {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\
     {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.
-  \item Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
+  \item \label{SAR2} Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
     {\bf Motivation:} Prevents unauthorized users from viewing sensitive event and user data.  \\
     {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins
 \end{enumerate}
@@ -1255,11 +1262,12 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries IG-\arabic*:]
-  \item The system shall provide input validation for all user submitted data \\[2mm]
+  label=\bfseries IG-\arabic*:,
+  ref=\bfseries IG-\arabic*]
+  \item \label{SIR1} The system shall provide input validation for all user submitted data \\[2mm]
     {\bf Motivation:} Ensures the safety of our application by ensuring only the required input types are entering our database. Protects us from SQL injection and data corruption in our database.  \\
     {\bf Fit Criterion:} All inputs will include checks to ensure only the correct type is entering our database. Perform testing to ensure that all inputs have validation checks.
-  \item The system shall only use HTTPS for communication between clients and servers \\[2mm]
+  \item \label{SIR2} The system shall only use HTTPS for communication between clients and servers \\[2mm]
     {\bf Motivation:} Ensures a secure connection between our client and server and protects against the interception or tampering of data during data transmission. \\
     {\bf Fit Criterion:} All requests will be done through HTTPS and if an HTTP request is done we will redirect it to HTTPS. \\
 \end{enumerate}
@@ -1268,14 +1276,15 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries PV-\arabic*:]
-  \item Users shall have the ability to request for the deletion of their stored personal data\\[2mm]
+  label=\bfseries PV-\arabic*:,
+  ref=\bfseries PV-\arabic*]
+  \item \label{SPR1} Users shall have the ability to request for the deletion of their stored personal data\\[2mm]
     {\bf Motivation:} Increases transparency and control over their own data for users. Provides reassurances for users that their data can be removed if neccesary.    \\
     {\bf Fit Criterion:} Ensure a mechanism exists for users to delete their data. Peform testing so that the mechanism actually removes all related data from the database.
-  \item The system shall only store sensitive data after obtaining the consent of the user \\[2mm]
+  \item \label{SPR2} The system shall only store sensitive data after obtaining the consent of the user \\[2mm]
     {\bf Motivation:} Keeps us legally sound as we are not storing user data without first obtaining consent. Also provides users with information on what their data is actually being used for.  \\
     {\bf Fit Criterion:} Ensure that all sections which require inputting sensitive information have consent checks where we explicitly explain what is being stored and how it may be used. \\
-  \item All sensitive user information such as student numbers, names and emails shall be encrypted in storage using AES-256\\[2mm]
+  \item \label{SPR3} All sensitive user information such as student numbers, names and emails shall be encrypted in storage using AES-256\\[2mm]
     {\bf Motivation:} Protects user's information from unauthorized viewing and ensures that even if a breach were to occur sensitive information will not be leaked.   \\
     {\bf Fit Criterion:} Inspect database to show that the required fields are stored encrypted and not in plaintext. \\
 \end{enumerate}
@@ -1284,8 +1293,9 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries AU-\arabic*:]
-  \item The system shall track admin action inside an audit log\\[2mm]
+  label=\bfseries AU-\arabic*:,
+  ref=\bfseries AU-\arabic*]
+  \item \label{SAuR1} The system shall track admin action inside an audit log\\[2mm]
     {\bf Motivation:} Ensures traceability of admin actions and allows other admins to know who performed what.  \\
     {\bf Fit Criterion:} 100\% of actions will be in a log with tracking of user who did the action, timestamp and action commited. Testing will be done to ensure all actions are being logged and logs should be exportable for review.
 \end{enumerate}
@@ -1298,8 +1308,9 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries CL-\arabic*:]
-  \item The system shall use Canadian English spelling.\\[2mm]
+  label=\bfseries CL-\arabic*:,
+  ref=\bfseries CL-\arabic*]
+  \item \label{CR1} The system shall use Canadian English spelling.\\[2mm]
     {\bf Motivation:} \Gls{mes} is an organization located in Canada.\\
     {\bf Fit Criterion:} All rendered text provided by the system passes a Canadian English spell-checker.\\
 \end{enumerate}
@@ -1310,8 +1321,9 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries LG-\arabic*:]
-  \item The system shall store and handle all sensitive personal data in compliance with PIPEDA regulations.\\[2mm]
+  label=\bfseries LG-\arabic*:,
+  ref=\bfseries LG-\arabic*]
+  \item \label{CLR1} The system shall store and handle all sensitive personal data in compliance with PIPEDA regulations.\\[2mm]
     {\bf Motivation:} The system will store private personal information, which must be done responsibly.\\
     {\bf Fit Criterion:} The system meets all PIPEDA regulation requirements.\\
 \end{enumerate}
@@ -1320,8 +1332,9 @@ Not Applicable.
   leftmargin=*,
   labelsep=1em,
   itemindent=0em,
-  label=\bfseries ST-\arabic*:]
-  \item The system code shall conform to the \textit{Airbnb JavaScript Style Guide} and \textit{Airbnb React/JSX
+  label=\bfseries ST-\arabic*:,
+  ref=\bfseries ST-\arabic*]
+  \item \label{CSCR1} The system code shall conform to the \textit{Airbnb JavaScript Style Guide} and \textit{Airbnb React/JSX
     Style Guide}.\\[2mm]
     {\bf Motivation:} Specified in Development Plan \S \ 11.\\
     {\bf Fit Criterion:} The system code passes all CI/CD checks related to formatting compliance.\\
@@ -1368,17 +1381,23 @@ product. Moreover, the \gls{mes} wants a product that doesn't require an externa
 house, so they have control over future development and usage.}
 
 \section{New Problems}
+
 \subsection{Effects on the Current Environment}
-\lips
+The new centralized EventHub platform will significantly change how MES events are managed, moving from manual and multi-platform workflows (e.g. Google Forms, Sheets) to a unified digital system. This shift will not only reduce administrative burden and data fragmentation but will also introduce a learning curve for organizers accustomed to traditional tools.
+
 \subsection{Effects on the Installed Systems}
-\lips
+The project replaces current processes rather than integrating with previous systems, meaning minimal dependency conflicts. However, transitioning from existing Google-based workflows may temporarily disrupt event preparation cycles until the new system stabilizes. 
+
 \subsection{Potential User Problems}
-\lips
+Users (both attendees and administrators) may initially encounter usability issues with the new form builder and event registration interfaces. While designed for ease of use, users might experience confusion with certain procedures until onboarding tutorials are introduced. 
+
 \subsection{Limitations in the Anticipated Implementation Environment That May
 Inhibit the New Product}
-\lips
+As the platform relies on consistent internet access and backend/frontend integration across web and mobile systems, technical limitations such as weak event Wi-Fi or inconsistent device support (especially for iOS/Android check-ins) may hinder performance. 
+
 \subsection{Follow-Up Problems}
-\lips
+Following initial deployment, maintenance/scalability challenges may arise, especially if the MES expands usage to other faculties. Continuous updates, bug fixes, and server resource management will be required to prevent system slowdowns. 
+
 
 \section{Tasks}
 \subsection{Project Planning }
@@ -1479,10 +1498,41 @@ The application itself will serve as the guide, helping users learn by doing rat
 
 
 \section{Waiting Room}
-\lips
+
+This section outlines extra features to consider that may or be not be implemented depending on time constraints.
+
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries WR-\arabic*:,
+  ref=\bfseries WR-\arabic*]
+  \item \label{WR1} The entire system shall be redistributable, customizable, and deployable for use by any organization. \\[2mm]
+    {\bf Motivation:} The system being built for the \gls{mes} can be expanded into a Software-as-a-Service (SaaS) for any organization looking for a centralized event or survey management system. \\
+    {\bf Fit Criterion:} At least two isolated copies of the system should be able to run simultaneously without any connections or interference between systems.
+  
+  \item \label{WR2} All forms of branding in the system shall be substitutable for a different branding through an easily accessible interface.\\[2mm]
+  {\bf Motivation:} If the system shall be expanded for use by any organization, the organization should be able to customize all branding of the system without requiring changes to the source code.\\
+  {\bf Fit Criterion:} All \gls{mes} branding should be removable and replaceable with seperate branding throughout the \gls{adm} and \gls{atd} systems without making any edits to source code.
+
+  \item \label{WR3} The system shall allow for live polling of all \glspl{atd} registered for a given event. \\[2mm]
+  {\bf Motivation:} Allowing for live polling of \glspl{atd} during an event can increase \gls{atd} engagement and further integrate the \gls{mes}'s suite of required tools into the centralized system\\
+  {\bf Fit Criterion:} The feature shall be tested during an event with at least 10 registered \glspl{atd}. All registered \glspl{atd} should receive the poll, submit a reponse, and an \gls{adm} shall be able to view all reponses within 5 minutes.
+
+  \item \label{WR4} The system shall provide the \gls{adm} with a report of recommendations to improve survey reponse rates and event turnout.\\[2mm]
+  {\bf Motivation:} Improving event turnout and survey reposnse rates is one of the main goals of the \gls{mes} for the proposed system. Adding intelligent recommendations based on previous survey and event data to improve this will increase the satisfaction of associated stakeholders.\\
+  {\bf Fit Criterion:} Upon creation of an event or survey, the system should inform the \gls{adm} of at least one parameter that can be changed to improve event turnout or response rates.
+
+  \item \label{WR5} The system shall provide the \gls{adm} with a reasonable prediction of the turnout of any given event.\\[2mm]
+  {\bf Motivation:} Predicting the turnout of an event can better prepare the \gls{mes} for event planning, finance management, and resource allocation.\\
+  {\bf Fit Criterion:} Upon creation of an event, the system should inform the \gls{adm} of the predicted turnout of the event that is within 20\% of the actual turnout.
+  
+\end{enumerate}
+
 
 \section{Ideas for Solution}
-\lips
+Our primary Idea for the solution is the creation of both a Web and Mobile application. This was dictated upon us as they were mandated by our client since he wanted the solution to be in this form. 
+
 
 \newpage{}
 \section*{Appendix --- Reflection}
