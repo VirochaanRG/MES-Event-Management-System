@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 
 \usepackage{booktabs}
 \usepackage{tabularx}
@@ -33,7 +33,7 @@
 
 ~\newpage
 
-\pagenumbering{roman}
+\pagenumbering{arabic}
 
 \begin{table}[hp]
 \caption{Revision History} \label{TblRevisionHistory}
@@ -56,10 +56,10 @@
 
 \pagenumbering{arabic}
 \section{Introduction}
-This document will contain the Hazard Analysis for EventHub. EventHub is a platform which provides the McMaster Engineering Society with the functionality to create and manage events, surveys and perform other administrative functions. It will allow both admins and users to interact with platform and register for events and complete surveys. For this Hazard Analysis we will be defining hazard as a potential risk situation which can result in or contribute to a mishap. The purpose of this document is to identify potential hazards and develop requirements and measure to help prevent or mitigate the risk posed by these hazards.  
+This document will contain the Hazard Analysis for \teamname. \teamname \ is a platform which provides the McMaster Engineering Society with the functionality to create and manage events, surveys and perform other administrative functions. It will allow both admins and users to interact with platform and register for events and complete surveys. For this Hazard Analysis we will be defining hazard as a potential risk situation which can result in or contribute to a mishap. The purpose of this document is to identify potential hazards and develop requirements and measure to help prevent or mitigate the risk posed by these hazards.
 
 \section{Scope and Purpose of Hazard Analysis}
-The purpose of this Hazard Analysis is to identify and mitigate potential hazards that could negatively impact the EventHub platforms. This includes both technical hazards relating to the design of the system as well as user interaction hazards. 
+The purpose of this Hazard Analysis is to identify and mitigate potential hazards that could negatively impact the \teamname \ platforms. This includes both technical hazards relating to the design of the system as well as user interaction hazards.
 
 
 \section{System Boundaries and Components}
@@ -73,17 +73,17 @@ notifications, and build analytics dashboards.
 \subsection{System Boundaries}
 
 \begin{itemize}
-    \item \textbf{In Scope}: Administrator and student web and mobile interfaces, 
-    form builder and renderer, registration and waiver processing, check-in and QR verification, 
-    attendee overview dashboard, analytics and reporting, notifications, authentication and authorization, 
+    \item \textbf{In Scope}: Administrator and student web and mobile interfaces,
+    form builder and renderer, registration and waiver processing, check-in and QR verification,
+    attendee overview dashboard, analytics and reporting, notifications, authentication and authorization,
     and internal data storage.
-    
-    \item \textbf{Not Covered}: Third-party services like university single sign-on (SSO), 
-    third-party email/SMS portals, and payment sites. These are treated as outside dependencies, 
+
+    \item \textbf{Not Covered}: Third-party services like university single sign-on (SSO),
+    third-party email/SMS portals, and payment sites. These are treated as outside dependencies,
     with interactions regulated through integration adapters.
-    
-    \item \textbf{Environment}: The system is web-based, compatible with major browsers, 
-    and supports portable devices (iOS and Android). Its operation requires steady internet connectivity, 
+
+    \item \textbf{Environment}: The system is web-based, compatible with major browsers,
+    and supports portable devices (iOS and Android). Its operation requires steady internet connectivity,
     although it offers minimal offline capability for the check-in process.
 \end{itemize}
 
@@ -125,7 +125,7 @@ Interfaces with required external systems such as university single sign-on (SSO
 % you could assume a part will never fail, but it is generally better to include
 % this potential failure mode.}
 \begin{itemize}
-    \item Users will have stable Internet Access: We are assuming that the user will remain connected to the internet as it will be required for using our application. 
+    \item Users will have stable Internet Access: We are assuming that the user will remain connected to the internet as it will be required for using our application.
     \item Users will use the system as intended: We are assuming that users will be not attempting to use the system maliciously and focus on the relevant use cases for this platform.
 \end{itemize}
 
@@ -134,7 +134,7 @@ Interfaces with required external systems such as university single sign-on (SSO
 The following section provides a breakdown of the Failure Modes and Effects Analysis (FMEA) for the system. Each component is evaluated for potential failures, their impact on system operation, possible causes, methods of detection, and recommended actions. This analysis ensures that hazards affecting event registration, form processing, check-ins, and analytics are identified early and mitigated through targeted safety and reliability requirements.
 \begin{figure}[H]
 \begin{subfigure}{\textwidth}
-    \centering\includegraphics[width=\textwidth]{FMEA_images/FMEA_1.png} 
+    \centering\includegraphics[width=\textwidth]{FMEA_images/FMEA_1.png}
     \caption{Fig. 1: FMEA Table Part 1}
 \end{subfigure}
 
@@ -153,7 +153,7 @@ The following section provides a breakdown of the Failure Modes and Effects Anal
 
 \section{Safety and Security Requirements}
 
-The following safety and security requirements were derived from the Failure Mode and Effects Analysis (FMEA). 
+The following safety and security requirements were derived from the Failure Mode and Effects Analysis (FMEA).
 They represent newly discovered requirements that should also be included in the Software Requirements Specification (SRS).
 
 \subsection{Form Builder \& Renderer}
@@ -211,13 +211,26 @@ They represent newly discovered requirements that should also be included in the
 
 \section{Roadmap}
 
-The hazard analysis identified several safety and security requirements. Within the capstone timeline, the focus will be on core reliability and usability features, including schema validation and fallback UI (SR1.1), reliable registration storage (SR2.1), QR code generation fallback (SR3.1), dashboard synchronization (SR4.1), and authentication fallback handling (SR6.2). More advanced requirements such as multi-factor authentication (SR6.1), scalable analytics (SR5.1), stronger data protection mechanisms (SR7.1, SR7.2), and redundant integration failover (SR8.1) are deferred to future development beyond the capstone scope. At project completion, the hazard analysis will be revisited to assess which risks have been mitigated and which requirements should be prioritized for follow-up work.
+The hazard analysis identified several safety and security requirements. Within the Capstone timeline, the focus will be on core reliability and usability features, including schema validation and fallback UI (SR1.1), reliable registration storage (SR2.1), QR code generation fallback (SR3.1), dashboard synchronization (SR4.1), and authentication fallback handling (SR6.2). More advanced requirements such as multi-factor authentication (SR6.1), scalable analytics (SR5.1), stronger data protection mechanisms (SR7.1, SR7.2), and redundant integration failover (SR8.1) are deferred to future development beyond the Capstone scope. At project completion, the hazard analysis will be revisited to assess which risks have been mitigated and which requirements should be prioritized for follow-up work.
 
 
 \newpage{}
 
 \section*{Appendix --- Reflection}
 % \input{../Reflection.tex}
+\subsubsection*{Mohammad Mahdi Mahboob Reflection}
+\begin{enumerate}
+    \item {\bf What went well while writing this deliverable?}\\
+        Identifying the system boundaries was a fairly smooth process. We had already identified most of the items
+        listed in this section based on communications with our client. This allowed us to easily and promptly outline
+        the items.
+    \item {\bf What pain points did you experience during this deliverable, and how did you resolve them?}\\
+        Since our solution involves only software interactions and components, there weren't necessarily any imminent
+        hazards which were obvious to us when we initially planned this document. I therefore found it a bit difficult
+        to conceptualize and appropriately categorize hazards and their severity. After meeting with the TA, we
+        had a clearer understanding of the scope which our hazards encompassed, and were able to organize the FMEA and
+        create relevant requirement guidelines.
+\end{enumerate}
 \subsubsection*{Virochaan Reflection}
 \begin{enumerate}
     \item \textbf{What went well while writing this deliverable?} \\
