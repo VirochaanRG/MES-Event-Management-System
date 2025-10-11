@@ -1001,169 +1001,188 @@ Below are formal state diagrams showing the different states of the system and t
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
 \begin{enumerate}[label=\bfseries AR-\arabic*:, wide=0pt, leftmargin=*, 
-  ref=\bfseries LFR-AP.\arabic*]
-  \item \label{LFAR1} The interface shall comply with MES branding criteria (logo, imagse, colour scheme).\\[2mm]
-    {\bf Motivation:} Ensures that the product is recognizable as an official MES event registration platform.\\
-    {\bf Fit Criterion:} The client from MES shall act as a mediator to request apperance specifications and ensure the product complies with the current standards.\\
+  ref=\bfseries AR-\arabic*]
+  \item \label{AR1} The interface shall comply with \Gls{mes} branding criteria (logo, images, colour scheme).\\[2mm]
+    {\bf Motivation:} Ensures that the product is recognizable as an official \Gls{mes} event registration platform.\\
+    {\bf Fit Criterion:} The client from \Gls{mes} shall act as a mediator to request apperance specifications and ensure the product complies with the current standards.\\
     {\bf Goals:} G-1
-  \item \label{LFAR2} The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
+  \item \label{AR2} The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
     {\bf Motivation:} Increases accessibility and user productivity, and allows for consistency across different events.\\
-    {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree it was \textit{clean} and \textit{professional}.
+    {\bf Fit Criterion:} After use in some \Gls{mes} events, 70\% of users shall agree it was \textit{clean} and \textit{professional}.\\
     {\bf Goals:} G-1, G-5
-  \item \label{LFAR3} Admin dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
+  \item \label{AR3} \Gls{adm} dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
     {\bf Motivation:} Improves organizer accessibility and readability, allowing for easier management during planning operations.\\
-    {\bf Fit Criterion:} The client shall approve of the analytics layout.
+    {\bf Fit Criterion:} The client shall approve of the analytics layout.\\
     {\bf Goals:} G-3, G-4
 \end{enumerate}
 
 \subsection{Style Requirements}
 \begin{enumerate}[label=\bfseries SR-\arabic*:, wide=0pt, leftmargin=*, 
-  ref=\bfseries LFR-S.\arabic*]
-  \item \label{LFSR1} The design shall be professional but approachable, accomodating all types of events.\\[2mm]
+  ref=\bfseries SR-\arabic*]
+  \item \label{SR1} The design shall be professional but approachable, accomodating all types of events.\\[2mm]
     {\bf Motivation:} The app should have a friendly vibe for casual student use, yet maintain a sense of maturity for the more formal uses.\\
-    {\bf Fit Criterion:} After use in some MES events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.\\
+    {\bf Fit Criterion:} After use in some \Gls{mes} events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.\\
     {\bf Goals:} G-1, G-5
-  \item \label{LFSR2} The admin dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
-    {\bf Motivation:} Admin and organizers require clear data and analytics, they have no use for stylistic components.\\
-    {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.
+  \item \label{SR2} The \gls{adm} dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+    {\bf Motivation:} \Gls{adm} and organizers require clear data and analytics, they have no use for stylistic components.\\
+    {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.\\
     {\bf Goals:} G-3
 \end{enumerate}
 
 \section{Usability and Humanity Requirements}
 \subsection{Ease of Use Requirements}
-
 \begin{enumerate}[label=\bfseries ER-\arabic*:, wide=0pt, leftmargin=*, 
-  ref=\bfseries UHR-EoU.\arabic*]
-  \item \label{UHEUR1} Registration and feedback forms shall be intiutive and require no clarification.\\[2mm]
-    {\bf Motivation:} Attendees should have clear direction and be able to fill it out on their first attempt with no instruction or training.\\
-    {\bf Fit Criterion:} During usability testing across the MES events, at least 80\% of students rate the platform's \textit{ease of use} a 4+.\\
+  ref=\bfseries ER-\arabic*]
+  \item \label{ER1} Registration and feedback forms shall be intiutive and require no clarification.\\[2mm]
+    {\bf Motivation:} \Glspl{atd} should have clear direction and be able to fill it out on their first attempt with no instruction or training.\\
+    {\bf Fit Criterion:} During usability testing across the MES events, at least 80\% of \glspl{atd} rate the platform's \textit{ease of use} a 4+.\\
     {\bf Goals:} G-2, G-5
-  \item \label{UHEUR2} Users shall sign-up/sign-in to the app with no instruction. \\[2mm]
+  \item \label{ER2} Users shall sign-up/sign-in to the app with no instruction. \\[2mm]
     {\bf Motivation:} The registration process is the most important aspect of the platform, so the app should have a clear and simple layout.\\
     {\bf Fit Criterion:} A sample of users shall register/login within 2 minutes without instruction.\\
     {\bf Goals:} G-2
-  \item \label{UHEUR3} Admins shall interact with dashboard, create a custom form, and visualize analytics with minimal instruction.\\[2mm]
-    {\bf Motivation:} The admin dashboard should be intuitive so that any new admins can immediately work out how to use it.\\
+  \item \label{ER3} \Glspl{adm} shall interact with dashboard, create a custom form, and visualize analytics with minimal instruction.\\[2mm]
+    {\bf Motivation:} The \gls{adm} dashboard should be intuitive so that any new \glspl{adm} can immediately work out how to use it.\\
     {\bf Fit Criterion:} A sample of event organizers are able to interpret all analytics without prior explanation.\\
     {\bf Goals:} G-3
-  \item \label{UHEUR4} The system shall provide survey progress indicators to reduce form abandonment
-    rates.
 \end{enumerate}
 
 \subsection{Personalization and Internationalization Requirements}
-\begin{enumerate}[label=UHR-PIR.\arabic*, wide=0pt, leftmargin=*]
-  \item \label{UHPIR1}The custom form builder shall allow admin to create personalized forms with event-specific fields.\\[2mm]
+\begin{enumerate}[label=PI-\arabic*, wide=0pt, leftmargin=*]
+  \item \label{PI1}The custom form builder shall allow \gls{adm} to create personalized forms with event-specific fields.\\[2mm]
     {\bf Motivation:} Flexibility is essential to accommodate the diverse set of events as per the scope.\\
-    {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.
-  \item \label{UHPIR2} Admin dashboard shall support sorting and filtering of attendees by predefined metrics.\\[2mm]
+    {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.\\
+    {\bf Goals:} G-1
+  \item \label{PI2} \Gls{adm} dashboard shall support sorting and filtering of \glspl{atd} by predefined metrics.\\[2mm]
     {\bf Motivation:} Streamlines the attendee organizing process, allowing admin to categorize attendees as per the event requirements.\\
-    {\bf Fit Criterion:} Organizers shall filter attendees within 1 minute of use without instruction.
+    {\bf Fit Criterion:} Organizers shall filter \glspl{atd} within 1 minute of use without instruction.\\
+    {\bf Goals:} G-3, G-4
 \end{enumerate}
 
 \subsection{Learning Requirements}
-\begin{enumerate}[label=\bfseries LR-\arabic*:, wide=0pt, leftmargin=*,ref=\bfseries UHR-LR\arabic*]
-  \item \label{UHLR1} The app shall be easy for anyone with an intermediate level of English.\\[2mm]
+\begin{enumerate}[label=\bfseries LR-\arabic*:, wide=0pt, leftmargin=*,ref=\bfseries LR-\arabic*]
+  \item \label{LR1} The app shall be easy for anyone with an intermediate level of English.\\[2mm]
     {\bf Motivation:} Users should expect intuitive, concise ineteractions.\\
-    {\bf Fit Criterion:} 80\% of students successfully complete a form with no assistance.
-  \item \label{UHLR2} Admin shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
+    {\bf Fit Criterion:} 80\% of \glspl{atd} successfully complete a form with no assistance.\\
+    {\bf Goals:} G-2, G-5
+  \item \label{LR2} \Gls{adm} shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
     {\bf Motivation:} Event organizers are constantly changing, so it is important to reduce dependency on technical training.\\
-    {\bf Fit Criterion:} 80\% of organizers shall complete a basic test form on their first attempt.
+    {\bf Fit Criterion:} 80\% of organizers shall complete a basic test form on their first attempt.\\
+    {\bf Goals:} G-1, G-3, G-4
 \end{enumerate}
 
 \subsection{Understandability and Politeness Requirements}
-\begin{enumerate}[label=\bfseries UR-\arabic*:, wide=0pt, leftmargin=*,,ref=\bfseries UHR-UPR\arabic*]
-  \item \label{UHUPR1} Basic, non-technical language will be used (Sign-up instead of RSVP).\\[2mm]
+\begin{enumerate}[label=\bfseries UR-\arabic*:, wide=0pt, leftmargin=*,,ref=\bfseries UR-\arabic*]
+  \item \label{UR1} Basic, non-technical language will be used (Sign-up instead of RSVP).\\[2mm]
     {\bf Motivation:} Increases accessibility among non-technical users, or non-fluent English speakers.\\
-    {\bf Fit Criterion:} 80\% of students understand all wording without clarification.
-  \item \label{UHUPR2} The app shall communicate errors clearly and politely.\\[2mm]
+    {\bf Fit Criterion:} 80\% of students understand all wording without clarification.\\
+    {\bf Goals:} G-5
+  \item \label{UR2} The app shall communicate errors clearly and politely.\\[2mm]
     {\bf Motivation:} Clear error messages reduce frustration and improve user experience.\\
-    {\bf Fit Criterion:} Feedback suggests that 80\% of students found the experience satisfying.
-  \item \label{UHUPR3} The app shall hide sensitive and confidential information from users.\\[2mm]
+    {\bf Fit Criterion:} Feedback suggests that 80\% of students found the experience satisfying.\\
+    {\bf Goals:} G-5
+  \item \label{UR3} The app shall hide sensitive and confidential information from users.\\[2mm]
     {\bf Motivation:} Enhances security and confidence of organizations in the product.\\
-    {\bf Fit Criterion:} Approval from MES representative.
+    {\bf Fit Criterion:} Approval from MES representative.\\
+    {\bf Goals:} G-2, G-4
   \item Progress bars and confirmations shall be used to inform users of their status.\\[2mm]
     {\bf Motivation:} Improves user experience and reduces user abandonment.\\
-    {\bf Fit Criterion:} 90\% of students completed the form without leaving.
+    {\bf Fit Criterion:} 90\% of students completed the form without leaving.\\
+    {\bf Goals:} G-5
 \end{enumerate}
 
 \subsection{Accessibility Requirements}
-\begin{enumerate}[label=\bfseries AC-\arabic*:, wide=0pt, leftmargin=*,ref=\bfseries UHR-AR\arabic*]
-  \item \label{UHAR1} The app shall conform to WCAG 2.0 AA standards, improving visibility for impaired users.\\[2mm]
+\begin{enumerate}[label=\bfseries AC-\arabic*:, wide=0pt, leftmargin=*,ref=\bfseries AC-\arabic*]
+  \item \label{AC1} The app shall conform to WCAG 2.0 AA standards as per the Accessibility for Ontarians with Disabilities Act (AODA), improving visibility for impaired users.\\[2mm]
     {\bf Motivation:} Ensures accessibility for users with visual disabilities and impairments.\\
-    {\bf Fit Criterion:} Approval from a sample of students with impairments, and evaluation tools (WAVE Web Accessibility).
+    {\bf Fit Criterion:} Approval from a sample of students with impairments, and evaluation tools.\\
+    {\bf Goals:} G-5
 \end{enumerate}
 
 \section{Performance Requirements}
 \subsection{Speed and Latency Requirements}
-\begin{enumerate}[label=\bfseries SL-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall have a maximum 2-second latency for form loading, optimized for mobile devices.\\
+\begin{enumerate}[label=\bfseries SL-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries SL-\arabic*]
+  \item \label{SL1} The system shall have a maximum 2-second latency for form loading, optimized for mobile devices.\\
   {\bf Motivation:} Allows for faster registration process and avoids user abandonment.\\
-  {\bf Fit Criterion:} Conduct a load test on different devices to ensure it meets the threshold.
-  \item \label{PSLR2} Attendee information and backend analytics shall have a maximum 4-second latency.\\
-  {\bf Motivation:} Admins and organizers require responsive timing to stay on track.\\
-  {\bf Fit Criterion:} Performance test show that results load within threshold.
+  {\bf Fit Criterion:} Conduct a load test on different devices to ensure it meets the threshold.\\
+  {\bf Goals:} G-1, G-5
+  \item \label{SL2} \Gls{atd} information and backend analytics shall have a maximum 4-second latency.\\
+  {\bf Motivation:} \Glspl{adm} and organizers require responsive timing to stay on track.\\
+  {\bf Fit Criterion:} Performance test show that results load within threshold.\\
+  {\bf Goals:} G-3, G-4
 \end{enumerate}
 
 \subsection{Safety-Critical Requirements}
-\begin{enumerate}[label=\bfseries SC-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall ensure that no errors are introduced that could result in data leaks, violating privacy laws.\\
+\begin{enumerate}[label=\bfseries SC-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries SC-\arabic*]
+  \item \label{SC1} The system shall ensure that no errors are introduced that could result in data leaks, violating privacy laws.\\
   {\bf Motivation:} Crucial to ensure the security of the product to build confidence in users and avoid liability to violations.\\
   {\bf Fit Criterion:} Conduct security tests to ensure no data leaks occur.
 \end{enumerate}
 
 \subsection{Precision or Accuracy Requirements}
-\begin{enumerate}[label=\bfseries PC-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall display all backend analytics accurate to the decimal.\\
-  {\bf Motivation:} Admin depends on accurate analytics for logisitcs, and organizing events. Since we are dealing with discrete data, such as attendee count, there should be no issue having it 100\% accurate.\\
-  {\bf Fit Criterion:} Conduct performance test and compare records to displayed analytics.
+\begin{enumerate}[label=\bfseries PA-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries PA-\arabic*]
+  \item \label{PA1} The system shall display all backend analytics accurate to the decimal.\\
+  {\bf Motivation:} \Gls{adm} depends on accurate analytics for logisitcs, and organizing events. Since we are dealing with discrete data, such as attendee count, there should be no issue having it 100\% accurate.\\
+  {\bf Fit Criterion:} Conduct performance test and compare records to displayed analytics.\\
+  {\bf Goals:} G-3, G-4
 \end{enumerate}
 
 \subsection{Robustness or Fault-Tolerance Requirements}
-\begin{enumerate}[label=\bfseries FT-\arabic*:, wide=0pt, leftmargin=*]
-  \item \label{PTFR1} The system shall auto-save incomplete surveys every 30 seconds.\\
+\begin{enumerate}[label=\bfseries FT-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries FT-\arabic*]
+  \item \label{FT1} The system shall auto-save incomplete surveys every 30 seconds.\\
   {\bf Motivation:} Prevents loss of progress from mistakes or connectivity issues.\\
-  {\bf Fit Criterion:} Make new changes, wait 30 seconds, and refresh the page. The changes should still be present.
-  \item \label{PTFR2} The system shall locally queue changes and re-apply them after disconnects within 60 seconds.\\
+  {\bf Fit Criterion:} Make new changes, wait 30 seconds, and refresh the page. The changes should still be present.\\
+  {\bf Goals:} G-5
+  \item \label{FT2} The system shall locally queue changes and re-apply them after disconnects within 60 seconds.\\
   {\bf Motivation:} Maintains progress to a degree to avoid user frustration. Mobile users often lose their connection depending on location, so this is highly relevant.\\
-  {\bf Fit Criterion:}Make changes to the form while offline, and then go back online. The changes should be saved and applied within 60 seconds.
-  \item \label{PTFR3} The system shall allow new form modules to be added without any downtime.\\
+  {\bf Fit Criterion:} Make changes to the form while offline, and then go back online. The changes should be saved and applied within 60 seconds.\\
+  {\bf Goals:} G-3, G-5
+  \item \label{FT3} The system shall allow new form modules to be added without any downtime.\\
   {\bf Motivation:} Ensures that different organizers can add forms for their respective events without disrupting other ongoing events.\\
-  {\bf Fit Criterion:} Add a new form module while an event is ongoing, and ensure no downtime or data loss occurs.
-  \item \label{PTFR4} The system shall allow \glspl{adm} to update event templates without disruption
+  {\bf Fit Criterion:} Add a new form module while an event is ongoing, and ensure no downtime or data loss occurs.\\
+  {\bf Goals:} G-1
+  \item \label{FT4} The system shall allow \glspl{adm} to update event templates without disruption
     during ongoing events.\\
   {\bf Motivation:} Ensures that organizers can make live changes without disrupting the event.\\
-  {\bf Fit Criterion:} Update an event template while an event is ongoing, and ensure no downtime or data loss occurs.
-  \item \label{PTFR5} The system shall display a last updated signifier for all analytics.\\
+  {\bf Fit Criterion:} Update an event template while an event is ongoing, and ensure no downtime or data loss occurs.\\
+  {\bf Goals:} G-1
+  \item \label{FT5} The system shall display a last updated signifier for all analytics.\\
   {\bf Motivation:} Ensures that organizers can trust the data they are viewing.\\
-  {\bf Fit Criterion:} Record time of live analytics as they are updated, then wait and go offline. Compare and make sure the last updated timestamp is accurate.
+  {\bf Fit Criterion:} Record time of live analytics as they are updated, then wait and go offline. Compare and make sure the last updated timestamp is accurate.\\
+  {\bf Goals:} G-3, G-4
   \end{enumerate}
 
 \subsection{Capacity Requirements}
 \begin{enumerate}[label=\bfseries CR-\arabic*:, wide=0pt, leftmargin=*]
   \item The system shall support 2047 concurrent users during peak event times.\\
   {\bf Motivation:} Ensures workflow is maintained during surges in usage.\\
-  {\bf Fit Criterion:} Conduct performance test with 100 concurrent users with minimal error rate and latency meeting PR-1 and PR-2.
+  {\bf Fit Criterion:} Conduct performance test with 100 concurrent users with minimal error rate and latency. See \label{PR1} and \label{PR2}.\\
+  {\bf Goals:} G-2, G-3, G-4
   \item The system database shall support up to 50,000 total user entries.\\
   {\bf Motivation:} Large events over the scope of the year require large tables. Ensures that the product can scale with the growing number of MES events and users.\\
-  {\bf Fit Criterion:} Create 50,000 test rows in the database. Check that they are stored correctly and that table interactions (filter, search) exhibit latency according to PR-1 and PR-2.
+  {\bf Fit Criterion:} Create 50,000 test rows in the database. Check that they are stored correctly and that table interactions (filter, search) exhibit latency. See \label{PR1} and \label{PR2}.\\
+  {\bf Goals:} G-2, G-3, G-4
 \end{enumerate}
 
 \subsection{Scalability or Extensibility Requirements}
-\begin{enumerate}[label=\bfseries SE-\arabic*:, wide=0pt, leftmargin=*]
-  \item \label{PSER1} The system shall support up to 2047 registrations per event.
-  \item \label{PSER2} The system shall be designed to allow for new analytic modules to be added in the future.\\
+\begin{enumerate}[label=\bfseries SE-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries SE-\arabic*]
+  \item \label{SE1} The system shall support up to 2047 registrations per event.
+  \item \label{SE2} The system shall be designed to allow for new analytic modules to be added in the future.\\
   {\bf Motivation:} As MES events evolve, new analytics may be required. Ensures that the product can adapt to future needs.\\
-  {\bf Fit Criterion:} Design the system to allow for easy integration of new modules without major refactoring.
+  {\bf Fit Criterion:} Design the system to allow for easy integration of new modules without major refactoring.\\
+  {\bf Goals:} G-3, G-4
 \end{enumerate}
 
 \subsection{Longevity Requirements}
-\begin{enumerate}[label=\bfseries LG-\arabic*:, wide=0pt, leftmargin=*]
-  \item The system shall be maintainable to fit future changes in \textit{React} or coding standards.\\
+\begin{enumerate}[label=\bfseries LG-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries LG-\arabic*]
+  \item \label{LG1} The system shall be maintainable to fit future changes in \textit{React} or coding standards.\\
     {\bf Motivation:} Ensures the tool can be updated easily to maintain usage over time.\\
-    {\bf Fit Criterion:} Thorough documentation, and modular coding practices.
-  \item The system shall support data portability.\\
+    {\bf Fit Criterion:} Thorough documentation, and modular coding practices.\\
+    {\bf Goals:} All
+  \item \label{LG2} The system shall support data portability.\\
     {\bf Motivation:} Exporting the data and storing is elsewhere allows to maintain space for future events.\\
-    {\bf Fit Criterion:} Successfully exporting data to CSV/Excel formats.
+    {\bf Fit Criterion:} Successfully exporting data to CSV/Excel formats.\\
+    {\bf Goals:} G-3, G-4
 \end{enumerate}
 
 \section{Operational and Environmental Requirements}
@@ -1171,7 +1190,7 @@ Below are formal state diagrams showing the different states of the system and t
 \begin{enumerate}[label=\bfseries PE-\arabic*:, wide=0pt, leftmargin=*]
   \item The system shall be used in convential device conditions (connection, temperature, humidity).\\
     {\bf Motivation:} Clarifies the system is expected to be used in typical environmental conditions for a mobile device. If in an environment with extreme conditions where the device will not function, the system will naturally not function either.\\
-    {\bf Fit Criterion:} The device functions normally and can use other apps.
+    {\bf Fit Criterion:} The device functions normally and can use other apps.\\
 \end{enumerate}
 
 \subsection{Wider Environment Requirements}
