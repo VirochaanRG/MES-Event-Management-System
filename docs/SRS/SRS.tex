@@ -1,1383 +1,1560 @@
-% THIS DOCUMENT IS TAILORED TO REQUIREMENTS FOR SCIENTIFIC COMPUTING.  IT SHOULDN'T
-% BE USED FOR NON-SCIENTIFIC COMPUTING PROJECTS
+% THIS DOCUMENT IS FOLLOWS THE VOLERE TEMPLATE BY Suzanne Robertson and James Robertson
+% ONLY THE SECTION HEADINGS ARE PROVIDED
+%
+% Initial draft from https://github.com/Dieblich/volere
+%
+% Risks are removed because they are covered by the Hazard Analysis
 \documentclass[12pt]{article}
 
-\usepackage{amsmath, mathtools}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{graphicx}
-\usepackage{colortbl}
-\usepackage{xr}
-\usepackage{hyperref}
-\usepackage{longtable}
-\usepackage{xfrac}
-\usepackage{tabularx}
-\usepackage{float}
-\usepackage{siunitx}
 \usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{graphicx}
 \usepackage{caption}
-\usepackage{pdflscape}
-\usepackage{afterpage}
-
-\usepackage[round]{natbib}
-
-%\usepackage{refcheck}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage[english]{babel}
+\usepackage[acronym,nonumberlist]{glossaries}
 
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
-      colorlinks=true,       % false: boxed links; true: colored links
+      colorlinks=true,      % false: boxed links; true: colored links
     linkcolor=red,          % color of internal links (change box color with linkbordercolor)
     citecolor=green,        % color of links to bibliography
     filecolor=magenta,      % color of file links
     urlcolor=cyan           % color of external links
 }
 
+\makenoidxglossaries
+\newacronym{mes}{MES}{McMaster Engineering Society}
+\newacronym{cfes}{CFES}{Canadian Federation of Engineering Students}
+\newglossaryentry{adm}{
+  name=admin,
+  description={A privileged system user affiliated with \gls{mes} who can access survey, event, and attendee records;
+  track finances; and update event statuses.}
+  plural=admins,
+}
+\newglossaryentry{atd}{
+  name=attendee,
+  description={An individual who attends an \gls{mes} event, and uses the system to register, receive event updates,
+  provide feedback, or fill out survey responses.}
+  plural=attendees,
+}
+
+\newcommand{\lips}{\textit{Insert your content here.}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\renewcommand{\glossarysection}[2][]{}
+
 \input{../Comments}
 \input{../Common}
 
-% For easy change of table widths
-\newcommand{\colZwidth}{1.0\textwidth}
-\newcommand{\colAwidth}{0.13\textwidth}
-\newcommand{\colBwidth}{0.82\textwidth}
-\newcommand{\colCwidth}{0.1\textwidth}
-\newcommand{\colDwidth}{0.05\textwidth}
-\newcommand{\colEwidth}{0.8\textwidth}
-\newcommand{\colFwidth}{0.17\textwidth}
-\newcommand{\colGwidth}{0.5\textwidth}
-\newcommand{\colHwidth}{0.28\textwidth}
-
-% Used so that cross-references have a meaningful prefix
-\newcounter{defnum} %Definition Number
-\newcommand{\dthedefnum}{GD\thedefnum}
-\newcommand{\dref}[1]{GD\ref{#1}}
-\newcounter{datadefnum} %Datadefinition Number
-\newcommand{\ddthedatadefnum}{DD\thedatadefnum}
-\newcommand{\ddref}[1]{DD\ref{#1}}
-\newcounter{theorynum} %Theory Number
-\newcommand{\tthetheorynum}{TM\thetheorynum}
-\newcommand{\tref}[1]{TM\ref{#1}}
-\newcounter{tablenum} %Table Number
-\newcommand{\tbthetablenum}{TB\thetablenum}
-\newcommand{\tbref}[1]{TB\ref{#1}}
-\newcounter{assumpnum} %Assumption Number
-\newcommand{\atheassumpnum}{A\theassumpnum}
-\newcommand{\aref}[1]{A\ref{#1}}
-\newcounter{goalnum} %Goal Number
-\newcommand{\gthegoalnum}{GS\thegoalnum}
-\newcommand{\gsref}[1]{GS\ref{#1}}
-\newcounter{instnum} %Instance Number
-\newcommand{\itheinstnum}{IM\theinstnum}
-\newcommand{\iref}[1]{IM\ref{#1}}
-\newcounter{reqnum} %Requirement Number
-\newcommand{\rthereqnum}{R\thereqnum}
-\newcommand{\rref}[1]{R\ref{#1}}
-\newcounter{nfrnum} %NFR Number
-\newcommand{\rthenfrnum}{NFR\thenfrnum}
-\newcommand{\nfrref}[1]{NFR\ref{#1}}
-\newcounter{lcnum} %Likely change number
-\newcommand{\lthelcnum}{LC\thelcnum}
-\newcommand{\lcref}[1]{LC\ref{#1}}
-
-\usepackage{fullpage}
-
-\newcommand{\deftheory}[9][Not Applicable]
-{
-\newpage
-\noindent \rule{\textwidth}{0.5mm}
-
-\paragraph{RefName: } \textbf{#2} \phantomsection 
-\label{#2}
-
-\paragraph{Label:} #3
-
-\noindent \rule{\textwidth}{0.5mm}
-
-\paragraph{Equation:}
-
-#4
-
-\paragraph{Description:}
-
-#5
-
-\paragraph{Notes:}
-
-#6
-
-\paragraph{Source:}
-
-#7
-
-\paragraph{Ref.\ By:}
-
-#8
-
-\paragraph{Preconditions for \hyperref[#2]{#2}:}
-\label{#2_precond}
-
-#9
-
-\paragraph{Derivation for \hyperref[#2]{#2}:}
-\label{#2_deriv}
-
-#1
-
-\noindent \rule{\textwidth}{0.5mm}
-
-}
-
 \begin{document}
 
-\title{Software Requirements Specification for \progname: subtitle describing software} 
+\title{Software Requirements Specification for \progname: A Platform for Event Management }
 \author{\authname}
 \date{\today}
 	
 \maketitle
-
 ~\newpage
-
-\pagenumbering{roman}
 
 \tableofcontents
 
 ~\newpage
 
 \section*{Revision History}
-
-\begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
-\toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
+\begin{table}[hp]
+\caption{Revision History} \label{TblRevisionHistory}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+10/10/2025 & All & Rev0 of SRS\\
+... & ... & ...\\
 \bottomrule
 \end{tabularx}
+\end{table}
 
-~\\
-\plt{This template is intended for use by CAS 741.  For CAS 741 the template
-should be used exactly as given, except the Reflection Appendix can be deleted.
-For the capstone course it is a source of ideas, but shouldn't be followed
-exactly.  The exception is the reflection appendix.  All capstone SRS documents
-should have a reflection appendix.}
 
 ~\newpage
+\section{Purpose of the Project}
 
-\section{Reference Material}
+The purpose of this project is to create a centralized platform for the \gls{mes} that simplifies how large-scale events
+are managed. By consolidating event registration, form creation, attendee tracking, and data analytics into a single
+system, the platform aims to reduce administrative workload, eliminate fragmented workflows, and enhance the overall
+experience for both event organizers and attendees.
 
-This section records information for easy reference.
+\subsection{User Business}
 
-\subsection{Table of Units}
+The primary users of this system are members of the McMaster Engineering Society, including executives and event
+organizers, as well as McMaster engineering students who attend \gls{mes} events.
 
-Throughout this document SI (Syst\`{e}me International d'Unit\'{e}s) is employed
-as the unit system.  In addition to the basic units, several derived units are
-used as described below.  For each unit, the symbol is given followed by a
-description of the unit and the SI name.
-~\newline
-
-\renewcommand{\arraystretch}{1.2}
-%\begin{table}[ht]
-  \noindent \begin{tabular}{l l l} 
-    \toprule		
-    \textbf{symbol} & \textbf{unit} & \textbf{SI}\\
-    \midrule 
-    \si{\metre} & length & metre\\
-    \si{\kilogram} & mass	& kilogram\\
-    \si{\second} & time & second\\
-    \si{\celsius} & temperature & centigrade\\
-    \si{\joule} & energy & joule\\
-    \si{\watt} & power & watt (W = \si{\joule\per\second})\\
-    \bottomrule
-  \end{tabular}
-  %	\caption{Provide a caption}
-%\end{table}
-
-\plt{Only include the units that your SRS actually uses.}
-
-\plt{Derived units, like newtons, pascal, etc, should show their derivation
-    (the units they are derived from) if their constituent units are in the
-    table of units (that is, if the units they are derived from are used in the
-    document).  For instance, the derivation of pascals as
-    $\si{\pascal}=\si{\newton\per\square\meter}$ is shown if newtons and m are
-    both in the table.  The derivations of newtons would not be shown if kg and
-    s are not both in the table.}
-
-\plt{The symbol for units named after people use capital letters, but the name
-  of the unit itself uses lower case.  For instance, pascals use the symbol Pa,
-  watts use the symbol W, teslas use the symbol T, newtons use the symbol N,
-  etc.  The one exception to this is degree Celsius.  Details on writing metric
-  units can be found on the 
-  \href{https://www.nist.gov/pml/weights-and-measures/writing-metric-units}
-  {NIST} web-page.}
-
-\subsection{Table of Symbols}
-
-The table that follows summarizes the symbols used in this document along with
-their units.  The choice of symbols was made to be consistent with the heat
-transfer literature and with existing documentation for solar water heating
-systems.  The symbols are listed in alphabetical order.
-
-\renewcommand{\arraystretch}{1.2}
-%\noindent \begin{tabularx}{1.0\textwidth}{l l X}
-\noindent \begin{longtable*}{l l p{12cm}} \toprule
-\textbf{symbol} & \textbf{unit} & \textbf{description}\\
-\midrule 
-$A_C$ & \si[per-mode=symbol] {\square\metre} & coil surface area
-\\
-$A_\text{in}$ & \si[per-mode=symbol] {\square\metre} & surface area over 
-which heat is transferred in
-\\ 
-\bottomrule
-\end{longtable*}
-\plt{Use your problems actual symbols.  The si package is a good idea to use for
-  units.}
-
-\subsection{Abbreviations and Acronyms}
-
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{l l} 
-  \toprule		
-  \textbf{symbol} & \textbf{description}\\
-  \midrule 
-  A & Assumption\\
-  DD & Data Definition\\
-  GD & General Definition\\
-  GS & Goal Statement\\
-  IM & Instance Model\\
-  LC & Likely Change\\
-  PS & Physical System Description\\
-  R & Requirement\\
-  SRS & Software Requirements Specification\\
-  \progname{} & \plt{put an expanded version of your program name here (as appropriate)}\\
-  TM & Theoretical Model\\
-  \bottomrule
-\end{tabular}\\
-
-\plt{Add any other abbreviations or acronyms that you add}
-
-\subsection{Mathematical Notation}
-
-\plt{This section is optional, but should be included for projects that make use
-  of notation to convey mathematical information.  For instance, if typographic
-  conventions (like bold face font) are used to distinguish matrices, this
-  should be stated here.  If symbols are used to show mathematical operations,
-  these should be summarized here.  In some cases the easiest way to summarize
-  the notation is to point to a text or other source that explains the
-  notation.}
-
-\plt{This section was added to the template because some students use very
-  domain specific notation.  This notation will not be readily understandable to
-  people outside of your domain.  It should be explained.}
-
-\newpage
-
-\pagenumbering{arabic}
-
-\plt{This SRS template is based on \citet{SmithAndLai2005, SmithEtAl2007,
-  SmithAndKoothoor2016}.  It will get you started.  You should not modify the
-  section headings, without first discussing the change with the course
-  instructor.  Modification means you are not following the template, which
-  loses some of the advantage of a template, especially standardization.
-  Although the bits shown below do not include type information, you may need to
-  add this information for your problem.  If you are unsure, please can ask the
-  instructor.}
-
-\plt{Feel free to change the appearance of the report by modifying the LaTeX
-  commands.}
-
-\plt{This template document assumes that a single program is being documented.
-  If you are documenting a family of models, you should start with a commonality
-  analysis.  A separate template is provided for this.  For program
-  families you should look at \cite{Smith2006, SmithMcCutchanAndCarette2017}.
-  Single family member programs are often programs based on a single physical
-  model.  General purpose tools are usually documented as a family.  Families of
-  physical models also come up.}
-
-\plt{The SRS is not generally written, or read, sequentially.  The SRS is a
-  reference document.  It is generally read in an ad hoc order, as the need
-  arises.  For writing an SRS, and for reading one for the first time, the
-  suggested order of sections is:
 \begin{itemize}
-\item Goal Statement
-\item Instance Models
-\item Requirements
-\item Introduction
-\item Specific System Description
+    \item \textbf{Administrators (\gls{mes} Executives and Organizers):} Responsible for creating events, designing
+      registration and feedback forms, managing attendee information, and analyzing data through the dashboard. They
+      will use the platform to reduce manual work and improve event coordination.
+    \item \textbf{End Users (Students and Attendees):} Students will use the platform to register for events, complete
+      waivers or feedback forms, and receive event confirmations and updates. The goal is to create a seamless and
+      engaging experience that encourages participation.
 \end{itemize}
-}
 
-\plt{Guiding principles for the SRS document:
+By serving both groups through a single platform, the system eliminates redundant workflows and ensures continuity of
+data across multiple events.
+
+\subsection{Goals of the Project}
+
+The primary goals of this project are as follows:
+
+\begin{enumerate}
+    \item \textbf{Develop a Custom Form Builder:} Build an intuitive tool that lets administrators design and manage
+      event or feedback forms with different question types and conditional logic, without needing third-party software.
+    \item \textbf{Implement a Unified Registration and Feedback System:} Create a simple, centralized process for
+      students to register for events, complete waivers, and share feedback—all in one place.
+    \item \textbf{Create an Attendee Overview Dashboard:} Give administrators a clear view of event participation by
+      displaying key details such as registration status, payments, and waiver completion in real time.
+    \item \textbf{Integrate Backend Analytics:} Include tools that help \gls{mes} organizers analyze event data, track
+      trends, and use insights to plan and improve future events more effectively.
+\end{enumerate}
+
+
+
+\section{Stakeholders}
+\subsection{Client}
+The client for this project is the supervisor, Luke Schuurman. He is a member of the \gls{mes} and has first-hand
+experience planning and hosting events with the \gls{mes}. As the supervisor he will play a crucial role by ensuring the
+project aligns with objective of the \gls{mes} and integrate the platform seamlessly with existing systems. He will also
+provide us with feedback and guidance throughout the project and will help define the project requirements in this
+document.
+% \subsection{Customer}
+% \lips
+% \subsection{Other Stakeholders}
+% \lips
+\subsection{Hands-On Users of the Project}
+\textbf{\gls{mes} Executives and Council Members}: They will be utilizing this system to create and manage events,
+configure forms and surveys, monitor event data and generate data analytics reports. They can be characterized as
+primarily undergraduate students who value their time greatly. They aim to reduce the time taken to do administrative
+tasks as well as provide a better experience during \gls{mes} events. Their experience with systems like this can range
+from Journeyman - Master as they can be experienced in event planning and student engagement. There may be a slight
+learning curve to utilizing the new technology, but these users have experience performing these functions.\\
+\newline
+\textbf{McMaster Engineering Students}: They will be utilizing this app to register for events, purchase tickets, sign
+waivers, check in at venues, and complete feedback surveys. They want to enjoy their university experience and connect
+with other students, They are also very busy and value their time greatly so are looking for an intuitive and
+straightforward user experience. Their general experience with systems like this is Journeyman as they may have used
+similar systems for other use cases. \\
+\newline
+\textbf{Other Students and Guest Event Attendees}: This group includes non-engineering students, alumni, and invited
+guests who participate in large-scale \gls{mes} events such as the Fireball Formal and Graduation Formal, which extend
+beyond the core engineering community. It could also include students and guests from other universities as well as
+industry which attend the engineering conferences that the \gls{mes} helps host. They are generally looking for an easy
+and seamless experience registering and attending these events. Their general experience with systems like this is
+Journeyman as they may have used similar systems for other use cases.
+\subsection{Personas}
+\begin{enumerate}
+  \item \textbf{Matthew Cruise (Engineering Student)}: Matthew is a 20-year-old second-year Mechanical Engineering
+    student at McMaster University. He lives in a shared house near campus with two close friends. He enjoys attending
+    \gls{mes} events like pub nights and the Fireball Formal as a way to balance his heavy academic workload with some
+    enjoyment and entertainment. He usually hears about events through word-of-mouth or social media and would prefer an
+    easy and effortless way to find and register for events. Matthew is generally tech-savvy and is comfortable using
+    online platforms but doesn't want to be bothered by too many notifications and forms. He has many ideas on how he
+    can generally improve his university experience but doesn't believe he has an outlet to convey them. For Matthew his
+    priority is convenience as he wants to enjoy himself but doesn't want to spend too much time or effort doing so.
+  \item \textbf{Adam Clooney (\gls{mes} Executive)}: Adam Clooney is a 22-year-old final-year Civil Engineering student
+    who currently serves as VP Social on the \gls{mes}. He is responsible for coordinating large-scale events like
+    Fireball Formal, working closely with other council members to handle logistics, advertising, and student
+    engagement. Adam is outgoing and enjoys bringing people together, but often feels the strain of balancing his role
+    with academic responsibilities. He is proficient with common digital tools such as Google Drive, spreadsheets, and
+    design platforms for promotions, but he’s not highly technical. Adam appreciates structure and tools that keep
+    things organized because he dislikes wasting time fixing errors or repeating work. He is motivated by the sense of
+    accomplishment that comes from hosting a successful event and wants tools that help him stay on top of details.
+  \item \textbf{Margot Watson (McMaster Student)}: Margot Watson is a 21-year-old undergraduate student in Political
+    Science at McMaster University. Although she is not part of the engineering faculty, she often attends large
+    \gls{mes}-hosted events such as the Fireball Formal and other socials because many of her friends are in
+    engineering. Margot lives in an off-campus apartment with two roommates and enjoys being involved in student life
+    across faculties. She has a relaxed attitude toward technology since she uses her phone daily for social media and
+    messaging, but she prefers things to be straightforward and intuitive. She is cautious with her money, balancing
+    tuition and living expenses, but she’s willing to spend on experiences with friends. She is motivated by spending
+    time with her friends and having good experiences to have a fulfilling student life.
+\end{enumerate}
+\subsection{Priorities Assigned to Users}
+\textbf{Key Users:} Luke Schuurman, \gls{mes} Council Members and Executives, McMaster Engineering Students. \\
+\textbf{Secondary Users:} Other Students and Guest Event Attendees.
+\subsection{User Participation}
+Our requirements will primarily be derived through meetings with our supervisor Luke Schuurman. If we have the need to
+clarify or elicit more requirements we will look to engage other \gls{mes} members either through our supervisor or
+directly.
+
+% \subsection{Maintenance Users and Service Technicians}
+% \lips
+
+\section{Mandated Constraints}
+\subsection{Solution Constraints}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SOC-\arabic*:]
+  \item The solution must provide web and mobile apps with \gls{adm} and \gls{atd} interfaces.\\[2mm]
+    {\bf Motivation:} Mandated by the client.
+\end{enumerate}
+
+\subsection{Implementation Environment of the Current System}
+The current \gls{mes} system is manual, decentralized, and fragmented, relying on:
 \begin{itemize}
-\item Do not repeat the same information at the same abstraction level.  If
-  information is repeated, the repetition should be at a different abstraction
-  level.  For instance, there will be overlap between the scope section and the
-  assumptions, but the scope section will not go into as much detail as the
-  assumptions section.
+  \item Google Forms for registration and feedback
+  \item Google Sheets for data and attendee management
+  \item Email and Discord for communication
+  \item Manual payment reconciliation for ticketing
+  \item Third-party services for waiver management
 \end{itemize}
-}
 
-\plt{The template description comments should be disabled before submitting this
-  document for grading.}
+There are currently no integrated or centralized backend systems or databases. The system will be implemented in a
+fresh environment with no legacy migration necessary; however, it must import past event data from spreadsheets or
+other logs if necessary.
 
-\plt{You can borrow any wording from the text given in the template.  It is part
-  of the template, and not considered an instance of academic integrity.  Of
-  course, you need to cite the source of the template.}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries IEC-\arabic*:]
+  \item The system shall be implemented in a new environment with no pre-existing infrastructure.\\[2mm]
+    {\bf Motivation:} See above.
+\end{enumerate}
 
-\plt{When the documentation is done, it should be possible to trace back to the
-  source of every piece of information.  Some information will come from
-  external sources, like terminology.  Other information will be derived, like
-  General Definitions.}
+\subsection{Partner or Collaborative Applications}
+This project is to be integrated alongside two others for \gls{mes}. Since this project is done in partial
+collaboration with two other Capstone groups, measures need to be implemented to ensure interoperability.
 
-\plt{An SRS document should have the following qualities: unambiguous,
-  consistent, complete, validatable, abstract and traceable.}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries PCC-\arabic*:]
+  \item The system must facilitate interoperability between projects and ensure collaborating projects can access
+    necessary APIs, components, or database schemas.\\[2mm]
+    {\bf Motivation:} Data and components created in this project will be integrated with other projects to
+    create a unified application.
+\end{enumerate}
 
-\plt{The overall goal of the SRS is that someone that meets the Characteristics
-  of the Intended Reader (Section~\ref{sec_IntendedReader}) can learn,
-  understand and verify the captured domain knowledge.  They should not have to
-  trust the authors of the SRS on any statements.  They should be able to
-  independently verify/derive every statement made.}
+\subsection{Off-the-Shelf Software}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries OSC-\arabic*:]
+  \item The system must implement a bespoke and original form-builder application.\\[2mm]
+    {\bf Motivation:} Mandated by the client.
+\end{enumerate}
 
-\section{Introduction}
+There are no other constraints regarding the use of pre-existing solutions, though the use of open-source components and
+solutions is encouraged.
+\subsection{Development Environment Constraints}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries DEC-\arabic*:]
+  \item The system must be developed using the Git submodule structure outlined by the client.\\[2mm]
+    {\bf Motivation:} Mandated by the client; the development process is currently being created by the client.
+  \item The system must use the {\bf Vite + TanStack + PostgreSQL} technology stack.\\[2mm]
+    {\bf Motivation:} Mandated by the client.
+\end{enumerate}
 
-\plt{The introduction section is written to introduce the problem.  It starts
-  general and focuses on the problem domain. The general advice is to start with
-a paragraph or two that describes the problem, followed by a ``roadmap''
-paragraph.  A roadmap orients the reader by telling them what sub-sections to
-expect in the Introduction section.}
+\subsection{Schedule Constraints}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SCC-\arabic*:]
+  \item A working prototype of the system must be made available by January.\\[2mm]
+    {\bf Motivation:} The client wishes to use the system for events happening in Winter 2026.
+  \item All documentation deliverables must be submitted in accordance to course deadlines as outline in Development
+    Plan \S \ 8, subject to changes as updated by course instructors.\\[2mm]
+    {\bf Motivation:} Course requirement.
+\end{enumerate}
 
-\subsection{Purpose of Document}
+\subsection{Budget Constraints}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries BGC-\arabic*:]
+  \item There is no budget allocated for the project. All hosting services will be provided by the client on behalf of
+    \gls{mes}.\\[2mm]
+    {\bf Motivation:} Mandated by the client.
+\end{enumerate}
 
-\plt{This section summarizes the purpose of the SRS document.  It does not focus
-  on the problem itself.  The problem is described in the ``Problem
-  Description'' section (Section~\ref{Sec_pd}).  The purpose is for the document
-  in the context of the project itself, not in the context of this course.
-  Although the ``purpose'' of the document is to get a grade, you should not
-  mention this.  Instead, ``fake it'' as if this is a real project.  The purpose
-  section will be similar between projects.  The purpose of the document is the
-  purpose of the SRS, including communication, planning for the design stage,
-  etc.}
+\subsection{Enterprise Constraints}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries EPC-\arabic*:]
+  \item All intellectual property produced during the project will be made available under the GPLv3 license as
+    outlined in the Development Plan \S \ 3.\\[2mm]
+    {\bf Motivation:} Selected license for the project. This also allows the client to maintain and improve the
+    IP as required after the completion of this project.
+\end{enumerate}
 
-\subsection{Scope of Requirements} 
+\section{Naming Conventions and Terminology}
+\subsection{Glossary of All Terms, Including Acronyms, Used by Stakeholders
+involved in the Project}
+\glsaddall
+\printnoidxglossaries
 
-\plt{Modelling the real world requires simplification.  The full complexity of
-  the actual physics, chemistry, biology is too much for existing models, and
-  for existing computational solution techniques.  Rather than say what is in
-  the scope, it is usually easier to say what is not.  You can think of it as
-  the scope is initially everything, and then it is constrained to create the
-  actual scope.  For instance, the problem can be restricted to 2 dimensions, or
-  it can ignore the effect of temperature (or pressure) on the material
-  properties, etc.}  
+\section{Relevant Facts And Assumptions}
 
-\plt{The scope section is related to the assumptions section
-  (Section~\ref{sec_assumpt}).  However, the scope and the assumptions are not
-  at the same level of abstraction.  The scope is at a high level.  The focus is
-  on the ``big picture'' assumptions.  The assumptions section lists, and
-  describes, all of the assumptions.}
+\subsection{Relevant Facts}
 
-\plt{The scope section is relevant for later determining typical values of inputs. The scope should make it clear what inputs are reasonable to expect. This is a distinction between scope and context (context is a later section).  Scope affects the inputs while context affects how the software will be used.}
+\begin{itemize}
+    \item The McMaster Engineering Society currently manages events such as Fireball Formal and the CALE Conference
+      using several disconnected tools like Google Forms and Google Sheets, which creates inefficiencies and limits data
+      analysis.
+    \item Each \gls{mes} event involves registration, waiver collection, and feedback surveys that must comply with
+      university data privacy and accessibility standards.
+    \item The system will be used by both administrators and students on a wide range of devices and browsers, so
+      responsive and cross-platform design is required.
+    \item The overall Event Management System is being co-developed by three Capstone teams. Project A must maintain
+      compatibility and shared data models with the other two teams’ components.
+    \item The project’s frontend stack was recently updated from \textbf{Next.js} to \textbf{Vite + TanStack Router +
+      TanStack Create} to improve development speed, hot reloading performance, and flexibility for building a Single
+      Page Application (SPA) with integrated admin dashboards and authentication.
+    \item PostgreSQL remains the chosen database technology for data storage and analytics.
+\end{itemize}
 
-\subsection{Characteristics of Intended Reader} \label{sec_IntendedReader}
+\subsection{Business Rules}
 
-\plt{This section summarizes the skills and knowledge of the readers of the
-  SRS.  It does NOT have the same purpose as the ``User Characteristics''
-  section (Section~\ref{SecUserCharacteristics}).  The intended readers are the
-  people that will read, review and maintain the SRS.  They are the people that
-  will conceivably design the software that is intended to meet the
-  requirements.  The user, on the other hand, is the person that uses the
-  software that is built.  They may never read this SRS document.  Of course,
-  the same person could be a ``user'' and an ``intended reader.''}
+\begin{itemize}
+    \item Only verified \gls{mes} administrators can create, edit, or delete forms and view backend analytics.
+    \item Event data, form responses, and attendee details must be securely stored and retrievable for future event
+      reviews.
+    \item All user input will be validated to prevent incomplete or invalid submissions before being stored in the
+      database.
+    \item A consistent data format must be maintained across all events to support accurate analytics and report
+      generation.
+    \item Administrators can export data such as attendee lists or analytics summaries in standard formats (e.g., CSV,
+      PDF).
+\end{itemize}
 
-\plt{The intended reader characteristics should be written as unambiguously and
-  as specifically as possible.  Rather than say, the user should have an
-  understanding of physics, say what kind of physics and at what level.  For
-  instance, is high school physics adequate, or should the reader have had a
-  graduate course on advanced quantum mechanics?}
+\subsection{Assumptions}
 
-\subsection{Organization of Document}
+\begin{itemize}
+    \item The \gls{mes} will provide sample event and registration data to support development and testing.
+    \item Users will have stable internet access when using the platform, as it relies on real-time connectivity.
+    \item Collaborating teams (Projects B and C) will follow the agreed API and database specifications to ensure system
+      integration works smoothly.
+    \item Authentication and authorization will be handled securely within the shared platform using standardized
+      methods.
+    \item Future \gls{mes} administrators and developers will continue maintaining the project using the provided GitHub
+      repository, documentation, and CI/CD workflows.
+\end{itemize}
 
-\plt{This section provides a roadmap of the SRS document.  It will help the
-  reader orient themselves.  It will provide direction that will help them
-  select which sections they want to read, and in what order.  This section will
-  be similar between project.}
+\section{The Scope of the Work}
 
-\plt{Include a reference to the template (\citet{SmithAndLai2005, SmithEtAl2007,
-  SmithAndKoothoor2016}) you are using in the documentation in the Organization of
-  the Document section.}
-  
+The purpose of the section is to define the expected scope of the project, including specifications on how the system is
+partitioned, business data models, and business use cases.
 
-\section{General System Description}
+\subsection{The Current Situation}
 
-This section provides general information about the system.  It identifies the
-interfaces between the system and its environment, describes the user
-characteristics and lists the system constraints.  \plt{This text can likely be
-  borrowed verbatim.}
+Currently, the \gls{mes} uses plethora of different platforms to host events and conduct surveys such as tools for
+registration, signing of waivers, and checking in \glspl{atd}. The main platforms used are a combination of Google Forms
+and Google Sheets. There are several pain points to address with the current system.
 
-\plt{The purpose of this section is to provide general information about the
-  system so the specific requirements in the next section will be easier to
-  understand. The general system description section is designed to be
-  changeable independent of changes to the functional requirements documented in
-  the specific system description. The general system description provides a
-  context for a family of related models.  The general description can stay the
-  same, while specific details are changed between family members.}
+\begin{itemize}
+  \item \textbf{Decentralized System Components} Registration and surveying is split across a plethora of tools and
+    software which may not be compatible with each other. For example, Google Forms is used for registration forms and
+    surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is
+    done by email or social media.
+  \item \textbf{Overly Complex Form Logic} The current \gls{cfes} survey consists of 70 pages of questions linked
+    together through complex branching logic. The Google Forms form building UI makes this very complicated as all form
+    elements are displayed as a linear list of sections making it very hard to track paths through the form.
+  \item \textbf{Disorganized Data Visualization} Form response data is currently stored using Google Sheets. While
+    Google Form data is easily imported into Google Sheets, any analytics on the data must be done manually through
+    equations and macros.
+  \item \textbf{Lack of Reusability} Google Forms comes with a few templates that provide an initial starting point for
+    many types of forms such as registrant information. However, after the first section of the form, each subsequent
+    section must be made manually. Sections may be imported from other forms, but this requires the user to have access
+    to a form with the wanted section and to scour through an unorganized list of forms and sections.
+  \item \textbf{Low Response Rates on Surveys} The response rates on the annual \gls{cfes} survey of undergraduate engineering
+    students have been decreasing due to the long length of the Google Form and the lack of ability to submit a
+    partially completed form.
+  \item \textbf{Manual Registration Scheduling} Event registration is managed through a combination of Instagram, Google
+    Forms, and LinkTree. Events are advertised on Instagram, and a link to the signup Google Form is posted on the
+    \gls{mes} LinkTree. This solution lacks automation since a new Google Form must be made for every event and links
+    have to be manually added and removed for each form when registration is opened or closed.
+\end{itemize}
 
-\subsection{System Context}
+% \gls{mes} hosts lots of events per year
+% Their event management system is unorganized
+% Consists of google forms, google sheets
+% No template form to work with redundant info between forms like name, number email, etc
+% Lots of steps to registration and split across too many platforms
+% The same thing is done for the annual \gls{cfes} survey of undergrad eng students
+% long 70 page form of complex branching logic, low response rate
+%
 
-\plt{Your system context will include a figure that shows the abstract view of
-  the software.  Often in a scientific context, the program can be viewed
-  abstractly following the design pattern of Inputs $\rightarrow$ Calculations
-  $\rightarrow$ Outputs.  The system context will therefore often follow this
-  pattern.  The user provides inputs, the system does the calculations, and then
-  provides the outputs to the user.  The figure should not show all of the
-  inputs, just an abstract view of the main categories of inputs (like material
-  properties, geometry, etc.).  Likewise, the outputs should be presented from
-  an abstract point of view.  In some cases the diagram will show other external
-  entities, besides the user.  For instance, when the software product is a
-  library, the user will be another software program, not an actual end user.
-  If there are system constraints that the software must work with external
-  libraries, these libraries can also be shown on the System Context diagram.
-  They should only be named with a specific library name if this is required by
-  the system constraint.}
 
-\begin{figure}[h!]
+\subsection{The Context of the Work}
+
+This section provides an overview of the high-level inputs and outputs between the system and external systems or
+actors.
+The system is split into two perspectives, the \gls{atd} perspective shown in \hyperref[fig:workcontextuser]{Figure
+\ref{fig:workcontextuser}}, and the \gls{adm} perspective shown in \hyperref[fig:workcontextadmin]{Figure
+\ref{fig:workcontextadmin}}.
+
 \begin{center}
- \includegraphics[width=0.6\textwidth]{SystemContextFigure}
-\caption{System Context}
-\label{Fig_SystemContext} 
-\end{center}
-\end{figure}
-
-\plt{For each of the entities in the system context diagram its responsibilities
-  should be listed.  Whenever possible the system should check for data quality,
-  but for some cases the user will need to assume that responsibility.  The list
-  of responsibilities should be about the inputs and outputs only, and they
-  should be abstract.  Details should not be presented here.  However, the
-  information should not be so abstract as to just say ``inputs'' and
-  ``outputs''.  A summarizing phrase can be used to characterize the inputs.
-  For instance, saying ``material properties'' provides some information, but it
-  stays away from the detail of listing every required properties.}
-
-\begin{itemize}
-\item User Responsibilities:
-\begin{itemize}
-\item 
-\end{itemize}
-\item \progname{} Responsibilities:
-\begin{itemize}
-\item Detect data type mismatch, such as a string of characters instead of a
-  floating point number
-\item 
-\end{itemize}
-\end{itemize}
-
-\plt{Identify in what context the software will typically be used.  Is it for
-exploration? education? engineering work? scientific work?. Identify whether it
-will be used for mission-critical or safety-critical applications.} \plt{This
-additional context information is needed to determine how much effort should be
-devoted to the rationale section.  If the application is safety-critical, the
-bar is higher.  This is currently less structured, but analogous to, the idea to
-the Automotive Safety Integrity Levels (ASILs) that McSCert uses in their
-automotive hazard analyses.}
-
-\subsection{User Characteristics} \label{SecUserCharacteristics}
-
-\plt{This section summarizes the knowledge/skills expected of the user.
-  Measuring usability, which is often a required non-function requirement,
-  requires knowledge of a typical user.  As mentioned above, the user is a
-  different role from the ``intended reader,'' as given in
-  Section~\ref{sec_IntendedReader}.  As in Section~\ref{sec_IntendedReader}, the
-  user characteristics should be specific an unambiguous.  For instance, ``The
-  end user of \progname{} should have an understanding of undergraduate Level 1
-  Calculus and Physics.''}
-
-\subsection{System Constraints}
-
-\plt{System constraints differ from other type of requirements because they
-  limit the developers' options in the system design and they identify how the
-  eventual system must fit into the world. This is the only place in the SRS
-  where design decisions can be specified.  That is, the quality requirement for
-  abstraction is relaxed here.  However, system constraints should only be
-  included if they are truly required.}
-
-\section{Specific System Description}
-
-This section first presents the problem description, which gives a high-level
-view of the problem to be solved.  This is followed by the solution characteristics
-specification, which presents the assumptions, theories, definitions and finally
-the instance models.  \plt{Add any project specific details that are relevant
-  for the section overview.}
-
-\subsection{Problem Description} \label{Sec_pd}
-
-\progname{} is intended to solve ... \plt{What problem does your program solve?
-The description here should be in the problem space, not the solution space.}
-
-\subsubsection{Terminology and  Definitions}
-
-\plt{This section is expressed in words, not with equations.  It provide the
-  meaning of the different words and phrases used in the domain of the problem.
-The terminology is used to introduce concepts from the world outside of the
-mathematical model  The terminology provides a real world connection to give the
-mathematical model meaning.}
-
-This subsection provides a list of terms that are used in the subsequent
-sections and their meaning, with the purpose of reducing ambiguity and making it
-easier to correctly understand the requirements:
-
-\begin{itemize}
-
-\item 
-
-\end{itemize}
-
-\subsubsection{Physical System Description} \label{sec_phySystDescrip}
-
-\plt{The purpose of this section is to clearly and unambiguously state the
-  physical system that is to be modelled. Effective problem solving requires a
-  logical and organized approach. The statements on the physical system to be
-  studied should cover enough information to solve the problem. The physical
-  description involves element identification, where elements are defined as
-  independent and separable items of the physical system. Some example elements
-  include acceleration due to gravity, the mass of an object, and the size and
-  shape of an object. Each element should be identified and labelled, with their
-  interesting properties specified clearly. The physical description can also
-  include interactions of the elements, such as the following: i) the
-  interactions between the elements and their physical environment; ii) the
-  interactions between elements; and, iii) the initial or boundary conditions.}
-
-\plt{The elements of the physical system do not have to correspond to an actual
-physical entity.  They can be conceptual.  This is particularly important when
-the documentation is for a numerical method. }
-
-The physical system of \progname{}, as shown in Figure~?,
-includes the following elements:
-
-\begin{itemize}
-
-\item[PS1:] 
-
-\item[PS2:] ...
-
-\end{itemize}
-
-\plt{A figure here makes sense for most SRS documents}
-
-% \begin{figure}[h!]
-% \begin{center}
-% %\rotatebox{-90}
-% {
-%  \includegraphics[width=0.5\textwidth]{<FigureName>}
-% }
-% \caption{\label{<Label>} <Caption>}
-% \end{center}
-% \end{figure}
-
-\subsubsection{Goal Statements}
-
-\plt{The goal statements refine the ``Problem Description''
-  (Section~\ref{Sec_pd}).  A goal is a functional objective the system under
-  consideration should achieve. Goals provide criteria for sufficient
-  completeness of a requirements specification and for requirements
-  pertinence. Goals will be refined in Section “Instanced Models”
-  (Section~\ref{sec_instance}). Large and complex goals should be decomposed
-  into smaller sub-goals.  The goals are written abstractly, with a minimal
-  amount of technical language.  They should be understandable by non-domain
-  experts.}
-
-\noindent Given the \plt{inputs}, the goal statements are:
-
-\begin{itemize}
-
-\item[GS\refstepcounter{goalnum}\thegoalnum \label{G_meaningfulLabel}:] \plt{One
-    sentence description of the goal.  There may be more than one.  Each Goal
-    should have a meaningful label.}
-
-\end{itemize}
-
-\subsection{Solution Characteristics Specification}
-
-\plt{This section specifies the information in the solution domain of the system
-  to be developed. This section is intended to express what is required in
-  such a way that analysts and stakeholders get a clear picture, and the
-  latter will accept it. The purpose of this section is to reduce the problem
-  into one expressed in mathematical terms. Mathematical expertise is used to
-  extract the essentials from the underlying physical description of the
-  problem, and to collect and substantiate all physical data pertinent to the
-  problem.}
-
-\plt{This section presents the solution characteristics by successively refining
-  models.  It starts with the abstract/general Theoretical Models (TMs) and
-  refines them to the concrete/specific Instance Models (IMs).  If necessary
-  there are intermediate refinements to General Definitions (GDs).  All of these
-  refinements can potentially use Assumptions (A) and Data Definitions (DD).
-  TMs are refined to create new models, that are called GMs or IMs. DDs are not
-  refined; they are just used. GDs and IMs are derived, or refined, from other
-  models. DDs are not derived; they are just given. TMs are also just given, but
-  they are refined, not used.  If a potential DD includes a derivation, then
-  that means it is refining other models, which would make it a GD or an IM.}
-
-\plt{The above makes a distinction between ``refined'' and ``used.'' A model is
-  refined to another model if it is changed by the refinement. When we change a
-  general 3D equation to a 2D equation, we are making a refinement, by applying
-  the assumption that the third dimension does not matter. If we use a
-  definition, like the definition of density, we aren't refining, or changing
-  that definition, we are just using it.}
-
-\plt{The same information can be a TM in one problem and a DD in another.  It is
-  about how the information is used.  In one problem the definition of
-  acceleration can be a TM, in another it would be a DD.}
-
-\plt{There is repetition between the information given in the different chunks
-  (TM, GDs etc) with other information in the document.  For instance, the
-  meaning of the symbols, the units etc are repeated.  This is so that the
-  chunks can stand on their own when being read by a reviewer/user.  It also
-  facilitates reuse of the models in a different context.}
-
-\noindent \plt{The relationships between the parts of the document are show in
-  the following figure.  In this diagram ``may ref'' has the same role as
-  ``uses'' above.  The figure adds ``Likely Changes,'' which are able to
-  reference (use) Assumptions.}
-
 \begin{figure}[H]
-  \includegraphics[scale=0.9]{RelationsBetweenTM_GD_IM_DD_A.pdf}
+    \centering
+    \includegraphics[width=1\linewidth]{images/work_context_user.png}
+    \caption{Work context diagram of the \gls{atd} side application}\label{fig:workcontextuser}
 \end{figure}
+\end{center}
 
-The instance models that govern \progname{} are presented in
-Subsection~\ref{sec_instance}.  The information to understand the meaning of the
-instance models and their derivation is also presented, so that the instance
-models can be verified.
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/work_context_admin.png}
+    \caption{Work context diagram of the \gls{adm} side application}\label{fig:workcontextadmin}
+\end{figure}
+\end{center}
 
-\subsubsection{Types}
+\subsection{Work Partitioning}
 
-\plt{This section is optional. Defining types can make the document easier to
-understand.}
+This section describes how the work done by the system can be partitioned into smaller and more manageable workflows.
+Below is a table describing each of the sub-workflows of the proposed systems. Note that event creation and survey
+creation have been grouped as a single workflow since they are nearly identical.
 
-\subsubsection{Scope Decisions}
-
-\plt{This section is optional.}
-\subsubsection{Modelling Decisions}
-
-\plt{This section is optional.}
-
-\subsubsection{Assumptions} \label{sec_assumpt}
-
-\plt{The assumptions are a refinement of the scope.  The scope is general, where
-  the assumptions are specific.  All assumptions should be listed, even those
-  that domain experts know so well that they are rarely (if ever) written down.}
-\plt{The document should not take for granted that the reader knows which
-  assumptions have been made. In the case of unusual assumptions, it is
-  recommended that the documentation either include, or point to, an explanation
-  and justification for the assumption.} 
-\plt{If it helps with the organization and understandability, the assumptions
-can be presented as sub sections.  The following sub-sections are options:
-background theory assumptions, helper theory assumptions, generic theory
-assumptions, problem specific assumptions, and rationale assumptions}
-
-This section simplifies the original problem and helps in developing the
-theoretical model by filling in the missing information for the physical system.
-The numbers given in the square brackets refer to the theoretical model [TM],
-general definition [GD], data definition [DD], instance model [IM], or likely
-change [LC], in which the respective assumption is used.
-
-\begin{itemize}
-
-\item[A\refstepcounter{assumpnum}\theassumpnum \label{A_meaningfulLabel}:]
-  \plt{Short description of each assumption.  Each assumption
-    should have a meaningful label.  Use cross-references to identify the
-    appropriate traceability to TM, GD, DD etc., using commands like dref, ddref
-    etc.  Each assumption should be atomic - that is, there should not be an
-    explicit (or implicit) ``and'' in the text of an assumption.}
-
-\end{itemize}
-
-\subsubsection{Theoretical Models}\label{sec_theoretical}
-
-\plt{Theoretical models are sets of abstract mathematical equations or axioms
-  for solving the problem described in Section ``Physical System Description''
-  (Section~\ref{sec_phySystDescrip}). Examples of theoretical models are
-  physical laws, constitutive equations, relevant conversion factors, etc.}
-
-\plt{Optionally the theory section could be divided into subsections to provide
-more structure and improve understandability and reusability.  Potential
-subsections include the following: Context theories, background theories, helper
-theories, generic theories, problem specific theories, final theories and
-rationale theories.}
-
-This section focuses on the general equations and laws that \progname{} is based
-on.  \plt{Modify the examples below for your problem, and add additional models
-  as appropriate.}
-
-~\newline
-
-\noindent
-\deftheory
-% #2 refname of theory
-{TM:COE}
-% #3 label
-{Conservation of thermal energy}
-% #4 equation
 {
-  $-{\bf \nabla \cdot q} + g$ = $\rho C \frac{\partial T}{\partial t}$
-}
-% #5 description
-{
-  The above equation gives the conservation of energy for transient heat transfer in a material
-  of specific heat capacity $C$ (\si{\joule\per\kilogram\per\celsius}) and density $\rho$ 
-  (\si{\kilogram\per\cubic\metre}), where $\bf q$ is the thermal flux vector (\si{\watt\per\square\metre}),
-  $g$ is the volumetric heat generation
-  (\si{\watt\per\cubic\metre}), $T$ is the temperature
-  (\si{\celsius}),  $t$ is time (\si{\second}), and $\nabla$ is
-  the gradient operator.  For this equation to apply, other forms
-  of energy, such as mechanical energy, are assumed to be negligible in the
-  system (\aref{A_OnlyThermalEnergy}).  In general, the material properties ($\rho$ and $C$) depend on temperature.
-}
-% #6 Notes
-{
-None.
-}
-% #7 Source
-{
-  \url{http://www.efunda.com/formulae/heat_transfer/conduction/overview_cond.cfm}
-}
-% #8 Referenced by
-{
-  \dref{ROCT}
-}
-% #9 Preconditions
-{
-None
-}
-% #1 derivation - not applicable by default
-{}
-
-\plt{``Ref.\ By'' is used repeatedly with the different types of information.
-  This stands for Referenced By.  It means that the models, definitions and
-  assumptions listed reference the current model, definition or assumption.
-  This information is given for traceability.  Ref. By provides a pointer in the
-  opposite direction to what we commonly do.  You still need to have a reference
-  in the other direction pointing to the current model, definition or
-  assumption.  As an example, if TM1 is referenced by GD2, that means that GD2 will
-  explicitly include a reference to TM1.}
-
-~\newline
-
-\subsubsection{General Definitions}\label{sec_gendef}
-
-\plt{General Definitions (GDs) are a refinement of one or more TMs, and/or of
-  other GDs.  The GDs are less abstract than the TMs.  Generally the reduction
-  in abstraction is possible through invoking (using/referencing) Assumptions.
-  For instance, the TM could be Newton's Law of Cooling stated abstracting.  The
-  GD could take the general law and apply it to get a 1D equation.}
-
-This section collects the laws and equations that will be used in building the
-instance models.
-
-\plt{Some projects may not have any content for this section, but the section
-  heading should be kept.}  \plt{Modify the examples below for your problem, and
-  add additional definitions as appropriate.}
-
-~\newline
-
-\noindent
-\begin{minipage}{\textwidth}
-\renewcommand*{\arraystretch}{1.5}
-\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
-\hline
-\rowcolor[gray]{0.9}
-Number& GD\refstepcounter{defnum}\thedefnum \label{NL}\\
-\hline
-Label &\bf Newton's law of cooling \\
-\hline
-% Units&$MLt^{-3}T^0$\\
-% \hline
-SI Units&\si{\watt\per\square\metre}\\
-\hline
-Equation&$ q(t) = h \Delta T(t)$  \\
-\hline
-Description &
-Newton's law of cooling describes convective cooling from a surface.  The law is
-stated as: the rate of heat loss from a body is proportional to the difference
-in temperatures between the body and its surroundings.
-\\
-& $q(t)$ is the thermal flux (\si{\watt\per\square\metre}).\\
-& $h$ is the heat transfer coefficient, assumed independent of $T$ (\aref{A_hcoeff})
-	(\si{\watt\per\square\metre\per\celsius}).\\
-&$\Delta T(t)$= $T(t) - T_{\text{env}}(t)$ is the time-dependent thermal gradient
-between the environment and the object (\si{\celsius}).
-\\
-\hline
-  Source & Citation here \\
-  \hline
-  Ref.\ By & \ddref{FluxCoil}, \ddref{FluxPCM}\\
-  \hline
-\end{tabular}
-\end{minipage}\\
-
-\subsubsection*{Detailed derivation of simplified rate of change of temperature}
-
-\plt{This may be necessary when the necessary information does not fit in the
-  description field.}
-\plt{Derivations are important for justifying a given GD.  You want it to be
-  clear where the equation came from.}
-
-\subsubsection{Data Definitions}\label{sec_datadef}
-
-\plt{The Data Definitions are definitions of symbols and equations that are
-  given for the problem.  They are not derived; they are simply used by other
-  models.  For instance, if a problem depends on density, there may be a data
-  definition for the equation defining density.  The DDs are given information
-  that you can use in your other modules.}
-
-\plt{All Data Definitions should be used (referenced) by at least one other
-  model.}
-
-This section collects and defines all the data needed to build the instance
-models. The dimension of each quantity is also given.  \plt{Modify the examples
-  below for your problem, and add additional definitions as appropriate.}
-
-~\newline
-
-\noindent
-\begin{minipage}{\textwidth}
-\renewcommand*{\arraystretch}{1.5}
-\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
-\hline
-\rowcolor[gray]{0.9}
-Number& DD\refstepcounter{datadefnum}\thedatadefnum \label{FluxCoil}\\
-\hline
-Label& \bf Heat flux out of coil\\
-\hline
-Symbol &$q_C$\\
-\hline
-% Units& $Mt^{-3}$\\
-% \hline
-  SI Units & \si{\watt\per\square\metre}\\
-  \hline
-  Equation&$q_C(t) = h_C (T_C - T_W(t))$, over area $A_C$\\
-  \hline
-  Description & 
-                $T_C$ is the temperature of the coil (\si{\celsius}).  $T_W$ is the temperature of the water (\si{\celsius}).  
-                The heat flux out of the coil, $q_C$ (\si{\watt\per\square\metre}), is found by
-                assuming that Newton's Law 
-                of Cooling applies (\aref{A_Newt_coil}).  This law (\dref{NL}) is used on the surface of
-                the coil, which has area $A_C$ (\si{\square\metre}) and heat 
-                transfer coefficient $h_C$
-                (\si{\watt\per\square\metre\per\celsius}).  This equation
-                assumes that the temperature of the coil is constant over time (\aref{A_tcoil}) and that it does not vary along the length
-                of the coil (\aref{A_tlcoil}).
-  \\
-  \hline
-  Sources& Citation here \\
-  \hline
-  Ref.\ By & \iref{ewat}\\
-  \hline
-\end{tabular}
-\end{minipage}\\
-
-\subsubsection{Data Types}\label{sec_datatypes}
-
-\plt{This section is optional.  In many scientific computing programs it isn't
-  necessary, since the inputs and outpus are straightforward types, like reals,
-  integers, and sequences of reals and integers.  However, for some problems it
-  is very helpful to capture the type information.}
-
-\plt{The data types are not derived; they are simply stated and used by other
-  models.}
-
-\plt{All data types must be used by at least one of the models.}
-
-\plt{For the mathematical notation for expressing types, the recommendation is
-  to use the notation of~\citet{HoffmanAndStrooper1995}.}
-
-This section collects and defines all the data types needed to document the
-models. \plt{Modify the examples below for your problem, and add additional
-  definitions as appropriate.}
-
-~\newline
-
-\noindent
-\begin{minipage}{\textwidth}
-\renewcommand*{\arraystretch}{1.5}
-\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
-  \hline
-  \rowcolor[gray]{0.9}
-  Type Name & Name for Type\\
-  \hline
-  Type Def & mathematical definition of the type\\
-  \hline
-  Description & description here
-  \\
-  \hline
-  Sources & Citation here, if the type is borrowed from another source\\
-  \hline
-\end{tabular}
-\end{minipage}\\
-
-\subsubsection{Instance Models} \label{sec_instance}    
-
-\plt{The motivation for this section is to reduce the problem defined in
-  ``Physical System Description'' (Section~\ref{sec_phySystDescrip}) to one
-  expressed in mathematical terms. The IMs are built by refining the TMs and/or
-  GDs.  This section should remain abstract.  The SRS should specify the
-  requirements without considering the implementation.}
-
-This section transforms the problem defined in Section~\ref{Sec_pd} into 
-one which is expressed in mathematical terms. It uses concrete symbols defined 
-in Section~\ref{sec_datadef} to replace the abstract symbols in the models 
-identified in Sections~\ref{sec_theoretical} and~\ref{sec_gendef}.
-
-The goals \plt{reference your goals} are solved by \plt{reference your instance
-  models}.  \plt{other details, with cross-references where appropriate.}
-\plt{Modify the examples below for your problem, and add additional models as
-  appropriate.}
-
-~\newline
-
-%Instance Model 1
-
-\noindent
-\begin{minipage}{\textwidth}
-\renewcommand*{\arraystretch}{1.5}
-\begin{tabular}{| p{\colAwidth} | p{\colBwidth}|}
-  \hline
-  \rowcolor[gray]{0.9}
-  Number& IM\refstepcounter{instnum}\theinstnum \label{ewat}\\
-  \hline
-  Label& \bf Energy balance on water to find $T_W$\\
-  \hline
-  Input&$m_W$, $C_W$, $h_C$, $A_C$, $h_P$, $A_P$, $t_\text{final}$, $T_C$, 
-  $T_\text{init}$, $T_P(t)$ from \iref{epcm}\\
-  & The input is constrained so that $T_\text{init} \leq T_C$ (\aref{A_charge})\\
-  \hline
-  Output&$T_W(t)$, $0\leq t \leq t_\text{final}$, such that\\
-  &$\frac{dT_W}{dt} = \frac{1}{\tau_W}[(T_C - T_W(t)) + {\eta}(T_P(t) - T_W(t))]$,\\
-  &$T_W(0) = T_P(0) = T_\text{init}$ (\aref{A_InitTemp}) and $T_P(t)$ from \iref{epcm} \\
-  \hline
-  Description&$T_W$ is the water temperature (\si{\celsius}).\\
-  &$T_P$ is the PCM temperature (\si{\celsius}).\\
-  &$T_C$ is the coil temperature (\si{\celsius}).\\
-  &$\tau_W = \frac{m_W C_W}{h_C A_C}$ is a constant (\si{\second}).\\
-  &$\eta = \frac{h_P A_P}{h_C A_C}$ is a constant (dimensionless).\\
-  & The above equation applies as long as the water is in liquid form,
-  $0<T_W<100^o\text{C}$, where $0^o\text{C}$ and $100^o\text{C}$ are the melting
-  and boiling points of water, respectively (\aref{A_OpRange}, \aref{A_Pressure}).
-  \\
-  \hline
-  Sources& Citation here \\
-  \hline
-  Ref.\ By & \iref{epcm}\\
-  \hline
-\end{tabular}
-\end{minipage}\\
-
-%~\newline
-
-\subsubsection*{Derivation of ...}
-
-\plt{The derivation shows how the IM is derived from the TMs/GDs.  In cases
-  where the derivation cannot be described under the Description field, it will
-  be necessary to include this subsection.}
-
-\subsubsection{Input Data Constraints} \label{sec_DataConstraints}    
-
-Table~\ref{TblInputVar} shows the data constraints on the input output
-variables.  The column for physical constraints gives the physical limitations
-on the range of values that can be taken by the variable.  The column for
-software constraints restricts the range of inputs to reasonable values.  The
-software constraints will be helpful in the design stage for picking suitable
-algorithms.  The constraints are conservative, to give the user of the model the
-flexibility to experiment with unusual situations.  The column of typical values
-is intended to provide a feel for a common scenario.  The uncertainty column
-provides an estimate of the confidence with which the physical quantities can be
-measured.  This information would be part of the input if one were performing an
-uncertainty quantification exercise.
-
-The specification parameters in Table~\ref{TblInputVar} are listed in
-Table~\ref{TblSpecParams}.
-
-\begin{table}[!h]
-  \caption{Input Variables} \label{TblInputVar}
+  \setlength{\tabcolsep}{0.2em}
   \renewcommand{\arraystretch}{1.2}
-\noindent \begin{longtable*}{l l l l c} 
-  \toprule
-  \textbf{Var} & \textbf{Physical Constraints} & \textbf{Software Constraints} &
-                             \textbf{Typical Value} & \textbf{Uncertainty}\\
-  \midrule 
-  $L$ & $L > 0$ & $L_{\text{min}} \leq L \leq L_{\text{max}}$ & 1.5 \si[per-mode=symbol] {\metre} & 10\%
-  \\
-  \bottomrule
-\end{longtable*}
-\end{table}
+\begin{longtable}[H]{p{0.03\linewidth}p{0.21\linewidth}p{0.25\linewidth}p{0.25\linewidth}p{0.28\linewidth}}
+      \textbf{\#} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
+      1 & \Gls{atd} registers for event & Registration data & Event ticket & \ref{FR3} \ref{FR4} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{SIR2} \ref{ER1} \ref{ER2} \ref{UR1} \ref{UR2} \ref{UR3} \ref{AC1} \ref{SL1} \ref{SE1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \ref{MSAR1} \ref{MSAR2} \\ \hline
+      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{FR9} \ref{SIR1} \ref{SIR2} \ref{FT2} \ref{ER1} \ref{UR1} \ref{UR2} \ref{UR3} \ref{AC1} \ref{SL1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \\ \hline
+      3 & \Gls{adm} creates a form module & Module questions & Reusable form module & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{PI1} \ref{LR2} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{FT4} \ref{FT5} \ref{MSMR1} \ref{SR2} \ref{ER3} \ref{UR3}\\ \hline
+      4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \ref{FR1} \ref{FR3} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR9} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{SIR2} \ref{SAuR1} \ref{PI2} \ref{ER3} \ref{LR2} \ref{FT4} \ref{FT5} \ref{MSAR1} \ref{MSAR2} \ref{MSMR1}\\ \hline
+      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \ref{FR2} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR8} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SAuR1} \ref{PI2} \ref{AR3} \ref{ER3} \ref{LR2} \ref{UR3}
+      \\ \hline
+    \caption{Partitioning of system workflows}\label{wfpart}
+  \end{longtable}
+}
 
-\noindent 
-\begin{description}
-\item[(*)] \plt{you might need to add some notes or clarifications}
-\end{description}
+\subsection{Specifying a Business Use Case (BUC)}
 
-\begin{table}[!h]
-\caption{Specification Parameter Values} \label{TblSpecParams}
+\subsubsection*{BUC 1: User registers for an event}
+\textbf{Input:} Registration data \\
+\textbf{Output:} Event tickets \\
+\textbf{Pre-condition:} User has downloaded the application and has created an account \\
+\textbf{Scenario:}
+\begin{enumerate}
+  \item The user application receives the registration data
+  \item The user application verifies the data is filled correctly
+  \item The user application sends the registration data to the backend server
+  \item The backend server verifies the event is not full, and the deadline has not passed
+  \item The backend server adds the user to the list of \glspl{atd}
+  \item The backend server generates an event ticket and sends it to the user application
+  \item The user application confirms with the user that the registration was successful and presents the user with the
+    ticket
+\end{enumerate}
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted registration data has errors: the user application prompts the user to fix the errors and resubmit.
+  \item [4a.] The event is full, or the deadline has passed: the backend sends an error code to the user application.
+  \item [4b.] The user application alerts the user of the error.
+\end{itemize}
+
+\subsubsection*{BUC 2: User fills out a survey module}
+\textbf{Input:} Survey responses \\
+\textbf{Output:} Survey completion confirmation \\
+\textbf{Pre-condition:} \Gls{atd} has downloaded the application and has created an account \\
+\textbf{Scenario:}
+\begin{enumerate}
+  \item The user application receives the survey data
+  \item The user application verifies the data is filled correctly
+  \item The user application sends the survey data to the backend server
+  \item The backend server updates the survey database with the \gls{atd}'s data
+  \item The backend server sends a confirmation message to the user application
+  \item The user application confirms with the \gls{atd} that the survey data has been submitted
+\end{enumerate}
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted data has errors (i.e. mandatory fields not filled), the user application prompts the \gls{atd} to fix the errors and resubmit
+\end{itemize}
+
+\subsubsection*{BUC 3: \Gls{adm} creates a form module}
+\textbf{Input:} Form fields \\
+\textbf{Output:} Reusable form module \\
+\textbf{Pre-condition:} \Gls{adm} has access to create custom form modules \\
+\textbf{Scenario:}
+\begin{enumerate}
+  \item The \gls{adm} portal receives the list of form fields and questions from the \gls{adm} user for the custom module
+  \item The \gls{adm} portal verifies the custom module has been created correctly
+  \item The \gls{adm} portal sends the custom module data to the backend server
+  \item The backend server authenticates the \gls{adm} user
+  \item The backend server saves the custom module data to the template database
+  \item The backend server sends a confirmation message to the \gls{adm} portal
+  \item The \gls{adm} portal updates the list of custom modules with the completed module
+  \item The \gls{adm} portal confirms with the \gls{adm} user that the custom module has been created
+\end{enumerate}
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted form module has errors (i.e. unfinished fields), the \gls{adm} user is prompted to fix these errors before resubmitting
+  \item [4a.] Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial
+\end{itemize}
+
+\subsubsection*{BUC 4: \Gls{adm} creates an event/survey}
+\textbf{Input:} Event details \\
+\textbf{Output:} Event creation confirmation \\
+\textbf{Pre-condition:} \Gls{adm} has access to create events \\
+\textbf{Scenario:}
+\begin{enumerate}
+  \item The \gls{adm} portal receives the event/survey details
+  \item The \gls{adm} portal verifies the event/survey details are correct
+  \item The \gls{adm} portal sends the event/survey data to the backend server
+  \item The backend server authenticates the \gls{adm} user
+  \item The backend server saves the event/survey data to the database of events/surveys
+  \item The backend server sends a message to the user application to notify users of the new event/survey
+  \item The backend server sends a confirmation message to the \gls{adm} portal
+  \item The \gls{adm} portal adds the created event/survey to the event/survey dashboard
+  \item The \gls{adm} portal confirms with the \gls{adm} user that the event/survey has been created
+\end{enumerate}
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [2a.] The submitted details have errors (i.e. event date has already passed), the \gls{adm} user is prompted to fix these errors before resubmitting
+  \item [4a.] Authentication of the \gls{adm} fails, the \gls{adm} portal is notified of the request denial
+\end{itemize}
+
+\subsubsection*{BUC 5: \Gls{adm} views event/survey statistics}
+\textbf{Input:} Event/survey to view \\
+\textbf{Output:} Event registration/survey response report \\
+\textbf{Pre-condition:} Event/survey has been created, and \glspl{atd} have registered/responded \\
+\textbf{Scenario:} \\
+\begin{enumerate}
+  \item The admin portal receives the request to view event/survey statistics
+  \item The admin portal sends a request to the backend server containing the identification for the event/survey to view
+  \item The backend server receives the request and authenticates the \gls{adm}
+  \item The backend server retrieves the registrant/response data for the requested event/survey from the database
+  \item The backend server generates a statistical report of all the data
+  \item The data is sent back to the admin portal
+  \item The admin portal formats all the data into a readable format
+  \item The \gls{adm} is presented with the event/survey statistics
+\end{enumerate}
+\textbf{Sub variations:}
+\begin{itemize}
+  \item [3a.] Authentication of the \gls{adm} fails, the admin portal is notified of the request denial
+\end{itemize}
+
+\section{Business Data Model and Data Dictionary}
+
+The purpose of this section is to illustrate the flow of data throughout the system.
+
+\subsection{Business Data Model}
+
+\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into into well defined subsystems and outlines the interactions between subsystems.
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/business_data_model.png}
+    \caption{Diagram of the interactions between main system components}\label{fig:businessdata}
+\end{figure}
+\end{center}
+\subsection{Data Dictionary}
+
+\hyperref[table:datadictionary]{Table \ref{table:datadictionary}} defines each of the system components shown in \hyperref[fig:businessdata]{Figure \ref{fig:businessdata}}.
+{
+\setlength{\tabcolsep}{0.3em}
 \renewcommand{\arraystretch}{1.2}
-\noindent \begin{longtable*}{l l} 
-  \toprule
-  \textbf{Var} & \textbf{Value} \\
-  \midrule 
-  $L_\text{min}$ & 0.1 \si{\metre}\\
-  \bottomrule
-\end{longtable*}
+\begin{table}[H]
+    \begin{tabular}{p{0.25\linewidth}p{0.6\linewidth}p{0.2\linewidth}}
+      \toprule
+      \textbf{Component Name}              & \textbf{Description}                                                                                                                                       & \textbf{Type} \\ \midrule
+        \gls{mes} Event/Survey Manager             & The application handling the \gls{adm} side of the system, including event/survey creation, and data analytics                                                 & Application   \\ \midrule
+        Event Builder                        & Contains tools for creating, publishing, and managing events                                                                                               & Module        \\ \midrule
+        Survey Builder                       & Contains tools for creating, publishing, and managing surveys                                                                                              & Module        \\ \midrule
+        Admin Controller                     & Handles the flow of execution of \gls{mes} Event/Survey Manager modules and data flow between the event/survey builders, data analyzers, and the user controller & Module        \\ \midrule
+        Financial Analyzer                   & Automates analysis and visualization of finances from event attendee data                                                                                  & Module        \\ \midrule
+        Survey Analyzer                      & Automates analysis and visualization of survey response data                                                                                               & Module        \\ \midrule
+        \gls{mes} Event Registration/Survey Filler & The application handling the \gls{atd} side of the system, including event registration and survey responses                                                    & Application   \\ \midrule
+        Form Filler                          & Handles input and validation of form responses                                                                                                             & Module        \\ \midrule
+        User Controller                      & Controls the flow of execution of the form filler and handles communication with the admin controller                                                      & Module        \\ \midrule
+    \end{tabular}
+    \captionof{table}{Data dictionary table}\label{table:datadictionary}
 \end{table}
+}
 
-\subsubsection{Properties of a Correct Solution} \label{sec_CorrectSolution}
+\section{The Scope of the Product}
 
-\noindent
-A correct solution must exhibit \plt{fill in the details}.  \plt{These
-  properties are in addition to the stated requirements.  There is no need to
-  repeat the requirements here.  These additional properties may not exist for
-  every problem.  Examples include conservation laws (like conservation of
-  energy or mass) and known constraints on outputs, which are usually summarized
-  in tabular form.  A sample table is shown in Table~\ref{TblOutputVar}}
+The purpose of this section is to define the scope of the product by defining the boundaries of each major component of the system as well as their functionalities, interfaces for external actors, and interactions with each other.
 
-\begin{table}[!h]
-\caption{Output Variables} \label{TblOutputVar}
-\renewcommand{\arraystretch}{1.2}
-\noindent \begin{longtable*}{l l} 
+\subsection{Product Boundary}
+
+\hyperref[fig:productusecase]{Figure \ref{fig:productusecase}} outlines the main components of the system, how they interact with each other, and their related use cases.
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.89\linewidth]{images/product_use_case.png}
+    \caption{Product use case diagram}\label{fig:productusecase}
+\end{figure}
+\end{center}
+\subsection{Product Use Case Table}
+
+\hyperref[table:productusecase]{Table \ref{table:productusecase}} further defines each of the individual use cases of the system, outlining the specific inputs and outputs and related requirements.
+
+{
+\setlength{\tabcolsep}{0.2em}
+\begin{longtable}[H]{p{0.04\linewidth}p{0.22\linewidth}p{0.13\linewidth}p{0.43\linewidth}p{0.22\linewidth}}
   \toprule
-  \textbf{Var} & \textbf{Physical Constraints} \\
-  \midrule 
-  $T_W$ & $T_\text{init} \leq T_W \leq T_C$ (by~\aref{A_charge})
-  \\
-  \bottomrule
-\end{longtable*}
-\end{table}
+  \textbf{\#}     & \textbf{Name}                  & \textbf{Actor} & \textbf{Input/Output}                                                                                                       & \textbf{Requirements} \\ \midrule
+  1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and \\fields (in)\\Reusable form module (out)\end{tabular}                        & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{ER3} \\ \midrule
+  2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{ER3} \\ \midrule
+  3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           & \ref{FR3} \ref{FR4} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{LR2} \\ \midrule
+  4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         & \ref{FR4} \ref{FR6} \ref{SAR2} \ref{SIR1} \ref{MSMR1} \ref{ER3} \\ \midrule
+  5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{LR2} \\ \midrule
+  6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and \\questions (in)\\Fillable survey (out)\end{tabular}                            & \ref{FR1} \ref{FR2} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{ER3} \\ \midrule
+  7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{ER3} \\ \midrule
+  8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{LR2} \\ \midrule
+  9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         & \ref{FR5} \ref{FR6} \ref{SAR2} \ref{SAuR1} \ref{LR2} \ref{PI2} \\ \midrule
+  10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SAuR1} \ref{ER3} \ref{LR2} \\ \midrule
+  11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  & \ref{FR6} \ref{FR8} \ref{SAR1} \ref{SAuR1} \ref{PI2} \ref{ER3} \\ \midrule
+  12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 & \ref{FR7} \ref{FR8} \ref{ER3} \ref{LR2} \ref{SL1} \ref{SE1} \\ \midrule
+  13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       & \ref{FR3} \ref{FR4} \ref{FR9} \ref{ER1} \ref{UR1} \ref{AC1} \\ \midrule
+  14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           & \ref{FR5} \ref{FR6} \ref{ER1} \ref{UR2} \ref{AC1} \ref{LR2} \\ \midrule
+  15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     & \ref{FR3} \ref{FR6} \ref{FR9} \ref{ER1} \ref{UR1} \ref{AC1} \\ \midrule
+  16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        & \ref{FR3} \ref{FR4} \ref{SAR1} \ref{SIR1} \ref{SL1} \ref{ER1} \\ \midrule
+  17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  & \ref{FR3} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSMR1} \ref{ER1} \\ \midrule
+  18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSAR2} \ref{ER1} \\ \midrule
+  19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            & \ref{FR1} \ref{FR2} \ref{FR6} \ref{ER1} \ref{UR1} \ref{AC1} \\ \midrule
+  20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion \\confirmation (out)\end{tabular} & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SIR1} \ref{SL1} \\ \midrule
+  21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update\\ confirmation (out)\end{tabular}           & \ref{FR2} \ref{FR6} \ref{SIR1} \ref{MSMR1} \ref{ER3} \ref{UR2} \\ \midrule
+  22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        & \ref{FR2} \ref{FR6} \ref{ER1} \ref{LR2} \ref{AC1} \ref{UR2} \\ \bottomrule
+  \caption{Product use case table}\label{table:productusecase}
+\end{longtable}
+}
 
-\plt{This section is not for test cases or techniques for verification and
-  validation.  Those topics will be addressed in the Verification and Validation
-  plan.}
+\subsection{Individual Product Use Cases (PUC's)}
 
-\section{Requirements}
+This section further expands on the use cases defined in \hyperref[table:productusecase]{Table \ref{table:productusecase}} by defining specific triggers, preconditions, and outcomes of each use case. \\
 
-\plt{The requirements refine the goal statement.  They will make heavy use of
-  references to the instance models.}
+{\setlength{\parindent}{0pt}
+\textbf{PUC 1: Create a custom form module} \\
+\textbf{Trigger:} The \gls{adm} requests to create a new form module \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to create form modules
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} A form module is created which \glspl{adm} can use in any event registration/survey form \\
+\textbf{Input:} Form module name and fields \\
+\textbf{Output:} Reusable form module \\[1em]
 
-This section provides the functional requirements, the business tasks that the
-software is expected to complete, and the nonfunctional requirements, the
-qualities that the software is expected to exhibit.
+\textbf{PUC 2: Edit an existing form module} \\
+\textbf{Trigger:} The \gls{adm} selects a form module to edit \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to edit form modules
+  \item At least one form module is available for editing
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The selected form module is updated with the \gls{adm}’s changes \\
+\textbf{Input:} Selected form module and updated fields \\
+\textbf{Output:} Edited form module \\[1em]
 
+\textbf{PUC 3: Create an event} \\
+\textbf{Trigger:} The \gls{adm} requests to create a new event \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to create events
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} An event is created and \glspl{atd} are notified of a new upcoming event \\
+\textbf{Input:} Event details (e.g. title, date, location, cost) \\
+\textbf{Output:} Scheduled event \\[1em]
+
+\textbf{PUC 4: Edit an event} \\
+\textbf{Trigger:} The \gls{adm} requests to edit an event \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to edit events
+  \item At least one upcoming event is scheduled
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The event details are updated and \glspl{atd} are notified of a change \\
+\textbf{Input:} Selected event and              edited details \\
+\textbf{Output:} Edited event \\[1em]
+
+\textbf{PUC 5: Cancel an event} \\
+\textbf{Trigger:} The \gls{adm} requests to cancel an event \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to cancel events
+  \item At least one upcoming event is scheduled
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The event is cancelled and the \glspl{atd} are notified of the change \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Cancelled event \\[1em]
+
+\textbf{PUC 6: Create a survey} \\
+\textbf{Trigger:} The \gls{adm} requests to create a new survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to create surveys
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey is created and \glspl{atd} are notified of a new survey \\
+\textbf{Input:} Survey details (e.g. title, questions) \\
+\textbf{Output:} Fillable survey \\[1em]
+
+\textbf{PUC 7: Edit a survey} \\
+\textbf{Trigger:} The \gls{adm} requests to edit a survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to edit surveys
+  \item At least one survey is open to responses
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey is updated and \glspl{atd} are notified of the change \\
+\textbf{Input:} Survey to update and              updated survey details \\
+\textbf{Output:} Updated survey \\[1em]
+
+\textbf{PUC 8: Close a survey} \\
+\textbf{Trigger:} The \gls{adm} requests to close a survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to close surveys
+  \item At least one survey is open to responses
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey is closed \\
+\textbf{Input:} Selected survey \\
+\textbf{Output:} Cancelled event \\[1em]
+
+\textbf{PUC 9: View financial reports} \\
+\textbf{Trigger:} The \gls{adm} requests to view a financial report \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view financial reports
+  \item At least one event has been scheduled or completed
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} A financial report of the selected event is generated and displayed \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Financial report of the selected event \\[1em]
+
+\textbf{PUC 10: View event attendee overview} \\
+\textbf{Trigger:} The \gls{adm} requests to view an event attendee overview \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view attendee overviews
+  \item At least one event has been scheduled or completed
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} An overview of registered \glspl{atd} is generated and displayed \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Attendee overview of the selected event \\[1em]
+
+\textbf{PUC 11: View survey response reports} \\
+\textbf{Trigger:} The \gls{adm} requests to view a survey response report \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view survey responses
+  \item At least one survey has been released and at least one \gls{atd} has responded
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} An overview of all survey responses is generated and displayed \\
+\textbf{Input:} Selected survey \\
+\textbf{Output:} Response report of the survey \\[1em]
+
+\textbf{PUC 12: Filter survey responses} \\
+\textbf{Trigger:} The \gls{adm} selects criterion to filter survey data by \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{adm} is logged in and authenticated
+  \item The \gls{adm} has permission to view survey responses
+  \item At least one survey has been released and at least one \gls{atd} has responded
+  \item The \gls{adm} has a survey response report open
+\end{itemize}
+\textbf{Actors:} \Gls{adm} \\
+\textbf{Outcome:} The survey data is filtered and the updated report is generated \\
+\textbf{Input:} Criteria to filter by \\
+\textbf{Output:} Filtered survey response data \\[1em]
+
+\textbf{PUC 13: View Upcoming Events} \\
+\textbf{Trigger:} The \gls{atd} requests to view a list of upcoming events \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item There is at least one upcoming event
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd} is shown a list of all future events \\
+\textbf{Input:} View request \\
+\textbf{Output:} Upcoming events list \\[1em]
+
+\textbf{PUC 14: View Past Events} \\
+\textbf{Trigger:} The \gls{atd} requests to view a list of past events \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item At least one event has completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd} is presented with a list of past events \\
+\textbf{Input:} View request \\
+\textbf{Output:} List of past events \\[1em]
+
+\textbf{PUC 15: View Registered Events} \\
+\textbf{Trigger:} The \gls{atd} requests to see events they are registered for \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} is registered for at least one event that has not completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The system displays all events the \gls{atd} has registered for \\
+\textbf{Input:} View request \\
+\textbf{Output:} Registered events list \\[1em]
+
+\textbf{PUC 16: Register for Upcoming Event} \\
+\textbf{Trigger:} The \gls{atd} selects an event and submits registration details \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The selected event is open for registration
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd}’s registration is confirmed, and an admission ticket is issued \\
+\textbf{Input:} Selected event and registration details \\
+\textbf{Output:} Event admission ticket \\[1em]
+
+\textbf{PUC 17: Update Event Registration} \\
+\textbf{Trigger:} The \gls{atd} requests to update their registration information \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} has registered for at least one event that has not completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The registration details are successfully updated \\
+\textbf{Input:} Selected event and updated details \\
+\textbf{Output:} Update confirmation \\[1em]
+
+\textbf{PUC 18: Cancel Event Registration} \\
+\textbf{Trigger:} The \gls{atd} requests to cancel a registration \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} is registered for at least one event which has not completed
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The registration is cancelled and the system confirms the cancellation \\
+\textbf{Input:} Selected event \\
+\textbf{Output:} Cancellation confirmation \\[1em]
+
+\textbf{PUC 19: View Fillable Surveys} \\
+\textbf{Trigger:} The \gls{atd} requests to view available surveys \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item At least one survey is open for responses
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd} sees a list of surveys they can complete \\
+\textbf{Input:} View request \\
+\textbf{Output:} List of surveys \\[1em]
+
+\textbf{PUC 20: Complete a Survey} \\
+\textbf{Trigger:} The \gls{atd} requests to fill out a survey \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item At least one survey is open for responses
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The \gls{atd}’s responses are submitted and the application confirms the submission \\
+\textbf{Input:} Selected survey and question responses \\
+\textbf{Output:} Survey completion confirmation \\[1em]
+
+\textbf{PUC 21: Edit a Survey Response} \\
+\textbf{Trigger:} The \gls{atd} requests to edit a survey response \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} has completed at least one survey which is still open for responses
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The survey response is updated successfully \\
+\textbf{Input:} Selected survey and edited answers \\
+\textbf{Output:} Survey update confirmation \\[1em]
+
+\textbf{PUC 22: View Previous Survey Responses} \\
+\textbf{Trigger:} The \gls{atd} requests to view their past survey responses \\
+\textbf{Preconditions:}
+\begin{itemize}
+  \item The \gls{atd} is logged in and authenticated
+  \item The \gls{atd} has completed at least one survey
+\end{itemize}
+\textbf{Actors:} \Gls{atd} \\
+\textbf{Outcome:} The system displays the \gls{atd}’s responses for the selected survey \\
+\textbf{Input:} Selected survey \\
+\textbf{Output:} Survey responses \\
+}
+
+\subsection{State Diagrams}
+
+Below are formal state diagrams showing the different states of the system and the transitions between them. [fig:stateadmin]{Figure \ref{fig:stateadmin}} shows the state diagram of the \gls{adm} side of the system and [fig:stateattendee]{Figure \ref{fig:stateattendee}} shows the \gls{atd} side.
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/state_diagram_admin.png}
+    \caption{State diagram of the \gls{adm} side of the system}\label{fig:stateadmin}
+\end{figure}
+\end{center}
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/state_diagram_attendee.png}
+    \caption{State diagram of the \gls{atd} side of the system}\label{fig:stateattendee}
+\end{figure}
+\end{center}
+
+\section{Functional Requirements}
 \subsection{Functional Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries FR-\arabic*:,
+  ref=\bfseries FR-\arabic*]
+  \item \label{FR1} The system shall allow \glspl{adm} to create forms with multiple field types.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-5}\}. \Gls{mes} wants to be able to create forms for their surveys,
+    especially \gls{cfes} surveys, with different response option types.\\
+    {\bf Fit Criterion:} Forms can be created with different response styles (e.g., single choice, multiple choice,
+    numeric scales) and response data is correctly stored in databases.
+  \item \label{FR2} The system shall allow \glspl{adm} to organize forms for analytics, and specify how
+    the analysis should be done.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-3}\}. \Gls{mes} wants to use different metrics to view survey data,
+    and wants to combine multiple forms in a singular analysis.\\
+    {\bf Fit Criterion:} \Glspl{adm} can combine results from multiple forms together in one analysis query, and can
+    compare data points as they wish.
+  \item \label{FR3} The system shall provide \glspl{atd} a method to register for events and view event information.
+    \\[2mm]
+    {\bf Motivation:} \{\textbf{G-2}\}. \Glspl{atd} must have a way to register for events and view event information.\\
+    {\bf Fit Criterion:} \Glspl{atd} can fill out event registration forms and receive and view notifications about
+    the events, and their registration is recorded in the database.
+  \item \label{FR4} The system shall generate QR codes for confirmation and check-in integration.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-2}\}. \Glspl{atd} should be able to provide proof of registration to have easy
+    access to events.\\
+    {\bf Fit Criterion:} A QR code is generated and stored in the dashboard for the \gls{atd}.
+  \item \label{FR5} The system shall provide an event dashboard for \glspl{adm} with filters
+    for status updates on payments, waivers, event sign-ins, etc.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-4}\}. \Glspl{adm} must have a way to track the event and relay updates as needed.\\
+    {\bf Fit Criterion:} The \gls{adm} dashboard provides trackers for sign-ins, and provides a medium to notify
+    \glspl{atd} of any changes.
+  \item \label{FR6} The system shall store all event data in a secure, centralized database.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-6}, \textbf{G-5}, \textbf{G-2}\}. Event and survey data can contain sensitive data
+    from \glspl{atd}, and should only be accessed by authorized users.\\
+    {\bf Fit Criterion:} Only relevant \glspl{adm} can access stored user data unrelated to their account.
+  \item \label{FR7} The system shall store all questionnaire data in a secure, centralized database.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-1}, \textbf{G-3}, \textbf{G-6}\}. See \ref{FR6}.\\
+    {\bf Fit Criterion:} See \ref{FR6}.
+  \item \label{FR8} The system shall allow \glspl{adm} to generate analytics visualizations and export
+    CSV/Excel reports.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-3}\}. \Glspl{adm} should have a way of viewing and exporting survey data.\\
+    {\bf Fit Criterion:} The \gls{adm} can export queried data as CSVs or Excel-compatible files, and can view
+    metrics of their choosing in the admin dashboard after specifying which metrics to plot.
+  \item \label{FR9} The system shall provide event \glspl{atd} with a medium to relay feedback for the
+    event.\\[2mm]
+    {\bf Motivation:} \{\textbf{G-5}\}. \Gls{mes} wants to gather feedback from events and incorporate them in future
+    events.\\
+    {\bf Fit Criterion:} \Glspl{adm} can create feedback forms which \glspl{atd} are provided during the event which
+    they can fill out, and their responses are stored in the database and are available for \glspl{adm} to access
+    during or after the event.
+  \item \label{FR10} The system shall provide \glspl{adm} with a medium to view all event feedback
+    once an event has completed.\\[2mm]
+  {\bf Motivation:} \{\textbf{G-5}, \textbf{G-4}, \textbf{G-3}\}. See \ref{FR9}.\\
+  {\bf Fit Criterion:} See \ref{FR9}.
+  \item \label{FR11} The system shall implement a roles-based feature access system which ensures that only relevant
+    functionality and information is made available to the user.\\[2mm]
+    {\bf Motivation:} \{{\bf G-4}, {\bf G-6}, {\bf G-2}\}. \Gls{mes} wants access to be restricted and ensure that
+    only authorized personnel can view relevant information.\\
+    {\bf Fit Criterion:} Users assigned roles can access information and features specified by those roles, and cannot
+    see irrelevant features or information.
+\end{enumerate}
 
-\noindent \begin{itemize}
+\section{Look and Feel Requirements}
+\subsection{Appearance Requirements}
+\begin{enumerate}[label=\bfseries AR-\arabic*:, wide=0pt, leftmargin=*, 
+  ref=\bfseries AR-\arabic*]
+  \item \label{AR1} The interface shall comply with \Gls{mes} branding criteria (logo, images, colour scheme).\\[2mm]
+    {\bf Motivation:} Ensures that the product is recognizable as an official \Gls{mes} event registration platform.\\
+    {\bf Fit Criterion:} The client from \Gls{mes} shall act as a mediator to request apperance specifications and ensure the product complies with the current standards.\\
+    {\bf Goals:} G-1
+  \item \label{AR2} The tool shall have a clean, minimalist layout prioritizing the functionality.\\[2mm]
+    {\bf Motivation:} Increases accessibility and user productivity, and allows for consistency across different events.\\
+    {\bf Fit Criterion:} After use in some \Gls{mes} events, 70\% of users shall agree it was \textit{clean} and \textit{professional}.\\
+    {\bf Goals:} G-1, G-5
+  \item \label{AR3} \Gls{adm} dashboard shall clearly display relevant analytics, and distinct charts.\\[2mm]
+    {\bf Motivation:} Improves organizer accessibility and readability, allowing for easier management during planning operations.\\
+    {\bf Fit Criterion:} The client shall approve of the analytics layout.\\
+    {\bf Goals:} G-3, G-4
+\end{enumerate}
 
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_Inputs}:] \plt{Requirements
-    for the inputs that are supplied by the user.  This information has to be
-    explicit.}
+\subsection{Style Requirements}
+\begin{enumerate}[label=\bfseries SR-\arabic*:, wide=0pt, leftmargin=*, 
+  ref=\bfseries SR-\arabic*]
+  \item \label{SR1} The design shall be professional but approachable, accomodating all types of events.\\[2mm]
+    {\bf Motivation:} The app should have a friendly vibe for casual student use, yet maintain a sense of maturity for the more formal uses.\\
+    {\bf Fit Criterion:} After use in some \Gls{mes} events, 70\% of users shall agree that they trust and respect the product, and 70\% shall agree that it was not boring.\\
+    {\bf Goals:} G-1, G-5
+  \item \label{SR2} The \gls{adm} dashboard shall emphasize functionality and clarity, avoiding distractions just for the sake of aesthetics.\\[2mm]
+    {\bf Motivation:} \Gls{adm} and organizers require clear data and analytics, they have no use for stylistic components.\\
+    {\bf Fit Criterion:} A sample of event organizers and club executives approve and are able to interpret all analytics without prior explanation.\\
+    {\bf Goals:} G-3
+\end{enumerate}
 
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_OutputInputs}:] \plt{It isn't
-    always required, but often echoing the inputs as part of the output is a
-    good idea.}
+\section{Usability and Humanity Requirements}
+\subsection{Ease of Use Requirements}
+\begin{enumerate}[label=\bfseries ER-\arabic*:, wide=0pt, leftmargin=*, 
+  ref=\bfseries ER-\arabic*]
+  \item \label{ER1} Registration and feedback forms shall be intiutive and require no clarification.\\[2mm]
+    {\bf Motivation:} \Glspl{atd} should have clear direction and be able to fill it out on their first attempt with no instruction or training.\\
+    {\bf Fit Criterion:} During usability testing across the MES events, at least 80\% of \glspl{atd} rate the platform's \textit{ease of use} a 4+.\\
+    {\bf Goals:} G-2, G-5
+  \item \label{ER2} Users shall sign-up/sign-in to the app with no instruction. \\[2mm]
+    {\bf Motivation:} The registration process is the most important aspect of the platform, so the app should have a clear and simple layout.\\
+    {\bf Fit Criterion:} A sample of users shall register/login within 2 minutes without instruction.\\
+    {\bf Goals:} G-2
+  \item \label{ER3} \Glspl{adm} shall interact with dashboard, create a custom form, and visualize analytics with minimal instruction.\\[2mm]
+    {\bf Motivation:} The \gls{adm} dashboard should be intuitive so that any new \glspl{adm} can immediately work out how to use it.\\
+    {\bf Fit Criterion:} A sample of event organizers are able to interpret all analytics without prior explanation.\\
+    {\bf Goals:} G-3
+\end{enumerate}
 
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_Calculate}:] \plt{Calculation
-    related requirements.}
+\subsection{Personalization and Internationalization Requirements}
+\begin{enumerate}[label=\bfseries PI-\arabic*, wide=0pt, leftmargin=*, ref=\bfseries PI-\arabic*]
+  \item \label{PI1}The custom form builder shall allow \gls{adm} to create personalized forms with event-specific fields.\\[2mm]
+    {\bf Motivation:} Flexibility is essential to accommodate the diverse set of events as per the scope.\\
+    {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.\\
+    {\bf Goals:} G-1
+  \item \label{PI2} \Gls{adm} dashboard shall support sorting and filtering of \glspl{atd} by predefined metrics.\\[2mm]
+    {\bf Motivation:} Streamlines the attendee organizing process, allowing admin to categorize attendees as per the event requirements.\\
+    {\bf Fit Criterion:} Organizers shall filter \glspl{atd} within 1 minute of use without instruction.\\
+    {\bf Goals:} G-3, G-4
+\end{enumerate}
 
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_VerifyOutput}:]
-  \plt{Verification related requirements.}
+\subsection{Learning Requirements}
+\begin{enumerate}[label=\bfseries LR-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries LR-\arabic*]
+  \item \label{LR1} The app shall be easy for anyone with an intermediate level of English.\\[2mm]
+    {\bf Motivation:} Users should expect intuitive, concise ineteractions.\\
+    {\bf Fit Criterion:} 80\% of \glspl{atd} successfully complete a form with no assistance.\\
+    {\bf Goals:} G-2, G-5
+  \item \label{LR2} \Gls{adm} shall be able to build a form with the custom builder with no prior instruction.\\[2mm]
+    {\bf Motivation:} Event organizers are constantly changing, so it is important to reduce dependency on technical training.\\
+    {\bf Fit Criterion:} 80\% of organizers shall complete a basic test form on their first attempt.\\
+    {\bf Goals:} G-1, G-3, G-4
+\end{enumerate}
 
-\item[R\refstepcounter{reqnum}\thereqnum \label{R_Output}:] \plt{Output related
-    requirements.}
+\subsection{Understandability and Politeness Requirements}
+\begin{enumerate}[label=\bfseries UR-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries UR-\arabic*]
+  \item \label{UR1} Basic, non-technical language will be used (Sign-up instead of RSVP).\\[2mm]
+    {\bf Motivation:} Increases accessibility among non-technical users, or non-fluent English speakers.\\
+    {\bf Fit Criterion:} 80\% of students understand all wording without clarification.\\
+    {\bf Goals:} G-5
+  \item \label{UR2} The app shall communicate errors clearly and politely.\\[2mm]
+    {\bf Motivation:} Clear error messages reduce frustration and improve user experience.\\
+    {\bf Fit Criterion:} Feedback suggests that 80\% of students found the experience satisfying.\\
+    {\bf Goals:} G-5
+  \item \label{UR3} The app shall hide sensitive and confidential information from users.\\[2mm]
+    {\bf Motivation:} Enhances security and confidence of organizations in the product.\\
+    {\bf Fit Criterion:} Approval from MES representative.\\
+    {\bf Goals:} G-2, G-4
+  \item Progress bars and confirmations shall be used to inform users of their status.\\[2mm]
+    {\bf Motivation:} Improves user experience and reduces user abandonment.\\
+    {\bf Fit Criterion:} 90\% of students completed the form without leaving.\\
+    {\bf Goals:} G-5
+\end{enumerate}
 
-\end{itemize}
+\subsection{Accessibility Requirements}
+\begin{enumerate}[label=\bfseries AC-\arabic*:, wide=0pt, leftmargin=*,ref=\bfseries AC-\arabic*]
+  \item \label{AC1} The app shall conform to WCAG 2.0 AA standards as per the Accessibility for Ontarians with Disabilities Act (AODA), improving visibility for impaired users.\\[2mm]
+    {\bf Motivation:} Ensures accessibility for users with visual disabilities and impairments.\\
+    {\bf Fit Criterion:} Approval from a sample of students with impairments, and evaluation tools.\\
+    {\bf Goals:} G-5
+\end{enumerate}
 
-\plt{Every IM should map to at least one requirement, but not every requirement
-  has to map to a corresponding IM.}
+\section{Performance Requirements}
+\subsection{Speed and Latency Requirements}
+\begin{enumerate}[label=\bfseries SL-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries SL-\arabic*]
+  \item \label{SL1} The system shall have a maximum 2-second latency for form loading, optimized for mobile devices.\\
+  {\bf Motivation:} Allows for faster registration process and avoids user abandonment.\\
+  {\bf Fit Criterion:} Conduct a load test on different devices to ensure it meets the threshold.\\
+  {\bf Goals:} G-1, G-5
+  \item \label{SL2} \Gls{atd} information and backend analytics shall have a maximum 4-second latency.\\
+  {\bf Motivation:} \Glspl{adm} and organizers require responsive timing to stay on track.\\
+  {\bf Fit Criterion:} Performance test show that results load within threshold.\\
+  {\bf Goals:} G-3, G-4
+\end{enumerate}
 
-\subsection{Nonfunctional Requirements}
+\subsection{Safety-Critical Requirements}
+\begin{enumerate}[label=\bfseries SC-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries SC-\arabic*]
+  \item \label{SC1} The system shall ensure that no errors are introduced that could result in data leaks, violating privacy laws.\\
+  {\bf Motivation:} Crucial to ensure the security of the product to build confidence in users and avoid liability to violations.\\
+  {\bf Fit Criterion:} Conduct security tests to ensure no data leaks occur.
+\end{enumerate}
 
-\plt{List your nonfunctional requirements.  You may consider using a fit
-  criterion to make them verifiable.}
-\plt{The goal is for the nonfunctional requirements to be unambiguous, abstract
-  and verifiable.  This isn't easy to show succinctly, so a good strategy may be
-to give a ``high level'' view of the requirement, but allow for the details to
-be covered in the Verification and Validation document.}
-\plt{An absolute requirement on a quality of the system is rarely needed.  For
-  instance, an accuracy of 0.0101 \% is likely fine, even if the requirement is
-  for 0.01 \% accuracy.  Therefore, the emphasis will often be more on
-  describing now well the quality is achieved, through experimentation, and
-  possibly theory, rather than meeting some bar that was defined a priori.}
-\plt{You do not need an entry for correctness in your NFRs.  The purpose of the
-  SRS is to record the requirements that need to be satisfied for correctness.
-  Any statement of correctness would just be redundant. Rather than discuss
-  correctness, you can characterize how far away from the correct (true)
-  solution you are allowed to be.  This is discussed under accuracy.}
+\subsection{Precision or Accuracy Requirements}
+\begin{enumerate}[label=\bfseries PA-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries PA-\arabic*]
+  \item \label{PA1} The system shall display all backend analytics accurate to the decimal.\\
+  {\bf Motivation:} \Gls{adm} depends on accurate analytics for logisitcs, and organizing events. Since we are dealing with discrete data, such as attendee count, there should be no issue having it 100\% accurate.\\
+  {\bf Fit Criterion:} Conduct performance test and compare records to displayed analytics.\\
+  {\bf Goals:} G-3, G-4
+\end{enumerate}
 
-\noindent \begin{itemize}
+\subsection{Robustness or Fault-Tolerance Requirements}
+\begin{enumerate}[label=\bfseries FT-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries FT-\arabic*]
+  \item \label{FT1} The system shall auto-save incomplete surveys every 30 seconds.\\
+  {\bf Motivation:} Prevents loss of progress from mistakes or connectivity issues.\\
+  {\bf Fit Criterion:} Make new changes, wait 30 seconds, and refresh the page. The changes should still be present.\\
+  {\bf Goals:} G-5
+  \item \label{FT2} The system shall locally queue changes and re-apply them after disconnects within 60 seconds.\\
+  {\bf Motivation:} Maintains progress to a degree to avoid user frustration. Mobile users often lose their connection depending on location, so this is highly relevant.\\
+  {\bf Fit Criterion:} Make changes to the form while offline, and then go back online. The changes should be saved and applied within 60 seconds.\\
+  {\bf Goals:} G-3, G-5
+  \item \label{FT3} The system shall allow new form modules to be added without any downtime.\\
+  {\bf Motivation:} Ensures that different organizers can add forms for their respective events without disrupting other ongoing events.\\
+  {\bf Fit Criterion:} Add a new form module while an event is ongoing, and ensure no downtime or data loss occurs.\\
+  {\bf Goals:} G-1
+  \item \label{FT4} The system shall allow \glspl{adm} to update event templates without disruption
+    during ongoing events.\\
+  {\bf Motivation:} Ensures that organizers can make live changes without disrupting the event.\\
+  {\bf Fit Criterion:} Update an event template while an event is ongoing, and ensure no downtime or data loss occurs.\\
+  {\bf Goals:} G-1
+  \item \label{FT5} The system shall display a last updated signifier for all analytics.\\
+  {\bf Motivation:} Ensures that organizers can trust the data they are viewing.\\
+  {\bf Fit Criterion:} Record time of live analytics as they are updated, then wait and go offline. Compare and make sure the last updated timestamp is accurate.\\
+  {\bf Goals:} G-3, G-4
+  \end{enumerate}
 
-\item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accuracy}:]
-  \textbf{Accuracy} \plt{Characterize the accuracy by giving the context/use for
-    the software.  Maybe something like, ``The accuracy of the computed
-    solutions should meet the level needed for $<$engineering or scientific
-    application$>$.  The level of accuracy achieved by \progname{} shall be
-    described following the procedure given in Section~X of the Verification and
-    Validation Plan.''  A link to the VnV plan would be a nice extra.}
+\subsection{Capacity Requirements}
+\begin{enumerate}[label=\bfseries CR-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries CR-\arabic*]
+  \item The system shall support 2047 concurrent users during peak event times.\\
+  {\bf Motivation:} Ensures workflow is maintained during surges in usage.\\
+  {\bf Fit Criterion:} Conduct performance test with 100 concurrent users with minimal error rate and latency. See \ref{SL1}, \ref{SL2}.\\
+  {\bf Goals:} G-2, G-3, G-4
+  \item The system database shall support up to 50,000 total user entries.\\
+  {\bf Motivation:} Large events over the scope of the year require large tables. Ensures that the product can scale with the growing number of MES events and users.\\
+  {\bf Fit Criterion:} Create 50,000 test rows in the database. Check that they are stored correctly and that table interactions (filter, search) exhibit latency. See \ref{SL1}, \ref{SL2}.\\
+  {\bf Goals:} G-2, G-3, G-4
+\end{enumerate}
 
-\item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Usability}:] \textbf{Usability}
-  \plt{Characterize the usability by giving the context/use for the software.
-    You should likely reference the user characteristics section.  The level of
-    usability achieved by the software shall be described following the
-    procedure given in Section~X of the Verification and Validation Plan.  A
-    link to the VnV plan would be a nice extra.}
+\subsection{Scalability or Extensibility Requirements}
+\begin{enumerate}[label=\bfseries SE-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries SE-\arabic*]
+  \item \label{SE1} The system shall support up to 2047 registrations per event.
+  \item \label{SE2} The system shall be designed to allow for new analytic modules to be added in the future.\\
+  {\bf Motivation:} As \Gls{mes} events evolve, new analytics may be required. Ensures that the product can adapt to future needs.\\
+  {\bf Fit Criterion:} Design the system to allow for easy integration of new modules without major refactoring.\\
+  {\bf Goals:} G-3, G-4
+\end{enumerate}
 
-\item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Maintainability}:]
-  \textbf{Maintainability} \plt{The effort required to make any of the likely
-    changes listed for \progname{} should be less than FRACTION of the original
-    development time.  FRACTION is then a symbolic constant that can be defined
-    at the end of the report.}
+\subsection{Longevity Requirements}
+\begin{enumerate}[label=\bfseries LG-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries LG-\arabic*]
+  \item \label{LG1} The system shall be maintainable to fit future changes in \textit{React} or coding standards.\\
+    {\bf Motivation:} Ensures the tool can be updated easily to maintain usage over time.\\
+    {\bf Fit Criterion:} Thorough documentation, and modular coding practices.\\
+    {\bf Goals:} All
+  \item \label{LG2} The system shall support data portability.\\
+    {\bf Motivation:} Exporting the data and storing is elsewhere allows to maintain space for future events.\\
+    {\bf Fit Criterion:} Successfully exporting data to CSV/Excel formats.\\
+    {\bf Goals:} G-3, G-4
+\end{enumerate}
 
-\item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Portability}:]
-  \textbf{Portability} \plt{This NFR is easier to write than the others.  The
-    systems that \progname{} should run on should be listed here.  When possible
-    the specific versions of the potential operating environments should be
-    given.  To make the NFR verifiable a statement could be made that the tests
-    from a given section of the VnV plan can be successfully run on all of the
-    possible operating environments.}
+\section{Operational and Environmental Requirements}
+\subsection{Expected Physical Environment}
+\begin{enumerate}[label=\bfseries PE-\arabic*:, wide=0pt, leftmargin=*]
+  \item The system shall be used in convential device conditions (connection, temperature, humidity).\\
+    {\bf Motivation:} Clarifies the system is expected to be used in typical environmental conditions for a mobile device. If in an environment with extreme conditions where the device will not function, the system will naturally not function either.\\
+    {\bf Fit Criterion:} The device functions normally and can use other apps.\\
+\end{enumerate}
 
-\item Other NFRs that might be discussed include verifiability,
-  understandability and reusability.
+\subsection{Wider Environment Requirements}
+Not Applicable.
 
-\end{itemize}
+\subsection{Requirements for Interfacing with Adjacent Systems}
+\begin{enumerate}[label=\bfseries IR-\arabic*:, wide=0pt, leftmargin=*]
+  \item The system shall work on recent releases of the most popular browsers.\\
+    {\bf Motivation:} Ensures that all users using a variety of devices and browsers can freely use the system.\\
+    {\bf Fit Criterion:} Test system on two versions of each of: Chrome, Safari, Edge, Firefox.
+  \item The system shall be compatible with both iOS and Android as an app.\\
+    {\bf Motivation:} Attendees will mostly use the mobile version, so app compatibility is a crucial element.\\
+    {\bf Fit Criterion:} Test of two versions of both an Apple and Android device. 
+\end{enumerate}
 
-\subsection{Rationale}
+\subsection{Productization Requirements}
+\begin{enumerate}[label=\bfseries PD-\arabic*:, wide=0pt, leftmargin=*]
+  \item The system shall be distributed as a secure webiste accessible under the predefined link/domain.\\
+    {\bf Motivation:} Keeps the system easily accessible at all times.\\
+    {\bf Fit Criterion:} Test that the HTTPS link is freely accessible with a TLS certificate.
+  \item The system shall be distributed as an app via popular app stores.\\
+    {\bf Motivation:} Attendees will benefit from mobile registration, and the freedom it brings.\\
+    {\bf Fit Criterion:} App can be installed on both iOS and Android devices.
+\end{enumerate}
 
-\plt{Provide a rationale for the decisions made in the documentation.  Rationale
-should be provided for scope decisions, modelling decisions, assumptions and
-typical values.}
+\subsection{Release Requirements}
+\begin{enumerate}[label=\bfseries RR-\arabic*:, wide=0pt, leftmargin=*]
+  \item The primary features specified in the goals and requirements must be implemented in a testable prototype by January, 2026.\\
+    {\bf Motivation:} Ensures that the system can be tested in the 2026 MES eventsand improved.\\
+    {\bf Fit Criterion:} Prototype approved by MES representative.
+\end{enumerate}
 
-\section{Likely Changes}    
+\section{Maintainability and Support Requirements}
+\subsection{Maintenance Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries MT-\arabic*:,
+  ref=\bfseries MT-\arabic*]
+  \item \label{MSMR1} The system shall provide updated documentation upon every release and be accessible to all developers\\[2mm]
+    {\bf Motivation:} Allows for developers to understand the changes made on each release and will be easily be able to modify the code to fix errors or make updates. \\
+    {\bf Fit Criterion:} Updated documentation will be included with the release of each version.
+\end{enumerate}
+\subsection{Supportability Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries SU-\arabic*:,
+  ref=\bfseries SU-\arabic*]
+  \item \label{MSSR1} The system shall include a FAQ section to help clarify or answer common questions.\\[2mm]
+    {\bf Motivation:} Will allow for a better user experience as they can solve their own problems quickly and will make it easier for MES support teams. \\
+    {\bf Fit Criterion:} Ensure a FAQ with common questions obtained from stakeholders (supervisor and MES council members) is included within the system.
+\end{enumerate}
+\subsection{Adaptability Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries AD-\arabic*:,
+  ref=\bfseries AD-\arabic*]
+  \item \label{MSAR1} The system shall run as a web app accessible through Chromium, Firefox, and Safari browsers. \\[2mm]
+    {\bf Motivation:} This will allow users to use whatever browser they want and will make the application more accessible. \\
+    {\bf Fit Criterion:} Test for compatibility of the application to ensure it runs on all specified browsers.
+  \item \label{MSAR2} The mobile app components will work on both IOS and Android platforms. \\[2mm]
+    {\bf Motivation:} Allows users on both mobile ecosystems to use the app making the application more accessible. \\
+    {\bf Fit Criterion:} Test the application in both the IOS and Android Environment ensuring correct functionality of all components.
+\end{enumerate}
 
-\noindent \begin{itemize}
+\section{Security Requirements}
+\subsection{Access Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries AC-\arabic*:,
+  ref=\bfseries AC-\arabic*]
+  \item \label{SAR1} The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
+    {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\
+    {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.
+  \item \label{SAR2} Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
+    {\bf Motivation:} Prevents unauthorized users from viewing sensitive event and user data.  \\
+    {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins
+\end{enumerate}
+\subsection{Integrity Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries IG-\arabic*:,
+  ref=\bfseries IG-\arabic*]
+  \item \label{SIR1} The system shall provide input validation for all user submitted data \\[2mm]
+    {\bf Motivation:} Ensures the safety of our application by ensuring only the required input types are entering our database. Protects us from SQL injection and data corruption in our database.  \\
+    {\bf Fit Criterion:} All inputs will include checks to ensure only the correct type is entering our database. Perform testing to ensure that all inputs have validation checks.
+  \item \label{SIR2} The system shall only use HTTPS for communication between clients and servers \\[2mm]
+    {\bf Motivation:} Ensures a secure connection between our client and server and protects against the interception or tampering of data during data transmission. \\
+    {\bf Fit Criterion:} All requests will be done through HTTPS and if an HTTP request is done we will redirect it to HTTPS. \\
+\end{enumerate}
+\subsection{Privacy Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries PV-\arabic*:,
+  ref=\bfseries PV-\arabic*]
+  \item \label{SPR1} Users shall have the ability to request for the deletion of their stored personal data\\[2mm]
+    {\bf Motivation:} Increases transparency and control over their own data for users. Provides reassurances for users that their data can be removed if neccesary.    \\
+    {\bf Fit Criterion:} Ensure a mechanism exists for users to delete their data. Peform testing so that the mechanism actually removes all related data from the database.
+  \item \label{SPR2} The system shall only store sensitive data after obtaining the consent of the user \\[2mm]
+    {\bf Motivation:} Keeps us legally sound as we are not storing user data without first obtaining consent. Also provides users with information on what their data is actually being used for.  \\
+    {\bf Fit Criterion:} Ensure that all sections which require inputting sensitive information have consent checks where we explicitly explain what is being stored and how it may be used. \\
+  \item \label{SPR3} All sensitive user information such as student numbers, names and emails shall be encrypted in storage using AES-256\\[2mm]
+    {\bf Motivation:} Protects user's information from unauthorized viewing and ensures that even if a breach were to occur sensitive information will not be leaked.   \\
+    {\bf Fit Criterion:} Inspect database to show that the required fields are stored encrypted and not in plaintext. \\
+\end{enumerate}
+\subsection{Audit Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries AU-\arabic*:,
+  ref=\bfseries AU-\arabic*]
+  \item \label{SAuR1} The system shall track admin action inside an audit log\\[2mm]
+    {\bf Motivation:} Ensures traceability of admin actions and allows other admins to know who performed what.  \\
+    {\bf Fit Criterion:} 100\% of actions will be in a log with tracking of user who did the action, timestamp and action commited. Testing will be done to ensure all actions are being logged and logs should be exportable for review.
+\end{enumerate}
+% \subsection{Immunity Requirements}
+% \textit{No relevant requirements}
 
-\item[LC\refstepcounter{lcnum}\thelcnum\label{LC_meaningfulLabel}:] \plt{Give
-    the likely changes, with a reference to the related assumption (aref), as appropriate.}
+\section{Cultural Requirements}
+\subsection{Cultural Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries CL-\arabic*:,
+  ref=\bfseries CL-\arabic*]
+  \item \label{CR1} The system shall use Canadian English spelling.\\[2mm]
+    {\bf Motivation:} \Gls{mes} is an organization located in Canada.\\
+    {\bf Fit Criterion:} All rendered text provided by the system passes a Canadian English spell-checker.\\
+\end{enumerate}
 
-\end{itemize}
+\section{Compliance Requirements}
+\subsection{Legal Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries LG-\arabic*:,
+  ref=\bfseries LG-\arabic*]
+  \item \label{CLR1} The system shall store and handle all sensitive personal data in compliance with PIPEDA regulations.\\[2mm]
+    {\bf Motivation:} The system will store private personal information, which must be done responsibly.\\
+    {\bf Fit Criterion:} The system meets all PIPEDA regulation requirements.\\
+\end{enumerate}
+\subsection{Standards Compliance Requirements}
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries ST-\arabic*:,
+  ref=\bfseries ST-\arabic*]
+  \item \label{CSCR1} The system code shall conform to the \textit{Airbnb JavaScript Style Guide} and \textit{Airbnb React/JSX
+    Style Guide}.\\[2mm]
+    {\bf Motivation:} Specified in Development Plan \S \ 11.\\
+    {\bf Fit Criterion:} The system code passes all CI/CD checks related to formatting compliance.\\
+\end{enumerate}
 
-\section{Unlikely Changes}    
-
-\noindent \begin{itemize}
-
-\item[LC\refstepcounter{lcnum}\thelcnum\label{LC_meaningfulLabel}:] \plt{Give
-    the unlikely changes.  The design can assume that the changes listed will
-    not occur.}
-
-\end{itemize}
-
-\section{Traceability Matrices and Graphs}
-
-The purpose of the traceability matrices is to provide easy references on what
-has to be additionally modified if a certain component is changed.  Every time a
-component is changed, the items in the column of that component that are marked
-with an ``X'' may have to be modified as well.  Table~\ref{Table:trace} shows the
-dependencies of theoretical models, general definitions, data definitions, and
-instance models with each other. Table~\ref{Table:R_trace} shows the
-dependencies of instance models, requirements, and data constraints on each
-other. Table~\ref{Table:A_trace} shows the dependencies of theoretical models,
-general definitions, data definitions, instance models, and likely changes on
-the assumptions.
-
-\plt{You will have to modify these tables for your problem.}
-
-\plt{The traceability matrix is not generally symmetric.  If GD1 uses A1, that
-  means that GD1's derivation or presentation requires invocation of A1.  A1
-  does not use GD1.  A1 is ``used by'' GD1.}
-
-\plt{The traceability matrix is challenging to maintain manually.  Please do
-  your best.  In the future tools (like Drasil) will make this much easier.}
-
-\afterpage{
-\begin{landscape}
-\begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-	& \aref{A_OnlyThermalEnergy}& \aref{A_hcoeff}& \aref{A_mixed}& \aref{A_tpcm}& \aref{A_const_density}& \aref{A_const_C}& \aref{A_Newt_coil}& \aref{A_tcoil}& \aref{A_tlcoil}& \aref{A_Newt_pcm}& \aref{A_charge}& \aref{A_InitTemp}& \aref{A_OpRangePCM}& \aref{A_OpRange}& \aref{A_htank}& \aref{A_int_heat}& \aref{A_vpcm}& \aref{A_PCM_state}& \aref{A_Pressure} \\
-\hline
-\tref{T_COE}        & X& & & & & & & & & & & & & & & & & & \\ \hline
-\tref{T_SHE}        & & & & & & & & & & & & & & & & & & & \\ \hline
-\tref{T_LHE}        & & & & & & & & & & & & & & & & & & & \\ \hline
-\dref{NL}           & & X& & & & & & & & & & & & & & & & & \\ \hline
-\dref{ROCT}         & & & X& X& X& X& & & & & & & & & & & & & \\ \hline
-\ddref{FluxCoil}    & & & & & & & X& X& X& & & & & & & & & & \\ \hline
-\ddref{FluxPCM}     & & & X& X& & & & & & X& & & & & & & & & \\ \hline
-\ddref{D_HOF}       & & & & & & & & & & & & & & & & & & & \\ \hline
-\ddref{D_MF}        & & & & & & & & & & & & & & & & & & & \\ \hline
-\iref{ewat}         & & & & & & & & & & & X& X& & X& X& X& & & X \\ \hline
-\iref{epcm}         & & & & & & & & & & & & X& X& & & X& X& X& \\ \hline
-\iref{I_HWAT}       & & & & & & & & & & & & & & X& & & & & X \\ \hline
-\iref{I_HPCM}       & & & & & & & & & & & & & X& & & & & X & \\ \hline
-\lcref{LC_tpcm}     & & & & X& & & & & & & & & & & & & & & \\ \hline
-\lcref{LC_tcoil}    & & & & & & & & X& & & & & & & & & & & \\ \hline
-\lcref{LC_tlcoil}   & & & & & & & & & X& & & & & & & & & & \\ \hline
-\lcref{LC_charge}   & & & & & & & & & & & X& & & & & & & & \\ \hline
-\lcref{LC_InitTemp} & & & & & & & & & & & & X& & & & & & & \\ \hline
-\lcref{LC_htank}    & & & & & & & & & & & & & & & X& & & & \\
-\hline
-\end{tabular}
-\caption{Traceability Matrix Showing the Connections Between Assumptions and Other Items}
-\label{Table:A_trace}
-\end{table}
-\end{landscape}
-}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline        
-	& \tref{T_COE}& \tref{T_SHE}& \tref{T_LHE}& \dref{NL}& \dref{ROCT} & \ddref{FluxCoil}& \ddref{FluxPCM} & \ddref{D_HOF}& \ddref{D_MF}& \iref{ewat}& \iref{epcm}& \iref{I_HWAT}& \iref{I_HPCM} \\
-\hline
-\tref{T_COE}     & & & & & & & & & & & & & \\ \hline
-\tref{T_SHE}     & & & X& & & & & & & & & & \\ \hline
-\tref{T_LHE}     & & & & & & & & & & & & & \\ \hline
-\dref{NL}        & & & & & & & & & & & & & \\ \hline
-\dref{ROCT}      & X& & & & & & & & & & & & \\ \hline
-\ddref{FluxCoil} & & & & X& & & & & & & & & \\ \hline
-\ddref{FluxPCM}  & & & & X& & & & & & & & & \\ \hline
-\ddref{D_HOF}    & & & & & & & & & & & & & \\ \hline
-\ddref{D_MF}     & & & & & & & & X& & & & & \\ \hline
-\iref{ewat}      & & & & & X& X& X& & & & X& & \\ \hline
-\iref{epcm}      & & & & & X& & X& & X& X& & & X \\ \hline
-\iref{I_HWAT}    & & X& & & & & & & & & & & \\ \hline
-\iref{I_HPCM}    & & X& X& & & & X& X& X& & X& & \\
-\hline
-\end{tabular}
-\caption{Traceability Matrix Showing the Connections Between Items of Different Sections}
-\label{Table:trace}
-\end{table}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{|c|c|c|c|c|c|c|c|}
-\hline
-	& \iref{ewat}& \iref{epcm}& \iref{I_HWAT}& \iref{I_HPCM}& \ref{sec_DataConstraints}& \rref{R_RawInputs}& \rref{R_MassInputs} \\
-\hline
-\iref{ewat}            & & X& & & & X& X \\ \hline
-\iref{epcm}            & X& & & X& & X& X \\ \hline
-\iref{I_HWAT}          & & & & & & X& X \\ \hline
-\iref{I_HPCM}          & & X& & & & X& X \\ \hline
-\rref{R_RawInputs}     & & & & & & & \\ \hline
-\rref{R_MassInputs}    & & & & & & X& \\ \hline
-\rref{R_CheckInputs}   & & & & & X& & \\ \hline
-\rref{R_OutputInputs}  & X& X& & & & X& X \\ \hline
-\rref{R_TempWater}     & X& & & & & & \\ \hline 
-\rref{R_TempPCM}       & & X& & & & & \\ \hline
-\rref{R_EnergyWater}   & & & X& & & & \\ \hline
-\rref{R_EnergyPCM}     & & & & X& & & \\ \hline
-\rref{R_VerifyOutput}  & & & X& X& & & \\ \hline
-\rref{R_timeMeltBegin} & & X& & & & & \\ \hline
-\rref{R_timeMeltEnd}   & & X& & & & & \\ 
-\hline
-\end{tabular}
-\caption{Traceability Matrix Showing the Connections Between Requirements and Instance Models}
-\label{Table:R_trace}
-\end{table}
-
-The purpose of the traceability graphs is also to provide easy references on
-what has to be additionally modified if a certain component is changed.  The
-arrows in the graphs represent dependencies. The component at the tail of an
-arrow is depended on by the component at the head of that arrow. Therefore, if a
-component is changed, the components that it points to should also be
-changed. Figure~\ref{Fig_ATrace} shows the dependencies of theoretical models,
-general definitions, data definitions, instance models, likely changes, and
-assumptions on each other. Figure~\ref{Fig_RTrace} shows the dependencies of
-instance models, requirements, and data constraints on each other.
-
-% \begin{figure}[h!]
-% 	\begin{center}
-% 		%\rotatebox{-90}
-% 		{
-% 			\includegraphics[width=\textwidth]{ATrace.png}
-% 		}
-% 		\caption{\label{Fig_ATrace} Traceability Matrix Showing the Connections Between Items of Different Sections}
-% 	\end{center}
-% \end{figure}
-
-
-% \begin{figure}[h!]
-% 	\begin{center}
-% 		%\rotatebox{-90}
-% 		{
-% 			\includegraphics[width=0.7\textwidth]{RTrace.png}
-% 		}
-% 		\caption{\label{Fig_RTrace} Traceability Matrix Showing the Connections Between Requirements, Instance Models, and Data Constraints}
-% 	\end{center}
-% \end{figure}
-
-\section{Development Plan}
-
-\plt{This section is optional.  It is used to explain the plan for developing
-  the software.  In particular, this section gives a list of the order in which
-  the requirements will be implemented.  In the context of a course  this is
-  where you can indicate which requirements will be implemented as part of the
-  course, and which will be ``faked'' as future work.  This section can be
-  organized as a prioritized list of requirements, or it could should the
-  requirements that will be implemented for ``phase 1'', ``phase 2'', etc.}
-
-\section{Values of Auxiliary Constants}
-
-\plt{Show the values of the symbolic parameters introduced in the report.}
-
-\plt{The definition of the requirements will likely call for SYMBOLIC\_CONSTANTS.
-Their values are defined in this section for easy maintenance.}
-
-\plt{The value of FRACTION, for the Maintainability NFR would be given here.}
-
-\newpage
-
-\bibliographystyle {plainnat}
-\bibliography {../../refs/References}
-
-\newpage
-
-\noindent \plt{The following is not part of the template, just some things to consider
-  when filing in the template.}
-
-\noindent \plt{Grammar, flow and \LaTeX advice:
+\section{Open Issues}
+There are currently no open issues which need to be considered at this stage of the development cycle.
+% Any problems that remain unresolved and undefined
+\section{Off-the-Shelf Solutions}
+\subsection{Ready-Made Products}
+There are some products that exist on the market which solve certain components of this product but no product exists
+that combines these components into one. For event management there are various tools such as EventBrite and Stubhub
+which can allow for the selling of tickets for events. The problem with these products are that they don't integrate
+well with current \gls{mes} Systems and don't provide all the features as required such as collecting waivers and
+ensuring McMaster students attend university specific events. For general data collection Google Forms is the most used
+tool, and it allows for the creation of complex forms and stores data in spreadsheets. For further data analysis it
+requires effort on the part of the form creator to actually go and analyze the data to gain actual insights. Also, the
+forms can become hard to handle as they become complex and can become confusing for respondents. As mentioned before
+there is no tool that has a combination of the two components.
+\subsection{Reusable Components}
+There are various components that we can use to help develop our application:
 \begin{itemize}
-\item For Mac users \texttt{*.DS\_Store} should be in \texttt{.gitignore}
-\item \LaTeX{} and formatting rules
-\begin{itemize}
-\item Variables are italic, everything else not, includes subscripts (link to
-  document)
-\begin{itemize}
-\item \href{https://physics.nist.gov/cuu/pdf/typefaces.pdf}{Conventions}
-\item Watch out for implied multiplication
+  \item \textbf{Vite}: Provides us with a framework for developing web apps in \textbf{React} and provides built in
+    routing behaviour. It also handles many built in libraries and packages that we can use for front-end styling such
+    as \textbf{tailwind-css}. We can also integrate it with other libraries for authentication and for database
+    management
+  \item \textbf{TanStack}: Provides us with a powerful middleware to connect backend and front-end services. Will
+    primarily be used for routing but also offers data visualization capabilities. Offers many libraries for working
+    with data and state management that we can leverage.
+  \item \textbf{SurveyJS}: This is a potential tool we can use to develop the form builder as it provides us with some
+    pre-built components we can use to develop and customize our own forms.
+  \item \textbf{Recharts}: This could be potential charting tool we can use to develop our admin dashboard. Though there
+    are other charting tools the benefit of Recharts is that it provides customization on top of the pre-built charts.
+  \item \textbf{Drizzle}: We can use Drizzle as an ORM to map from our database to our web-app. Drizzle is useful since
+    it is lightweight and is code first. Drizzle's simplicity allows for faster development and is perfect for our use
+    case.
 \end{itemize}
-\item Use BibTeX
-\item Use cross-referencing
-\end{itemize}
-\item Grammar and writing rules
-\begin{itemize}
-\item Acronyms expanded on first usage (not just in table of acronyms)
-\item ``In order to'' should be ``to''
-\end{itemize}
-\end{itemize}}
+These components will allow us to develop our application faster and more efficiently as many of these products are
+already optimized. All the above products are free to use so do not incur any extra costs or require the handling of
+licenses.
+\subsection{Products That Can Be Copied}
+\textit{There don't seem to be any products that can be copied which contain all the required components within a single
+product. Moreover, the \gls{mes} wants a product that doesn't require an external license and wants to be fully built in
+house, so they have control over future development and usage.}
 
-\noindent \plt{Advice on using the template:
+\section{New Problems}
+
+\subsection{Effects on the Current Environment}
+The new centralized EventHub platform will significantly change how MES events are managed, moving from manual and multi-platform workflows (e.g. Google Forms, Sheets) to a unified digital system. This shift will not only reduce administrative burden and data fragmentation but will also introduce a learning curve for organizers accustomed to traditional tools.
+
+\subsection{Effects on the Installed Systems}
+The project replaces current processes rather than integrating with previous systems, meaning minimal dependency conflicts. However, transitioning from existing Google-based workflows may temporarily disrupt event preparation cycles until the new system stabilizes. 
+
+\subsection{Potential User Problems}
+Users (both attendees and administrators) may initially encounter usability issues with the new form builder and event registration interfaces. While designed for ease of use, users might experience confusion with certain procedures until onboarding tutorials are introduced. 
+
+\subsection{Limitations in the Anticipated Implementation Environment That May
+Inhibit the New Product}
+As the platform relies on consistent internet access and backend/frontend integration across web and mobile systems, technical limitations such as weak event Wi-Fi or inconsistent device support (especially for iOS/Android check-ins) may hinder performance. 
+
+\subsection{Follow-Up Problems}
+Following initial deployment, maintenance/scalability challenges may arise, especially if the MES expands usage to other faculties. Continuous updates, bug fixes, and server resource management will be required to prevent system slowdowns. 
+
+
+\section{Tasks}
+\subsection{Project Planning }
+
 \begin{itemize}
-\item Difference between physical and software constraints
-\item Properties of a correct solution means \emph{additional} properties, not
-  a restating of the requirements (may be ``not applicable'' for your problem).
-  If you have a table of output constraints, then these are properties of a
-  correct solution.
-\item Assumptions have to be invoked somewhere
-\item ``Referenced by'' implies that there is an explicit reference
-\item Think of traceability matrix, list of assumption invocations and list of
-  reference by fields as automatically generatable
-\item If you say the format of the output (plot, table etc), then your
-  requirement could be more abstract
+    \item \textbf{Task Assignment:} Tasks are divided based on each member’s technical strengths and defined roles.
+    Rayyan leads the admin web UI, Virochaan handles full-stack web and DevOps, Ibrahim focuses on backend and mobile integration, Omar develops mobile UI components, and Mahdi manages backend logic and database design.
+    \item \textbf{Collaboration:} Weekly meetings are held to review progress, plan upcoming work, and prepare for supervisor syncs.
+    Daily communication occurs over Discord, while GitHub Issues serve as the main hub for technical updates.
+    \item \textbf{Quality Control:} All new code must pass automated linting and testing via GitHub Actions before merging.
+    Peer reviews on pull requests ensure consistency and prevent regressions.
 \end{itemize}
-}
+
+\subsection{Planning of Development Phases}
+
+Development is organized into five phases, each with clear goals and deliverables.
+The primary objective is to have a fully functional \textbf{Minimum Viable Product (MVP)} by the end of \textbf{December 2025}, where all four core features work at a basic level before refinement begins.
+
+\begin{enumerate}
+    \item \textbf{Phase 1 – Requirements and Design (September–October 2025)}
+    Finalize system requirements, architecture, and UI mockups for the Admin Portal and Custom Form Builder.
+    Deliverables include the SRS, Hazard Analysis, and shared API specifications with Projects B and C.
+
+    \item \textbf{Phase 2 – Core Functionality and MVP (Mid October–December 2025)}
+    Implement the main system features for a working MVP:
+    \begin{itemize}
+        \item Basic \textbf{Custom Form Builder} for creating and saving modular forms.
+        \item Functional \textbf{Registration and Feedback Forms} linked to the backend.
+        \item Simple \textbf{Attendee Overview Dashboard} showing registration data.
+        \item Initial \textbf{Backend Analytics} for event and submission counts.
+    \end{itemize}
+    The MVP will demonstrate a complete flow—from form creation to submission and viewing results.
+
+    \item \textbf{Phase 3 – Integration and Refinement (January 2026)}
+    Improve performance, UI/UX, and backend data handling.
+    Begin integration testing with Projects B and C to ensure smooth database and API interaction.
+
+    \item \textbf{Phase 4 – Analytics and Dashboard Expansion (February–March 2026)}
+    Enhance analytics and administrative tools with filtering, charts, and export options (CSV/PDF).
+    The dashboard will evolve into a production-ready tool for MES event organizers.
+
+    \item \textbf{Phase 5 – Testing and Deployment (March–April 2026)}
+    Conduct final testing, bug fixes, and documentation updates.
+    Complete cross-team integration and deploy the system for real MES events such as Fireball Formal or CALE Conference.
+    Prepare final deliverables and the Capstone Expo presentation.
+\end{enumerate}
+
+\section{Migration to the New Product}
+\subsection{Requirements for Migration to the New Product}
+Migration to the new system will be straightforward as there is no existing framework in the first place. The MES currently uses a combination of Google Forms and other platforms to handle event registration and feedback collection. The new system will replace these manual processes with the new platform that centralizes and streamlines event management. The MES will simply transition to this system for future events, with no migration process required.
+\subsection{Data That Has to be Modified or Translated for the New System}
+Not Applicable.
+
+\section{Costs}
+We don't expect any costs to arise during the development of the project. We will be using free tools and libraries for
+development and for hosting we will look to host databases and the back-end locally. In production the hosting will be
+done by the \gls{mes}, so it is out of the scope of this Capstone.
+
+\section{User Documentation and Training}
+
+\subsection{User Documentation Requirements}
+
+No separate written documentation or manuals are planned for this system.
+Instead, all user guidance will be built directly into the application to create a more natural and seamless learning experience.
+This approach ensures that both attendees and administrators can quickly understand how to use the platform without leaving the interface.
+
+The system will include:
+\begin{itemize}
+    \item \textbf{Interactive Onboarding:}
+    Step-by-step tutorial pop-ups and tooltips that appear during first-time use to introduce users to key features such as event registration, check-in, and analytics.
+
+    \item \textbf{Guided Walkthroughs:}
+    Contextual highlights that show users where to click and how to complete common actions directly within the interface.
+
+    \item \textbf{Short Visual Aids:}
+    Optional embedded videos or animations explaining how to perform important tasks, such as creating an event or submitting a form.
+\end{itemize}
+
+These interactive elements replace the need for formal documentation and are designed to make the system self-explanatory and easy to learn.
+Users will be able to replay the onboarding sequence or revisit tips at any time from within the application.
+
+\subsection{Training Requirements}
+
+No formal training sessions or written instructions are required for this system.
+The design prioritizes simplicity, discoverability, and self-learning through interactive guidance.
+
+\begin{itemize}
+    \item \textbf{End Users (Attendees):}
+    Will learn the system through in-app pop-ups and short guided tutorials shown during their first login.
+    These tutorials will walk users through tasks such as signing up for an event, filling out a form, or checking in.
+
+    \item \textbf{Administrators and Event Organizers:}
+    Will be guided through core management workflows using the same interactive approach, supported by optional short videos or animations that explain advanced features such as creating forms or viewing analytics.
+\end{itemize}
+
+Overall, training and documentation will be fully integrated into the user experience.
+The application itself will serve as the guide, helping users learn by doing rather than reading external instructions.
+
+
+\section{Waiting Room}
+
+This section outlines extra features to consider that may or be not be implemented depending on time constraints.
+
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em,
+  label=\bfseries WR-\arabic*:,
+  ref=\bfseries WR-\arabic*]
+  \item \label{WR1} The entire system shall be redistributable, customizable, and deployable for use by any organization. \\[2mm]
+    {\bf Motivation:} The system being built for the \gls{mes} can be expanded into a Software-as-a-Service (SaaS) for any organization looking for a centralized event or survey management system. \\
+    {\bf Fit Criterion:} At least two isolated copies of the system should be able to run simultaneously without any connections or interference between systems.
+  
+  \item \label{WR2} All forms of branding in the system shall be substitutable for a different branding through an easily accessible interface.\\[2mm]
+  {\bf Motivation:} If the system shall be expanded for use by any organization, the organization should be able to customize all branding of the system without requiring changes to the source code.\\
+  {\bf Fit Criterion:} All \gls{mes} branding should be removable and replaceable with seperate branding throughout the \gls{adm} and \gls{atd} systems without making any edits to source code.
+
+  \item \label{WR3} The system shall allow for live polling of all \glspl{atd} registered for a given event. \\[2mm]
+  {\bf Motivation:} Allowing for live polling of \glspl{atd} during an event can increase \gls{atd} engagement and further integrate the \gls{mes}'s suite of required tools into the centralized system\\
+  {\bf Fit Criterion:} The feature shall be tested during an event with at least 10 registered \glspl{atd}. All registered \glspl{atd} should receive the poll, submit a reponse, and an \gls{adm} shall be able to view all reponses within 5 minutes.
+
+  \item \label{WR4} The system shall provide the \gls{adm} with a report of recommendations to improve survey reponse rates and event turnout.\\[2mm]
+  {\bf Motivation:} Improving event turnout and survey reposnse rates is one of the main goals of the \gls{mes} for the proposed system. Adding intelligent recommendations based on previous survey and event data to improve this will increase the satisfaction of associated stakeholders.\\
+  {\bf Fit Criterion:} Upon creation of an event or survey, the system should inform the \gls{adm} of at least one parameter that can be changed to improve event turnout or response rates.
+
+  \item \label{WR5} The system shall provide the \gls{adm} with a reasonable prediction of the turnout of any given event.\\[2mm]
+  {\bf Motivation:} Predicting the turnout of an event can better prepare the \gls{mes} for event planning, finance management, and resource allocation.\\
+  {\bf Fit Criterion:} Upon creation of an event, the system should inform the \gls{adm} of the predicted turnout of the event that is within 20\% of the actual turnout.
+  
+\end{enumerate}
+
+
+\section{Ideas for Solution}
+Our primary Idea for the solution is the creation of both a Web and Mobile application. This was dictated upon us as they were mandated by our client since he wanted the solution to be in this form. 
+
 
 \newpage{}
 \section*{Appendix --- Reflection}
-
-\wss{Not required for CAS 741}
-
-The information in this section will be used to evaluate the team members on the
-graduate attribute of Lifelong Learning.  
 
 \input{../Reflection.tex}
 
