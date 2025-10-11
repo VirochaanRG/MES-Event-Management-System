@@ -65,15 +65,15 @@
 
 \section*{Revision History}
 \begin{table}[hp]
-\caption{Revision History} \label{TblRevisionHistory}
 \begin{tabularx}{\textwidth}{llX}
 \toprule
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
 10/10/2025 & All & Rev0 of SRS\\
-... & ... & ...\\
+10/10/2025 & All & Reflections \\
 \bottomrule
 \end{tabularx}
+\caption{Revision History} \label{TblRevisionHistory}
 \end{table}
 
 
@@ -357,14 +357,14 @@ partitioned, business data models, and business use cases.
 
 \subsection{The Current Situation}
 
-Currently, the \gls{mes} uses plethora of different platforms to host events and conduct surveys such as tools for
+Currently, the \gls{mes} uses a plethora of different platforms to host events and conduct surveys such as tools for
 registration, signing of waivers, and checking in \glspl{atd}. The main platforms used are a combination of Google Forms
 and Google Sheets. There are several pain points to address with the current system.
 
 \begin{itemize}
-  \item \textbf{Decentralized System Components} Registration and surveying is split across a plethora of tools and
+  \item \textbf{Decentralized System Components} Registration and surveying is split across multiple tools and
     software which may not be compatible with each other. For example, Google Forms is used for registration forms and
-    surveys, Google Sheets stores form data and LinkTree holds links to all the registration forms, and event updates is
+    surveys, Google Sheets stores form data, LinkTree holds links to all the registration forms, and event updates are
     done by email or social media.
   \item \textbf{Overly Complex Form Logic} The current \gls{cfes} survey consists of 70 pages of questions linked
     together through complex branching logic. The Google Forms form building UI makes this very complicated as all form
@@ -384,16 +384,6 @@ and Google Sheets. There are several pain points to address with the current sys
     \gls{mes} LinkTree. This solution lacks automation since a new Google Form must be made for every event and links
     have to be manually added and removed for each form when registration is opened or closed.
 \end{itemize}
-
-% \gls{mes} hosts lots of events per year
-% Their event management system is unorganized
-% Consists of google forms, google sheets
-% No template form to work with redundant info between forms like name, number email, etc
-% Lots of steps to registration and split across too many platforms
-% The same thing is done for the annual \gls{cfes} survey of undergrad eng students
-% long 70 page form of complex branching logic, low response rate
-%
-
 
 \subsection{The Context of the Work}
 
@@ -551,7 +541,7 @@ The purpose of this section is to illustrate the flow of data throughout the sys
 
 \subsection{Business Data Model}
 
-\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into into well defined subsystems and outlines the interactions between subsystems.
+\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into well defined subsystems and outlines the interactions between subsystems.
 
 \begin{center}
 \begin{figure}[H]
