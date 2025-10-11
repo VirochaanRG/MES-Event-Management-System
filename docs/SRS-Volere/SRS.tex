@@ -430,11 +430,11 @@ creation have been grouped as a single workflow since they are nearly identical.
   \renewcommand{\arraystretch}{1.2}
 \begin{longtable}[H]{p{0.03\linewidth}p{0.21\linewidth}p{0.25\linewidth}p{0.25\linewidth}p{0.28\linewidth}}
       \textbf{\#} & \textbf{Event} & \textbf{Input} & \textbf{Output} & \textbf{Requirements} \\ \hline
-      1 & \Gls{atd} registers for event & Registration data & Event ticket & \ref{FR3} \ref{FR4} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{SIR2} \ref{UHEUR1} \ref{UHEUR2} \ref{UHUPR1} \ref{UHUPR2} \ref{UHUPR3} \ref{UHAR1} \ref{PSLR1} \ref{PSER1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \ref{MSAR1} \ref{MSAR2} \\ \hline
-      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{FR9} \ref{SIR1} \ref{SIR2} \ref{PTFR2} \ref{UHEUR1} \ref{UHEUR4} \ref{UHUPR1} \ref{UHUPR2} \ref{UHUPR3} \ref{UHAR1} \ref{PSLR1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \\ \hline
-      3 & \Gls{adm} creates a form module & Module questions & Reusable form module & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{UHPIR1} \ref{UHLR2} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{PTFR4} \ref{PTFR5} \ref{MSMR1} \ref{LFSR2} \ref{UHEUR3} \ref{UHUPR3}\\ \hline
-      4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \ref{FR1} \ref{FR3} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR9} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{SIR2} \ref{SAuR1} \ref{UHPIR2} \ref{UHEUR3} \ref{UHLR2} \ref{PTFR4} \ref{PTFR5} \ref{MSAR1} \ref{MSAR2} \ref{MSMR1}\\ \hline
-      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \ref{FR2} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR8} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SAuR1} \ref{UHPIR2} \ref{LFAR3} \ref{UHEUR3} \ref{UHLR2} \ref{UHUPR3}
+      1 & \Gls{atd} registers for event & Registration data & Event ticket & \ref{FR3} \ref{FR4} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{SIR2} \ref{ER1} \ref{ER2} \ref{UR1} \ref{UR2} \ref{UR3} \ref{AC1} \ref{SL1} \ref{SE1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \ref{MSAR1} \ref{MSAR2} \\ \hline
+      2 & \Gls{atd} fills out a survey & Survey responses & Survey completion confirmation & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{FR9} \ref{SIR1} \ref{SIR2} \ref{FT2} \ref{ER1} \ref{UR1} \ref{UR2} \ref{UR3} \ref{AC1} \ref{SL1} \ref{SPR2} \ref{SPR3} \ref{CLR1} \\ \hline
+      3 & \Gls{adm} creates a form module & Module questions & Reusable form module & \ref{FR1} \ref{FR2} \ref{FR6} \ref{FR7} \ref{PI1} \ref{LR2} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{FT4} \ref{FT5} \ref{MSMR1} \ref{SR2} \ref{ER3} \ref{UR3}\\ \hline
+      4 & \Gls{adm} creates an event/survey & Event/survey data & Event/survey creation confirmation & \ref{FR1} \ref{FR3} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR9} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SIR1} \ref{SIR2} \ref{SAuR1} \ref{PI2} \ref{ER3} \ref{LR2} \ref{FT4} \ref{FT5} \ref{MSAR1} \ref{MSAR2} \ref{MSMR1}\\ \hline
+      5 & \Gls{adm} views survey/event statistics & Event/survey to view & Event/survey registration/response reports & \ref{FR2} \ref{FR5} \ref{FR6} \ref{FR7} \ref{FR8} \ref{FR10} \ref{SAR1} \ref{SAR2} \ref{SAuR1} \ref{PI2} \ref{AR3} \ref{ER3} \ref{LR2} \ref{UR3}
       \\ \hline
     \caption{Partitioning of system workflows}\label{wfpart}
   \end{longtable}
@@ -608,28 +608,28 @@ The purpose of this section is to define the scope of the product by defining th
 \begin{longtable}[H]{p{0.04\linewidth}p{0.22\linewidth}p{0.13\linewidth}p{0.43\linewidth}p{0.22\linewidth}}
   \toprule
   \textbf{\#}     & \textbf{Name}                  & \textbf{Actor} & \textbf{Input/Output}                                                                                                       & \textbf{Requirements} \\ \midrule
-  1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and \\fields (in)\\Reusable form module (out)\end{tabular}                        & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{UHEUR3} \\ \midrule
-  2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{UHEUR3} \\ \midrule
-  3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           & \ref{FR3} \ref{FR4} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{UHLR2} \\ \midrule
-  4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         & \ref{FR4} \ref{FR6} \ref{SAR2} \ref{SIR1} \ref{MSMR1} \ref{UHEUR3} \\ \midrule
-  5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{UHLR2} \\ \midrule
-  6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and \\questions (in)\\Fillable survey (out)\end{tabular}                            & \ref{FR1} \ref{FR2} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{UHEUR3} \\ \midrule
-  7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{UHEUR3} \\ \midrule
-  8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{UHLR2} \\ \midrule
-  9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         & \ref{FR5} \ref{FR6} \ref{SAR2} \ref{SAuR1} \ref{UHLR2} \ref{UHPIR2} \\ \midrule
-  10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SAuR1} \ref{UHEUR3} \ref{UHLR2} \\ \midrule
-  11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  & \ref{FR6} \ref{FR8} \ref{SAR1} \ref{SAuR1} \ref{UHPIR2} \ref{UHEUR3} \\ \midrule
-  12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 & \ref{FR7} \ref{FR8} \ref{UHEUR3} \ref{UHLR2} \ref{PSLR1} \ref{PSER1} \\ \midrule
-  13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       & \ref{FR3} \ref{FR4} \ref{FR9} \ref{UHEUR1} \ref{UHUPR1} \ref{UHAR1} \\ \midrule
-  14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           & \ref{FR5} \ref{FR6} \ref{UHEUR1} \ref{UHUPR2} \ref{UHAR1} \ref{UHLR2} \\ \midrule
-  15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     & \ref{FR3} \ref{FR6} \ref{FR9} \ref{UHEUR1} \ref{UHUPR1} \ref{UHAR1} \\ \midrule
-  16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        & \ref{FR3} \ref{FR4} \ref{SAR1} \ref{SIR1} \ref{PSLR1} \ref{UHEUR1} \\ \midrule
-  17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  & \ref{FR3} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSMR1} \ref{UHEUR1} \\ \midrule
-  18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSAR2} \ref{UHEUR1} \\ \midrule
-  19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            & \ref{FR1} \ref{FR2} \ref{FR6} \ref{UHEUR1} \ref{UHUPR1} \ref{UHAR1} \\ \midrule
-  20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion \\confirmation (out)\end{tabular} & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SIR1} \ref{PSLR1} \ref{UHEUR4} \\ \midrule
-  21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update\\ confirmation (out)\end{tabular}           & \ref{FR2} \ref{FR6} \ref{SIR1} \ref{MSMR1} \ref{UHEUR3} \ref{UHUPR2} \\ \midrule
-  22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        & \ref{FR2} \ref{FR6} \ref{UHEUR1} \ref{UHLR2} \ref{UHAR1} \ref{UHUPR2} \\ \bottomrule
+  1               & Create a custom form module    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Form module name and \\fields (in)\\Reusable form module (out)\end{tabular}                        & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{ER3} \\ \midrule
+  2               & Edit an existing module        & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected form module and \\updated fields   (in)\\Edited module (out)\end{tabular}                 & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{ER3} \\ \midrule
+  3               & Create an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Event details (in)\\Scheduled event (out)\end{tabular}                                           & \ref{FR3} \ref{FR4} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{LR2} \\ \midrule
+  4               & Edit an event                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Edited event (out)\end{tabular}                         & \ref{FR4} \ref{FR6} \ref{SAR2} \ref{SIR1} \ref{MSMR1} \ref{ER3} \\ \midrule
+  5               & Cancel an event                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancelled event (out)\end{tabular}                                          & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{LR2} \\ \midrule
+  6               & Create a survey                & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Survey details and \\questions (in)\\Fillable survey (out)\end{tabular}                            & \ref{FR1} \ref{FR2} \ref{FR9} \ref{SAR1} \ref{SIR1} \ref{ER3} \\ \midrule
+  7               & Edit a survey                  & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey and \\updated details (in)\\Edited survey (out)\end{tabular}                       & \ref{FR2} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSMR1} \ref{ER3} \\ \midrule
+  8               & Close a survey                 & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Closed survey (out)\end{tabular}                                           & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SIR1} \ref{MSAR2} \ref{LR2} \\ \midrule
+  9               & View financial reports         & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Financial report (out)\end{tabular}                                         & \ref{FR5} \ref{FR6} \ref{SAR2} \ref{SAuR1} \ref{LR2} \ref{PI2} \\ \midrule
+  10              & View event attendee overview   & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Attendee data (out)\end{tabular}                                            & \ref{FR6} \ref{FR7} \ref{SAR1} \ref{SAuR1} \ref{ER3} \ref{LR2} \\ \midrule
+  11              & View survey response report    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Selected Survey (in)\\Survey response report (out)\end{tabular}                                  & \ref{FR6} \ref{FR8} \ref{SAR1} \ref{SAuR1} \ref{PI2} \ref{ER3} \\ \midrule
+  12              & Filter survey response data    & \Gls{adm}          & \begin{tabular}[c]{@{}l@{}}Filter Criterion (in)\\Filtered response data (out)\end{tabular}                                 & \ref{FR7} \ref{FR8} \ref{ER3} \ref{LR2} \ref{SL1} \ref{SE1} \\ \midrule
+  13              & View upcoming events           & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Upcoming events list (out)\end{tabular}                                       & \ref{FR3} \ref{FR4} \ref{FR9} \ref{ER1} \ref{UR1} \ref{AC1} \\ \midrule
+  14              & View past events               & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Past events list (out)\end{tabular}                                           & \ref{FR5} \ref{FR6} \ref{ER1} \ref{UR2} \ref{AC1} \ref{LR2} \\ \midrule
+  15              & View registered events         & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\Registered events list (out)\end{tabular}                                     & \ref{FR3} \ref{FR6} \ref{FR9} \ref{ER1} \ref{UR1} \ref{AC1} \\ \midrule
+  16              & Register for upcoming event    & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\registration details (in)\\Event admission ticket (out)\end{tabular}        & \ref{FR3} \ref{FR4} \ref{SAR1} \ref{SIR1} \ref{SL1} \ref{ER1} \\ \midrule
+  17              & Update event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event and \\updated details (in)\\Update confirmation (out)\end{tabular}                  & \ref{FR3} \ref{FR6} \ref{SAR1} \ref{SIR1} \ref{MSMR1} \ref{ER1} \\ \midrule
+  18              & Cancel event registration      & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected event (in)\\Cancellation confirmation (out)\end{tabular}                                & \ref{FR5} \ref{FR6} \ref{SAR1} \ref{SIR2} \ref{MSAR2} \ref{ER1} \\ \midrule
+  19              & View fillable surveys          & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}View request (in)\\List of surveys (out)\end{tabular}                                            & \ref{FR1} \ref{FR2} \ref{FR6} \ref{ER1} \ref{UR1} \ref{AC1} \\ \midrule
+  20              & Complete a survey              & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\question responses (in)\\Survey completion \\confirmation (out)\end{tabular} & \ref{FR1} \ref{FR2} \ref{FR6} \ref{SIR1} \ref{SL1} \\ \midrule
+  21              & Edit a   survey response       & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey and \\edited answers (in)\\Survey update\\ confirmation (out)\end{tabular}           & \ref{FR2} \ref{FR6} \ref{SIR1} \ref{MSMR1} \ref{ER3} \ref{UR2} \\ \midrule
+  22              & View previous survey responses & \Gls{atd}       & \begin{tabular}[c]{@{}l@{}}Selected survey (in)\\Survey responses (out)\end{tabular}                                        & \ref{FR2} \ref{FR6} \ref{ER1} \ref{LR2} \ref{AC1} \ref{UR2} \\ \bottomrule
   \caption{Product use case table}\label{table:productusecase}
 \end{longtable}
 }
@@ -1048,7 +1048,7 @@ Below are formal state diagrams showing the different states of the system and t
 \end{enumerate}
 
 \subsection{Personalization and Internationalization Requirements}
-\begin{enumerate}[label=PI-\arabic*, wide=0pt, leftmargin=*]
+\begin{enumerate}[label=\bfseries PI-\arabic*, wide=0pt, leftmargin=* ref=\bfseries PI-\arabic*]
   \item \label{PI1}The custom form builder shall allow \gls{adm} to create personalized forms with event-specific fields.\\[2mm]
     {\bf Motivation:} Flexibility is essential to accommodate the diverse set of events as per the scope.\\
     {\bf Fit Criterion:} The forum is used for 2 events successfully without developer assistance.\\
@@ -1060,7 +1060,7 @@ Below are formal state diagrams showing the different states of the system and t
 \end{enumerate}
 
 \subsection{Learning Requirements}
-\begin{enumerate}[label=\bfseries LR-\arabic*:, wide=0pt, leftmargin=*,ref=\bfseries LR-\arabic*]
+\begin{enumerate}[label=\bfseries LR-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries LR-\arabic*]
   \item \label{LR1} The app shall be easy for anyone with an intermediate level of English.\\[2mm]
     {\bf Motivation:} Users should expect intuitive, concise ineteractions.\\
     {\bf Fit Criterion:} 80\% of \glspl{atd} successfully complete a form with no assistance.\\
@@ -1072,7 +1072,7 @@ Below are formal state diagrams showing the different states of the system and t
 \end{enumerate}
 
 \subsection{Understandability and Politeness Requirements}
-\begin{enumerate}[label=\bfseries UR-\arabic*:, wide=0pt, leftmargin=*,,ref=\bfseries UR-\arabic*]
+\begin{enumerate}[label=\bfseries UR-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries UR-\arabic*]
   \item \label{UR1} Basic, non-technical language will be used (Sign-up instead of RSVP).\\[2mm]
     {\bf Motivation:} Increases accessibility among non-technical users, or non-fluent English speakers.\\
     {\bf Fit Criterion:} 80\% of students understand all wording without clarification.\\
@@ -1153,14 +1153,14 @@ Below are formal state diagrams showing the different states of the system and t
   \end{enumerate}
 
 \subsection{Capacity Requirements}
-\begin{enumerate}[label=\bfseries CR-\arabic*:, wide=0pt, leftmargin=*]
+\begin{enumerate}[label=\bfseries CR-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries CR-\arabic*]
   \item The system shall support 2047 concurrent users during peak event times.\\
   {\bf Motivation:} Ensures workflow is maintained during surges in usage.\\
-  {\bf Fit Criterion:} Conduct performance test with 100 concurrent users with minimal error rate and latency. See \label{PR1} and \label{PR2}.\\
+  {\bf Fit Criterion:} Conduct performance test with 100 concurrent users with minimal error rate and latency. See \ref{SL1}, \ref{SL2}.\\
   {\bf Goals:} G-2, G-3, G-4
   \item The system database shall support up to 50,000 total user entries.\\
   {\bf Motivation:} Large events over the scope of the year require large tables. Ensures that the product can scale with the growing number of MES events and users.\\
-  {\bf Fit Criterion:} Create 50,000 test rows in the database. Check that they are stored correctly and that table interactions (filter, search) exhibit latency. See \label{PR1} and \label{PR2}.\\
+  {\bf Fit Criterion:} Create 50,000 test rows in the database. Check that they are stored correctly and that table interactions (filter, search) exhibit latency. See \ref{SL1}, \ref{SL2}.\\
   {\bf Goals:} G-2, G-3, G-4
 \end{enumerate}
 
