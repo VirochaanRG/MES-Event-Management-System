@@ -1,4 +1,4 @@
-# EventHub
+# EvENGage
 
 **Developer Names**: Virochaan Ravichandran Gowri, Omar Al-Asfar, Rayyan Suhail, Ibrahim Quraishi, Mohammad Mahdi Mahboob.
 
