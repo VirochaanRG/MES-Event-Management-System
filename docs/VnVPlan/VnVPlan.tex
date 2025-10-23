@@ -212,6 +212,19 @@ that document.}
 \wss{The details of this section will likely evolve as you get closer to the
   implementation.}
 
+
+\begin{itemize}
+    \item \textbf{Vitest:} Used as the primary unit and integration testing framework for the frontend. It integrates seamlessly with the Vite development environment and allows for efficient automated testing of components, hooks, and application logic. Vitest supports mocking and snapshot testing, which ensures that UI and logic remain consistent after code changes.
+
+    \item \textbf{Playwright:} Utilized for automated end-to-end testing to simulate user interactions across different browsers and devices. This tool validates complete user workflows such as event registration, survey submission, and form creation, ensuring system functionality and reliability from the user's perspective.
+
+    \item \textbf{Postman and Newman:} Employed for API-level testing and verification. Postman allows the team to design and execute test cases for RESTful endpoints, while Newman enables command-line execution of these tests within the CI/CD pipeline. Together, they ensure backend consistency and correct response handling.
+
+    \item \textbf{GitHub Actions:} Serves as the continuous integration (CI) platform that automates testing and verification tasks. It will execute unit tests, end-to-end tests, and linters automatically on each push or pull request, ensuring that all commits meet quality and functionality standards before merging.
+
+    \item \textbf{pgTAP:} Used for database testing in PostgreSQL. It verifies that database functions, triggers, and constraints behave correctly under various input conditions, ensuring data integrity and correct backend logic implementation.
+\end{itemize}
+
 \subsection{Software Validation}
 
 \wss{If there is any external data that can be used for validation, you should
@@ -254,6 +267,52 @@ the contents of the subsections.}
   table in the SRS.}
 		
 \paragraph{Title for Test}
+
+\begin{enumerate}
+    \item \textbf{Test ID: ST-FR1 -- Register for Upcoming Event}
+    \begin{itemize}
+        \item \textbf{Type:} Functional, Dynamic, Manual
+        \item \textbf{Initial State:} User is logged in as an attendee. One event is open for registration.
+        \item \textbf{Input/Output:}
+        \begin{itemize}
+            \item \textbf{Input:} User selects an event, fills out the registration form, and submits it.
+            \item \textbf{Output:} System displays a confirmation message and generates a digital event ticket.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Test ID: ST-FR2 -- Create a Custom Form Module}
+    \begin{itemize}
+        \item \textbf{Type:} Functional, Dynamic, Manual
+        \item \textbf{Initial State:} Admin is logged in and authenticated with form creation permissions.
+        \item \textbf{Input/Output:}
+        \begin{itemize}
+            \item \textbf{Input:} Admin provides form name, question types, and saves the module.
+            \item \textbf{Output:} The system creates and stores the reusable form module successfully.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Test ID: ST-FR3 -- View Event Attendee Overview}
+    \begin{itemize}
+        \item \textbf{Type:} Functional, Dynamic, Manual
+        \item \textbf{Initial State:} Admin is logged in; at least one event has registered attendees.
+        \item \textbf{Input/Output:}
+        \begin{itemize}
+            \item \textbf{Input:} Admin selects an event from the dashboard to view attendee data.
+            \item \textbf{Output:} System displays a list of attendees and their registration statuses.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Test ID: ST-FR4 -- Complete a Survey}
+    \begin{itemize}
+        \item \textbf{Type:} Functional, Dynamic, Manual
+        \item \textbf{Initial State:} Attendee is logged in with at least one survey open for responses.
+        \item \textbf{Input/Output:}
+        \begin{itemize}
+            \item \textbf{Input:} Attendee selects a survey, answers questions, and submits the form.
+            \item \textbf{Output:} System confirms successful submission and stores responses in the database.
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
 
 \begin{enumerate}
 
@@ -315,6 +374,41 @@ format for the tests given below.}
 \wss{If you introduce static tests in your plan, you need to provide details.
 How will they be done?  In cases like code (or document) walkthroughs, who will
 be involved? Be specific.}
+
+\begin{enumerate}
+    \item \textbf{Test ID: ST-NFR1 -- Form Loading Latency}
+    \begin{itemize}
+        \item \textbf{Type:} Nonfunctional, Dynamic, Automatic
+        \item \textbf{Initial State:} Server running in staging environment with representative dataset loaded.
+        \item \textbf{Input/Output:}
+        \begin{itemize}
+            \item \textbf{Input:} User loads the registration form under normal and peak loads.
+            \item \textbf{Output:} Page load time is less than or equal to 2 seconds.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Test ID: ST-NFR2 -- Auto-Save Functionality}
+    \begin{itemize}
+        \item \textbf{Type:} Nonfunctional, Dynamic, Manual
+        \item \textbf{Initial State:} Survey partially filled but not yet submitted.
+        \item \textbf{Input/Output:}
+        \begin{itemize}
+            \item \textbf{Input:} Wait more than 30 seconds and refresh the page.
+            \item \textbf{Output:} Survey progress remains intact after refresh.
+        \end{itemize}
+    \end{itemize}
+
+    \item \textbf{Test ID: ST-NFR3 -- Concurrent User Capacity}
+    \begin{itemize}
+        \item \textbf{Type:} Nonfunctional, Dynamic, Automatic
+        \item \textbf{Initial State:} System deployed to a test environment with monitoring enabled.
+        \item \textbf{Input/Output:}
+        \begin{itemize}
+            \item \textbf{Input:} Simulate 100 concurrent users performing event registration.
+            \item \textbf{Output:} System maintains response time under 4 seconds and less than 2\% error rate.
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
 
 \subsubsection{Area of Testing1}
 		
