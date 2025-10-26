@@ -182,18 +182,28 @@ verified.  Techniques for this include review and mutation testing.}
 
 \wss{Create a checklists?}
 
+
 \subsection{Implementation Verification}
 
-\wss{You should at least point to the tests listed in this document and the unit
-  testing plan.}
+To make sure that the system works as intended and meets all the goals set out in the SRS, our team will verify the implementation through both testing and review processes. The focus will mainly be on the four main parts: the \textbf{Custom Form Builder}, \textbf{Registration and Feedback Forms}, \textbf{Attendee Overview}, and \textbf{Backend Analytics}. 
 
-\wss{In this section you would also give any details of any plans for static
-  verification of the implementation.  Potential techniques include code
-  walkthroughs, code inspection, static analyzers, etc.}
+\subsubsection*{Dynamic Verification}
+Dynamic verification will confirm that each feature works correctly through practical testing during development.
 
-\wss{The final class presentation in CAS 741 could be used as a code
-walkthrough.  There is also a possibility of using the final presentation (in
-CAS741) for a partial usability survey.}
+\begin{itemize}
+  \item \textbf{Unit Testing:} Every module will be tested on its own using Jest and the React Testing Library. These tests will check things like whether form fields are created properly, if branching logic behaves as expected, and whether data is saved correctly in the database. 
+  \item \textbf{Integration Testing:} Once the individual parts are stable, integration tests will be done to make sure the frontend and backend communicate properly. These tests will confirm that data moves smoothly between the admin portal, the backend server, and the shared database used by the other capstone teams.
+  \item \textbf{System and Acceptance Testing:} The final round of testing will simulate real MES events, such as the Fireball Formal or CALE Conference. This will test the full flow—from creating a form, registering attendees, collecting feedback, and generating analytics. We will also check that pages load quickly (forms within about two seconds and analytics within about four) and that all security and accessibility requirements are met. 
+\end{itemize}
+
+\subsubsection*{Static Verification}
+\begin{itemize}
+  \item \textbf{Code Reviews and Walkthroughs:} Every major change will go through a peer review before being merged. The team will check that the code and the logic matches what’s described in the SRS.
+  \item \textbf{Static Analysis Tools:} Automatic tools like ESLint and Prettier will be used through GitHub Actions to keep formatting consistent and catch syntax or logic mistakes. We’ll also run scans to identify any issues in third-party libraries (for example, \texttt{npm audit}).
+\end{itemize}
+
+\subsubsection*{Usability Verification}
+As part of the final CAS 741 presentation, we will also conduct a short usability check. MES members and students will try out basic workflows such as creating a form, signing up for an event, or checking analytics. Their feedback on how easy or confusing it feels will help us fine-tune the interface before final deployment.
 
 \subsection{Automated Testing and Verification Tools}
 
@@ -214,23 +224,22 @@ that document.}
 
 \subsection{Software Validation}
 
-\wss{If there is any external data that can be used for validation, you should
-  point to it here.  If there are no plans for validation, you should state that
-  here.}
+\subsubsection*{Stakeholder Review and Demonstrations}
+Validation will occur continuously through review sessions with the project supervisor, Luke Schuurman. Each major milestone will be demonstrated to him for feedback to ensure that the system aligns with MES needs. The \textbf{Rev 0 demonstration} will serve as the first major validation checkpoint, where core workflows—form creation, registration, feedback submission, and analytics—will be shown to the supervisor for approval. 
 
-\wss{You might want to use review sessions with the stakeholder to check that
-the requirements document captures the right requirements.  Maybe task based
-inspection?}
+After the scheduled Rev 0 demo, the team will conduct a dedicated review meeting with the supervisor to gather specific feedback on usability, workflow logic, and data visualization accuracy. This feedback will guide refinements for later iterations and integration with other teams’ modules.
 
-\wss{For those capstone teams with an external supervisor, the Rev 0 demo should 
-be used as an opportunity to validate the requirements.  You should plan on 
-demonstrating your project to your supervisor shortly after the scheduled Rev 0 demo.  
-The feedback from your supervisor will be very useful for improving your project.}
+\subsubsection*{Task-Based User Testing}
+Toward the end of the development cycle, we plan to conduct task-based inspections where selected MES members and student users will complete typical actions such as:
+\begin{itemize}
+  \item Creating a registration or feedback form
+  \item Submitting a form as an attendee
+  \item Viewing analytics in the admin dashboard
+\end{itemize}
+Their success rate and feedback will help validate that the system is intuitive and easy to use without any formal training.
 
-\wss{For teams without an external supervisor, user testing can serve the same purpose 
-as a Rev 0 demo for the supervisor.}
-
-\wss{This section might reference back to the SRS verification section.}
+\subsubsection*{External Data for Validation}
+There are no external data sets required for validation since this is a new system replacing manual workflows. However, data collected from real events (e.g., Fireball Formal or CALE Conference) will later be compared with historical Google Form data to confirm that the new system provides the same or improved accuracy and completeness of records.
 
 \section{System Tests}
 
@@ -502,6 +511,7 @@ Their values are defined in this section for easy maintenance.
 \wss{This is a section that would be appropriate for some projects.}
 
 \newpage{}
+
 \section*{Appendix --- Reflection}
 
 \wss{This section is not required for CAS 741}
