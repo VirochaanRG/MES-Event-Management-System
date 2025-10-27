@@ -3,6 +3,7 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{float}
 \hypersetup{
     colorlinks,
     citecolor=blue,
@@ -250,30 +251,28 @@ as a Rev 0 demo for the supervisor.}
 \wss{There should be text between all headings, even if it is just a roadmap of
 the contents of the subsections.}
 
-\section{Tests for Functional Requirements}
+\subsection{Tests for Functional Requirements}
 
 This section verifies that the implemented system fulfills all \textbf{Functional Requirements (FR-1 through FR-11)} defined in the SRS. 
-Tests are grouped into three \textbf{Areas of Testing} — \textit{Admin Portal (AP)}, \textit{Attendee Application (AA)}, and \textit{System Integration (SI)} — corresponding to the main functional modules. 
-Each test includes a concise derivation statement referencing relevant requirements and a one-sentence description of how the test will be performed.
-
-\subsection{Area of Testing 1 – Admin Portal}
+The tests are grouped into three \textbf{Areas of Testing}: \textit{Admin Portal (AP)}, \textit{Attendee Application (AA)}, and \textit{System Integration and Security (SI)}. 
+\subsubsection{Area of Testing 1 – Admin Portal}
 
 \begin{enumerate}
 
-\item[\textbf{Test-FR-AP-1}] \textbf{Create Form Module}\\
+\item[\textbf{Test-FR-AP-1}] \textbf{Create Form}\\
 \textbf{Type:} Manual\\
 \textbf{Initial State:} Admin is logged in with form creation privileges.\\
 \textbf{Input/Condition:} Admin enters a new form name and adds multiple field types (text, checkbox, rating).\\
-\textbf{Expected Output:} The new form module is created, persisted, and visible in the Custom Forms list.\\
-\textbf{Test Case Derivation:} This test verifies the system’s ability to support dynamic form creation and storage as required by FR-1 and FR-6.\\
+\textbf{Expected Output:} The new form module is created and is visible in the database and in the admin dashboard.\\
+\textbf{Test Case Derivation:} This test verifies the system’s ability to support dynamic form creation and storage as required by FR-1 and FR-7.\\
 \textbf{How the test will be performed:} The tester will create a new form and confirm it appears correctly in the interface and database.\\[6pt]
 
-\item[\textbf{Test-FR-AP-2}] \textbf{Organize and Analyze Form Data}\\
+\item[\textbf{Test-FR-AP-2}] \textbf{View and Analyze Form Data}\\
 \textbf{Type:} Manual\\
 \textbf{Initial State:} At least two forms with collected responses exist.\\
-\textbf{Input/Condition:} Admin selects multiple forms and requests combined analysis.\\
+\textbf{Input/Condition:} Admin selects multiple forms and clicks button to view report analytics\\
 \textbf{Expected Output:} Aggregated analytics are displayed correctly and match backend data.\\
-\textbf{Test Case Derivation:} This test confirms data organization and analytical visualization functionalities described in FR-2 and FR-8, ensuring accurate aggregation and reporting.\\
+\textbf{Test Case Derivation:} This test confirms data organization and analytical visualization functionalities described in FR-2 and FR-8, ensuring accurate reporting and analytics.\\
 \textbf{How the test will be performed:} The tester will generate combined analytics and confirm that the displayed charts match backend results.\\[6pt]
 
 \item[\textbf{Test-FR-AP-3}] \textbf{Manage Events via Dashboard}\\
@@ -281,7 +280,7 @@ Each test includes a concise derivation statement referencing relevant requireme
 \textbf{Initial State:} Several events with participant data exist.\\
 \textbf{Input/Condition:} Admin accesses the dashboard and applies filters (e.g., pending payment).\\
 \textbf{Expected Output:} Filtered results display accurately with correct status counts.\\
-\textbf{Test Case Derivation:} This test validates event management, filtering, and data persistence mechanisms described in FR-3, FR-5, and FR-6.\\
+\textbf{Test Case Derivation:} This test validates event management, filtering, and data persistence mechanisms described in FR-5 and FR-6.\\
 \textbf{How the test will be performed:} The tester will apply filters and verify that displayed data matches expected event records.\\[6pt]
 
 \item[\textbf{Test-FR-AP-4}] \textbf{View and Export Event Analytics}\\
@@ -289,12 +288,12 @@ Each test includes a concise derivation statement referencing relevant requireme
 \textbf{Initial State:} Events and surveys contain collected feedback.\\
 \textbf{Input/Condition:} Admin selects an event and exports analytics.\\
 \textbf{Expected Output:} Correct analytics display and downloadable report matches system data.\\
-\textbf{Test Case Derivation:} This test ensures that analytics generation and report export satisfy the requirements for event statistics and reporting defined in FR-8, FR-9, and FR-10.\\
+\textbf{Test Case Derivation:} This test ensures that analytics generation and report export satisfy the requirements for event statistics and reporting defined in FR-8 and FR-10.\\
 \textbf{How the test will be performed:} The tester will view analytics for an event, export the report, and compare the output to dashboard data.\\[12pt]
 
 \end{enumerate}
 
-\subsection{Area of Testing 2 – Attendee Application}
+\subsubsection{Area of Testing 2 – Attendee Application}
 
 \begin{enumerate}
 
@@ -302,29 +301,29 @@ Each test includes a concise derivation statement referencing relevant requireme
 \textbf{Type:} Automatic\\
 \textbf{Initial State:} An event is open and attendee is authenticated.\\
 \textbf{Input/Condition:} Attendee submits an event registration form.\\
-\textbf{Expected Output:} Registration is saved, confirmation is displayed, and a QR ticket is generated.\\
-\textbf{Test Case Derivation:} This test validates the registration workflow and QR ticket generation process in accordance with FR-3, FR-4, and FR-6.\\
-\textbf{How the test will be performed:} An automated test will submit registration data and verify the confirmation message and QR code.\\[6pt]
+\textbf{Expected Output:} Registration is saved and a confirmation message is displayed and sent to attendee and a QR ticket is generated.\\
+\textbf{Test Case Derivation:} This test validates the registration workflow and QR ticket generation process as required by FR-3, FR-4, and FR-6.\\
+\textbf{How the test will be performed:} An automated test will submit registration data and verify the confirmation message and QR code has been created. Will confirm that the event data has also been updated in the database.\\[6pt]
 
 \item[\textbf{Test-FR-AA-2}] \textbf{Access Event Listings}\\
 \textbf{Type:} Manual\\
 \textbf{Initial State:} The system has multiple upcoming and past events.\\
 \textbf{Input/Condition:} Attendee views ``Upcoming'' and ``Registered Events'' tabs.\\
 \textbf{Expected Output:} Each tab displays correct events for that category.\\
-\textbf{Test Case Derivation:} This test confirms accurate retrieval and filtering of events for authenticated users as required by FR-3 and FR-6.\\
-\textbf{How the test will be performed:} The tester will view event lists and verify they match stored registration records.\\[6pt]
+\textbf{Test Case Derivation:} This test confirms accurate retrieval and filtering of events for authenticated users as required by FR-3 and ensures user can view event info.\\
+\textbf{How the test will be performed:} The tester will view event lists and verify they match stored registration records. Tester will also ensure event info shows up correctly and matches database.\\[6pt]
 
-\item[\textbf{Test-FR-AA-3}] \textbf{Complete Feedback Survey}\\
+\item[\textbf{Test-FR-AA-3}] \textbf{Fill out Form}\\
 \textbf{Type:} Automatic\\
 \textbf{Initial State:} A survey is available and attendee is authenticated.\\
 \textbf{Input/Condition:} Attendee completes and submits the survey.\\
 \textbf{Expected Output:} Survey responses are stored and a confirmation message appears.\\
-\textbf{Test Case Derivation:} This test ensures that survey submission and feedback processing meet the specifications in FR-7, FR-9, and FR-6.\\
-\textbf{How the test will be performed:} An automated test will submit survey responses and confirm that results are stored and acknowledged.\\[12pt]
+\textbf{Test Case Derivation:} This test ensures that survey submission and feedback processing meet the specifications in FR-7, FR-9.\\
+\textbf{How the test will be performed:} An automated test will submit survey responses and confirm that results are stored and submission is found in the centralized database.\\[12pt]
 
 \end{enumerate}
 
-\subsection{Area of Testing 3 – System Integration and Security}
+\subsubsection{Area of Testing 3 – System Integration and Security}
 
 \begin{enumerate}
 
@@ -333,40 +332,22 @@ Each test includes a concise derivation statement referencing relevant requireme
 \textbf{Initial State:} Admin and attendee interfaces are active.\\
 \textbf{Input/Condition:} Admin updates event details (e.g., venue or date).\\
 \textbf{Expected Output:} Attendee view updates automatically without manual refresh.\\
-\textbf{Test Case Derivation:} This test validates the real-time synchronization and data propagation features required by FR-6 and FR-7.\\
+\textbf{Test Case Derivation:} This test validates the real-time synchronization and data propagation features required by FR-6 and FR-7 and ensures that both databases are connected to the interface.\\
 \textbf{How the test will be performed:} An automated test will modify event data and verify that the attendee view reflects the change immediately.\\[6pt]
 
 \item[\textbf{Test-FR-SI-2}] \textbf{Role-Based Access Verification}\\
 \textbf{Type:} Manual\\
 \textbf{Initial State:} Admin and attendee accounts exist with distinct permissions.\\
 \textbf{Input/Condition:} Each user attempts to access admin-only features.\\
-\textbf{Expected Output:} Admin gains access; attendee is denied with proper error handling.\\
-\textbf{Test Case Derivation:} This test checks role-based access control and authorization mechanisms as defined in FR-11 and FR-6.\\
+\textbf{Expected Output:} Admin gains access but attendee is denied access with proper error handling.\\
+\textbf{Test Case Derivation:} This test checks role-based access control and authorization mechanisms as defined in FR-11 ensuring only specific users have access to admin controls.\\
 \textbf{How the test will be performed:} The tester will log in as both user types and attempt to access admin features to confirm proper restriction.\\[12pt]
 
 \end{enumerate}
 
 % \subsection{Functional Requirement Coverage Summary}
 
-% \begin{table}[H]
-% \centering
-% \begin{tabular}{|l|l|}
-% \hline
-% \textbf{Test ID} & \textbf{Functional Requirements Covered} \\
-% \hline
-% Test-FR-AP-1 & FR-1, FR-6 \\
-% Test-FR-AP-2 & FR-2, FR-8 \\
-% Test-FR-AP-3 & FR-3, FR-5, FR-6 \\
-% Test-FR-AP-4 & FR-8, FR-9, FR-10 \\
-% Test-FR-AA-1 & FR-3, FR-4, FR-6 \\
-% Test-FR-AA-2 & FR-3, FR-6 \\
-% Test-FR-AA-3 & FR-7, FR-9, FR-6 \\
-% Test-FR-SI-1 & FR-6, FR-7 \\
-% Test-FR-SI-2 & FR-11, FR-6 \\
-% \hline
-% \end{tabular}
-% \caption{Mapping of System Tests to Functional Requirements}
-% \end{table}
+
 
 
 \subsection{Tests for Nonfunctional Requirements}
@@ -391,41 +372,6 @@ format for the tests given below.}
 \wss{If you introduce static tests in your plan, you need to provide details.
 How will they be done?  In cases like code (or document) walkthroughs, who will
 be involved? Be specific.}
-
-\begin{enumerate}
-    \item \textbf{Test ID: ST-NFR1 -- Form Loading Latency}
-    \begin{itemize}
-        \item \textbf{Type:} Nonfunctional, Dynamic, Automatic
-        \item \textbf{Initial State:} Server running in staging environment with representative dataset loaded.
-        \item \textbf{Input/Output:}
-        \begin{itemize}
-            \item \textbf{Input:} User loads the registration form under normal and peak loads.
-            \item \textbf{Output:} Page load time is less than or equal to 2 seconds.
-        \end{itemize}
-    \end{itemize}
-
-    \item \textbf{Test ID: ST-NFR2 -- Auto-Save Functionality}
-    \begin{itemize}
-        \item \textbf{Type:} Nonfunctional, Dynamic, Manual
-        \item \textbf{Initial State:} Survey partially filled but not yet submitted.
-        \item \textbf{Input/Output:}
-        \begin{itemize}
-            \item \textbf{Input:} Wait more than 30 seconds and refresh the page.
-            \item \textbf{Output:} Survey progress remains intact after refresh.
-        \end{itemize}
-    \end{itemize}
-
-    \item \textbf{Test ID: ST-NFR3 -- Concurrent User Capacity}
-    \begin{itemize}
-        \item \textbf{Type:} Nonfunctional, Dynamic, Automatic
-        \item \textbf{Initial State:} System deployed to a test environment with monitoring enabled.
-        \item \textbf{Input/Output:}
-        \begin{itemize}
-            \item \textbf{Input:} Simulate 100 concurrent users performing event registration.
-            \item \textbf{Output:} System maintains response time under 4 seconds and less than 2\% error rate.
-        \end{itemize}
-    \end{itemize}
-\end{enumerate}
 
 \subsubsection{Area of Testing1}
 		
@@ -465,8 +411,25 @@ How test will be performed:
 
 \subsection{Traceability Between Test Cases and Requirements}
 
-\wss{Provide a table that shows which test cases are supporting which
-  requirements.}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Test ID} & \textbf{Functional Requirements Covered} \\
+\hline
+Test-FR-AP-1 & FR-1, FR-7 \\
+Test-FR-AP-2 & FR-2, FR-8 \\
+Test-FR-AP-3 & FR-5, FR-6 \\
+Test-FR-AP-4 & FR-8, FR-10 \\
+Test-FR-AA-1 & FR-3, FR-4, FR-6 \\
+Test-FR-AA-2 & FR-3\\
+Test-FR-AA-3 & FR-7, FR-9\\
+Test-FR-SI-1 & FR-6, FR-7 \\
+Test-FR-SI-2 & FR-11 \\
+\hline
+\end{tabular}
+\caption{Mapping of System Tests to Functional Requirements}
+\end{table}
 
 \section{Unit Test Description}
 
