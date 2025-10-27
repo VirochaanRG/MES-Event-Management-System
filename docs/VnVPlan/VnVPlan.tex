@@ -198,32 +198,16 @@ CAS741) for a partial usability survey.}
 
 \subsection{Automated Testing and Verification Tools}
 
-\wss{What tools are you using for automated testing.  Likely a unit testing
-  framework and maybe a profiling tool, like ValGrind.  Other possible tools
-  include a static analyzer, make, continuous integration tools, test coverage
-  tools, etc.  Explain your plans for summarizing code coverage metrics.
-  Linters are another important class of tools.  For the programming language
-  you select, you should look at the available linters.  There may also be tools
-  that verify that coding standards have been respected, like flake9 for
-  Python.}
-
-\wss{If you have already done this in the development plan, you can point to
-that document.}
-
-\wss{The details of this section will likely evolve as you get closer to the
-  implementation.}
-
-
 \begin{itemize}
     \item \textbf{Vitest:} Used as the primary unit and integration testing framework for the frontend. It integrates seamlessly with the Vite development environment and allows for efficient automated testing of components, hooks, and application logic. Vitest supports mocking and snapshot testing, which ensures that UI and logic remain consistent after code changes.
 
-    \item \textbf{Playwright:} Utilized for automated end-to-end testing to simulate user interactions across different browsers and devices. This tool validates complete user workflows such as event registration, survey submission, and form creation, ensuring system functionality and reliability from the user's perspective.
+    \item \textbf{Playwright:} Utilized for automated end-to-end testing to simulate user interactions across different browsers and devices. This tool can be used to validate complete user workflows such as event registration and form creation and submissions. This will help ensure system functionality and reliability from the user's perspective.
 
     \item \textbf{Postman and Newman:} Employed for API-level testing and verification. Postman allows the team to design and execute test cases for RESTful endpoints, while Newman enables command-line execution of these tests within the CI/CD pipeline. Together, they ensure backend consistency and correct response handling.
 
-    \item \textbf{GitHub Actions:} Serves as the continuous integration (CI) platform that automates testing and verification tasks. It will execute unit tests, end-to-end tests, and linters automatically on each push or pull request, ensuring that all commits meet quality and functionality standards before merging.
+    \item \textbf{GitHub Actions:} Serves as the continuous integration (CI) platform that automates testing and verification tasks. It will execute unit tests, end-to-end tests, and linters automatically on each push or pull request. This will ensure that all commits meet quality and functionality and don't break the system before merging.
 
-    \item \textbf{pgTAP:} Used for database testing in PostgreSQL. It verifies that database functions, triggers, and constraints behave correctly under various input conditions, ensuring data integrity and correct backend logic implementation.
+    \item \textbf{pgTAP:} Used for database testing in PostgreSQL. It can help ensure database integrity and ensure that that database schema and back-end logic is implemented correctly through unit testing.
 \end{itemize}
 
 \subsection{Software Validation}
@@ -248,8 +232,7 @@ as a Rev 0 demo for the supervisor.}
 
 \section{System Tests}
 
-\wss{There should be text between all headings, even if it is just a roadmap of
-the contents of the subsections.}
+This section outlines the the system wide tests to validate both functional and non-functional requirements defined in our Software Requirements Specification.
 
 \subsection{Tests for Functional Requirements}
 
