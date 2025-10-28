@@ -15,6 +15,13 @@
     urlcolor=blue
 }
 \usepackage[round]{natbib}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage[english]{babel}
+\usepackage[acronym,nonumberlist]{glossaries}
 
 \input{../Comments}
 \input{../Common}
@@ -684,51 +691,225 @@ How test will be performed:
 
 \subsection{Tests for Nonfunctional Requirements}
 
-\wss{If there is a module that needs to be independently assessed for
-  performance, those test cases can go here.  In some projects, planning for
-  nonfunctional tests of units will not be that relevant.}
+The following will outline system tests for the nonfunctional requirements highlighted in the SRS, directly verifying each Fit Criterion. Note that there are tests that cover multiple nonfunctional requirements. At the same time, some nonfunctional requirements are not present as they are already accounted for in the functional requirements test plan. 
 
-\wss{These tests may involve collecting performance data from previously
-  mentioned functional tests.}
+\subsubsection{Look and Feel}
+\begin{enumerate}[label=\bfseries LF-\arabic*:, wide=0pt]
+  \item \label{test-LF1} \textbf{MES Branding Conformance}\\[2mm]
+    {\bf Type:} Manual, Static\\
+    {\bf Initial State:} UI for basic build is finalized.\\
+    {\bf Input/Condition:} MES representative given access to app UI.\\
+    {\bf Output/Result:} Approval from MES representative.\\
+    {\bf Covers:} AR-1\\
+    {\bf How test will be performed:} A meeting will be held with the representative with a clear showing of the app UI, where they will assess design decisions (branding, colour palette) against MES branding criteria.
+  
+  \item \label{test-LF2} \textbf{Design Reception Survey}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} Basic production build and survey ready.\\
+    {\bf Input/Condition:} App used in at least one MES event, and survey sent out to all attendees.\\
+    {\bf Output/Result:} Survey filled out to illustrate user reception on design.\\
+    {\bf Covers:} AR-2, SR-1\\
+    {\bf How test will be performed:} The survey results will be compiled and analyzed to determine user reception of the design, and whether it meets usability expectations.
 
-\subsubsection{Module ?}
+    \item \label{test-LF3} \textbf{Admin Analytics Acceptance}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} Admin dashboard operational and contains realistic analytics and charts.\\
+    {\bf Input/Condition:} MES representative given access to dashboard preview.\\
+    {\bf Output/Result:} Approval from MES representative.\\
+    {\bf Covers:} AR-3, SR-2, FT-5\\
+    {\bf How test will be performed:} A meeting will be held with the representative to demonstrate the dashboard analytics. They will give approval on the types of metrics visualized as well as their layout.
+\end{enumerate}
 
-\begin{enumerate}
+\subsubsection{Usability and Humanity}
+\begin{enumerate}[label=\bfseries UH-\arabic*:, wide=0pt]
+  \item \label{test-UH1} \textbf{Intuitive Feedback and Registration}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} Functional live event forms.\\
+    {\bf Input/Condition:} App used in at least one MES event, attendees are provided access to app.\\
+    {\bf Output/Result:} Successful submission of pertinent forms with no instruction, and highly rating the experience.\\
+    {\bf Covers:} ER-1, LR-1\\
+    {\bf How test will be performed:} Observe successful registration and form completion by minimum 30 attendees, with an average of 80\% rating ease of use a 4+ out of 5.(ER-1).
+  
+  \item \label{test-UH2} \textbf{Seamless Sign-In / Sign-Up}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} Prior to set up of new user accounts.\\
+    {\bf Input/Condition:} Users perform sign-up and sign-in with no instruction.\\
+    {\bf Output/Result:} 10 users complete registration and sign in to account.\\
+    {\bf Covers:} ER-2\\
+    {\bf How test will be performed:} A sample of 10 users will be taken and observed for their ability to complete registration and login within 2 minutes (ER-2).
 
-\item{test-id1\\}
+  \item \label{test-UH3} \textbf{Admin Dashboard and Form Building Usability}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} Access to admin account with no prior training.\\
+    {\bf Input/Condition:} Admin creates a basic event form, and interprets analytics.\\
+    {\bf Output/Result:} 10 users successfully create event forms, and illustrate correct understanding of analytics.\\
+    {\bf Covers:} SR-2, ER-3, PI-1, PI-2, LR-2\\
+    {\bf How test will be performed:} Admins are instructed to create a basic event form, and describe their understanding of the analytics dashboard. A minimum of 10 users will be assessed for successful form creation and understanding of analytics (ER-3/SR-2).
 
-Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
-  be automatic}
+  \item \label{test-UH4} \textbf{Undesrtandable Language and Clear Prompts}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} All prompts implemented.\\
+    {\bf Input/Condition:} Used in at least one MES event where users interact with app prompts and evaluate clarity of wording.\\
+    {\bf Output/Result:} 80\% of users complete survey and rate language as accetptable.\\
+    {\bf Covers:} UR-1, UR-2, UR-4, CL-1\\
+    {\bf How test will be performed:} After completing the registration process for the MES event, users will be prompted to complete a feedback survey, where they rate language clarity out of 5.
 
-Initial State:
+  \item \label{test-UH5} \textbf{Polite and Constructive Error Handling}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} Platform triggers common errors.\\
+    {\bf Input/Condition:} User experiences error message and evaluate usefulness.\\
+    {\bf Output/Result:} 80\% of users rate the experience as satisfying.\\
+    {\bf Covers:} UR-1, UR-2\\
+    {\bf How test will be performed:} Users will aim to fill out the forms for at least one MES event, and interact with error messages to direct the completion of the form. Afterwards, they will rate the usefulness of the error messages in a survey out of 5.
+  
+  \item \label{test-UH6} \textbf{Accessability Conformance}\\[2mm]
+    {\bf Type:} Automatic, Dynamic\\
+    {\bf Initial State:} Fully configured UI themes.\\
+    {\bf Input/Condition:} Web tool used to assess UI.\\
+    {\bf Output/Result:} Design conforms to WCAG 2.0 and AODA requirements.\\
+    {\bf Covers:} AC-1\\
+    {\bf How test will be performed:} Automated web tools will be used to assess conformance to accessability standards (WebAIM). 
+\end{enumerate}
 
-Input/Condition:
+\subsection{Performance}
+\begin{enumerate}[label=\bfseries PF-\arabic*:, wide=0pt]
+  \item \label{test-PF1} \textbf{Form Latency}\\[2mm]
+    {\bf Type:} Automatic, Dynamic\\
+    {\bf Initial State:} Platform open on variety of devices (iOS, Android, Windows).\\
+    {\bf Input/Condition:} Loading event forms.\\
+    {\bf Output/Result:} Measured Time to First Byte (TTFB) will be less than 2 seconds.\\
+    {\bf Covers:} SL-1, IR-1, IR-2, PD-1, PD-2, AD-1, AD-2\\
+    {\bf How test will be performed:} App will be opened on distinct devices, and the according browser developer tools and APM's will be used to measure whether form loading latency meets performance requirements.
 
-Output/Result:
+  \item \label{test-PF2} \textbf{Data and Analytics Latency}\\[2mm]
+    {\bf Type:} Automatic, Dynamic\\
+    {\bf Initial State:} Admin dashboard open on variety of devices (iOS, Android, Windows).\\
+    {\bf Input/Condition:} Loading data analytics and performing filtering queries.\\
+    {\bf Output/Result:} Measured Time to First Byte (TTFB) using browser developer tools and APM's.\\
+    {\bf Covers:} SL-2, IR-1, IR-2, PD-1, PD-2\\
+    {\bf How test will be performed:} App will be opened on distinct devices, and the according browser developer tools and APM's will be used to measure whether analytics latency meets performance requirements.
 
-How test will be performed:
+  \item \label{test-PF4} \textbf{Wide User and Data Capacity}\\[2mm]
+    {\bf Type:} Automatic, Dynamic\\
+    {\bf Initial State:} Fully configured user access.\\
+    {\bf Input/Condition:} Stress tool used to simulate high traffic.\\
+    {\bf Output/Result:} Assess tool results to determine platform performance and bottlenecks.\\
+    {\bf Covers:} CR-1, CR-2\\
+    {\bf How test will be performed:} Load and stress tools (JMeter, DevTools) will be used to determine performance capacity of the app and areas of improvement to increase limitations.  
 
-\item{test-id2\\}
+{Untested Requirements}
+\begin{itemize}
+    \item \textbf{Safety Critical (SC-1):} Verified by \textbf{Test-FR-AP-2}, which compare dashboard values to backend analytics and exported reports.
 
-Type: Functional, Dynamic, Manual, Static etc.
+    \item \textbf{Precision or Accuracy (PA-1):}Verified by \textbf{Test-FR-AP-2} and \textbf{Test-FR-AP-4}, which compare dashboard values to backend analytics and exported reports.
+  
+    \item \textbf{Robustness or Fault Tolerance (PA-1, PA-2, PA-3, PA-4):} Verified by \textbf{Test-FR-SI-1}, which tests data synchronization and ensures all updates are saved and automatically viewable.
+    
+    \item \textbf{Scalability or Extensibility (SE-2):} Verified through code review. This is not directly measureable through system testing.
 
-Initial State:
-
-Input:
-
-Output:
-
-How test will be performed:
+    \item \textbf{Longevity (LG-2):} \textbf{Test-FR-AP-4} confirms the report/export function.
+\end{itemize}
 
 \end{enumerate}
 
-\subsubsection{Module ?}
+\subsubsection{Operational and Evironmental}
+\begin{enumerate}[label=\bfseries OE-\arabic*:, wide=0pt]
+  \item \label{test-OE1} \textbf{Timely Prototype Completion}\\[2mm]
+    {\bf Type:} Manual, Static\\
+    {\bf Initial State:} Completion of basic prototype.\\
+    {\bf Input/Condition:} Give MES representative access to prototype.\\
+    {\bf Output/Result:} Receive approval.\\
+    {\bf Covers:} RR-1\\
+    {\bf How test will be performed:} The MES representative will be given access to the basic prototype, and a meeting will be held to receive their approval on whether it meets expectations for the initial release.
+\end{enumerate}
+
+\subsubsection{Maintainability and Support}
+\begin{enumerate}[label=\bfseries MS-\arabic*:, wide=0pt]
+  \item \label{test-MS1} \textbf{Updated Product Documentation}\\[2mm]
+    {\bf Type:} Manual, Static\\
+    {\bf Initial State:} Latest release of product available.\\
+    {\bf Input/Condition:} Developer references product documentation.\\
+    {\bf Output/Result:} Documentation will be followed to add new features or correct errors.\\
+    {\bf Covers:} MT-1\\
+    {\bf How test will be performed:} Developers will follow documentation to identify the changes made with each release and direct future modification processes.
+
+  \item \label{test-MS2} \textbf{FAQ Coverage}\\[2mm]
+    {\bf Type:} Manual, Static\\
+    {\bf Initial State:} Published FAQ section.\\
+    {\bf Input/Condition:} Crosscheck FAQ postings with stakeholder/representative questions.\\
+    {\bf Output/Result:} Listing of ideal postings for FAQ section.\\
+    {\bf Covers:} SU-1\\
+    {\bf How test will be performed:} Compile stakeholder feedback and survey results and compare to FAQ section to validate inclusion of pertinent topics.
+\end{enumerate}
+
+\subsubsection{Security}
+\begin{enumerate}[label=\bfseries ST-\arabic*:, wide=0pt]
+
+  \item \label{test-ST1} \textbf{Secure Email Authentication}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} Access to app with authentication configured to McMaster emails.\\
+    {\bf Input/Condition:} Attempt login with non-McMaster and McMaster emails.\\
+    {\bf Output/Result:} Only authorized users pass. Any invalid attempts are logged for admin to view\\
+    {\bf Covers:} AC-1\\
+    {\bf How test will be performed:} App login will be tested with valid and invalid email addresses. Only the valid should be able to access the app. The invalid attempt should be logged in history.\\
+
+  \item \label{test-ST2} \textbf{HTTPS-Limited Communication}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} TLS configured domain.\\
+    {\bf Input/Condition:} Attempt HTTP connections and inspect traffic.\\
+    {\bf Output/Result:} All HTTP traffic redirects to HTTPS.\\
+    {\bf Covers:} IG-2\\
+    {\bf How test will be performed:} Different connections from different devices will be attempted, followed by inspections of the browser logs to verify correct use of HTTPS.\\
+
+  \item \label{test-ST3} \textbf{Personal Data Deletion}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} User account already made with personal data stored in database.\\
+    {\bf Input/Condition:} Submit a request to delete data through the app.\\
+    {\bf Output/Result:} All personal data removed fairly in accordance with policy.\\
+    {\bf Covers:} PV-1\\
+    {\bf How test will be performed:} User will create an account, and request deletion after confirming its data was stored in the database. After alleged deletion, query the database to verify complete removal of data.\\
+
+  \item \label{test-ST4} \textbf{Secure Data Encryption (AES-256)}\\[2mm]
+    {\bf Type:} Manual, Static\\
+    {\bf Initial State:} No account created yet.\\
+    {\bf Input/Condition:} Send account information to database.\\
+    {\bf Output/Result:} Data entry is fully encrypted with no plaintext values.\\
+    {\bf Covers:} PV-2, PV-3\\
+    {\bf How test will be performed:} Test account will be created, followed by an inspection of the data entry to ensure competent encryption.\\
+
+  \item \label{test-ST5} \textbf{Detailed Admin Audit Log}\\[2mm]
+    {\bf Type:} Manual, Dynamic\\
+    {\bf Initial State:} Audit logging fully enabled.\\
+    {\bf Input/Condition:} Perform different admin actions (create, update, delete, export).\\
+    {\bf Output/Result:} Each action recorded with actor, timestamp, and action type.\\
+    {\bf Covers:} AU-1\\
+    {\bf How test will be performed:} Replay test scenarios and confirm completeness and accuracy of logs.\\
+
+{Untested Requirements}
+\begin{itemize}
+    \item \textbf{Access (AC-2):} Verified by \textbf{Test-FR-SI-2}, which ensures restriction of data based on permissions.
+
+    \item \textbf{Integrity (IG-1):}Verified by \textbf{Test-FR-SI-1}, which covers data synchronization and accuracy of inputs.
+\end{itemize}
+
+\end{enumerate}
+
+\subsubsection{Compliance}
+\begin{enumerate}[label=\bfseries ST-\arabic*:, wide=0pt]
+  \item \label{test-ST1} \textbf{Updated Product Documentation}\\[2mm]
+    {\bf Type:} Manual, Static\\
+    {\bf Initial State:} Latest release of product available.\\
+    {\bf Input/Condition:} Developer references product documentation.\\
+    {\bf Output/Result:} Documentation will be followed to add new features or correct errors.\\
+    {\bf Covers:} MT-1\\
+    {\bf How test will be performed:} Developers will follow documentation to identify the changes made with each release and direct future modification processes.
+\end{enumerate}
 
 ...
 
 \subsection{Traceability Between Test Cases and Modules}
 
-\wss{Provide evidence that all of the modules have been considered.}
+Traceability between the unit test cases and the modules they are intended to verify is already illustrated in the \textbf{Covers} section for each NFR.
 
 \bibliographystyle{plainnat}
 
