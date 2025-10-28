@@ -3,6 +3,7 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{float}
 \usepackage{enumitem}
 \hypersetup{
     colorlinks,
@@ -224,20 +225,17 @@ As part of the final CAS 741 presentation, we will also conduct a short usabilit
 
 \subsection{Automated Testing and Verification Tools}
 
-\wss{What tools are you using for automated testing.  Likely a unit testing
-  framework and maybe a profiling tool, like ValGrind.  Other possible tools
-  include a static analyzer, make, continuous integration tools, test coverage
-  tools, etc.  Explain your plans for summarizing code coverage metrics.
-  Linters are another important class of tools.  For the programming language
-  you select, you should look at the available linters.  There may also be tools
-  that verify that coding standards have been respected, like flake9 for
-  Python.}
+\begin{itemize}
+    \item \textbf{Vitest:} Used as the primary unit and integration testing framework for the frontend. It integrates seamlessly with the Vite development environment and allows for efficient automated testing of components, hooks, and application logic. Vitest supports mocking and snapshot testing, which ensures that UI and logic remain consistent after code changes.
 
-\wss{If you have already done this in the development plan, you can point to
-that document.}
+    \item \textbf{Playwright:} Utilized for automated end-to-end testing to simulate user interactions across different browsers and devices. This tool can be used to validate complete user workflows such as event registration and form creation and submissions. This will help ensure system functionality and reliability from the user's perspective.
 
-\wss{The details of this section will likely evolve as you get closer to the
-  implementation.}
+    \item \textbf{Postman and Newman:} Employed for API-level testing and verification. Postman allows the team to design and execute test cases for RESTful endpoints, while Newman enables command-line execution of these tests within the CI/CD pipeline. Together, they ensure backend consistency and correct response handling.
+
+    \item \textbf{GitHub Actions:} Serves as the continuous integration (CI) platform that automates testing and verification tasks. It will execute unit tests, end-to-end tests, and linters automatically on each push or pull request. This will ensure that all commits meet quality and functionality and don't break the system before merging.
+
+    \item \textbf{pgTAP:} Used for database testing in PostgreSQL. It can help ensure database integrity and ensure that that database schema and back-end logic is implemented correctly through unit testing.
+\end{itemize}
 
 \subsection{Software Validation}
 
@@ -260,64 +258,106 @@ There are no external data sets required for validation since this is a new syst
 
 \section{System Tests}
 
-\wss{There should be text between all headings, even if it is just a roadmap of
-the contents of the subsections.}
+This section outlines the the system wide tests to validate both functional and non-functional requirements defined in our Software Requirements Specification.
 
 \subsection{Tests for Functional Requirements}
 
-\wss{Subsets of the tests may be in related, so this section is divided into
-  different areas.  If there are no identifiable subsets for the tests, this
-  level of document structure can be removed.}
-
-\wss{Include a blurb here to explain why the subsections below
-  cover the requirements.  References to the SRS would be good here.}
-
-\subsubsection{Area of Testing1}
-
-\wss{It would be nice to have a blurb here to explain why the subsections below
-  cover the requirements.  References to the SRS would be good here.  If a section
-  covers tests for input constraints, you should reference the data constraints
-  table in the SRS.}
-
-\paragraph{Title for Test}
+This section verifies that the implemented system fulfills all \textbf{Functional Requirements (FR-1 through FR-11)} defined in the SRS. 
+The tests are grouped into three \textbf{Areas of Testing}: \textit{Admin Portal (AP)}, \textit{Attendee Application (AA)}, and \textit{System Integration and Security (SI)}. 
+\subsubsection{Area of Testing 1 – Admin Portal}
 
 \begin{enumerate}
 
-\item{test-id1\\}
+\item[\textbf{Test-FR-AP-1}] \textbf{Create Form}\\
+\textbf{Type:} Manual\\
+\textbf{Initial State:} Admin is logged in with form creation privileges.\\
+\textbf{Input/Condition:} Admin enters a new form name and adds multiple field types (text, checkbox, rating).\\
+\textbf{Expected Output:} The new form module is created and is visible in the database and in the admin dashboard.\\
+\textbf{Test Case Derivation:} This test verifies the system’s ability to support dynamic form creation and storage as required by FR-1 and FR-7.\\
+\textbf{How the test will be performed:} The tester will create a new form and confirm it appears correctly in the interface and database.\\[6pt]
 
-Control: Manual versus Automatic
+\item[\textbf{Test-FR-AP-2}] \textbf{View and Analyze Form Data}\\
+\textbf{Type:} Manual\\
+\textbf{Initial State:} At least two forms with collected responses exist.\\
+\textbf{Input/Condition:} Admin selects multiple forms and clicks button to view report analytics\\
+\textbf{Expected Output:} Aggregated analytics are displayed correctly and match backend data.\\
+\textbf{Test Case Derivation:} This test confirms data organization and analytical visualization functionalities described in FR-2 and FR-8, ensuring accurate reporting and analytics.\\
+\textbf{How the test will be performed:} The tester will generate combined analytics and confirm that the displayed charts match backend results.\\[6pt]
 
-Initial State:
+\item[\textbf{Test-FR-AP-3}] \textbf{Manage Events via Dashboard}\\
+\textbf{Type:} Manual\\
+\textbf{Initial State:} Several events with participant data exist.\\
+\textbf{Input/Condition:} Admin accesses the dashboard and applies filters (e.g., pending payment).\\
+\textbf{Expected Output:} Filtered results display accurately with correct status counts.\\
+\textbf{Test Case Derivation:} This test validates event management, filtering, and data persistence mechanisms described in FR-5 and FR-6.\\
+\textbf{How the test will be performed:} The tester will apply filters and verify that displayed data matches expected event records.\\[6pt]
 
-Input:
-
-Output: \wss{The expected result for the given inputs.  Output is not how you
-are going to return the results of the test.  The output is the expected
-result.}
-
-Test Case Derivation: \wss{Justify the expected value given in the Output field}
-
-How test will be performed:
-
-\item{test-id2\\}
-
-Control: Manual versus Automatic
-
-Initial State:
-
-Input:
-
-Output: \wss{The expected result for the given inputs}
-
-Test Case Derivation: \wss{Justify the expected value given in the Output field}
-
-How test will be performed:
+\item[\textbf{Test-FR-AP-4}] \textbf{View and Export Event Analytics}\\
+\textbf{Type:} Manual\\
+\textbf{Initial State:} Events and surveys contain collected feedback.\\
+\textbf{Input/Condition:} Admin selects an event and exports analytics.\\
+\textbf{Expected Output:} Correct analytics display and downloadable report matches system data.\\
+\textbf{Test Case Derivation:} This test ensures that analytics generation and report export satisfy the requirements for event statistics and reporting defined in FR-8 and FR-10.\\
+\textbf{How the test will be performed:} The tester will view analytics for an event, export the report, and compare the output to dashboard data.\\[12pt]
 
 \end{enumerate}
 
-\subsubsection{Area of Testing2}
+\subsubsection{Area of Testing 2 – Attendee Application}
 
-...
+\begin{enumerate}
+
+\item[\textbf{Test-FR-AA-1}] \textbf{Register for Event}\\
+\textbf{Type:} Automatic\\
+\textbf{Initial State:} An event is open and attendee is authenticated.\\
+\textbf{Input/Condition:} Attendee submits an event registration form.\\
+\textbf{Expected Output:} Registration is saved and a confirmation message is displayed and sent to attendee and a QR ticket is generated.\\
+\textbf{Test Case Derivation:} This test validates the registration workflow and QR ticket generation process as required by FR-3, FR-4, and FR-6.\\
+\textbf{How the test will be performed:} An automated test will submit registration data and verify the confirmation message and QR code has been created. Will confirm that the event data has also been updated in the database.\\[6pt]
+
+\item[\textbf{Test-FR-AA-2}] \textbf{Access Event Listings}\\
+\textbf{Type:} Manual\\
+\textbf{Initial State:} The system has multiple upcoming and past events.\\
+\textbf{Input/Condition:} Attendee views ``Upcoming'' and ``Registered Events'' tabs.\\
+\textbf{Expected Output:} Each tab displays correct events for that category.\\
+\textbf{Test Case Derivation:} This test confirms accurate retrieval and filtering of events for authenticated users as required by FR-3 and ensures user can view event info.\\
+\textbf{How the test will be performed:} The tester will view event lists and verify they match stored registration records. Tester will also ensure event info shows up correctly and matches database.\\[6pt]
+
+\item[\textbf{Test-FR-AA-3}] \textbf{Fill out Form}\\
+\textbf{Type:} Automatic\\
+\textbf{Initial State:} A survey is available and attendee is authenticated.\\
+\textbf{Input/Condition:} Attendee completes and submits the survey.\\
+\textbf{Expected Output:} Survey responses are stored and a confirmation message appears.\\
+\textbf{Test Case Derivation:} This test ensures that survey submission and feedback processing meet the specifications in FR-7, FR-9.\\
+\textbf{How the test will be performed:} An automated test will submit survey responses and confirm that results are stored and submission is found in the centralized database.\\[12pt]
+
+\end{enumerate}
+
+\subsubsection{Area of Testing 3 – System Integration and Security}
+
+\begin{enumerate}
+
+\item[\textbf{Test-FR-SI-1}] \textbf{Real-Time Data Synchronization}\\
+\textbf{Type:} Automatic\\
+\textbf{Initial State:} Admin and attendee interfaces are active.\\
+\textbf{Input/Condition:} Admin updates event details (e.g., venue or date).\\
+\textbf{Expected Output:} Attendee view updates automatically without manual refresh.\\
+\textbf{Test Case Derivation:} This test validates the real-time synchronization and data propagation features required by FR-6 and FR-7 and ensures that both databases are connected to the interface.\\
+\textbf{How the test will be performed:} An automated test will modify event data and verify that the attendee view reflects the change immediately.\\[6pt]
+
+\item[\textbf{Test-FR-SI-2}] \textbf{Role-Based Access Verification}\\
+\textbf{Type:} Manual\\
+\textbf{Initial State:} Admin and attendee accounts exist with distinct permissions.\\
+\textbf{Input/Condition:} Each user attempts to access admin-only features.\\
+\textbf{Expected Output:} Admin gains access but attendee is denied access with proper error handling.\\
+\textbf{Test Case Derivation:} This test checks role-based access control and authorization mechanisms as defined in FR-11 ensuring only specific users have access to admin controls.\\
+\textbf{How the test will be performed:} The tester will log in as both user types and attempt to access admin features to confirm proper restriction.\\[12pt]
+
+\end{enumerate}
+
+% \subsection{Functional Requirement Coverage Summary}
+
+
+
 
 \subsection{Tests for Nonfunctional Requirements}
 
@@ -380,8 +420,25 @@ How test will be performed:
 
 \subsection{Traceability Between Test Cases and Requirements}
 
-\wss{Provide a table that shows which test cases are supporting which
-  requirements.}
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Test ID} & \textbf{Functional Requirements Covered} \\
+\hline
+Test-FR-AP-1 & FR-1, FR-7 \\
+Test-FR-AP-2 & FR-2, FR-8 \\
+Test-FR-AP-3 & FR-5, FR-6 \\
+Test-FR-AP-4 & FR-8, FR-10 \\
+Test-FR-AA-1 & FR-3, FR-4, FR-6 \\
+Test-FR-AA-2 & FR-3\\
+Test-FR-AA-3 & FR-7, FR-9\\
+Test-FR-SI-1 & FR-6, FR-7 \\
+Test-FR-SI-2 & FR-11 \\
+\hline
+\end{tabular}
+\caption{Mapping of System Tests to Functional Requirements}
+\end{table}
 
 \section{Unit Test Description}
 
@@ -528,25 +585,68 @@ Their values are defined in this section for easy maintenance.
 \wss{This is a section that would be appropriate for some projects.}
 
 \newpage{}
-
 \section*{Appendix --- Reflection}
-\subsection*{Reflection Questions}
+
+The information in this section will be used to evaluate the team members on the
+graduate attribute of Lifelong Learning.
+
+% \input{../Reflection.tex}
+\subsubsection*{Virochaan Ravichandran Gowri Reflection}
 \begin{enumerate}
-  \item What went well while writing this deliverable?
-  \item What pain points did you experience during this deliverable, and how
-    did you resolve them?
-  \item What knowledge and skills will the team collectively need to acquire to
-  successfully complete the verification and validation of your project?
-  Examples of possible knowledge and skills include dynamic testing knowledge,
-  static testing knowledge, specific tool usage, Valgrind etc.  You should look to
-  identify at least one item for each team member.
-  \item For each of the knowledge areas and skills identified in the previous
-  question, what are at least two approaches to acquiring the knowledge or
-  mastering the skill?  Of the identified approaches, which will each team
-  member pursue, and why did they make this choice?
+  \item \textbf{What went well while writing this deliverable?} 
+  Since we had already completed the SRS deriving test cases to ensure that the different requirements were covered was quite easy and straightforward. We used some of the diagrams and components identified within the SRS to breakdown the functional system tests and for the NFR system tests 
+  \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?}
+  One pain point that was more of an annoyance was ensuring traceability and that we kept a good track of what test cases were covering which requirements and not having too much overlap on the requirements we were validating. We also wanted to ensure that the test were actually feasible and did not put too high of a burden on us. This meant that we had to consider both manual and automatic tests that could be accomplished. 
 \end{enumerate}
 
-\subsection*{Individual Reflections}
+\subsubsection*{Group Reflection}
+\begin{enumerate}
+ 
+  \item \textbf{What knowledge and skills will the team collectively need to acquire to successfully complete the verification and validation of your project?
+  Examples of possible knowledge and skills include dynamic testing knowledge, static testing knowledge, specific tool usage, Valgrind etc.  You should look to identify at least one item for each team member.}
+  \begin {enumerate}
+    \item \textbf{Automated Testing with CI/CD}: We need to ensure we understand how test pipelines work and how some of these automated testing tools such as ViteTest and Playwright will integrate within our workflows. As mentioned in the SRS we also need to build upon our knowledge on GitHub Actions to ensure that we utilize it properly to have a proper testing workflow.
+    \item \textbf{Static Testing and Code Quality Assurance}: Understand and implement static testing methods such as code inspections and code reviews. It will help us find more tools to help perform static analysis to find defects early in the development lifecycle.
+    \item \textbf{Dynamic Testing}: Build upon pre-existing dynamic testing skills and find ways to use it in our use case. This includes developing better system and unit testing skills and developing skills in creating test cases.
+    \item \textbf{Usability Testing}: Though this might relate more to the Usability report, we need to develop this skill to ensure that we can create a positive user experience. 
+    \item \textbf{ViteTest and Playwright}: These two tools are the most important tools that we will be using throughout our testing phase of the project so it is important we gain a good understanding of these tools to utilize them to the highest level.
+  \end{enumerate}
+  \item \textbf{For each of the knowledge areas and skills identified in the previous
+  question, what are at least two approaches to acquiring the knowledge or
+  mastering the skill?  Of the identified approaches, which will each team
+  member pursue, and why did they make this choice?}
+  \begin{enumerate}
+    \item \textbf{Automated Testing with CI/CD}: 
+    To acquire this knowledge we can study the official documentation and tutorials for GitHub Actions as well as related automated testing tools. This will help us understand configuration and workflow syntax. We can also analyze open-source repositories that employ CI/CD with similar front-end stacks to observe best practices and reusable workflow patterns. 
+    \item \textbf{Static Testing and Code Quality Assurance}: 
+    This knowledge can be developed by completing structured online modules or guides on static code analysis, focusing on tools that are easy to use for our use case. We can also conduct regular peer-led code reviews and checklist-based inspections to ensure we hold each other accountable and figure out our code patterns. 
+
+    \item \textbf{Dynamic Testing}: 
+    The team can strengthen this skill by taking short online courses or tutorials on unit, integration, and system testing methodologies and find videos on testcase design. We can also look back to our SFWRENG 3S03 where we worked first hand on developing test cases to ensure we can find ways to maximize code coverage.
+
+    \item \textbf{Usability Testing}: 
+    To develop this skill, the team could review Human–Computer Interaction (HCI) principles and usability evaluation methods through our course work. We can also look into tutorials online about effective UX design to and link usability testing to front-end design. We can also discuss with our stakeholders and supervisors their expectations to develop our own testing framework.
+
+
+    \item \textbf{ViteTest and Playwright}: 
+    The team can gain proficiency by following official tutorials and documentation to build example test suites and understand configuration options for both tools. We can also look to open-source projects or community-driven examples to learn advanced testing features that these tools offer. \newline
+\end{enumerate}
+
+\textbf{What each member will pursue:}
+\begin{enumerate}
+    \item \textbf{Virochaan}:  Virochaan will focus on mastering \textbf{Automated Testing with CI/CD}, particularly the integration of GitHub Actions with Vitest and Playwright. Since he was specified as the DevOps manager it will be important to know to create proper Github workflows. From this he will also need to know the details of \textbf{Vitest and Playwright} to ensure that we develop the proper testing protocol for this. He will primarily focus on looking at tutorials and find open source projects with workflows that we can look to understand to develop our own.
+
+    \item \textbf{Mohammad}: Mohammad has worked with static coding tools in the past so he will look to develop those skills further by focusing on \textbf{Static Testing}. He will do this by researching static testing tools for our usecase and looking at tutorials and examples where static testing has been done for full-stack apps.
+
+    \item \textbf{Omar}: Omar has experience developing mobile apps so he will focus on \textbf{Usability Testing} to ensure that he can develop the best user experience possible. He will do this by primarily looking at video tutorials on usability testing and in our supervisor meetings develop a testing framework for our UI.
+
+    \item \textbf{Ibrahim}: Ibrahim will look to focus on \textbf{Dynamic Testing} with \textbf{Vitest and Playwright}. These tools also offer dynamic testing capabilities and it is important we figure out how to connect the two effectively. Ibrahim will focus on looking through tutorials for the two technologies and watching videos on testing methodologies so we can implement the methodologies for our usecase.
+
+    \item \textbf{Rayyan}: Rayyan has experience working with testing through his coop experiences. To build upon this he will focus on \textbf{Dynamic Testing} and \textbf{Static Testing} and will look to be well rounded on this. In our roles we also identified him as a web app tester so this will allow him to develop good testcases to accomplish this. He will primarily focus on looking at tutorials on dynamic and static testing and how we can connect the two together to make a better testing framework.
+
+\end{enumerate}
+\end{enumerate}
+
 \subsubsection*{Mohammad Mahdi Mahboob}
 \begin{enumerate}[align=left,
   leftmargin=*,
