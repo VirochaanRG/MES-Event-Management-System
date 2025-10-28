@@ -3,6 +3,7 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{enumitem}
 \hypersetup{
     colorlinks,
     citecolor=blue,
@@ -17,10 +18,10 @@
 
 \begin{document}
 
-\title{System Verification and Validation Plan for \progname{}} 
+\title{System Verification and Validation Plan for \progname{}}
 \author{\authname}
 \date{\today}
-	
+
 \maketitle
 
 \pagenumbering{roman}
@@ -65,10 +66,10 @@ in.}
 \section{Symbols, Abbreviations, and Acronyms}
 
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{l l} 
-  \toprule		
+\begin{tabular}{l l}
+  \toprule
   \textbf{symbol} & \textbf{description}\\
-  \midrule 
+  \midrule
   T & Test\\
   \bottomrule
 \end{tabular}\\
@@ -89,56 +90,65 @@ This document ... \wss{provide an introductory blurb and roadmap of the
 
 \subsection{Summary}
 
-\wss{Say what software is being tested.  Give its name and a brief overview of
-  its general functions.}
+The following core features of the product will be tested:
+
+\begin{description}
+  \item[Custom Form Builder] Allows admins to create and publish survey forms; obtains responses from attendees; and
+    allows admins to view responses.
+  \item[Registration and Feedback Forms] Allow admins to create or monitor registration forms for events; allow students
+    to register for events; generate QR codes and tickets for students to confirm their registrations; receive feedback
+    from students regarding events; allow admins to review feedback received from students.
+  \item[Attendee Overview] Allow admins to view event attendance; allow admins to update event statuses and inform
+    attendees of changes; allow attendees to receive notifications regarding events.
+  \item[Backend Analytics] Allow admins to query any set of form questions and view aggregated results from the query;
+    allow admins to freely visualize relevant data points from surveys; allow admins to export analytics data as
+    SCV/Excel reports.
+\end{description}
 
 \subsection{Objectives}
 
-\wss{State what is intended to be accomplished.  The objective will be around
-  the qualities that are most important for your project.  You might have
-  something like: ``build confidence in the software correctness,''
-  ``demonstrate adequate usability.'' etc.  You won't list all of the qualities,
-  just those that are most important.}
+The purpose of this verification and validation plan is to evaluate the reliability, accuracy, and conformity of the
+\teamname~with its requirements. The main objectives are to build confidence in the correctness of the overall system,
+verify that all core features and functionality operate as intended, and demonstrate that the system will perform well
+when deployed by MES. The testing focus will be on ensuring functionality, performance, reliability, and correctness of
+the core components, both in isolation and when integrated with the rest of the system. These core components are
+essential to the completion of the capstone, so they must function correctly in order to meet the project goals.
 
-\wss{You should also list the objectives that are out of scope.  You don't have 
-the resources to do everything, so what will you be leaving out.  For instance, 
-if you are not going to verify the quality of usability, state this.  It is also 
-worthwhile to justify why the objectives are left out.}
+User Interface and application usability are out of scope for the testing roadmap outlined in this plan as they are
+addressed in the project extras. Also out of scope for this plan is verification of external libraries and third-party
+tools (such as PostgreSQL and React) as it is assumed that these products have been validated by their respective
+developers. This plan prioritizes the testing and verification of the team's bespoke components and their integration
+with the overall system.
 
-\wss{The objectives are important because they highlight that you are aware of 
-limitations in your resources for verification and validation.  You can't do everything, 
-so what are you going to prioritize?  As an example, if your system depends on an 
-external library, you can explicitly state that you will assume that external library 
-has already been verified by its implementation team.}
+\subsection{Extras}
 
-\subsection{Challenge Level and Extras}
+\subsubsection{Usability Report}
+The usability report will evaluate the overall ease-of-use of the application for both admins and attendees. This
+includes definition of evaluation metrics, description of the evaluation process, evaluation results, and an analysis of
+the data gathered from the evaluation to determine the usability of the application based on its conformity to the
+outlined metrics.
 
-\wss{State the challenge level (advanced, general, basic) for your project.
-Your challenge level should exactly match what is included in your problem
-statement.  This should be the challenge level agreed on between you and the
-course instructor.  You can use a pull request to update your challenge level
-(in TeamComposition.csv or Repos.csv) if your plan changes as a result of the
-VnV planning exercise.}
+\subsubsection{Wireframe Report}
+The wireframe report will document the design process for the application user interface for both admins and attendees.
+It will justify design decisions and how the team expects these visual representations to allow users to navigate the
+application with a reasonably low amount of effort.
 
-\wss{Summarize the extras (if any) that were tackled by this project.  Extras
-can include usability testing, code walkthroughs, user documentation, formal
-proof, GenderMag personas, Design Thinking, etc.  Extras should have already
-been approved by the course instructor as included in your problem statement.
-You can use a pull request to update your extras (in TeamComposition.csv or
-Repos.csv) if your plan changes as a result of the VnV planning exercise.}
 
 \subsection{Relevant Documentation}
-
-\wss{Reference relevant documentation.  This will definitely include your SRS
-  and your other project documents (design documents, like MG, MIS, etc).  You
-  can include these even before they are written, since by the time the project
-  is done, they will be written.  You can create BibTeX entries for your
-  documents and within those entries include a hyperlink to the documents.}
-
-\citet{SRS}
-
-\wss{Don't just list the other documents.  You should explain why they are relevant and 
-how they relate to your VnV efforts.}
+The following documents are relevant to the context of the verification and validation plan:
+\begin{enumerate}[align=left,
+  leftmargin=*,
+  labelsep=1em,
+  itemindent=0em, font=\bfseries]
+  \item {\bfseries SRS:} Defines all functional and non-functional requirements which form the basis of the verification
+    process \citep{SRS}.
+  \item {\bfseries Development Plan:} Outlines the code and development structure as well as lists third-party
+    technologies which will be used for development, and defines the technology to be used for testing \citep{DVP}.
+  \item {\bfseries Usability Report:} Provides a thorough evaluation of the application and user interface for design
+    validation.
+  \item {\bfseries Wireframe Report:} Documents the user interface design process, including mockups from which design
+    evaluations may stem.
+\end{enumerate}
 
 \section{Plan}
 
@@ -185,15 +195,15 @@ verified.  Techniques for this include review and mutation testing.}
 
 \subsection{Implementation Verification}
 
-To make sure that the system works as intended and meets all the goals set out in the SRS, our team will verify the implementation through both testing and review processes. The focus will mainly be on the four main parts: the \textbf{Custom Form Builder}, \textbf{Registration and Feedback Forms}, \textbf{Attendee Overview}, and \textbf{Backend Analytics}. 
+To make sure that the system works as intended and meets all the goals set out in the SRS, our team will verify the implementation through both testing and review processes. The focus will mainly be on the four main parts: the \textbf{Custom Form Builder}, \textbf{Registration and Feedback Forms}, \textbf{Attendee Overview}, and \textbf{Backend Analytics}.
 
 \subsubsection*{Dynamic Verification}
 Dynamic verification will confirm that each feature works correctly through practical testing during development.
 
 \begin{itemize}
-  \item \textbf{Unit Testing:} Every module will be tested on its own using Jest and the React Testing Library. These tests will check things like whether form fields are created properly, if branching logic behaves as expected, and whether data is saved correctly in the database. 
+  \item \textbf{Unit Testing:} Every module will be tested on its own using Jest and the React Testing Library. These tests will check things like whether form fields are created properly, if branching logic behaves as expected, and whether data is saved correctly in the database.
   \item \textbf{Integration Testing:} Once the individual parts are stable, integration tests will be done to make sure the frontend and backend communicate properly. These tests will confirm that data moves smoothly between the admin portal, the backend server, and the shared database used by the other capstone teams.
-  \item \textbf{System and Acceptance Testing:} The final round of testing will simulate real MES events, such as the Fireball Formal or CALE Conference. This will test the full flow—from creating a form, registering attendees, collecting feedback, and generating analytics. We will also check that pages load quickly (forms within about two seconds and analytics within about four) and that all security and accessibility requirements are met. 
+  \item \textbf{System and Acceptance Testing:} The final round of testing will simulate real MES events, such as the Fireball Formal or CALE Conference. This will test the full flow—from creating a form, registering attendees, collecting feedback, and generating analytics. We will also check that pages load quickly (forms within about two seconds and analytics within about four) and that all security and accessibility requirements are met.
 \end{itemize}
 
 \subsubsection*{Static Verification}
@@ -225,7 +235,7 @@ that document.}
 \subsection{Software Validation}
 
 \subsubsection*{Stakeholder Review and Demonstrations}
-Validation will occur continuously through review sessions with the project supervisor, Luke Schuurman. Each major milestone will be demonstrated to him for feedback to ensure that the system aligns with MES needs. The \textbf{Rev 0 demonstration} will serve as the first major validation checkpoint, where core workflows—form creation, registration, feedback submission, and analytics—will be shown to the supervisor for approval. 
+Validation will occur continuously through review sessions with the project supervisor, Luke Schuurman. Each major milestone will be demonstrated to him for feedback to ensure that the system aligns with MES needs. The \textbf{Rev 0 demonstration} will serve as the first major validation checkpoint, where core workflows—form creation, registration, feedback submission, and analytics—will be shown to the supervisor for approval.
 
 After the scheduled Rev 0 demo, the team will conduct a dedicated review meeting with the supervisor to gather specific feedback on usability, workflow logic, and data visualization accuracy. This feedback will guide refinements for later iterations and integration with other teams’ modules.
 
@@ -261,7 +271,7 @@ the contents of the subsections.}
   cover the requirements.  References to the SRS would be good here.  If a section
   covers tests for input constraints, you should reference the data constraints
   table in the SRS.}
-		
+
 \paragraph{Title for Test}
 
 \begin{enumerate}
@@ -269,32 +279,32 @@ the contents of the subsections.}
 \item{test-id1\\}
 
 Control: Manual versus Automatic
-					
-Initial State: 
-					
-Input: 
-					
+
+Initial State:
+
+Input:
+
 Output: \wss{The expected result for the given inputs.  Output is not how you
 are going to return the results of the test.  The output is the expected
 result.}
 
 Test Case Derivation: \wss{Justify the expected value given in the Output field}
-					
-How test will be performed: 
-					
+
+How test will be performed:
+
 \item{test-id2\\}
 
 Control: Manual versus Automatic
-					
-Initial State: 
-					
-Input: 
-					
+
+Initial State:
+
+Input:
+
 Output: \wss{The expected result for the given inputs}
 
 Test Case Derivation: \wss{Justify the expected value given in the Output field}
 
-How test will be performed: 
+How test will be performed:
 
 \end{enumerate}
 
@@ -326,7 +336,7 @@ How will they be done?  In cases like code (or document) walkthroughs, who will
 be involved? Be specific.}
 
 \subsubsection{Area of Testing1}
-		
+
 \paragraph{Title for Test}
 
 \begin{enumerate}
@@ -334,26 +344,26 @@ be involved? Be specific.}
 \item{test-id1\\}
 
 Type: Functional, Dynamic, Manual, Static etc.
-					
-Initial State: 
-					
-Input/Condition: 
-					
-Output/Result: 
-					
-How test will be performed: 
-					
+
+Initial State:
+
+Input/Condition:
+
+Output/Result:
+
+How test will be performed:
+
 \item{test-id2\\}
 
 Type: Functional, Dynamic, Manual, Static etc.
-					
-Initial State: 
-					
-Input: 
-					
-Output: 
-					
-How test will be performed: 
+
+Initial State:
+
+Input:
+
+Output:
+
+How test will be performed:
 
 \end{enumerate}
 
@@ -372,14 +382,14 @@ How test will be performed:
   document) has been completed.}
 
 \wss{Reference your MIS (detailed design document) and explain your overall
-philosophy for test case selection.}  
+philosophy for test case selection.}
 
-\wss{To save space and time, it may be an option to provide less detail in this section.  
-For the unit tests you can potentially layout your testing strategy here.  That is, you 
-can explain how tests will be selected for each module.  For instance, your test building 
-approach could be test cases for each access program, including one test for normal behaviour 
-and as many tests as needed for edge cases.  Rather than create the details of the input 
-and output here, you could point to the unit testing code.  For this to work, you code 
+\wss{To save space and time, it may be an option to provide less detail in this section.
+For the unit tests you can potentially layout your testing strategy here.  That is, you
+can explain how tests will be selected for each module.  For instance, your test building
+approach could be test cases for each access program, including one test for normal behaviour
+and as many tests as needed for edge cases.  Rather than create the details of the input
+and output here, you could point to the unit testing code.  For this to work, you code
 needs to be well-documented, with meaningful names for all of the tests.}
 
 \subsection{Unit Testing Scope}
@@ -409,34 +419,34 @@ needs to be well-documented, with meaningful names for all of the tests.}
 
 Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
   be automatic}
-					
-Initial State: 
-					
-Input: 
-					
+
+Initial State:
+
+Input:
+
 Output: \wss{The expected result for the given inputs}
 
 Test Case Derivation: \wss{Justify the expected value given in the Output field}
 
-How test will be performed: 
-					
+How test will be performed:
+
 \item{test-id2\\}
 
 Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
   be automatic}
-					
-Initial State: 
-					
-Input: 
-					
+
+Initial State:
+
+Input:
+
 Output: \wss{The expected result for the given inputs}
 
 Test Case Derivation: \wss{Justify the expected value given in the Output field}
 
-How test will be performed: 
+How test will be performed:
 
 \item{...\\}
-    
+
 \end{enumerate}
 
 \subsubsection{Module 2}
@@ -453,33 +463,33 @@ How test will be performed:
   mentioned functional tests.}
 
 \subsubsection{Module ?}
-		
+
 \begin{enumerate}
 
 \item{test-id1\\}
 
 Type: \wss{Functional, Dynamic, Manual, Automatic, Static etc. Most will
   be automatic}
-					
-Initial State: 
-					
-Input/Condition: 
-					
-Output/Result: 
-					
-How test will be performed: 
-					
+
+Initial State:
+
+Input/Condition:
+
+Output/Result:
+
+How test will be performed:
+
 \item{test-id2\\}
 
 Type: Functional, Dynamic, Manual, Static etc.
-					
-Initial State: 
-					
-Input: 
-					
-Output: 
-					
-How test will be performed: 
+
+Initial State:
+
+Input:
+
+Output:
+
+How test will be performed:
 
 \end{enumerate}
 
@@ -490,7 +500,7 @@ How test will be performed:
 \subsection{Traceability Between Test Cases and Modules}
 
 \wss{Provide evidence that all of the modules have been considered.}
-				
+
 \bibliographystyle{plainnat}
 
 \bibliography{../../refs/References}
@@ -522,7 +532,7 @@ graduate attribute of Lifelong Learning.
 \input{../Reflection.tex}
 
 \begin{enumerate}
-  \item What went well while writing this deliverable? 
+  \item What went well while writing this deliverable?
   \item What pain points did you experience during this deliverable, and how
     did you resolve them?
   \item What knowledge and skills will the team collectively need to acquire to
