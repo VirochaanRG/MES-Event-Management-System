@@ -142,14 +142,21 @@ how they relate to your VnV efforts.}
 
 \section{Plan}
 
-\wss{Introduce this section.  You can provide a roadmap of the sections to
-  come.}
+This sections provides a detailed overview of the validation and verification of the of the system. This includes specific roles in the process and plans for validating requirements from the Software Requirements Specification.
 
 \subsection{Verification and Validation Team}
 
 \wss{Your teammates.  Maybe your supervisor.
   You should do more than list names.  You should say what each person's role is
   for the project's verification.  A table is a good way to summarize this information.}
+\begin{itemize}
+  \item \textbf{Ibrahim Quraishi}: Backend Tester. Verifies that the backend service logic complies with all related functional requirements as well as nonfunctional requirements such as performance and maintainability requirements.
+  \item \textbf{Omar Al-Asfar}: Mobile Application Tester. Verifies the mobile application complies with all related functional requirements as well as nonfunctional requirements such as usability and look and feel requirements.
+  \item \textbf{Rayyan Suhail}: Web Application Tester. Verifies the admin web application complies with all related functional requirements as well as nonfunctional requirements such as usability and look and feel requirements. 
+  \item \textbf{Virochaan Ravichandran Gowri}: Integration Tester. Tests the overall integration of system components and their compliance with non-functional requirements such as performance and maintainability.
+  \item \textbf{Mohammad Mahdi Mahboob}: Security Tester. Tests the security of the system by checking for compliance with security standards and legal requirements.
+  \item \textbf{Luke Schermann}: Supervisor and Acceptance Tester. Supervises the overal implementation of the system, ensuring stakeholder requirements are met. Responsible for attending acceptance testing workshops with the developers for the admin web portal.
+\end{itemize}
 
 \subsection{SRS Verification}
 
@@ -162,6 +169,27 @@ read over the SRS.  You should explain your structured approach to the review.
 Will you have a meeting?  What will you present?  What questions will you ask?
 Will you give them instructions for a task-based inspection?  Will you use your
 issue tracker?}
+
+\subsubsection{Requirements Validation}
+The first step of verification for the software requirements specification is to design and implement a suite of tests that provide a comprehensive coverage of the functional and non functional requirements. To ensure traceability between test cases and requirements, each test case should maintain a clear documentation referencing which requirements it covers, its inputs, and expected behaviour. The requirements validation will be split into two parts. 
+
+\textbf{Component Level}
+Each of the main components of the system listed below will first be tested in isolation without connections to components. Wherever necessary, dummy data will be used to fill in inputs or outputs from other system components.
+\begin{itemize}
+  \item \textbf{Web Admin Application:} Testing of UI elements, event and survey creation, form module creation, and analytics viewing. May use a combination of React Testing Library and Jest.
+  \item \textbf{Mobile Attendee Application:} Testing of UI elements, event registration, survey completion, response editing. May use a combination of React Testing Library and Jest.
+  \item \textbf{Backend Server:} Testing of data, security and encryption, server capacity limits, and API responses. Testing framework(s) will depend on language used to build the backend. 
+  \item \textbf{Database:} Verifying that database schema matches business logic, performance testing, and query correctness testing. Testing can be done through a database wrapper in Python with a test suite written with PyTest.
+\end{itemize}
+\textbf{System Level}
+  After integration of each of the systems components are complete, additional system level testing will be done to verify end to end behaviour. The system will be deployed to a staging environment to carry out automated testing using a framework such as Selenium/Appium as well as manual testing from the frontend sides by developers. This will include testing of non functional requirements which can only be done on the entire system such as speed, latency, and capacity requirements.
+\subsubsection{Stakeholder Review}
+  While regular weekly update meetings and/or feature demonstrations will occur with our supervisor, Luke Schermann, an additional formal stakeholder review will be conducted with Luke and any other MES executives who are interested in attending. A comprehensive walkthrough of the entire system will be presented, including a summary of key requirements and conduct end to end demonstrations of system workflows with a focus on the administrative user perspective. The purpose of the review is to confirm that the system meets all requirements specified by the stakeholders and provide an opportunity to gather feedback on the completed system to address any outstanding concerns before the final deployment.
+\subsubsection{User Acceptance Testing}
+  User acceptance testing will be conducted on a staging deployment of the system with a group of about 10 test users. Each user will be given a list of actions to perform on the attendee mobile application without help from developers, such as looking up and registering for an every or filling out a survey. The user will then provide feedback on the experience of completing these actions which will be analyzed for final improvments before the initial launch.
+
+\subsubsection{Pilot Launch}
+  By request of the project supervisor, a pilot program of the system will be launched in January. This pilot program will involve testing the system in a scenario with real users, such as the Fireball Formal and CFES National Survey. The system will be deployed to a production environment, where users will use the application as intended. Feedback will be collected by both attendees and admins to analyze and address any final problems before the official launch of the system. 
 
 \wss{Maybe create an SRS checklist?}
 
