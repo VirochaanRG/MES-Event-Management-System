@@ -3,6 +3,7 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{longtable}
 \usepackage{float}
 \usepackage{enumitem}
 \usepackage{longtable}
@@ -373,9 +374,9 @@ To make sure that the system works as intended and meets all the goals set out i
 Dynamic verification will confirm that each feature works correctly through practical testing during development.
 
 \begin{itemize}
-  \item \textbf{Unit Testing:} Every module will be tested on its own using Jest and the React Testing Library. These tests will check things like whether form fields are created properly, if branching logic behaves as expected, and whether data is saved correctly in the database.
+  \item \textbf{Unit Testing:} Every module will be tested on its own using Jest and the React Testing Library. These tests will check things like whether form fields are created properly, if branching logic behaves as expected, and whether data is saved correctly in the database. 
   \item \textbf{Integration Testing:} Once the individual parts are stable, integration tests will be done to make sure the frontend and backend communicate properly. These tests will confirm that data moves smoothly between the admin portal, the backend server, and the shared database used by the other capstone teams.
-  \item \textbf{System and Acceptance Testing:} The final round of testing will simulate real MES events, such as the Fireball Formal or CALE Conference. This will test the full flow—from creating a form, registering attendees, collecting feedback, and generating analytics. We will also check that pages load quickly (forms within about two seconds and analytics within about four) and that all security and accessibility requirements are met.
+  \item \textbf{System and Acceptance Testing:} The final round of testing will simulate real MES events, such as the Fireball Formal or CALE Conference. This will test the full flow—from creating a form, registering attendees, collecting feedback, and generating analytics. We will also check that pages load quickly (forms within about two seconds and analytics within about four) and that all security and accessibility requirements are met. 
 \end{itemize}
 
 \subsubsection*{Static Verification}
@@ -749,6 +750,7 @@ Their values are defined in this section for easy maintenance.
 \wss{This is a section that would be appropriate for some projects.}
 
 \newpage{}
+
 \section*{Appendix --- Reflection}
 
 The information in this section will be used to evaluate the team members on the
