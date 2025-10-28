@@ -93,8 +93,16 @@ Date 2 & 1.1 & Notes\\
 
 \pagenumbering{arabic}
 
-This document ... \wss{provide an introductory blurb and roadmap of the
-  Verification and Validation plan}
+This document outlines the verification and validation plan for the \teamname~ system, a centralized event management
+platform developed for the McMaster Engineering Society (MES). It describes how the project team will ensure that the
+system meets its specified requirements and functions correctly under real use conditions. The plan begins by providing
+general information about the software, its testing objectives, and related documentation. It then details the specific
+verification and validation activities to be performed throughout the development process, including requirements
+verification, design verification, implementation verification, and software validation. Following that, the document
+defines the system and unit test strategies used to confirm both functional and non-functional requirements, along with
+traceability between requirements and tests. The roadmap concludes with appendices outlining test parameters and
+evaluations. Overall, this document serves as a comprehensive guide to how \teamname~ will be tested, reviewed, and
+validated to ensure it meets the MES’s needs before deployment.
 
 \section{General Information}
 
@@ -179,7 +187,7 @@ This sections provides a detailed overview of the validation and verification of
 \begin{itemize}
   \item \textbf{Ibrahim Quraishi}: Backend Tester. Verifies that the backend service logic complies with all related functional requirements as well as nonfunctional requirements such as performance and maintainability requirements.
   \item \textbf{Omar Al-Asfar}: Mobile Application Tester. Verifies the mobile application complies with all related functional requirements as well as nonfunctional requirements such as usability and look and feel requirements.
-  \item \textbf{Rayyan Suhail}: Web Application Tester. Verifies the admin web application complies with all related functional requirements as well as nonfunctional requirements such as usability and look and feel requirements. 
+  \item \textbf{Rayyan Suhail}: Web Application Tester. Verifies the admin web application complies with all related functional requirements as well as nonfunctional requirements such as usability and look and feel requirements.
   \item \textbf{Virochaan Ravichandran Gowri}: Integration Tester. Tests the overall integration of system components and their compliance with non-functional requirements such as performance and maintainability.
   \item \textbf{Mohammad Mahdi Mahboob}: Security Tester. Tests the security of the system by checking for compliance with security standards and legal requirements.
   \item \textbf{Luke Schermann}: Supervisor and Acceptance Tester. Supervises the overal implementation of the system, ensuring stakeholder requirements are met. Responsible for attending acceptance testing workshops with the developers for the admin web portal.
@@ -188,14 +196,14 @@ This sections provides a detailed overview of the validation and verification of
 \subsection{SRS Verification}
 
 \subsubsection{Requirements Validation}
-The first step of verification for the software requirements specification is to design and implement a suite of tests that provide a comprehensive coverage of the functional and non functional requirements. To ensure traceability between test cases and requirements, each test case should maintain a clear documentation referencing which requirements it covers, its inputs, and expected behaviour. The requirements validation will be split into two parts. 
+The first step of verification for the software requirements specification is to design and implement a suite of tests that provide a comprehensive coverage of the functional and non functional requirements. To ensure traceability between test cases and requirements, each test case should maintain a clear documentation referencing which requirements it covers, its inputs, and expected behaviour. The requirements validation will be split into two parts.
 
 \textbf{Component Level}
 Each of the main components of the system listed below will first be tested in isolation without connections to other components. Wherever necessary, dummy data will be used to fill in inputs or outputs from other system components.
 \begin{itemize}
   \item \textbf{Web Admin Application:} Testing of UI elements, event and survey creation, form module creation, and analytics viewing. May use a combination of React Testing Library and Jest.
   \item \textbf{Mobile Attendee Application:} Testing of UI elements, event registration, survey completion, response editing. May use a combination of React Testing Library and Jest.
-  \item \textbf{Backend Server:} Testing of data, security and encryption, server capacity limits, and API responses. This will also include testing and performance measurements of database querying and posting. Testing framework(s) will depend on language used to build the backend. 
+  \item \textbf{Backend Server:} Testing of data, security and encryption, server capacity limits, and API responses. This will also include testing and performance measurements of database querying and posting. Testing framework(s) will depend on language used to build the backend.
 \end{itemize}
 
 \textbf{System Level}
@@ -203,7 +211,7 @@ Each of the main components of the system listed below will first be tested in i
 
 \subsubsection{Stakeholder Review}
   While regular weekly update meetings and/or feature demonstrations will occur with our supervisor, Luke Schermann, an additional formal stakeholder review will be conducted with Luke and any other MES executives who are interested in attending. Assuming the supervisor has read through the SRS, a comprehensive walkthrough of the entire system will be presented, including a summary of key requirements and conduct end to end demonstrations of system workflows with a focus on the administrative user perspective. The purpose of the review is to confirm that the system meets all requirements specified by the stakeholders and provide an opportunity to gather feedback on the completed system to address any outstanding concerns before the final deployment. A list of specific feedback questions will be prepared for the meeting, such as questions on project scoping, additional constraints, and whether project goals have been met.
-  
+
   \subsubsection{User Acceptance Testing}
   User acceptance testing will be conducted on a staging deployment of the system with a group of about 10 test users. Each user will be given a list of actions to perform on the attendee mobile application without help from developers, such as looking up and registering for an evert or filling out a survey. The user will then provide feedback on the experience of completing these actions which will be analyzed for final improvments before the initial launch.
 
@@ -381,9 +389,9 @@ To make sure that the system works as intended and meets all the goals set out i
 Dynamic verification will confirm that each feature works correctly through practical testing during development.
 
 \begin{itemize}
-  \item \textbf{Unit Testing:} Every module will be tested on its own using Jest and the React Testing Library. These tests will check things like whether form fields are created properly, if branching logic behaves as expected, and whether data is saved correctly in the database. 
+  \item \textbf{Unit Testing:} Every module will be tested on its own using Jest and the React Testing Library. These tests will check things like whether form fields are created properly, if branching logic behaves as expected, and whether data is saved correctly in the database.
   \item \textbf{Integration Testing:} Once the individual parts are stable, integration tests will be done to make sure the frontend and backend communicate properly. These tests will confirm that data moves smoothly between the admin portal, the backend server, and the shared database used by the other capstone teams.
-  \item \textbf{System and Acceptance Testing:} The final round of testing will simulate real MES events, such as the Fireball Formal or CALE Conference. This will test the full flow—from creating a form, registering attendees, collecting feedback, and generating analytics. We will also check that pages load quickly (forms within about two seconds and analytics within about four) and that all security and accessibility requirements are met. 
+  \item \textbf{System and Acceptance Testing:} The final round of testing will simulate real MES events, such as the Fireball Formal or CALE Conference. This will test the full flow—from creating a form, registering attendees, collecting feedback, and generating analytics. We will also check that pages load quickly (forms within about two seconds and analytics within about four) and that all security and accessibility requirements are met.
 \end{itemize}
 
 \subsubsection*{Static Verification}
@@ -434,8 +442,8 @@ This section outlines the the system wide tests to validate both functional and 
 
 \subsection{Tests for Functional Requirements}
 
-This section verifies that the implemented system fulfills all \textbf{Functional Requirements (FR-1 through FR-11)} defined in the SRS. 
-The tests are grouped into three \textbf{Areas of Testing}: \textit{Admin Portal (AP)}, \textit{Attendee Application (AA)}, and \textit{System Integration and Security (SI)}. 
+This section verifies that the implemented system fulfills all \textbf{Functional Requirements (FR-1 through FR-11)} defined in the SRS.
+The tests are grouped into three \textbf{Areas of Testing}: \textit{Admin Portal (AP)}, \textit{Attendee Application (AA)}, and \textit{System Integration and Security (SI)}.
 \subsubsection{Area of Testing 1 – Admin Portal}
 
 \begin{enumerate}
@@ -533,7 +541,7 @@ The tests are grouped into three \textbf{Areas of Testing}: \textit{Admin Portal
 
 \subsection{Tests for Nonfunctional Requirements}
 
-The following will outline system tests for the nonfunctional requirements highlighted in the SRS, directly verifying each Fit Criterion. Note that there are tests that cover multiple nonfunctional requirements. At the same time, some nonfunctional requirements are not present as they are already accounted for in the functional requirements test plan. 
+The following will outline system tests for the nonfunctional requirements highlighted in the SRS, directly verifying each Fit Criterion. Note that there are tests that cover multiple nonfunctional requirements. At the same time, some nonfunctional requirements are not present as they are already accounted for in the functional requirements test plan.
 
 \subsubsection{Look and Feel}
 \begin{enumerate}[label=\bfseries LF-\arabic*:, wide=0pt]
@@ -544,7 +552,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Output/Result:} Approval from MES representative.\\
     {\bf Covers:} AR-1\\
     {\bf How test will be performed:} A meeting will be held with the representative with a clear showing of the app UI, where they will assess design decisions (branding, colour palette) against MES branding criteria.
-  
+
   \item \label{test-LF2} \textbf{Design Reception Survey}\\[2mm]
     {\bf Type:} Manual, Dynamic\\
     {\bf Initial State:} Basic production build and survey ready.\\
@@ -571,7 +579,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Output/Result:} Successful submission of pertinent forms with no instruction, and highly rating the experience.\\
     {\bf Covers:} ER-1, LR-1\\
     {\bf How test will be performed:} Observe successful registration and form completion by minimum 30 attendees, with an average of 80\% rating ease of use a 4+ out of 5.(ER-1).
-  
+
   \item \label{test-UH2} \textbf{Seamless Sign-In / Sign-Up}\\[2mm]
     {\bf Type:} Manual, Dynamic\\
     {\bf Initial State:} Prior to set up of new user accounts.\\
@@ -603,14 +611,14 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Output/Result:} 80\% of users rate the experience as satisfying.\\
     {\bf Covers:} UR-1, UR-2\\
     {\bf How test will be performed:} Users will aim to fill out the forms for at least one MES event, and interact with error messages to direct the completion of the form. Afterwards, they will rate the usefulness of the error messages in a survey out of 5.
-  
+
   \item \label{test-UH6} \textbf{Accessability Conformance}\\[2mm]
     {\bf Type:} Automatic, Dynamic\\
     {\bf Initial State:} Fully configured UI themes.\\
     {\bf Input/Condition:} Web tool used to assess UI.\\
     {\bf Output/Result:} Design conforms to WCAG 2.0 and AODA requirements.\\
     {\bf Covers:} AC-1\\
-    {\bf How test will be performed:} Automated web tools will be used to assess conformance to accessability standards (WebAIM). 
+    {\bf How test will be performed:} Automated web tools will be used to assess conformance to accessability standards (WebAIM).
 \end{enumerate}
 
 \subsection{Performance}
@@ -637,16 +645,16 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Input/Condition:} Stress tool used to simulate high traffic.\\
     {\bf Output/Result:} Assess tool results to determine platform performance and bottlenecks.\\
     {\bf Covers:} CR-1, CR-2\\
-    {\bf How test will be performed:} Load and stress tools (JMeter, DevTools) will be used to determine performance capacity of the app and areas of improvement to increase limitations.  
+    {\bf How test will be performed:} Load and stress tools (JMeter, DevTools) will be used to determine performance capacity of the app and areas of improvement to increase limitations.
 
 {Untested Requirements}
 \begin{itemize}
     \item \textbf{Safety Critical (SC-1):} Verified by \textbf{Test-FR-AP-2}, which compare dashboard values to backend analytics and exported reports.
 
     \item \textbf{Precision or Accuracy (PA-1):}Verified by \textbf{Test-FR-AP-2} and \textbf{Test-FR-AP-4}, which compare dashboard values to backend analytics and exported reports.
-  
+
     \item \textbf{Robustness or Fault Tolerance (PA-1, PA-2, PA-3, PA-4):} Verified by \textbf{Test-FR-SI-1}, which tests data synchronization and ensures all updates are saved and automatically viewable.
-    
+
     \item \textbf{Scalability or Extensibility (SE-2):} Verified through code review. This is not directly measureable through system testing.
 
     \item \textbf{Longevity (LG-2):} \textbf{Test-FR-AP-4} confirms the report/export function.
@@ -851,7 +859,7 @@ How test will be performed:
 
 \subsection{Tests for Nonfunctional Requirements}
 
-The following will outline system tests for the nonfunctional requirements highlighted in the SRS, directly verifying each Fit Criterion. Note that there are tests that cover multiple nonfunctional requirements. At the same time, some nonfunctional requirements are not present as they are already accounted for in the functional requirements test plan. 
+The following will outline system tests for the nonfunctional requirements highlighted in the SRS, directly verifying each Fit Criterion. Note that there are tests that cover multiple nonfunctional requirements. At the same time, some nonfunctional requirements are not present as they are already accounted for in the functional requirements test plan.
 
 \subsubsection{Look and Feel}
 \begin{enumerate}[label=\bfseries LF-\arabic*:, wide=0pt]
@@ -862,7 +870,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Output/Result:} Approval from MES representative.\\
     {\bf Covers:} AR-1\\
     {\bf How test will be performed:} A meeting will be held with the representative with a clear showing of the app UI, where they will assess design decisions (branding, colour palette) against MES branding criteria.
-  
+
   \item \label{test-LF2} \textbf{Design Reception Survey}\\[2mm]
     {\bf Type:} Manual, Dynamic\\
     {\bf Initial State:} Basic production build and survey ready.\\
@@ -889,7 +897,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Output/Result:} Successful submission of pertinent forms with no instruction, and highly rating the experience.\\
     {\bf Covers:} ER-1, LR-1\\
     {\bf How test will be performed:} Observe successful registration and form completion by minimum 30 attendees, with an average of 80\% rating ease of use a 4+ out of 5.(ER-1).
-  
+
   \item \label{test-UH2} \textbf{Seamless Sign-In / Sign-Up}\\[2mm]
     {\bf Type:} Manual, Dynamic\\
     {\bf Initial State:} Prior to set up of new user accounts.\\
@@ -921,14 +929,14 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Output/Result:} 80\% of users rate the experience as satisfying.\\
     {\bf Covers:} UR-1, UR-2\\
     {\bf How test will be performed:} Users will aim to fill out the forms for at least one MES event, and interact with error messages to direct the completion of the form. Afterwards, they will rate the usefulness of the error messages in a survey out of 5.
-  
+
   \item \label{test-UH6} \textbf{Accessability Conformance}\\[2mm]
     {\bf Type:} Automatic, Dynamic\\
     {\bf Initial State:} Fully configured UI themes.\\
     {\bf Input/Condition:} Web tool used to assess UI.\\
     {\bf Output/Result:} Design conforms to WCAG 2.0 and AODA requirements.\\
     {\bf Covers:} AC-1\\
-    {\bf How test will be performed:} Automated web tools will be used to assess conformance to accessability standards (WebAIM). 
+    {\bf How test will be performed:} Automated web tools will be used to assess conformance to accessability standards (WebAIM).
 \end{enumerate}
 
 \subsection{Performance}
@@ -955,16 +963,16 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Input/Condition:} Stress tool used to simulate high traffic.\\
     {\bf Output/Result:} Assess tool results to determine platform performance and bottlenecks.\\
     {\bf Covers:} CR-1, CR-2\\
-    {\bf How test will be performed:} Load and stress tools (JMeter, DevTools) will be used to determine performance capacity of the app and areas of improvement to increase limitations.  
+    {\bf How test will be performed:} Load and stress tools (JMeter, DevTools) will be used to determine performance capacity of the app and areas of improvement to increase limitations.
 
 {Untested Requirements}
 \begin{itemize}
     \item \textbf{Safety Critical (SC-1):} Verified by \textbf{Test-FR-AP-2}, which compare dashboard values to backend analytics and exported reports.
 
     \item \textbf{Precision or Accuracy (PA-1):}Verified by \textbf{Test-FR-AP-2} and \textbf{Test-FR-AP-4}, which compare dashboard values to backend analytics and exported reports.
-  
+
     \item \textbf{Robustness or Fault Tolerance (PA-1, PA-2, PA-3, PA-4):} Verified by \textbf{Test-FR-SI-1}, which tests data synchronization and ensures all updates are saved and automatically viewable.
-    
+
     \item \textbf{Scalability or Extensibility (SE-2):} Verified through code review. This is not directly measureable through system testing.
 
     \item \textbf{Longevity (LG-2):} \textbf{Test-FR-AP-4} confirms the report/export function.
@@ -1101,14 +1109,14 @@ graduate attribute of Lifelong Learning.
 
 \subsubsection*{Group Reflection}
 \begin{enumerate}
- 
+
   \item \textbf{What knowledge and skills will the team collectively need to acquire to successfully complete the verification and validation of your project?
   Examples of possible knowledge and skills include dynamic testing knowledge, static testing knowledge, specific tool usage, Valgrind etc.  You should look to identify at least one item for each team member.}
   \begin {enumerate}
     \item \textbf{Automated Testing with CI/CD}: We need to ensure we understand how test pipelines work and how some of these automated testing tools such as ViteTest and Playwright will integrate within our workflows. As mentioned in the SRS we also need to build upon our knowledge on GitHub Actions to ensure that we utilize it properly to have a proper testing workflow.
     \item \textbf{Static Testing and Code Quality Assurance}: Understand and implement static testing methods such as code inspections and code reviews. It will help us find more tools to help perform static analysis to find defects early in the development lifecycle.
     \item \textbf{Dynamic Testing}: Build upon pre-existing dynamic testing skills and find ways to use it in our use case. This includes developing better system and unit testing skills and developing skills in creating test cases.
-    \item \textbf{Usability Testing}: Though this might relate more to the Usability report, we need to develop this skill to ensure that we can create a positive user experience. 
+    \item \textbf{Usability Testing}: Though this might relate more to the Usability report, we need to develop this skill to ensure that we can create a positive user experience.
     \item \textbf{ViteTest and Playwright}: These two tools are the most important tools that we will be using throughout our testing phase of the project so it is important we gain a good understanding of these tools to utilize them to the highest level.
   \end{enumerate}
   \item \textbf{For each of the knowledge areas and skills identified in the previous
@@ -1116,19 +1124,19 @@ graduate attribute of Lifelong Learning.
   mastering the skill?  Of the identified approaches, which will each team
   member pursue, and why did they make this choice?}
   \begin{enumerate}
-    \item \textbf{Automated Testing with CI/CD}: 
-    To acquire this knowledge we can study the official documentation and tutorials for GitHub Actions as well as related automated testing tools. This will help us understand configuration and workflow syntax. We can also analyze open-source repositories that employ CI/CD with similar front-end stacks to observe best practices and reusable workflow patterns. 
-    \item \textbf{Static Testing and Code Quality Assurance}: 
-    This knowledge can be developed by completing structured online modules or guides on static code analysis, focusing on tools that are easy to use for our use case. We can also conduct regular peer-led code reviews and checklist-based inspections to ensure we hold each other accountable and figure out our code patterns. 
+    \item \textbf{Automated Testing with CI/CD}:
+    To acquire this knowledge we can study the official documentation and tutorials for GitHub Actions as well as related automated testing tools. This will help us understand configuration and workflow syntax. We can also analyze open-source repositories that employ CI/CD with similar front-end stacks to observe best practices and reusable workflow patterns.
+    \item \textbf{Static Testing and Code Quality Assurance}:
+    This knowledge can be developed by completing structured online modules or guides on static code analysis, focusing on tools that are easy to use for our use case. We can also conduct regular peer-led code reviews and checklist-based inspections to ensure we hold each other accountable and figure out our code patterns.
 
-    \item \textbf{Dynamic Testing}: 
+    \item \textbf{Dynamic Testing}:
     The team can strengthen this skill by taking short online courses or tutorials on unit, integration, and system testing methodologies and find videos on testcase design. We can also look back to our SFWRENG 3S03 where we worked first hand on developing test cases to ensure we can find ways to maximize code coverage.
 
-    \item \textbf{Usability Testing}: 
+    \item \textbf{Usability Testing}:
     To develop this skill, the team could review Human–Computer Interaction (HCI) principles and usability evaluation methods through our course work. We can also look into tutorials online about effective UX design to and link usability testing to front-end design. We can also discuss with our stakeholders and supervisors their expectations to develop our own testing framework.
 
 
-    \item \textbf{ViteTest and Playwright}: 
+    \item \textbf{ViteTest and Playwright}:
     The team can gain proficiency by following official tutorials and documentation to build example test suites and understand configuration options for both tools. We can also look to open-source projects or community-driven examples to learn advanced testing features that these tools offer. \newline
 \end{enumerate}
 
@@ -1165,9 +1173,9 @@ graduate attribute of Lifelong Learning.
 \subsubsection*{Virochaan Ravichandran Gowri Reflection}
 \begin{enumerate}
   \item \textbf{What went well while writing this deliverable?} \\
-  Since we had already completed the SRS deriving test cases to ensure that the different requirements were covered was quite easy and straightforward. We used some of the diagrams and components identified within the SRS to breakdown the functional system tests and for the NFR system tests 
+  Since we had already completed the SRS deriving test cases to ensure that the different requirements were covered was quite easy and straightforward. We used some of the diagrams and components identified within the SRS to breakdown the functional system tests and for the NFR system tests
   \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
-  One pain point that was more of an annoyance was ensuring traceability and that we kept a good track of what test cases were covering which requirements and not having too much overlap on the requirements we were validating. We also wanted to ensure that the test were actually feasible and did not put too high of a burden on us. This meant that we had to consider both manual and automatic tests that could be accomplished. 
+  One pain point that was more of an annoyance was ensuring traceability and that we kept a good track of what test cases were covering which requirements and not having too much overlap on the requirements we were validating. We also wanted to ensure that the test were actually feasible and did not put too high of a burden on us. This meant that we had to consider both manual and automatic tests that could be accomplished.
 \end{enumerate}
 \subsubsection*{Rayyan Suhail Reflection}
 \begin{enumerate}
@@ -1183,7 +1191,7 @@ The main challenge was keeping the content concise and focused instead of diving
   \item \textbf{What went well while writing this deliverable?} \\
   Based on what was written in each section of the verification plan, I was able to come up with a ready to use and exhaustive checklist of ways to verify that our design follows the outlined plan. These checklists may be useful in the future when performing unit testing, stakeholder reviews, etc.
   \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
-  It was very difficult to come up with an exhaustive list of things that needed verification, people who need to be involved in verification, and steps to complete it due to the large scale of the system. This issue was mitigated by consistenly referencing and thoroughly checking older documents such as the development plan, SRS, and hazard analysis to ensure nothing was missed. 
+  It was very difficult to come up with an exhaustive list of things that needed verification, people who need to be involved in verification, and steps to complete it due to the large scale of the system. This issue was mitigated by consistenly referencing and thoroughly checking older documents such as the development plan, SRS, and hazard analysis to ensure nothing was missed.
 \end{enumerate}
 
 \subsubsection*{Omar Al-Asfar Reflection}
