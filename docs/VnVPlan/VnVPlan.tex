@@ -143,7 +143,7 @@ how they relate to your VnV efforts.}
 
 \section{Plan}
 
-This sections provides a detailed overview of the validation and verification of the of the system. This includes specific roles in the process and plans for validating requirements from the Software Requirements Specification.
+This sections provides a detailed overview of the validation and verification of the system, including specific validation and verification roles, requirements verification, and design verification.
 
 \subsection{Verification and Validation Team}
 
@@ -175,7 +175,7 @@ issue tracker?}
 The first step of verification for the software requirements specification is to design and implement a suite of tests that provide a comprehensive coverage of the functional and non functional requirements. To ensure traceability between test cases and requirements, each test case should maintain a clear documentation referencing which requirements it covers, its inputs, and expected behaviour. The requirements validation will be split into two parts. 
 
 \textbf{Component Level}
-Each of the main components of the system listed below will first be tested in isolation without connections to components. Wherever necessary, dummy data will be used to fill in inputs or outputs from other system components.
+Each of the main components of the system listed below will first be tested in isolation without connections to other components. Wherever necessary, dummy data will be used to fill in inputs or outputs from other system components.
 \begin{itemize}
   \item \textbf{Web Admin Application:} Testing of UI elements, event and survey creation, form module creation, and analytics viewing. May use a combination of React Testing Library and Jest.
   \item \textbf{Mobile Attendee Application:} Testing of UI elements, event registration, survey completion, response editing. May use a combination of React Testing Library and Jest.
@@ -183,7 +183,7 @@ Each of the main components of the system listed below will first be tested in i
 \end{itemize}
 
 \textbf{System Level}
-  After integration of each of the systems components are complete, additional system level testing will be done to verify end to end behaviour. The system will be deployed to a staging environment to carry out automated testing using a framework such as Selenium/Appium as well as manual testing from the frontend sides by developers. This will include testing of non functional requirements which can only be done on the entire system such as speed, latency, and capacity requirements.
+  After integration of each of the system's components are complete, additional system level testing will be done to verify end to end behaviour. The system will be deployed to a staging environment to carry out automated testing using a framework such as Selenium/Appium as well as manual testing from the frontend sides by developers. This will include testing of non functional requirements which can only be done on the entire system such as speed, latency, and capacity requirements.
 
 \subsubsection{Stakeholder Review}
   While regular weekly update meetings and/or feature demonstrations will occur with our supervisor, Luke Schermann, an additional formal stakeholder review will be conducted with Luke and any other MES executives who are interested in attending. Assuming the supervisor has read through the SRS, a comprehensive walkthrough of the entire system will be presented, including a summary of key requirements and conduct end to end demonstrations of system workflows with a focus on the administrative user perspective. The purpose of the review is to confirm that the system meets all requirements specified by the stakeholders and provide an opportunity to gather feedback on the completed system to address any outstanding concerns before the final deployment. A list of specific feedback questions will be prepared for the meeting, such as questions on project scoping, additional constraints, and whether project goals have been met.
