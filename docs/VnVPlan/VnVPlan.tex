@@ -567,20 +567,60 @@ The information in this section will be used to evaluate the team members on the
 graduate attribute of Lifelong Learning.
 
 \input{../Reflection.tex}
-
+\subsubsection*{Virochaan Ravichandran Gowri Reflection}
 \begin{enumerate}
-  \item What went well while writing this deliverable? 
-  \item What pain points did you experience during this deliverable, and how
-    did you resolve them?
-  \item What knowledge and skills will the team collectively need to acquire to
-  successfully complete the verification and validation of your project?
-  Examples of possible knowledge and skills include dynamic testing knowledge,
-  static testing knowledge, specific tool usage, Valgrind etc.  You should look to
-  identify at least one item for each team member.
-  \item For each of the knowledge areas and skills identified in the previous
+  \item \textbf{What went well while writing this deliverable?} 
+  Since we had already completed the SRS deriving test cases to ensure that the different requirements were covered was quite easy and straightforward. We used some of the diagrams and components identified within the SRS to breakdown the functional system tests and for the NFR system tests 
+  \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?}
+  One pain point that was more of an annoyance was ensuring traceability and that we kept a good track of what test cases were covering which requirements and not having too much overlap on the requirements we were validating. We also wanted to ensure that the test were actually feasible and did not put too high of a burden on us. This meant that we had to consider both manual and automatic tests that could be accomplished. 
+\end{enumerate}
+
+\subsubsection*{Group Reflection}
+\begin{enumerate}
+ 
+  \item \textbf{What knowledge and skills will the team collectively need to acquire to successfully complete the verification and validation of your project?
+  Examples of possible knowledge and skills include dynamic testing knowledge, static testing knowledge, specific tool usage, Valgrind etc.  You should look to identify at least one item for each team member.}
+  \begin {enumerate}
+    \item \textbf{Automated Testing with CI/CD}: We need to ensure we understand how test pipelines work and how some of these automated testing tools such as ViteTest and Playwright will integrate within our workflows. As mentioned in the SRS we also need to build upon our knowledge on GitHub Actions to ensure that we utilize it properly to have a proper testing workflow.
+    \item \textbf{Static Testing and Code Quality Assurance}: Understand and implement static testing methods such as code inspections and code reviews. It will help us find more tools to help perform static analysis to find defects early in the development lifecycle.
+    \item \textbf{Dynamic Testing}: Build upon pre-existing dynamic testing skills and find ways to use it in our use case. This includes developing better system and unit testing skills and developing skills in creating test cases.
+    \item \textbf{Usability Testing}: Though this might relate more to the Usability report, we need to develop this skill to ensure that we can create a positive user experience. 
+    \item \textbf{ViteTest and Playwright}: These two tools are the most important tools that we will be using throughout our testing phase of the project so it is important we gain a good understanding of these tools to utilize them to the highest level.
+  \end{enumerate}
+  \item \textbf{For each of the knowledge areas and skills identified in the previous
   question, what are at least two approaches to acquiring the knowledge or
   mastering the skill?  Of the identified approaches, which will each team
-  member pursue, and why did they make this choice?
+  member pursue, and why did they make this choice?}
+  \begin{enumerate}
+    \item \textbf{Automated Testing with CI/CD}: 
+    To acquire this knowledge we can study the official documentation and tutorials for GitHub Actions as well as related automated testing tools. This will help us understand configuration and workflow syntax. We can also analyze open-source repositories that employ CI/CD with similar front-end stacks to observe best practices and reusable workflow patterns. 
+    \item \textbf{Static Testing and Code Quality Assurance}: 
+    This knowledge can be developed by completing structured online modules or guides on static code analysis, focusing on tools that are easy to use for our use case. We can also conduct regular peer-led code reviews and checklist-based inspections to ensure we hold each other accountable and figure out our code patterns. 
+
+    \item \textbf{Dynamic Testing}: 
+    The team can strengthen this skill by taking short online courses or tutorials on unit, integration, and system testing methodologies and find videos on testcase design. We can also look back to our SFWRENG 3S03 where we worked first hand on developing test cases to ensure we can find ways to maximize code coverage.
+
+    \item \textbf{Usability Testing}: 
+    To develop this skill, the team could review Human–Computer Interaction (HCI) principles and usability evaluation methods through our course work. We can also look into tutorials online about effective UX design to and link usability testing to front-end design. We can also discuss with our stakeholders and supervisors their expectations to develop our own testing framework.
+
+
+    \item \textbf{ViteTest and Playwright}: 
+    The team can gain proficiency by following official tutorials and documentation to build example test suites and understand configuration options for both tools. We can also look to open-source projects or community-driven examples to learn advanced testing features that these tools offer. \newline
+\end{enumerate}
+
+\textbf{What each member will pursue:}
+\begin{enumerate}
+    \item \textbf{Virochaan}:  Virochaan will focus on mastering \textbf{Automated Testing with CI/CD}, particularly the integration of GitHub Actions with Vitest and Playwright. Since he was specified as the DevOps manager it will be important to know to create proper Github workflows. From this he will also need to know the details of \textbf{Vitest and Playwright} to ensure that we develop the proper testing protocol for this. He will primarily focus on looking at tutorials and find open source projects with workflows that we can look to understand to develop our own.
+
+    \item \textbf{Mohammad}: Mohammad has worked with static coding tools in the past so he will look to develop those skills further by focusing on \textbf{Static Testing}. He will do this by researching static testing tools for our usecase and looking at tutorials and examples where static testing has been done for full-stack apps.
+
+    \item \textbf{Omar}: Omar has experience developing mobile apps so he will focus on \textbf{Usability Testing} to ensure that he can develop the best user experience possible. He will do this by primarily looking at video tutorials on usability testing and in our supervisor meetings develop a testing framework for our UI.
+
+    \item \textbf{Ibrahim}: Ibrahim will look to focus on \textbf{Dynamic Testing} with \textbf{Vitest and Playwright}. These tools also offer dynamic testing capabilities and it is important we figure out how to connect the two effectively. Ibrahim will focus on looking through tutorials for the two technologies and watching videos on testing methodologies so we can implement the methodologies for our usecase.
+
+    \item \textbf{Rayyan}: Rayyan has experience working with testing through his coop experiences. To build upon this he will focus on \textbf{Dynamic Testing} and \textbf{Static Testing} and will look to be well rounded on this. In our roles we also identified him as a web app tester so this will allow him to develop good testcases to accomplish this. He will primarily focus on looking at tutorials on dynamic and static testing and how we can connect the two together to make a better testing framework.
+
+\end{enumerate}
 \end{enumerate}
 
 \end{document}
