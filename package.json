@@ -1,0 +1,26 @@
+{
+  "name": "@teamd/capstonemock",
+  "version": "0.1.0",
+  "description": "Team D CapstoneMock project",
+  "private": true,
+  "workspaces": [
+    "src/web-admin",
+    "src/web-user",
+    "src/api",
+    "src/mobile",
+    "src/shared"
+  ],
+  "packageManager": "pnpm@10.18.0",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter @teamd/web-admin dev\" \"pnpm --filter @teamd/web-user dev\"",
+    "dev:admin": "pnpm --filter @teamd/web-admin dev",
+    "dev:user": "pnpm --filter @teamd/web-user dev",
+    "build": "pnpm -r build",
+    "start": "concurrently \"pnpm --filter @teamd/web-admin start\" \"pnpm --filter @teamd/web-user start\"",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r clean"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

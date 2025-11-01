@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2020",
+    "outDir": "./dist/server",
+    "rootDir": "./src/server",
+    "noEmit": false,
+    "allowImportingTsExtensions": false
+  },
+  "include": [
+    "src/server/**/*",
+    "src/lib/auth.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/app",
+    "src/components"
+  ]
+}
