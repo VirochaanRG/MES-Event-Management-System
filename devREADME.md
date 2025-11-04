@@ -1,6 +1,6 @@
-# Team D CapstoneMock
+# Team B CapstoneMock
 
-This repository contains Team D's implementation for the CapstoneMock project, designed to work both standalone and as part of the larger large-event project.
+This repository contains Team B's implementation for the Capstone project, designed to work both standalone and as part of the larger large-event project.
 
 ## Project Structure
 
@@ -38,6 +38,7 @@ pnpm start
 ### Individual App Commands
 
 #### Web Admin (Port 3001)
+
 ```bash
 cd src/web-admin
 pnpm dev    # Development mode
@@ -46,6 +47,7 @@ pnpm start  # Production server
 ```
 
 #### Web User (Port 3002)
+
 ```bash
 cd src/web-user
 pnpm dev    # Development mode
@@ -57,7 +59,7 @@ pnpm start  # Production server
 
 This project is designed to integrate seamlessly with the large-event monorepo:
 
-1. The `teams/teamD/src` workspace is already configured in large-event
+1. The `teams/teamB/src` workspace is already configured in large-event
 2. Dependencies and scripts are compatible with the parent project
 3. Port configuration ensures no conflicts with other team apps
 

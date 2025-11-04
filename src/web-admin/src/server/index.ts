@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
+import { db } from '../../../db/src/db';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
@@ -16,16 +17,42 @@ await fastify.register(cors, {
 await fastify.register(cookie);
 
 // Simple health check
-fastify.get('/api/health', async (request, reply) => {
+fastify.get('/api/health', async (request, reply) =>
+{
   reply.send({ status: 'ok' });
 });
 
+//Get events
+fastify.get('/api/events', async (request, reply) =>
+{
+  try
+  {
+    const allEvents = await db.query.events.findMany();
+    console.log('🗂️ Events from DB:', allEvents);
+
+    return reply.send({
+      success: true,
+      data: allEvents,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch events');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch events',
+    });
+  }
+});
+
 // Local login (for testing without main portal)
-fastify.post('/api/auth/local-login', async (request, reply) => {
-  try {
+fastify.post('/api/auth/local-login', async (request, reply) =>
+{
+  try
+  {
     const { email } = request.body as { email: string };
 
-    if (!email) {
+    if (!email)
+    {
       return reply.code(400).send({ error: 'Email is required' });
     }
 
@@ -38,17 +65,20 @@ fastify.post('/api/auth/local-login', async (request, reply) => {
       user,
       token
     });
-  } catch (error) {
+  } catch (error)
+  {
     fastify.log.error({ err: error }, 'Local login error');
     reply.code(500).send({ error: 'Internal server error' });
   }
 });
 
 // Start server
-try {
+try
+{
   await fastify.listen({ port: PORT, host: '0.0.0.0' });
   console.log(`Team D Admin server running on http://localhost:${PORT}`);
-} catch (err) {
+} catch (err)
+{
   fastify.log.error(err);
   process.exit(1);
 }
