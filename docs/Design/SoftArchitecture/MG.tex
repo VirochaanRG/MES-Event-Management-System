@@ -191,34 +191,80 @@ below, which are leaves in the hierarchy tree, are the modules that will
 actually be implemented.
 
 \begin{description}
-\item [\refstepcounter{mnum} \mthemnum \label{mHH}:] Hardware-Hiding Module
-\item ...
+
+\item [\refstepcounter{mnum}\mthemnum\label{m1}:] Virtual Hardware Interface Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m2}:] User Authentication Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m3}:] User Authorization Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m4}:] Form Template Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m5}:] Form Submission Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m6}:] Event Management Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m7}:] Event Notification Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m8}:] Registration Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m9}:] Attendance Tracking Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m10}:] Survey Management Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m11}:] Survey Response Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m12}:] Analytics Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m13}:] Report Generation Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m14}:] Database Access Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m15}:] Data Validation Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m16}:] Encryption Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m17}:] Communication Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m18}:] Logging Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m19}:] Audit Module
+
 \end{description}
 
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{p{0.3\textwidth} p{0.6\textwidth}}
 \toprule
 \textbf{Level 1} & \textbf{Level 2}\\
 \midrule
 
-{Hardware-Hiding Module} & ~ \\
+Hardware-Hiding Module & \mref{m1}: Virtual Hardware Interface Module\\
 \midrule
 
-\multirow{7}{0.3\textwidth}{Behaviour-Hiding Module} & ?\\
-& ?\\
-& ?\\
-& ?\\
-& ?\\
-& ?\\
-& ?\\ 
-& ?\\
+\multirow{12}{0.3\textwidth}{Behaviour-Hiding Modules} 
+& \mref{m2}: User Authentication Module\\
+& \mref{m3}: User Authorization Module\\
+& \mref{m4}: Form Template Module\\
+& \mref{m5}: Form Submission Module\\
+& \mref{m6}: Event Management Module\\
+& \mref{m7}: Event Notification Module\\
+& \mref{m8}: Registration Module\\
+& \mref{m9}: Attendance Tracking Module\\
+& \mref{m10}: Survey Management Module\\
+& \mref{m11}: Survey Response Module\\
+& \mref{m12}: Analytics Module\\
+& \mref{m13}: Report Generation Module\\
 \midrule
 
-\multirow{3}{0.3\textwidth}{Software Decision Module} & {?}\\
-& ?\\
-& ?\\
+\multirow{6}{0.3\textwidth}{Software-Decision Modules} 
+& \mref{m14}: Database Access Module\\
+& \mref{m15}: Data Validation Module\\
+& \mref{m16}: Encryption Module\\
+& \mref{m17}: Communication Module\\
+& \mref{m18}: Logging Module\\
+& \mref{m19}: Audit Module\\
 \bottomrule
 
 \end{tabular}
@@ -278,19 +324,77 @@ to be implemented.
 \item[Implemented By:] --
 \end{description}
 
-\subsubsection{Input Format Module (\mref{mInput})}
+\subsubsection{User Authentication Module (\mref{m2})}
+\label{m2}
+\textbf{Secrets:} The internal methods used for verifying user identities (e.g., token generation, password hashing, OAuth, McMaster SSO).\\
+\textbf{Services:} Authenticates users by validating credentials and issuing secure access tokens.\\
+\textbf{Implemented By:} Backend authentication service.
 
-\begin{description}
-\item[Secrets:]The format and structure of the input data.
-\item[Services:]Converts the input data into the data structure used by the
-  input parameters module.
-\item[Implemented By:] [Your Program Name Here]
-\item[Type of Module:] [Record, Library, Abstract Object, or Abstract Data Type]
-  [Information to include for leaf modules in the decomposition by secrets tree.]
-\end{description}
+\subsubsection{User Authorization Module (\mref{m3})}
+\label{m3}
+\textbf{Secrets:} Rules defining access levels and user roles.\\
+\textbf{Services:} Determines permissions for authenticated users, controlling access to admin or attendee features.\\
+\textbf{Implemented By:} Backend access control middleware.
 
-\subsubsection{Etc.}
+\subsubsection{Form Template Module (\mref{m4})}
+\label{m4}
+\textbf{Secrets:} The structure and layout of form templates used in surveys and event creation.\\
+\textbf{Services:} Provides reusable blueprints for constructing event or survey forms.\\
+\textbf{Implemented By:} Frontend form builder and backend template schema.
 
+\subsubsection{Form Submission Module (\mref{m5})}
+\label{m5}
+\textbf{Secrets:} Validation rules and submission workflows for user input data.\\
+\textbf{Services:} Receives and validates user-submitted forms, then stores them in persistent storage.\\
+\textbf{Implemented By:} Backend form processing API.
+
+\subsubsection{Event Management Module (\mref{m6})}
+\label{m6}
+\textbf{Secrets:} Event data structures and scheduling rules.\\
+\textbf{Services:} Enables creation, editing, and cancellation of events by administrators.\\
+\textbf{Implemented By:} Backend event management service.
+
+\subsubsection{Event Notification Module (\mref{m7})}
+\label{m7}
+\textbf{Secrets:} Notification delivery logic and timing rules.\\
+\textbf{Services:} Sends alerts to users regarding new events, updates, or cancellations.\\
+\textbf{Implemented By:} Backend notification handler and third-party messaging APIs.
+
+\subsubsection{Registration Module (\mref{m8})}
+\label{m8}
+\textbf{Secrets:} Mapping between users, events, and registration states.\\
+\textbf{Services:} Allows users to register, modify, or cancel event participation.\\
+\textbf{Implemented By:} Backend registration handler.
+
+\subsubsection{Attendance Tracking Module (\mref{m9})}
+\label{m9}
+\textbf{Secrets:} Methods for recording attendance and validating entry codes.\\
+\textbf{Services:} Tracks event attendance and verifies participant access.\\
+\textbf{Implemented By:} Backend attendance subsystem.
+
+\subsubsection{Survey Management Module (\mref{m10})}
+\label{m10}
+\textbf{Secrets:} Survey metadata and organizational logic.\\
+\textbf{Services:} Creates, stores, and manages surveys linked to events.\\
+\textbf{Implemented By:} Backend survey management service.
+
+\subsubsection{Survey Response Module (\mref{m11})}
+\label{m11}
+\textbf{Secrets:} Logic for storing and associating survey responses to users and events.\\
+\textbf{Services:} Collects and stores completed survey responses for later analysis.\\
+\textbf{Implemented By:} Frontend survey interface and backend API.
+
+\subsubsection{Analytics Module (\mref{m12})}
+\label{m12}
+\textbf{Secrets:} Algorithms for aggregating and calculating statistics.\\
+\textbf{Services:} Computes summaries, attendance rates, and survey trends.\\
+\textbf{Implemented By:} Backend analytics processor.
+
+\subsubsection{Report Generation Module (\mref{m13})}
+\label{m13}
+\textbf{Secrets:} Formatting logic for report generation (PDF, CSV, charts).\\
+\textbf{Services:} Converts analytics data into exportable, human-readable reports.\\
+\textbf{Implemented By:} Backend report generation utility.
 
 \subsection{Software Decision Module}
 
@@ -305,7 +409,41 @@ to be implemented.
 \item[Implemented By:] --
 \end{description}
 
-\subsubsection{Etc.}
+\subsubsection{Database Access Module (\mref{m14})}
+\label{m14}
+\textbf{Secrets:} Database schema design and query optimization strategies.\\
+\textbf{Services:} Provides CRUD operations through a unified data access layer.\\
+\textbf{Implemented By:} Drizzle ORM and PostgreSQL.
+
+\subsubsection{Data Validation Module (\mref{m15})}
+\label{m15}
+\textbf{Secrets:} Input validation and sanitization logic.\\
+\textbf{Services:} Ensures user and system inputs conform to expected formats.\\
+\textbf{Implemented By:} Backend validation middleware.
+
+\subsubsection{Encryption Module (\mref{m16})}
+\label{m16}
+\textbf{Secrets:} Encryption algorithms and key management strategies.\\
+\textbf{Services:} Encrypts and decrypts sensitive data to ensure secure storage and communication.\\
+\textbf{Implemented By:} Backend security subsystem.
+
+\subsubsection{Communication Module (\mref{m17})}
+\label{m17}
+\textbf{Secrets:} Message routing, formatting, and delivery protocols.\\
+\textbf{Services:} Sends messages, alerts, and confirmations to users or admins.\\
+\textbf{Implemented By:} Backend communication service and third-party APIs.
+
+\subsubsection{Logging Module (\mref{m18})}
+\label{m18}
+\textbf{Secrets:} Log format, storage mechanisms, and retention policy.\\
+\textbf{Services:} Records system events and errors for debugging and monitoring.\\
+\textbf{Implemented By:} Backend logging framework.
+
+\subsubsection{Audit Module (\mref{m19})}
+\label{m19}
+\textbf{Secrets:} Policy and data structure for recording administrative actions.\\
+\textbf{Services:} Tracks user and admin activities to ensure traceability and compliance.\\
+\textbf{Implemented By:} Backend audit service.
 
 \section{Traceability Matrix} \label{SecTM}
 
