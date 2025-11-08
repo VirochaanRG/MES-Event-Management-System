@@ -13,6 +13,7 @@
   ],
   "packageManager": "pnpm@10.18.0",
   "scripts": {
+    "dbsetup": "concurrently \"pnpm --filter @teamb/db init:db\" \"pnpm --filter @teamb/db generate:simple\" \"pnpm --filter @teamb/db push:force\"",
     "dev": "concurrently \"pnpm --filter @teamb/web-admin dev\" \"pnpm --filter @teamb/web-user dev\"",
     "dev:admin": "pnpm --filter @teamb/web-admin dev",
     "dev:user": "pnpm --filter @teamb/web-user dev",

@@ -12,18 +12,19 @@
     "generate:simple": "drizzle-kit generate",
     "migrate": "tsx src/migrate.ts",
     "push": "drizzle-kit push",
+    "push:force": "drizzle-kit push --force",
     "studio": "drizzle-kit studio",
     "promote": "node src/scripts/promote-schema.js",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "drizzle-orm": "^0.30.10",
+    "drizzle-orm": "^0.44.7",
     "pg": "^8.11.5"
   },
   "devDependencies": {
     "@types/pg": "^8.11.5",
-    "drizzle-kit": "^0.21.2",
+    "drizzle-kit": "^0.31.6",
     "tsx": "^4.7.2",
     "typescript": "^5.4.5"
   },
