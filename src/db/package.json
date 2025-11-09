@@ -15,6 +15,7 @@
     "push:force": "drizzle-kit push --force",
     "studio": "drizzle-kit studio",
     "promote": "node src/scripts/promote-schema.js",
+    "seed": "tsx src/seed.ts",
     "clean": "rm -rf dist"
   },
   "dependencies": {

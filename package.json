@@ -18,6 +18,7 @@
     "dev:admin": "pnpm --filter @teamb/web-admin dev",
     "dev:user": "pnpm --filter @teamb/web-user dev",
     "build": "pnpm -r build",
+    "build:full": "concurrently \"pnpm --filter @teamb/web-admin build\" \"pnpm --filter @teamb/web-user build\"",
     "start": "concurrently \"pnpm --filter @teamb/web-admin start\" \"pnpm --filter @teamb/web-user start\"",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean"

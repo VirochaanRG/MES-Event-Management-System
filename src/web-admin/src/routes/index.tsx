@@ -1,10 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { getCurrentUser, AuthUser } from '../lib/auth';
-import ProtectedTeamPortal from '../components/ProtectedTeamPortal';
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { getCurrentUser, AuthUser } from "../lib/auth";
+import ProtectedTeamPortal from "../components/ProtectedTeamPortal";
 
 function TeamDDashboard() {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [activeTab, setActiveTab] = useState<"events" | "users" | "reports">(
+    "events"
+  );
 
   useEffect(() => {
     const authUser = getCurrentUser();
@@ -13,101 +16,94 @@ function TeamDDashboard() {
 
   return (
     <main>
-      <div style={{
-        textAlign: 'center',
-        padding: '40px 20px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '8px',
-        margin: '20px 0'
-      }}>
-        <h1 style={{
-          fontSize: '2.5rem',
-          color: '#333',
-          marginBottom: '20px'
-        }}>
-          Hi {user?.email}
-        </h1>
-        <h2 style={{
-          fontSize: '2rem',
-          color: '#555',
-          marginBottom: '20px'
-        }}>
-          Team D Web Admin
-        </h2>
-        <p style={{
-          fontSize: '1.2rem',
-          color: '#666',
-          marginBottom: '30px'
-        }}>
+      <div className="text-center px-5 py-10 bg-gray-100 rounded-lg mx-5 my-5">
+        <h1 className="text-4xl text-gray-800 mb-5">Hi {user?.email}</h1>
+        <h2 className="text-3xl text-gray-700 mb-5">Team D Admin Dashboard</h2>
+        <p className="text-xl text-gray-600 mb-7">
           Welcome to the Team D Administrative Dashboard
         </p>
-        <div style={{
-          backgroundColor: '#e7f3ff',
-          padding: '20px',
-          borderRadius: '4px',
-          border: '1px solid #b3d9ff'
-        }}>
-          <p style={{ margin: 0, color: '#0066cc' }}>
-            This app is running on port 3024 and ready for development!
+        <div className="bg-blue-50 p-5 rounded border border-blue-300">
+          <p className="m-0 text-blue-700">
+            🚀 This app is running on port 3024 and ready for development!
           </p>
-          <p style={{ margin: '10px 0 0 0', color: '#0066cc' }}>
+          <p className="mt-2.5 text-blue-700">
             Session authenticated for: <strong>{user?.email}</strong>
           </p>
         </div>
 
         {/* Team D specific content */}
-        <div style={{
-          marginTop: '30px',
-          padding: '20px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px',
-          border: '1px solid #dee2e6'
-        }}>
-          <h3 style={{ color: '#495057', marginBottom: '15px' }}>
-            Team D Management Tools
-          </h3>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '15px',
-            marginTop: '20px'
-          }}>
-            <div style={{
-              padding: '15px',
-              backgroundColor: '#ffffff',
-              borderRadius: '6px',
-              border: '1px solid #e9ecef',
-              textAlign: 'left'
-            }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#6f42c1' }}>Events</h4>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
-                Manage Team D events and activities
-              </p>
-            </div>
-            <div style={{
-              padding: '15px',
-              backgroundColor: '#ffffff',
-              borderRadius: '6px',
-              border: '1px solid #e9ecef',
-              textAlign: 'left'
-            }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#6f42c1' }}>Users</h4>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
-                Team member management and permissions
-              </p>
-            </div>
-            <div style={{
-              padding: '15px',
-              backgroundColor: '#ffffff',
-              borderRadius: '6px',
-              border: '1px solid #e9ecef',
-              textAlign: 'left'
-            }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#6f42c1' }}>Reports</h4>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
-                Analytics and performance metrics
-              </p>
-            </div>
+        <div className="mt-7 p-5 bg-gray-50 rounded-lg border border-gray-300">
+          <h3 className="text-gray-700 mb-3.5">Team D Management Tools</h3>
+
+          {/* Tab Navigation */}
+          <div className="flex gap-4 mb-6 border-b border-gray-300">
+            <button
+              onClick={() => setActiveTab("events")}
+              className={`px-4 py-2 font-semibold transition-colors ${
+                activeTab === "events"
+                  ? "text-purple-700 border-b-2 border-purple-700"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              Events
+            </button>
+            <button
+              onClick={() => setActiveTab("users")}
+              className={`px-4 py-2 font-semibold transition-colors ${
+                activeTab === "users"
+                  ? "text-purple-700 border-b-2 border-purple-700"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              Users
+            </button>
+            <button
+              onClick={() => setActiveTab("reports")}
+              className={`px-4 py-2 font-semibold transition-colors ${
+                activeTab === "reports"
+                  ? "text-purple-700 border-b-2 border-purple-700"
+                  : "text-gray-600 hover:text-gray-800"
+              }`}
+            >
+              Reports
+            </button>
+          </div>
+
+          {/* Tab Content */}
+          <div className="mt-6 p-6 bg-white rounded-lg border border-gray-200">
+            {activeTab === "events" && (
+              <div>
+                <h4 className="text-2xl font-bold text-purple-700 mb-3">
+                  Events
+                </h4>
+                <p className="text-gray-600">
+                  This section has Events content. Manage Team D events and
+                  activities here.
+                </p>
+              </div>
+            )}
+            {activeTab === "users" && (
+              <div>
+                <h4 className="text-2xl font-bold text-purple-700 mb-3">
+                  Users
+                </h4>
+                <p className="text-gray-600">
+                  This section has Users content. Team member management and
+                  permissions go here.
+                </p>
+              </div>
+            )}
+            {activeTab === "reports" && (
+              <div>
+                <h4 className="text-2xl font-bold text-purple-700 mb-3">
+                  Reports
+                </h4>
+                <p className="text-gray-600">
+                  This section has Reports content. Analytics and performance
+                  metrics are displayed here.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -123,6 +119,6 @@ function Home() {
   );
 }
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: Home,
 });

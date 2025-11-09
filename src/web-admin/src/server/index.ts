@@ -28,7 +28,6 @@ fastify.get('/api/events', async (request, reply) =>
   try
   {
     const allEvents = await db.query.events.findMany();
-    console.log('🗂️ Events from DB:', allEvents);
 
     return reply.send({
       success: true,
