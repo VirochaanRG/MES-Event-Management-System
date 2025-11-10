@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getCurrentUser, AuthUser } from "../lib/auth";
 import ProtectedTeamPortal from "../components/ProtectedTeamPortal";
+import EventsTab from "@/components/EventsTab";
 
 function TeamDDashboard() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -73,13 +74,7 @@ function TeamDDashboard() {
           <div className="mt-6 p-6 bg-white rounded-lg border border-gray-200">
             {activeTab === "events" && (
               <div>
-                <h4 className="text-2xl font-bold text-purple-700 mb-3">
-                  Events
-                </h4>
-                <p className="text-gray-600">
-                  This section has Events content. Manage Team D events and
-                  activities here.
-                </p>
+                <EventsTab />
               </div>
             )}
             {activeTab === "users" && (

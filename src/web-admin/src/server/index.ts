@@ -3,6 +3,7 @@ import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
+import { events } from '../../../db/src/schemas/events';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
@@ -39,6 +40,65 @@ fastify.get('/api/events', async (request, reply) =>
     return reply.code(500).send({
       success: false,
       error: 'Failed to fetch events',
+    });
+  }
+});
+
+//Create events
+fastify.post('/api/event/create', async (request, reply) =>
+{
+  try
+  {
+    const {
+      title,
+      description,
+      location,
+      startTime,
+      endTime,
+      capacity,
+      isPublic,
+      status,
+    } = request.body as {
+      title: string;
+      description?: string;
+      location?: string;
+      startTime: string;
+      endTime: string;
+      capacity?: number;
+      isPublic?: boolean;
+      status?: string;
+    };
+
+    // Validate required fields
+    if (!title || !startTime || !endTime)
+    {
+      return reply.status(400).send({
+        error: 'Missing required fields: title, startTime, endTime',
+      });
+    }
+
+    // Create the event in the database
+    const newEvent = await db.insert(events).values({
+      title,
+      description: description || null,
+      location: location || null,
+      startTime: new Date(startTime),
+      endTime: new Date(endTime),
+      capacity: capacity || 0,
+      isPublic: isPublic !== undefined ? isPublic : true,
+      status: status || 'scheduled',
+    }).returning();
+
+    return reply.status(201).send({
+      success: true,
+      data: newEvent[0],
+    });
+  } catch (error)
+  {
+    console.error('Error creating event:', error);
+    return reply.status(500).send({
+      error: 'Failed to create event',
+      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 });
