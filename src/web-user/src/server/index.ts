@@ -2,12 +2,15 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
+import { db } from '../../../db/src/db';
+import { events } from '../../../db/src/schemas/events';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-interface AuthUser {
+interface AuthUser
+{
   email: string;
   id?: number;
 }
@@ -19,19 +22,24 @@ const mockUsers: { [email: string]: AuthUser } = {
   'demo@teamd.local': { email: 'demo@teamd.local', id: 3 },
 };
 
-function validateUser(email: string): AuthUser | null {
+function validateUser(email: string): AuthUser | null
+{
   return mockUsers[email] || null;
 }
 
-function generateToken(user: AuthUser): string {
+function generateToken(user: AuthUser): string
+{
   return jwt.sign({ user }, JWT_SECRET, { expiresIn: '24h' });
 }
 
-function verifyToken(token: string): { user: AuthUser } | null {
-  try {
+function verifyToken(token: string): { user: AuthUser } | null
+{
+  try
+  {
     const decoded = jwt.verify(token, JWT_SECRET) as { user: AuthUser };
     return decoded;
-  } catch (error) {
+  } catch (error)
+  {
     return null;
   }
 }
@@ -47,19 +55,23 @@ await fastify.register(cookie);
 // Auth hook
 fastify.decorateRequest('user', null);
 
-fastify.addHook('onRequest', async (request, reply) => {
+fastify.addHook('onRequest', async (request, reply) =>
+{
   const protectedRoutes = ['/api/auth/me', '/api/auth/token'];
 
-  if (protectedRoutes.includes(request.url)) {
+  if (protectedRoutes.includes(request.url))
+  {
     const token = request.cookies['auth-token'];
 
-    if (!token) {
+    if (!token)
+    {
       reply.code(401).send({ error: 'Unauthorized' });
       return;
     }
 
     const decoded = verifyToken(token);
-    if (!decoded) {
+    if (!decoded)
+    {
       reply.code(401).send({ error: 'Invalid token' });
       return;
     }
@@ -69,16 +81,20 @@ fastify.addHook('onRequest', async (request, reply) => {
 });
 
 // Login endpoint
-fastify.post('/api/auth/login', async (request, reply) => {
-  try {
+fastify.post('/api/auth/login', async (request, reply) =>
+{
+  try
+  {
     const { email } = request.body as { email: string };
 
-    if (!email) {
+    if (!email)
+    {
       return reply.code(400).send({ error: 'Email is required' });
     }
 
     const user = validateUser(email);
-    if (!user) {
+    if (!user)
+    {
       return reply.code(401).send({ error: 'User not found' });
     }
 
@@ -97,34 +113,61 @@ fastify.post('/api/auth/login', async (request, reply) => {
       user: { id: user.id, email: user.email },
       token
     });
-  } catch (error) {
+  } catch (error)
+  {
     fastify.log.error({ err: error }, 'Login error');
     reply.code(500).send({ error: 'Internal server error' });
   }
 });
 
 // Logout endpoint
-fastify.post('/api/auth/logout', async (request, reply) => {
+fastify.post('/api/auth/logout', async (request, reply) =>
+{
   reply.clearCookie('auth-token', { path: '/' });
   reply.send({ success: true });
 });
 
+//Get events
+fastify.get('/api/events', async (request, reply) =>
+{
+  try
+  {
+    const allEvents = await db.query.events.findMany();
+
+    return reply.send({
+      success: true,
+      data: allEvents,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch events');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch events',
+    });
+  }
+});
+
 // Get current user endpoint
-fastify.get('/api/auth/me', async (request, reply) => {
+fastify.get('/api/auth/me', async (request, reply) =>
+{
   reply.send({ user: (request as any).user });
 });
 
 // Get token endpoint
-fastify.get('/api/auth/token', async (request, reply) => {
+fastify.get('/api/auth/token', async (request, reply) =>
+{
   const token = request.cookies['auth-token'];
   reply.send({ token });
 });
 
 // Start server
-try {
+try
+{
   await fastify.listen({ port: PORT, host: '0.0.0.0' });
   console.log(`Team D User server running on http://localhost:${PORT}`);
-} catch (err) {
+} catch (err)
+{
   fastify.log.error(err);
   process.exit(1);
 }
