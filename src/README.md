@@ -41,6 +41,6 @@ In the root folder run `pnpm dbsetup`. This should create the database and and p
 
 ### Running the Web App
 
-Run `pnpm dev` to run both web-admin and web-user.
+Run `pnpm dev` to run both web-admin and web-user. If it is your first time you have to run `pnpm build:full` first and then run `pnpm dev`.
 
 ### Running the Mobile App
