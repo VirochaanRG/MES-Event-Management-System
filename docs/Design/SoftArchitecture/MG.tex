@@ -153,20 +153,24 @@ unlikely changes are listed in Section \ref{SecUchange}.
 Anticipated changes are the source of the information that is to be hidden
 inside the modules. Ideally, changing one of the anticipated changes will only
 require changing the one module that hides the associated decision. The approach
-adapted here is called design for
-change.
+adapted here is called design for change.
 
 \begin{description}
-\item[\refstepcounter{acnum} \actheacnum \label{acHardware}:] The specific
-  hardware on which the software is running.
-\item[\refstepcounter{acnum} \actheacnum \label{acInput}:] The format of the
-  initial input data.
-\item ...
+\item[\refstepcounter{acnum} \actheacnum \label{acUI}:] 
+  The user interface of the app. Modifications may be made to improve usability, accessibility, or better represent the use case (eg. MES).
+\item[\refstepcounter{acnum} \actheacnum \label{acForms}:] 
+  The form builder functionality. The structure and logic of registration and feedback forms may change to support new fields, features, or requirements.
+\item[\refstepcounter{acnum} \actheacnum \label{acAuth}:] 
+  The user authentication and authorization policy. The security and user requirements may evolve, requiring the introduction of new authentication techniques (eg. custom login, university single sign-on). There may also be a need to add new user/admin roles, or modify the permissions process based on the use case.
+\item[\refstepcounter{acnum} \actheacnum \label{acData}:] 
+  Backend functionality. The database handling or entry relationships may change to support scalability, or custom event workflows.
+\item[\refstepcounter{acnum} \actheacnum \label{acNotifications}:] 
+  Notification delivery methods. Communication channels (email, SMS, push notifications) and message formats may improve to meet updated communication needs for event reminders, updates, or confirmations.
+\item[\refstepcounter{acnum} \actheacnum \label{acSecurity}:] 
+  Security and encryption network. The app's security standards may require updated encryption algorithms, expanded input validation, and refined logging detail depending on the use case to ensure compliance.
+\item[\refstepcounter{acnum} \actheacnum \label{acIntegration}:] 
+  External integration methods. The app may be required to connect with specialized APIs, external databases, or other third-party systems (eg. payment gateways). The data formats and protocols used in these integrations may evolve over time.
 \end{description}
-
-\wss{Anticipated changes relate to changes that would be made in requirements,
-design or implementation choices.  They are not related to changes that are made
-at run-time, like the values of parameters.}
 
 \subsection{Unlikely Changes} \label{SecUchange}
 
@@ -178,10 +182,14 @@ will potentially need to be modified. Hence, it is not intended that these
 decisions will be changed.
 
 \begin{description}
-\item[\refstepcounter{ucnum} \uctheucnum \label{ucIO}:] Input/Output devices
-  (Input: File and/or Keyboard, Output: File, Memory, and/or Screen).
-\item ...
+\item[\refstepcounter{ucnum} \uctheucnum \label{ucUse}:] 
+  Changes to the primary application of events, registration, tickets, and feedback. The development is focused solely on event management and is not expected to change to accomodate other uses.
+\item[\refstepcounter{ucnum} \uctheucnum \label{ucStack}:] 
+  Migrating to a different technology stack. The current architecture is designed around an existing framework. A different technology stack would require reimplementing nearly all modules.
+\item[\refstepcounter{ucnum} \uctheucnum \label{ucData}:] 
+  Transitioning from a centralized database model. The platform relies on centralized data storage for all event management, and applies role-based access to ensure users are only viewing permitted information. Moving to a different model (eg. decentralized) would conflict with the functional requirements, and require rethinking the entire user interaction model.
 \end{description}
+
 
 \section{Module Hierarchy} \label{SecMH}
 
