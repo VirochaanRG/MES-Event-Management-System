@@ -803,67 +803,108 @@ Contains functionality for logging in and authenticating
 
 \subsection{Module}
 
-Contains functionality for logging in and authenticating
+Contains functionality for computing summary statistics and trends for events,
+registrations, attendance, and surveys.
 
 \subsection{Uses}
 
+Database Access Module (M\ref{m11}) \\
+Registration Module (M\ref{m7}) \\
+Attendance Tracking Module (M\ref{m8}) \\
+Survey Response Module (M\ref{m9})
 
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
 
+None
+
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{0.27\textwidth} p{0.19\textwidth} p{0.29\textwidth} p{0.20\textwidth}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{getEventStats} &
+\texttt{eventId : $\mathbb{N}$} &
+\texttt{stats : EventStats} &
+\texttt{EventNotFound} \\
 \hline
-\end{tabular}
+\texttt{getSurveyStats} &
+\texttt{surveyId : $\mathbb{N}$} &
+\texttt{summary : SurveySummary} &
+\texttt{SurveyNotFound} \\
+\hline
+\texttt{getRegistrationTrends} &
+\texttt{eventId : $\mathbb{N}$} &
+\texttt{trend : list(RegistrationPoint)} &
+\texttt{EventNotFound} \\
+\hline
+\end{tabularx}
 \end{center}
+
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
 
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+None
 
 \subsubsection{Environment Variables}
 
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+None
 
 \subsubsection{Assumptions}
 
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+\begin{itemize}
+  \item The Database Access Module (M\ref{m11}) correctly stores registrations,
+        attendance records, and survey responses.
+  \item The given \texttt{eventId} and \texttt{surveyId} refer to events and
+        surveys that were, if they exist, created by other modules.
+\end{itemize}
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{getEventStats(eventId : $\mathbb{N}$)}:
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+  \item transition: None (read-only). Queries the database for all registrations
+        and attendance records associated with \texttt{eventId} and computes
+        totals such as number of registrations, check-ins, and attendance rate.
+  \item output: \texttt{stats} containing the computed summary values.
+  \item exception:
+    \begin{itemize}
+      \item \texttt{EventNotFound} if \texttt{eventId} does not correspond to any event.
+    \end{itemize}
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
+\noindent \texttt{getSurveyStats(surveyId : $\mathbb{N}$)}:
+\begin{itemize}
+  \item transition: None (read-only). Queries survey responses associated with
+        \texttt{surveyId} and aggregates them per question (for example,
+        counts per option for multiple-choice questions).
+  \item output: \texttt{summary} containing aggregated statistics for each question.
+  \item exception:
+    \begin{itemize}
+      \item \texttt{SurveyNotFound} if \texttt{surveyId} does not correspond to any survey.
+    \end{itemize}
+\end{itemize}
 
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{getRegistrationTrends(eventId : $\mathbb{N}$)}:
+\begin{itemize}
+  \item transition: None (read-only). Retrieves timestamps of registrations for
+        \texttt{eventId} and computes cumulative registration counts over time.
+  \item output: \texttt{trend} as a list of \texttt{RegistrationPoint} records,
+        each containing a timestamp and cumulative registration count.
+  \item exception:
+    \begin{itemize}
+      \item \texttt{EventNotFound} if \texttt{eventId} does not correspond to any event.
+    \end{itemize}
+\end{itemize}
 
 \subsubsection{Local Functions}
 
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+None
 
 \newpage
 
