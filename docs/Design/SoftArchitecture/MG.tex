@@ -333,7 +333,7 @@ There are no hardware components for this system.
 
 \subsubsection{Form Submission Module (\mref{m5})}
 \textbf{Secrets:} Validation rules of the user input data.\\
-\textbf{Services:} Receives and validates user-submitted forms and stores them in database.\\
+\textbf{Services:} Provides mechanism for user to answer and submit forms. Receives and validates user-submitted forms and stores them in database.\\
 \textbf{Implemented By:} Backend form processing JavaScript API.\\
 \textbf{Module Type:} Abstract Object Module.
 
@@ -432,6 +432,155 @@ FR-11 & \mref{m1}, \mref{m2}\\
 
 \begin{table}[H]
 \centering
+\begin{tabular}{p{0.22\textwidth} p{0.68\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+AR-1 & \mref{m1} \\
+AR-2 & \mref{m1} \\
+AR-3 & \mref{m1}, \mref{m10}, \mref{m11} \\
+SR-1 & \mref{m1}\\
+SR-2 & \mref{m1}, \mref{m4}, , \mref{m6}, \mref{m10} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Look and Feel Requirements and Modules}
+\label{TblRT_LF}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.20\textwidth} p{0.70\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+ER-1 & \mref{m4}, \mref{m5}, \mref{m8}  \\
+ER-2 & \mref{m1}, \mref{m2} \\
+ER-3 & \mref{m1}, \mref{m4}, \mref{m10}, \mref{m11} \\
+PI-1 & \mref{m4} \\
+PI-2 & \mref{m1}, \mref{m9}, \mref{m11} \\
+LR-1 & \mref{m1} \\
+LR-2 & \mref{m1}, \mref{m4} \\
+UR-1 & \mref{m1} \\
+UR-2 & \mref{m1}\\
+UR-3 & \mref{m1}, \mref{m12}, \mref{m13} \\
+UR-4 & \mref{m1} \\
+AC-1 & \mref{m1} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Usability and Humanity Requirements and Modules}
+\label{TblRT_Usability}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.20\textwidth} p{0.70\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+SL-1 & \mref{m1}, \mref{m5}, \mref{m8}, \mref{m12} \\
+SL-2 & \mref{m9}, \mref{m11}, \mref{m12} \\
+SC-1 & \mref{m1}, \mref{m12}, \mref{m13} \\
+PA-1 & \mref{m11} \\
+FT-1 & \mref{m1}, \mref{m5} \\
+FT-2 & \mref{m1}, \mref{m5}, \mref{m12} \\
+FT-3 & \mref{m1}, \mref{m4}, \mref{m12} \\
+FT-4 & \mref{m1}, \mref{m6}, \mref{m12} \\
+FT-5 & \mref{m11} \\
+CR-1 & \mref{m1}, \mref{m12} \\
+CR-2 & \mref{m12} \\
+SE-1 & \mref{m12} \\
+SE-2 & \mref{m1}, \mref{m11}, \mref{m12} \\
+LG-1 & \mref{m1} \\
+LG-2 & \mref{m1}, \mref{m12}, \mref{m10} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Performance Requirements and Modules}
+\label{TblRT_Perf}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.20\textwidth} p{0.70\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+PE-1 & \\
+IR-1 & \mref{m1} \\
+IR-2 & \mref{m1} \\
+PD-1 & \mref{m1} \\
+PD-2 & \mref{m1} \\
+RR-1 &  \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Operational \& Environmental Requirements and Modules}
+\label{TblRT_OpEnv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.22\textwidth} p{0.68\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+MT-1 & \\
+SU-1 & \mref{m1} \\
+AD-1 & \mref{m1} \\
+AD-2 & \mref{m1} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Maintainability \& Support Requirements and Modules}
+\label{TblRT_Maintain}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.22\textwidth} p{0.68\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+AC-1 & \mref{m2} \\
+AC-2 & \mref{m2}, \mref{m3} \\
+IG-1 & \mref{m1}, \mref{m5}, \mref{m12} \\
+IG-2 & \mref{m1} \\
+PV-1 & \mref{m1}, \mref{m12}, \mref{m13} \\
+PV-2 & \mref{m1}, \mref{m2}, \mref{m12} \\
+PV-3 & \mref{m12}, \mref{m13} \\
+AU-1 & \mref{m13} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Security Requirements and Modules}
+\label{TblRT_Security}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.25\textwidth} p{0.65\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+CL-1 & \mref{m1} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Cultural Requirements and Modules}
+\label{TblRT_Cultural}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.25\textwidth} p{0.65\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+LG-1 & \mref{m12}, \mref{m13} \\
+ST-1 & \mref{m1} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Compliance Requirements and Modules}
+\label{TblRT_Compliance}
+\end{table}
+
+\begin{table}[H]
+\centering
 \begin{tabular}{p{0.2\textwidth} p{0.6\textwidth}}
 \toprule
 \textbf{AC} & \textbf{Modules}\\
@@ -467,18 +616,18 @@ the modules. It can be seen that the graph is a directed acyclic graph
 system, and modules in the higher level of the hierarchy are essentially simpler
 because they use modules from the lower levels.
 
-\wss{The uses relation is not a data flow diagram.  In the code there will often
-be an import statement in module A when it directly uses module B.  Module B
-provides the services that module A needs.  The code for module A needs to be
-able to see these services (hence the import statement).  Since the uses
-relation is transitive, there is a use relation without an import, but the
-arrows in the diagram typically correspond to the presence of import statement.}
+% \wss{The uses relation is not a data flow diagram.  In the code there will often
+% be an import statement in module A when it directly uses module B.  Module B
+% provides the services that module A needs.  The code for module A needs to be
+% able to see these services (hence the import statement).  Since the uses
+% relation is transitive, there is a use relation without an import, but the
+% arrows in the diagram typically correspond to the presence of import statement.}
 
-\wss{If module A uses module B, the arrow is directed from A to B.}
+% \wss{If module A uses module B, the arrow is directed from A to B.}
 
 \begin{figure}[H]
 \centering
-%\includegraphics[width=0.7\textwidth]{UsesHierarchy.png}
+\includegraphics[width=0.9\textwidth]{UsesHierarchy.png}
 \caption{Use hierarchy among modules}
 \label{FigUH}
 \end{figure}
