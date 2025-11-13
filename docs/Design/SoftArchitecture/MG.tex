@@ -191,30 +191,31 @@ below, which are leaves in the hierarchy tree, are the modules that will
 actually be implemented.
 
 \begin{description}
+\item [\refstepcounter{mnum}\mthemnum\label{m1}:] Main System Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m1}:] User Authentication Module
+\item [\refstepcounter{mnum}\mthemnum\label{m2}:] User Authentication Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m2}:] User Authorization Module
+\item [\refstepcounter{mnum}\mthemnum\label{m3}:] User Authorization Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m3}:] Form Template Module
+\item [\refstepcounter{mnum}\mthemnum\label{m4}:] Form Template Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m4}:] Form Submission Module
+\item [\refstepcounter{mnum}\mthemnum\label{m5}:] Form Submission Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m5}:] Event Management Module
+\item [\refstepcounter{mnum}\mthemnum\label{m6}:] Event Management Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m6}:] Event Notification Module
+\item [\refstepcounter{mnum}\mthemnum\label{m7}:] Event Notification Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m7}:] Registration Module
+\item [\refstepcounter{mnum}\mthemnum\label{m8}:] Registration Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m8}:] Attendance Tracking Module
+\item [\refstepcounter{mnum}\mthemnum\label{m9}:] Attendance Tracking Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m9}:] Report Generation Module
+\item [\refstepcounter{mnum}\mthemnum\label{m10}:] Report Generation Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m10}:] Analytics Module
+\item [\refstepcounter{mnum}\mthemnum\label{m11}:] Analytics Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m11}:] Database Access Module
+\item [\refstepcounter{mnum}\mthemnum\label{m12}:] Database Access Module
 
-\item [\refstepcounter{mnum}\mthemnum\label{m12}:] Audit Module
+\item [\refstepcounter{mnum}\mthemnum\label{m13}:] Audit Module
 
 \end{description}
 
@@ -231,21 +232,22 @@ Hardware-Hiding Module
 \midrule
 
 \multirow{9}{0.3\textwidth}{Behaviour-Hiding Modules} 
-& \mref{m1}: User Authentication Module\\
-& \mref{m2}: User Authorization Module\\
-& \mref{m3}: Form Template Module\\
-& \mref{m4}: Form Submission Module\\
-& \mref{m5}: Event Management Module\\
-& \mref{m6}: Event Notification Module\\
-& \mref{m7}: Registration Module\\
-& \mref{m8}: Attendance Tracking Module\\
-& \mref{m9}: Report Generation Module\\
+& \mref{m1}: Main System Module\\
+& \mref{m2}: User Authentication Module\\
+& \mref{m3}: User Authorization Module\\
+& \mref{m4}: Form Template Module\\
+& \mref{m5}: Form Submission Module\\
+& \mref{m6}: Event Management Module\\
+& \mref{m7}: Event Notification Module\\
+& \mref{m8}: Registration Module\\
+& \mref{m9}: Attendance Tracking Module\\
+& \mref{m10}: Report Generation Module\\
 \midrule
 
 \multirow{3}{0.3\textwidth}{Software-Decision Modules} 
-& \mref{m10}: Analytics Module\\
-& \mref{m11}: Database Access Module\\
-& \mref{m12}: Audit Module\\
+& \mref{m11}: Analytics Module\\
+& \mref{m12}: Database Access Module\\
+& \mref{m13}: Audit Module\\
 \bottomrule
 
 \end{tabular}
@@ -305,55 +307,61 @@ There are no hardware components for this system.
 % \item[Implemented By:] --
 % \end{description}
 
-\subsubsection{User Authentication Module (\mref{m1})}
+\subsubsection{Main System Module (\mref{m1})}
+\textbf{Secrets:} Defines the business logic which allows for the communication between the different modules and with external users\\
+\textbf{Services:} Manages and stores the application states and context and serves as the central entrypoint to the system and which modules to communicate with.\\
+\textbf{Implemented By:} React and NodeJS\\
+\textbf{Module Type:} Abstract Object Module.
+
+\subsubsection{User Authentication Module (\mref{m2})}
 \textbf{Secrets:} The internal methods used for verifying user identities within the system.\\
 \textbf{Services:} Authenticates users by validating credentials and provides access to the system.\\
 \textbf{Implemented By:} Backend JavaScript API.\\
 \textbf{Module Type:} Abstract Object Module.
 
-\subsubsection{User Authorization Module (\mref{m2})}
+\subsubsection{User Authorization Module (\mref{m3})}
 \textbf{Secrets:} Rules defining access levels and user roles. Defines which features are to be accessed by each role.\\
-\textbf{Services:} Provides the system with a ruleset on what each roles have access to.\\
+\textbf{Services:} Provides the system with a ruleset on what each roles have access to and limits/grants access to different parts of the system to users based on credentials. \\
 \textbf{Implemented By:} Backend JavaScript API.\\
 \textbf{Module Type:} Abstract Data Type Module.
 
-\subsubsection{Form Template Module (\mref{m3})}
+\subsubsection{Form Template Module (\mref{m4})}
 \textbf{Secrets:} The structure and layout of form templates used in surveys and event creation.\\
 \textbf{Services:} Provides reusable blueprints for constructing event or survey forms. Allows for the creation of new forms and editing of preexisting forms.\\
 \textbf{Implemented By:} React Frontend, Backend PostgreSQL Database Schemas.\\
 \textbf{Module Type:} Abstract Data Type Module.
 
-\subsubsection{Form Submission Module (\mref{m4})}
+\subsubsection{Form Submission Module (\mref{m5})}
 \textbf{Secrets:} Validation rules of the user input data.\\
 \textbf{Services:} Receives and validates user-submitted forms and stores them in database.\\
 \textbf{Implemented By:} Backend form processing JavaScript API.\\
 \textbf{Module Type:} Abstract Object Module.
 
-\subsubsection{Event Management Module (\mref{m5})}
+\subsubsection{Event Management Module (\mref{m6})}
 \textbf{Secrets:} Event data structures and scheduling rules.\\
 \textbf{Services:} Enables creation, editing, and cancellation of events by administrators.\\
 \textbf{Implemented By:} React Frontend with Backend event processing JavaScript API.\\
 \textbf{Module Type:} Abstract Object Module.
 
-\subsubsection{Event Notification Module (\mref{m6})}
+\subsubsection{Event Notification Module (\mref{m7})}
 \textbf{Secrets:} Notification delivery logic and timing rules.\\
 \textbf{Services:} Sends alerts to users regarding new events, updates, or cancellations.\\
 \textbf{Implemented By:} Third-Party Messaging Apis.\\
 \textbf{Module Type:} Library.
 
-\subsubsection{Registration Module (\mref{m7})}
+\subsubsection{Registration Module (\mref{m8})}
 \textbf{Secrets:} Mapping between users, events, and registration states.\\
-\textbf{Services:} Allows users to register, modify, or cancel event participation. Provides validation and confirmation of registration within the event.\\
+\textbf{Services:} Allows users to register, modify, or cancel event participation. Provides validation and confirmation of registration within the event. Allows for admins to view users who have registered for each event and the stage of the process they are in.\\
 \textbf{Implemented By:} Backend JavaScript APIs.\\
 \textbf{Module Type:} Abstract Data Type Module.
 
-\subsubsection{Attendance Tracking Module (\mref{m8})}
+\subsubsection{Attendance Tracking Module (\mref{m9})}
 \textbf{Secrets:} Methods for recording attendance and validating entry codes.\\
-\textbf{Services:} Tracks event attendance and verifies participant access.\\
+\textbf{Services:} Tracks event attendance and verifies participant access. Allows for admins for to view \\
 \textbf{Implemented By:} Backend JavaScript APIs.\\
 \textbf{Module Type:} Abstract Data Object Module.
 
-\subsubsection{Report Generation Module (\mref{m9})}
+\subsubsection{Report Generation Module (\mref{m10})}
 \textbf{Secrets:} Formatting logic for report generation and provides static data structure of the report.\\
 \textbf{Services:} Converts analytics data into exportable human-readable reports.\\
 \textbf{Implemented By:} Third Part Apis with JavaScript and React.\\
@@ -372,19 +380,19 @@ There are no hardware components for this system.
 % \item[Implemented By:] --
 % \end{description}
 
-\subsubsection{Analytics Module (\mref{m10})}
+\subsubsection{Analytics Module (\mref{m11})}
 \textbf{Secrets:} Algorithms for aggregating and calculating statistics.\\
 \textbf{Services:} Computes summaries based on the data provided for set statistics and performs data analysis.\\
 \textbf{Implemented By:} Javascript Backend Library.\\
 \textbf{Module Type:} Library.
 
-\subsubsection{Database Access Module (\mref{m11})}
+\subsubsection{Database Access Module (\mref{m12})}
 \textbf{Secrets:} Database schema design and access.\\
 \textbf{Services:} Provides database operations to query and insert to database through a unified database layer.\\
 \textbf{Implemented By:} Drizzle ORM with JavaScript APIs.
 \textbf{Module Type:} Abstract Data Object Module.
 
-\subsubsection{Audit Module (\mref{m12})}
+\subsubsection{Audit Module (\mref{m13})}
 \textbf{Secrets:} Policy and data structure for recording administrative actions.\\
 \textbf{Services:} Provides methods to track user and admin activities to ensure traceability and compliance.\\
 \textbf{Implemented By:} Backend Javascript API with PostgreSQL Database.
@@ -403,17 +411,17 @@ requirements and between the modules and the anticipated changes.
 \toprule
 \textbf{Req.} & \textbf{Modules}\\
 \midrule
-FR-1 & \mref{m3}, \mref{m4}\\
-FR-2 & \mref{m9}, \mref{m10}\\
-FR-3 & \mref{m7}, \mref{m5}\\
-FR-4 & \mref{m7}\\
-FR-5 & \mref{m5}\\
-FR-6 & \mref{m11}\\
-FR-7 & \mref{m11}, \mref{m3}, \mref{m4}\\
-FR-8 & \mref{m9}, \mref{m10}\\
-FR-9 & \mref{m3}, \mref{m4}\\
-FR-10 & \mref{m5}\\
-FR-11 & \mref{m2}\\
+FR-1 & \mref{m1},\mref{m3}, \mref{m4}\\
+FR-2 & \mref{m1},\mref{m9}, \mref{m10}\\
+FR-3 & \mref{m1},\mref{m7}, \mref{m5}\\
+FR-4 & \mref{m1},\mref{m7}\\
+FR-5 & \mref{m1},\mref{m5}\\
+FR-6 & \mref{m1},\mref{m11}\\
+FR-7 & \mref{m1},\mref{m11}, \mref{m3}, \mref{m4}\\
+FR-8 & \mref{m1},\mref{m9}, \mref{m10}\\
+FR-9 & \mref{m1},\mref{m3}, \mref{m4}\\
+FR-10 & \mref{m1},\mref{m5}\\
+FR-11 & \mref{m1}, \mref{m2}\\
 
 
 \bottomrule
