@@ -296,7 +296,7 @@ Contains functionality for role based access management
 
 \subsubsection{State Variables}
 
-\texttt{roles : map(string, set(T))}: Mapping of user IDs to the set of roles the user is assigned.
+\texttt{roles : map(string, set(T))}: Mapping of user to the set of roles the user is assigned.
 
 \subsubsection{Environment Variables}
 
@@ -375,7 +375,7 @@ Contains functionality for creating and linking form modules.
 \hline
 \texttt{getModules} & None & \texttt{modules : set(FormModule)} & None  \\
 \hline
-\texttt{linkQuestion} & \texttt{question : Question} \newline \texttt{linkedModuleIds : list(string)} & None & \texttt{InvalidModule} \newline \texttt{IllegalArgument} \\
+\texttt{linkQuestion} & \texttt{question : Question} \newline \texttt{linkedModule: list(string)} & None & \texttt{InvalidModule} \newline \texttt{IllegalArgument} \\
 \hline
 \texttt{createForm} & \texttt{formName : string} \newline \texttt{startingModuleId : $\mathbb{N}$} \newline \texttt{formSettings : map(string, string)}  & Form & None \\
 \hline
@@ -448,7 +448,7 @@ Retrieves the set of all modules.
 \item exception: None
 \end{itemize}
 
-\noindent \texttt{linkQuestion(question : Question, linkedModuleIds : list(string))}: \\
+\noindent \texttt{linkQuestion(question : Question, linkedModuleIds: list($\mathbb{N}$))}: \\
 Links the answers of a question to another module for branching forms.
 \begin{itemize}
 \item transition: Modifies the module in \texttt{modules} containing the specified Question
@@ -533,9 +533,9 @@ None
 \hline
 \texttt{respondToForm} & \texttt{userId : $\mathbb{N}$ \newline formId : $\mathbb{N}$ \newline formResponse : map(Question, string)} & \texttt{responseId : $\mathbb{N}$} & \texttt{InvalidUser} \newline \texttt{InvalidForm} \newline \texttt{IllegalArgument} \\
 \hline
-\texttt{getResponses} & \texttt{userId : $\mathbb{N}$ \newline formId : $\mathbb{N}$} & \texttt{responseIds : set($\mathbb{N}$)} & \texttt{InvalidUser} \newline \texttt{InvalidForm} \newline \texttt{IllegalArgument} \\
+\texttt{getResponses} & \texttt{userId : $\mathbb{N}$ \newline formId : $\mathbb{N}$} & \texttt{responseIds : set($\mathbb{N}$)} & \texttt{InvalidUser} \newline \texttt{InvalidForm} \\
 \hline
-\texttt{editResponse} & \texttt{userId : $\mathbb{N}$ \newline responseId : $\mathbb{N}$ \newline formResponse : map(Question, string)} & None & \texttt{InvalidUser} \newline \texttt{InvalidForm} \newline \texttt{IllegalArgument} \\
+\texttt{editResponse} & \texttt{userId : $\mathbb{N}$ \newline responseId : $\mathbb{N}$ \newline formResponse : map(Question, string)} & None & \texttt{InvalidUser} \newline \texttt{InvalidForm} \newline \texttt{IllegalArgument} \newline \texttt{UnsupportedOperation} \\
 \hline
 \end{tabularx}
 \end{center}
@@ -558,33 +558,37 @@ None
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \texttt{getFillableForms(userId : string)}:
+\noindent \texttt{getFillableForms(userId : $\mathbb{N}$)}:
 \begin{itemize}
 \item transition: None 
 \item output: The set of all forms available for the user to fill
 \item exception: InvalidUser if user does not exist 
 \end{itemize}
 
-\noindent \texttt{respondToForm(userId : string, formId: string, \newline formResponse: map(Question, string))}:
+\noindent \texttt{respondToForm(userId : $\mathbb{N}$, formId: string, \newline formResponse: map(Question, string))}:
 \begin{itemize}
-\item transition: Inserts the created response id into \texttt{userResponses} and \texttt{formResponses}
+\item transition: Inserts the created response ID into \texttt{userResponses} and \texttt{formResponses}
 \item output: None
 \item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist, IllegalArgument if the responses do not match the expected format given by the form (e.g. unidentified question)
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
+\noindent \texttt{getResponses(userId : $\mathbb{N}$, formId: string)}:
+\begin{itemize}
+\item transition: Inserts the created response ID into \texttt{userResponses} and \texttt{formResponses}
+\item output: The set of all responses for the user in \texttt{userResponses} for a particular form in \texttt{formResponses}
+\item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist
+\end{itemize}
 
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{editResponse(userId : $\mathbb{N}$, formId: string, \newline formResponse: map(Question, string))}:
+\begin{itemize}
+\item transition: Edits the reponse for the given form (if it allows editing) in \texttt{userResponses} and \texttt{formResponses}
+\item output: None
+\item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist, IllegalArgument if the responses do not match the expected format given by the form, UnsupportedOperation if the form does not allow editing responses
+\end{itemize}
 
 \subsubsection{Local Functions}
 
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+None
 
 \newpage
 
@@ -592,10 +596,9 @@ None
 
 \subsection{Module}
 
-Contains functionality for logging in and authenticating
+Contains functionality for creating and managing events.
 
 \subsection{Uses}
-
 
 \subsection{Syntax}
 
@@ -604,55 +607,77 @@ Contains functionality for logging in and authenticating
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.3\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{createEvent} & \texttt{eventDetails : EventData} & \texttt{eventId : $\mathbb{N}$} & IllegalArgument \\
 \hline
-\end{tabular}
+\texttt{editEvent} & \texttt{eventId : $\mathbb{N}$ \newline eventDetails : $\mathbb{N}$} & None & \texttt{InvalidEvent} \newline \texttt{IllegalArgument} \\
+\hline
+\texttt{deleteEvent} & \texttt{eventId : $\mathbb{N}$} & None & \texttt{InvalidEvent} \\
+\hline
+\texttt{getAllEvents} & None & \texttt{eventIds: set($\mathbb{N}$)} & None \\
+\hline
+\texttt{getEventDetails} & \texttt{eventId : $\mathbb{N}$} & \texttt{eventData : EventData} & \texttt{InvalidEvent} \\
+\hline
+\end{tabularx}
 \end{center}
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
 
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+\texttt{events : map($\mathbb{N}$, EventData)}: Mapping of all event IDs to their details
 
 \subsubsection{Environment Variables}
 
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+\texttt{currentTime : DateTime}: Current date and time
 
 \subsubsection{Assumptions}
 
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+The calculated current date and time is within 5 seconds of the actual date and time
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{createEvent(eventDetails : EventData)}:
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+\item transition: Inserts an event into \texttt{events}.
+\item output: ID of the created event 
+\item exception: None
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
+\noindent \texttt{editEvent(eventId : string, eventDetails : EventData)}:
+\begin{itemize}
+\item transition: Removes the event details in \texttt{events} with the new details for the event ID
+\item output: None
+\item exception: InvalidEvent if event does not exist
+\end{itemize}
 
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{deleteEvent(eventId : string)}:
+\begin{itemize}
+\item transition: Removes the event from \texttt{events}
+\item output: None
+\item exception: InvalidEvent if event does not exist
+\end{itemize}
+
+\noindent \texttt{getAllEvents()}:
+\begin{itemize}
+\item transition: None
+\item output: A copy of all keys in \texttt{events}
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{getEventDetails(eventId : string)}:
+\begin{itemize}
+\item transition: None
+\item output: The event details for the given event ID in \texttt{events}
+\item exception: InvalidEvent if event does not exist
+\end{itemize}
 
 \subsubsection{Local Functions}
 
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+None
 
 \newpage
 
