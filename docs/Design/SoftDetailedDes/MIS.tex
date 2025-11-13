@@ -32,8 +32,8 @@ urlcolor=cyan          % color of external links
 
 \usepackage{array}
 
-\externaldocument{../../SRS/SRS}[SRS]
-\externaldocument{../../Design/SoftArchitecture/MG}[MG]
+\externaldocument[]{../SoftArchitecture/MG}
+\externaldocument[SRS-]{../../SRS/SRS}
 
 \input{../../Comments}
 \input{../../Common}
@@ -533,14 +533,15 @@ Contains functionality for logging in and authenticating
 
 \subsection{Module}
 
-Contains functionality for logging in and authenticating
+Contains functionality for notifying users abouts upcoming events.
 
 \subsection{Uses}
-
 
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
+
+None
 
 \subsubsection{Exported Access Programs}
 
