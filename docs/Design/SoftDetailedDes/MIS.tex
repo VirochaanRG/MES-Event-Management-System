@@ -111,6 +111,12 @@ character & char & a single symbol or digit\\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
 natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
 real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
+string & string & An ordered list of characters of any length\\
+Cookie & Cookie & A file stored on the client device storing user data\\
+List of type T & list(T) & A dynamically sized list of elements of type T\\
+Set of type T & set(T) & A dynamically sized set of elements of type T\\
+Date and time & DateTime & Stores a specific date in time using the Gregorian calendar and 24 hour clock\\
+User session & Session & Stores data on a user's session and time of last validation\\
 \bottomrule
 \end{tabular} 
 \end{center}
@@ -162,67 +168,90 @@ The following table is taken directly from the Module Guide document for this pr
 
 \subsection{Module}
 
-Contains functionality for logging in and authenticating
+Contains functionality for logging in and authenticating users.
 
 \subsection{Uses}
-
 
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
 
+None
+
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.3\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{attemptLogin} & \texttt{username : string } \newline \texttt{password : string} & \texttt{sessionCookie : Cookie} & None \\
 \hline
-\end{tabular}
+\texttt{logout} & \texttt{sessionCookie : Cookie }  & None & \texttt{InvalidSession} \\
+\hline
+\texttt{validateSession} & \texttt{sessionCookie : Cookie} & \texttt{sessionIsValid : bool} & None\\
+\hline
+\texttt{registerUser} & \texttt{username : string } \newline \texttt{password : string} & None & None \\
+\hline
+\end{tabularx}
 \end{center}
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
 
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+\texttt{sessions : set(Session)}: Set of all active sessions
 
 \subsubsection{Environment Variables}
 
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+\texttt{currentTime : DateTime}: Stores the current date and time
 
 \subsubsection{Assumptions}
 
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+None
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{attemptLogin(username : string, password : string)}: \\
+Attempts a login given a username and password.
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+\item transition: creates and adds a new session to \texttt{sessions} if login is successful
+\item output: Cookie containing session data to be sent back to the client
+\item exception: None 
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
+\noindent \texttt{logout(sessionCookie: Cookie)}: \\
+Logs the specified user out.
+\begin{itemize}
+\item transition: Removes the specified session from \texttt{sessions}
+\item output: None
+\item exception: InvalidSession if session is not found in \texttt{sessions} 
+\end{itemize}
 
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{validateSession(sessionCookie: Cookie)}: \\
+Validates and refreshes a users session.
+\begin{itemize}
+\item transition: Refreshes the timeout of the session in \texttt{sessions} if session is valid
+\item output: Boolean indicating if sessionCookie exists in \texttt{sessions}
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{registerUser(username : string, password : string)}: \\
+Registers a new user to the database of users.
+\begin{itemize}
+\item transition: None
+\item output: Boolean stating whether registration was successful
+\item exception: None
+\end{itemize}
 
 \subsubsection{Local Functions}
 
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+\noindent \texttt{refreshSessions()}:
+\begin{itemize}
+\item transition: Periodically checks \texttt{sessions} and removes any session older than 3 hours
+\item output: None
+\item exception: None 
+\end{itemize}
 
 \newpage
 
