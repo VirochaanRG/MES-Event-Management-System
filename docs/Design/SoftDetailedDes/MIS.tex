@@ -107,19 +107,21 @@ The following table summarizes the primitive data types used by \progname.
 \toprule 
 \textbf{Data Type} & \textbf{Notation} & \textbf{Description}\\ 
 \midrule
-character & char & a single symbol or digit\\
+character & char & a single symbol or digit \\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
 natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
-real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
-string & string & An ordered list of characters of any length\\
-Cookie & Cookie & A file stored on the client device storing user data\\
-List of type T & list(T) & A dynamically sized list of elements of type T\\
-Set of type T & set(T) & A dynamically sized set of elements of type T\\
-Date and time & DateTime & Stores a specific date in time using the Gregorian calendar and 24 hour clock\\
-User session & Session & Stores data on a user's session and time of last validation\\
+real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$) \\
+string & string & An ordered list of characters of any length \\
+Cookie & Cookie & A file stored on the client device storing user data \\
+List of type T & list(T) & A dynamically sized list of elements of type T \\
+Set of type T & set(T) & A dynamically sized set of elements of type T \\
+Map of type K to V & map(K, V) & A collection mapping keys of type K to values of type V \\
+Date and time & DateTime & A specific date and time using the Gregorian calendar and 24-hour clock \\
+User session & Session & Stores data on a user's session and time of last validation \\
 \bottomrule
-\end{tabular} 
+\end{tabular}
 \end{center}
+
 
 \noindent
 The specification of \progname \ uses some derived data types: sequences, strings, and
