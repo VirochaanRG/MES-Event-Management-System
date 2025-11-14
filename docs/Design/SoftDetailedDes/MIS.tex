@@ -110,14 +110,13 @@ The following table summarizes the primitive data types used by \progname.
 character & char & a single symbol or digit \\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
 natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
-real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$) \\
-string & string & An ordered list of characters of any length \\
-Cookie & Cookie & A file stored on the client device storing user data \\
-List of type T & list(T) & A dynamically sized list of elements of type T \\
-Set of type T & set(T) & A dynamically sized set of elements of type T \\
-Map of type K to V & map(K, V) & A collection mapping keys of type K to values of type V \\
-Date and time & DateTime & A specific date and time using the Gregorian calendar and 24-hour clock \\
-User session & Session & Stores data on a user's session and time of last validation \\
+real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
+string & string & An ordered list of characters of any length\\
+Cookie & Cookie & A file stored on the client device storing user data\\
+List of type T & list(T) & A dynamically sized list of elements of type T\\
+Set of type T & set(T) & A dynamically sized set of elements of type T\\
+Map of type K to V & map(K, V) & A map containing key value pairs with keys of type K and values of type V\\
+Date and time & DateTime & Stores a specific date in time using the Gregorian calendar and 24 hour clock\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -141,22 +140,28 @@ The following table is taken directly from the Module Guide document for this pr
 \toprule
 \textbf{Level 1} & \textbf{Level 2}\\
 \midrule
+
+Hardware-Hiding Module
+& No Modules\\
+\midrule
+
 \multirow{9}{0.3\textwidth}{Behaviour-Hiding Modules} 
-& M\ref{m1}: User Authentication Module\\
-& M\ref{m2}: User Authorization Module\\
-& M\ref{m3}: Form Template Module\\
-& M\ref{m4}: Form Submission Module\\
-& M\ref{m5}: Event Management Module\\
-& M\ref{m6}: Event Notification Module\\
-& M\ref{m7}: Registration Module\\
-& M\ref{m8}: Attendance Tracking Module\\
-& M\ref{m9}: Report Generation Module\\
+& M\ref{m1}: Main System Module\\
+& M\ref{m2}: User Authentication Module\\
+& M\ref{m3}: User Authorization Module\\
+& M\ref{m4}: Form Template Module\\
+& M\ref{m5}: Form Submission Module\\
+& M\ref{m6}: Event Management Module\\ 
+& M\ref{m7}: Event Notification Module\\
+& M\ref{m8}: Registration Module\\
+& M\ref{m9}: Attendance Tracking Module\\
+& M\ref{m10}: Report Generation Module\\
 \midrule
 
 \multirow{3}{0.3\textwidth}{Software-Decision Modules} 
-& M\ref{m10}: Analytics Module\\
-& M\ref{m11}: Database Access Module\\
-& M\ref{m12}: Audit Module\\
+& M\ref{m11}: Analytics Module\\
+& M\ref{m12}: Database Access Module\\
+& M\ref{m13}: Audit Module\\
 \bottomrule
 
 \end{tabular}
@@ -166,13 +171,59 @@ The following table is taken directly from the Module Guide document for this pr
 
 \newpage
 
-\section{MIS of M\ref{m1}: User Authentication Module}
+\section{MIS of M\ref{m1}: Main System Module}
 
 \subsection{Module}
 
-Contains functionality for logging in and authenticating users.
+Acts as the entry point for all other modules
 
 \subsection{Uses}
+
+Acts as the entry point for M\ref{m2}, M\ref{m4}, M\ref{m6}, M\ref{m10}.
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+None
+
+\subsubsection{Exported Access Programs}
+
+None
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+None
+
+\subsubsection{Environment Variables}
+
+None
+
+\subsubsection{Assumptions}
+
+This module can be invoked externally by a user who has access to the backend server.
+
+\subsubsection{Access Routine Semantics}
+
+N/A
+
+\subsubsection{Local Functions}
+
+None
+
+\newpage
+
+\section{MIS of M\ref{m2}: User Authentication Module}
+
+\subsection{Module}
+
+Contains functionality for authenticating users and registering new users.
+
+\subsection{Uses}
+
+None
 
 \subsection{Syntax}
 
@@ -183,7 +234,7 @@ None
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.3\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.25\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
@@ -193,7 +244,7 @@ None
 \hline
 \texttt{validateSession} & \texttt{sessionCookie : Cookie} & \texttt{sessionIsValid : bool} & None\\
 \hline
-\texttt{registerUser} & \texttt{username : string } \newline \texttt{password : string} & None & None \\
+\texttt{registerUser} & \texttt{username : string } \newline \texttt{password : string} & \texttt{registrationSuccessful : bool} & None \\
 \hline
 \end{tabularx}
 \end{center}
@@ -257,14 +308,103 @@ Registers a new user to the database of users.
 
 \newpage
 
-\section{MIS of M\ref{MG-m2}: User Authorization Module}
+\section{MIS of M\ref{m3}: User Authorization Module}
 
 \subsection{Module}
 
-Contains functionality for logging in and authenticating
+Contains functionality for role based access management
 
 \subsection{Uses}
 
+Uses M\ref{m2} for authentication before checking authorizations.
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+\texttt{validRoles : set(Role)}: The set of all valid roles that can be assigned to users.
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.25\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{addRole} & \texttt{userId : $\mathbb{N}$} \newline \texttt{role : Role} & None & \texttt{InvalidRole} \newline \texttt{InvalidUser} \\
+\hline
+\texttt{removeRole} & \texttt{userId : $\mathbb{N}$} \newline \texttt{role : Role} & None & \texttt{InvalidRole} \newline \texttt{InvalidUser} \\
+\hline
+\texttt{hasPermission} & \texttt{userId : $\mathbb{N}$} \newline \texttt{role : Role} & \texttt{hasPermission : bool} & \texttt{InvalidRole} \newline \texttt{InvalidUser}  \\
+\hline
+\texttt{getUserRoles} & \texttt{userId : $\mathbb{N}$} & \texttt{roles : set(Role)} &  \texttt{InvalidUser}\\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\texttt{roles : map($\mathbb{N}$, set(T))}: Mapping of user ID to the set of roles the user is assigned.
+
+\subsubsection{Environment Variables}
+
+None
+
+\subsubsection{Assumptions}
+
+At least one user who has permission to assign and revoke roles already exists in the system.
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{addRole(userId : $\mathbb{N}$, role : Role)}: \\
+Assigns a role to a user.
+\begin{itemize}
+\item transition: Inserts the specified role into the set attached to the user ID in \texttt{roles}
+\item output: None 
+\item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
+\end{itemize}
+
+\noindent \texttt{removeRole(userId : $\mathbb{N}$, role : Role)}: \\
+Revokes a role from a user.
+\begin{itemize}
+\item transition: Removes the specified role from the set attached to the user ID in \texttt{roles}
+\item output: None 
+\item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
+\end{itemize}
+
+\noindent \texttt{hasPermission(userId : $\mathbb{N}$, role : Role)}: \\
+Checks if a user has a certain permission.
+\begin{itemize}
+\item transition: None
+\item output: A boolean value which is true if the set attached to the user ID in \texttt{roles} contains the specified role 
+\item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
+\end{itemize}
+
+\noindent \texttt{getUserRoles(userId : $\mathbb{N}$)}: \\
+Gets all roles assigned to a given user.
+\begin{itemize}
+\item transition: None
+\item output: The set of roles attached to the user ID in \texttt{roles} 
+\item exception: InvalidUser if the user does not exist
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None
+
+\newpage
+
+\section{MIS of M\ref{m4}: Form Template Module}
+
+\subsection{Module}
+
+Contains functionality for creating and linking form modules. 
+
+\subsection{Uses}
+
+Uses M\ref{m3} to check for form managment permissions.
 
 \subsection{Syntax}
 
@@ -273,269 +413,162 @@ Contains functionality for logging in and authenticating
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.3\textwidth} p{0.25\textwidth} p{0.2\textwidth}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{createModule} & \texttt{moduleTitle : string} \newline \texttt{questions : list(Question)} & \texttt{module : FormModule} & None \\
 \hline
-\end{tabular}
+\texttt{deleteModule} & \texttt{moduleId : $\mathbb{N}$} & None & \texttt{InvalidModule} \\
+\hline
+\texttt{editModule} & \texttt{moduleId : $\mathbb{N}$} \newline \texttt{newModuleName : string} \newline \texttt{newQuestions : list(Question)} & None & \texttt{InvalidModule}  \\
+\hline
+\texttt{copyModule} & \texttt{moduleId : $\mathbb{N}$} & \texttt{copiedModule : FormModule } & \texttt{InvalidModule} \\
+\hline
+\texttt{getModules} & None & \texttt{modules : set(FormModule)} & None  \\
+\hline
+\texttt{linkQuestion} & \texttt{question : Question} \newline \texttt{linkedModule: list(string)} & None & \texttt{InvalidModule} \newline \texttt{IllegalArgument} \\
+\hline
+\texttt{createForm} & \texttt{formName : string} \newline \texttt{startingModuleId : $\mathbb{N}$} \newline \texttt{formSettings : map(string, string)}  & Form & None \\
+\hline
+\texttt{deleteForm} & \texttt{formId : $\mathbb{N}$} & None & \texttt{InvalidForm} \\
+\hline
+\texttt{editForm} & \texttt{newFormName : string} \newline \texttt{startingModuleId : $\mathbb{N}$} \newline \texttt{newFormSettings : map(string, string)}  & None & \texttt{InvalidForm} \\
+\hline
+\texttt{releaseForm} & \texttt{formId : $\mathbb{N}$, deadline : DateTime} & None & \texttt{InvalidForm} \\
+\hline
+\texttt{hideForm} & \texttt{formName : string, startingModuleId : $\mathbb{N}$} & None & \texttt{InvalidForm} \\
+\hline
+\end{tabularx}
 \end{center}
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
 
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+\texttt{modules : set(FormModule)}: Set of all created form modules.
+\\
+\texttt{createdForms : set(Form)}: Set of all created forms.
 
 \subsubsection{Environment Variables}
 
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+\texttt{currentTime : DateTime}: The current date and time
 
 \subsubsection{Assumptions}
 
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+The calculated current date and time is within 5 seconds of the real date and time 
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{createModule(moduleTitle : string, questions : list(Question))}: \\
+Creates a new module given a title and a list of questions.
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+\item transition: Inserts the created module into \texttt{modules}
+\item output: The created FormModule
+\item exception: None
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
+\noindent \texttt{deleteModule(moduleId : $\mathbb{N}$)}: \\
+Deletes a module.
+\begin{itemize}
+\item transition: Removes the created module from \texttt{modules}
+\item output: None
+\item exception: InvalidModule if module does not exist
+\end{itemize}
 
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{editModule(moduleId : $\mathbb{N}$, newModuleName : string, newQuestions : list(Question))}: \\
+Edits the module, assigning a new name and question list.
+\begin{itemize}
+\item transition: Removes the specified module, then inserts the modified one into \texttt{modules}
+\item output: None
+\item exception: InvalidModule if module does not exist
+\end{itemize}
+
+\noindent \texttt{copyModule(moduleId : $\mathbb{N}$)}: \\
+Copies an existing module.
+\begin{itemize}
+\item transition: Creates a copy of the given module with a different module ID, then inserts it into \texttt{modules}
+\item output: The copied FormModule
+\item exception: InvalidModule if module does not exist
+\end{itemize}
+
+\noindent \texttt{getModules()}: \\
+Retrieves the set of all modules.
+\begin{itemize}
+\item transition: None
+\item output: A copy of \texttt{modules}
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{linkQuestion(question : Question, linkedModuleIds: list($\mathbb{N}$))}: \\
+Links the answers of a question to another module for branching forms.
+\begin{itemize}
+\item transition: Modifies the module in \texttt{modules} containing the specified Question
+\item output: None
+\item exception: InvalidModule if module does not exist, IllegalArgument if the size of linkedModuleIds does not match the number of possible answers in the question.
+\end{itemize}
+
+\noindent \texttt{createForm(formTitle : string, startingModuleId: string,  \newline formSettings : map(string, string))}: \\
+Creates a form starting from a specified module with certain settings (e.g. multiple submissions, editable submissions)
+\begin{itemize}
+\item transition: Inserts the created form into \texttt{createdForms}
+\item output: The created Form
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{deleteForm(formId : $\mathbb{N}$)}: \\
+Deletes the specified form.
+\begin{itemize}
+\item transition: Removes the specified form from \texttt{createdForms}
+\item output: None
+\item exception: InvalidForm if form does not exist
+\end{itemize}
+
+\noindent \texttt{editForm(formTitle : string, startingModuleId: string,  \newline formSettings : map(string, string))}: \\
+Edits the specified form.
+\begin{itemize}
+\item transition: Removes the specified form from \texttt{createdForms} and inserts the modified form
+\item output: None
+\item exception: InvalidForm if form does not exist
+\end{itemize}
+
+\noindent \texttt{releaseForm(formId: string, deadline : DateTime)}: \\
+Releases a form for submissions with the specified deadline.
+\begin{itemize}
+\item transition: Modifies the visibility of the specified form in \texttt{createdForms}
+\item output: None
+\item exception: InvalidForm if form does not exist
+\end{itemize}
+
+\noindent \texttt{hideForm(formId: string)}: \\
+Closes submissions for a form.
+\begin{itemize}
+\item transition: Modifies the visibility of the specified form in \texttt{createdForms}
+\item output: None
+\item exception: InvalidForm if form does not exist
+\end{itemize}
 
 \subsubsection{Local Functions}
 
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
-
-\newpage
-
-\section{MIS of M\ref{m3}: Form Template Module}
-
-\subsection{Module}
-
-Contains functionality for logging in and authenticating
-
-\subsection{Uses}
-
-
-\subsection{Syntax}
-
-\subsubsection{Exported Constants}
-
-\subsubsection{Exported Access Programs}
-
-\begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
-\hline
-\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
-\hline
-\wss{accessProg} & - & - & - \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Semantics}
-
-\subsubsection{State Variables}
-
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
-
-\subsubsection{Environment Variables}
-
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
-
-\subsubsection{Assumptions}
-
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
-
-\subsubsection{Access Routine Semantics}
-
-\noindent \wss{accessProg}():
+\noindent \texttt{expireForms()}: \\
+Periodically checks \texttt{createdForms} for expired deadlines and closes them.
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+\item transition: Modifies the visibility of the forms in \texttt{createdForms}
+\item output: None
+\item exception: None
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
-
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
-
-\subsubsection{Local Functions}
-
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
-
 \newpage
 
-\section{MIS of M\ref{m4}: Form Submission Module}
+\section{MIS of M\ref{m5}: Form Submission Module}
 
 \subsection{Module}
 
-Contains functionality for logging in and authenticating
+Contains functionality for submitting reponses to forms.
 
 \subsection{Uses}
 
-
-\subsection{Syntax}
-
-\subsubsection{Exported Constants}
-
-\subsubsection{Exported Access Programs}
-
-\begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
-\hline
-\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
-\hline
-\wss{accessProg} & - & - & - \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Semantics}
-
-\subsubsection{State Variables}
-
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
-
-\subsubsection{Environment Variables}
-
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
-
-\subsubsection{Assumptions}
-
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
-
-\subsubsection{Access Routine Semantics}
-
-\noindent \wss{accessProg}():
-\begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
-\end{itemize}
-
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
-
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
-
-\subsubsection{Local Functions}
-
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
-
-\newpage
-
-\section{MIS of M\ref{m5}: Event Management Module}
-
-\subsection{Module}
-
-Contains functionality for logging in and authenticating
-
-\subsection{Uses}
-
-
-\subsection{Syntax}
-
-\subsubsection{Exported Constants}
-
-\subsubsection{Exported Access Programs}
-
-\begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
-\hline
-\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
-\hline
-\wss{accessProg} & - & - & - \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection{Semantics}
-
-\subsubsection{State Variables}
-
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
-
-\subsubsection{Environment Variables}
-
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
-
-\subsubsection{Assumptions}
-
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
-
-\subsubsection{Access Routine Semantics}
-
-\noindent \wss{accessProg}():
-\begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
-\end{itemize}
-
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
-
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
-
-\subsubsection{Local Functions}
-
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
-
-\newpage
-
-\section{MIS of M\ref{m6}: Event Notification Module}
-
-\subsection{Module}
-
-Contains functionality for notifying users abouts upcoming events.
-
-\subsection{Uses}
+Uses M\ref{m4} to retreive fillable forms.
 
 \subsection{Syntax}
 
@@ -546,55 +579,244 @@ None
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.3\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{getFillableForms} & \texttt{userId : $\mathbb{N}$} & \texttt{fillableForms : set(Form)} & InvalidUser \\
 \hline
-\end{tabular}
+\texttt{respondToForm} & \texttt{userId : $\mathbb{N}$ \newline formId : $\mathbb{N}$ \newline formResponse : map(Question, string)} & \texttt{responseId : $\mathbb{N}$} & \texttt{InvalidUser} \newline \texttt{InvalidForm} \newline \texttt{IllegalArgument} \\
+\hline
+\texttt{getResponses} & \texttt{userId : $\mathbb{N}$ \newline formId : $\mathbb{N}$} & \texttt{responseIds : set($\mathbb{N}$)} & \texttt{InvalidUser} \newline \texttt{InvalidForm} \\
+\hline
+\texttt{editResponse} & \texttt{userId : $\mathbb{N}$ \newline responseId : $\mathbb{N}$ \newline formResponse : map(Question, string)} & None & \texttt{InvalidUser} \newline \texttt{InvalidForm} \newline \texttt{IllegalArgument} \newline \texttt{UnsupportedOperation} \\
+\hline
+\end{tabularx}
 \end{center}
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
 
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+\texttt{formResponses : map(form : Form, responseIds : list($\mathbb{N}$))}: A list of responses for each form 
+\\
+\texttt{userResponses : map(userId : $\mathbb{N}$, responseIds : list($\mathbb{N}$))}: A list of responses for each user 
 
 \subsubsection{Environment Variables}
 
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+None
 
 \subsubsection{Assumptions}
 
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+None
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{getFillableForms(userId : $\mathbb{N}$)}: \\
+Retreives all forms fillable by the user.
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+\item transition: None 
+\item output: The set of all forms available for the user to fill
+\item exception: InvalidUser if user does not exist 
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
+\noindent \texttt{respondToForm(userId : $\mathbb{N}$, formId: string, \newline formResponse: map(Question, string))}: \\
+Records a user's response to a form.
+\begin{itemize}
+\item transition: Inserts the created response ID into \texttt{userResponses} and \texttt{formResponses}
+\item output: None
+\item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist, IllegalArgument if the responses do not match the expected format given by the form (e.g. unidentified question)
+\end{itemize}
 
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{getResponses(userId : $\mathbb{N}$, formId: string)}: \\
+Retrieves all of a user's responses for a given forms.
+\begin{itemize}
+\item transition: None
+\item output: The set of all responses for the user in \texttt{userResponses} for a particular form in \texttt{formResponses}
+\item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist
+\end{itemize}
+
+\noindent \texttt{editResponse(userId : $\mathbb{N}$, formId: string, \newline formResponse: map(Question, string))}: \\
+Modifies a user's response to a form.
+\begin{itemize}
+\item transition: Edits the reponse for the given form (if it allows editing) in \texttt{userResponses} and \texttt{formResponses}
+\item output: None
+\item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist, IllegalArgument if the responses do not match the expected format given by the form, UnsupportedOperation if the form does not allow editing responses
+\end{itemize}
 
 \subsubsection{Local Functions}
 
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+None
+
+\newpage
+
+\section{MIS of M\ref{m6}: Event Management Module}
+
+\subsection{Module}
+
+Contains functionality for creating and managing events.
+
+\subsection{Uses}
+
+Uses M\ref{m3} to check permissions for managing events, and M\ref{m7} for sending event related notifications.
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.3\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{createEvent} & \texttt{eventDetails : EventData} & \texttt{eventId : $\mathbb{N}$} & \texttt{IllegalArgument} \\
+\hline
+\texttt{editEvent} & \texttt{eventId : $\mathbb{N}$ \newline eventDetails : $\mathbb{N}$} & None & \texttt{InvalidEvent} \newline \texttt{IllegalArgument} \\
+\hline
+\texttt{deleteEvent} & \texttt{eventId : $\mathbb{N}$} & None & \texttt{InvalidEvent} \\
+\hline
+\texttt{getAllEvents} & None & \texttt{eventIds: set($\mathbb{N}$)} & None \\
+\hline
+\texttt{getEventDetails} & \texttt{eventId : $\mathbb{N}$} & \texttt{eventData : EventData} & \texttt{InvalidEvent} \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\texttt{events : map($\mathbb{N}$, EventData)}: Mapping of all event IDs to their details
+
+\subsubsection{Environment Variables}
+
+\texttt{currentTime : DateTime}: Current date and time
+
+\subsubsection{Assumptions}
+
+The calculated current date and time is within 5 seconds of the actual date and time
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{createEvent(eventDetails : EventData)}: \\
+Creates a new event.
+\begin{itemize}
+\item transition: Inserts an event into \texttt{events}.
+\item output: ID of the created event 
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{editEvent(eventId : string, eventDetails : EventData)}:\\
+Edits an existing event.
+\begin{itemize}
+\item transition: Removes the event details in \texttt{events} with the new details for the event ID
+\item output: None
+\item exception: InvalidEvent if event does not exist
+\end{itemize}
+
+\noindent \texttt{deleteEvent(eventId : string)}:\\
+Deletes/cancels an event.
+\begin{itemize}
+\item transition: Removes the event from \texttt{events}
+\item output: None
+\item exception: InvalidEvent if event does not exist
+\end{itemize}
+
+\noindent \texttt{getAllEvents()}:\\
+Retrieves all events.
+\begin{itemize}
+\item transition: None
+\item output: A copy of all keys in \texttt{events}
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{getEventDetails(eventId : string)}:\\
+Retrieves the details of an event.
+\begin{itemize}
+\item transition: None
+\item output: The event details for the given event ID in \texttt{events}
+\item exception: InvalidEvent if event does not exist
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None
+
+\newpage
+
+\section{MIS of M\ref{m7}: Event Notification Module}
+
+\subsection{Module}
+
+Contains functionality for notifying users abouts upcoming events.
+
+\subsection{Uses}
+
+None
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+None
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.3\textwidth} p{0.3\textwidth} p{0.2\textwidth} p{0.2\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{sendNotification} & \texttt{userIds : list($\mathbb{N}$) \newline message : string} & None & InvalidUser \\
+\hline
+\texttt{scheduleNotification} & \texttt{userIds : list($\mathbb{N}$) \newline message : string \newline datetime: DateTime} & None & InvalidEvent \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+None
+
+\subsubsection{Environment Variables}
+
+None
+
+\subsubsection{Assumptions}
+
+None
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{sendNotification(userIds : list($\mathbb{N}$), message : string, \newline datetime: DateTime)}: \\
+Sends a notification to the list of users specified.
+\begin{itemize}
+\item transition: None
+\item output: None
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{scheduleNotification(userIds : list($\mathbb{N}$), message : string, \newline datetime : DateTime)}: \\
+Schedules a notification to send to the list of users specified.
+\begin{itemize}
+\item transition: None
+\item output: None
+\item exception: None
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\noindent \texttt{checkScheduleNotifications()}: \\
+Periodically checks and sends out scheduled notifications at their deadline.
+\begin{itemize}
+\item transition: None
+\item output: None
+\item exception: None
+\end{itemize}
 
 \newpage
 
@@ -802,7 +1024,7 @@ Contains functionality for logging in and authenticating
 
 \newpage
 
-\section{MIS of M\ref{m10}: Analytics Module}
+\section{MIS of M\ref{m11}: Analytics Module}
 
 \subsection{Module}
 
@@ -911,7 +1133,7 @@ None
 
 \newpage
 
-\section{MIS of M\ref{m11}: Database Access Module}
+\section{MIS of M\ref{m12}: Database Access Module}
 
 \subsection{Module}
 
@@ -1058,7 +1280,7 @@ None
 
 \newpage
 
-\section{MIS of M\ref{m12}: Audit Module}
+\section{MIS of M\ref{m13}: Audit Module}
 
 \subsection{Module}
 
