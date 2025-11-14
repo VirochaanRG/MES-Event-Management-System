@@ -16,6 +16,7 @@
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{comment}
 \usepackage[section]{placeins}
 \usepackage{caption}
 \usepackage{fullpage}
@@ -110,13 +111,15 @@ The following table summarizes the primitive data types used by \progname.
 character & char & a single symbol or digit \\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
 natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
-real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
-string & string & An ordered list of characters of any length\\
-Cookie & Cookie & A file stored on the client device storing user data\\
-List of type T & list(T) & A dynamically sized list of elements of type T\\
-Set of type T & set(T) & A dynamically sized set of elements of type T\\
-Map of type K to V & map(K, V) & A map containing key value pairs with keys of type K and values of type V\\
-Date and time & DateTime & Stores a specific date in time using the Gregorian calendar and 24 hour clock\\
+real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$) \\
+string & string & An ordered list of characters of any length \\
+Cookie & Cookie & A file stored on the client device storing user data \\
+List of type T & list(T) & A dynamically sized list of elements of type T \\
+Set of type T & set(T) & A dynamically sized set of elements of type T \\
+Map of type K to V & map(K, V) & A collection mapping keys of type K to values of type V \\
+Tuple of types T1, T2, \dots & tuple(T1, T2, \dots) & A finite ordered collection of elements of the specified types \\
+Date and time & DateTime & A specific date and time using the Gregorian calendar and 24-hour clock \\
+
 \bottomrule
 \end{tabular}
 \end{center}
@@ -820,81 +823,133 @@ Periodically checks and sends out scheduled notifications at their deadline.
 
 \newpage
 
-\section{MIS of M\ref{m7}: Registration Module}
+\section{MIS of M\ref{m8}: Registration Module}
 
 \subsection{Module}
 
-Contains functionality for logging in and authenticating
+Contains functionality for registering users for events.
 
 \subsection{Uses}
-
+\begin{itemize}
+  \item Event Management Module (M\ref{m7})
+\end{itemize}
 
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
 
 \subsubsection{Exported Access Programs}
-
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{10em} X X X}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{registerUser} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$ \\ userId : $\mathbb{N}$}} &
+\texttt{confirmation : string} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent}} \\
+
+\texttt{delistUser} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$ \\ userId : $\mathbb{N}$}} &
+\texttt{removed : bool} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent}} \\
+
+\texttt{getRegistrationCode} &
+\texttt{confirmation : string} &
+\texttt{code : QRCode} &
+\texttt{InvalidConfirmation} \\
+
+\texttt{getRegistrationCode} &
+\parbox[t]{\hsize}{\texttt{userId : $\mathbb{N}$ \\ eventId : $\mathbb{N}$}} &
+\texttt{code : QRCode} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent \\ InvalidRegistration}} \\
+\texttt{getConfirmationInfo} &
+\texttt{confirmation : string} &
+\parbox[t]{\hsize}{\texttt{userId : $\mathbb{N}$ \\ eventId : $\mathbb{N}$}} &
+\texttt{InvalidConfirmation} \\
 \hline
-\end{tabular}
+\end{tabularx}
 \end{center}
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
+\begin{itemize}
+  \item \texttt{eventAttendees : map(eventId : $\mathbb{N}$, users :
+    set($\mathbb{N}$))}: A set of users who have registered for each event.
+  \item \texttt{confirmations : map(confirmation : string, registration : tuple(userId : $\mathbb{N}$, eventId :
+    $\mathbb{N}$))}: A mapping of all confirmation strings into \texttt{(userId, eventId)} tuples.
+\end{itemize}
 
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+
 
 \subsubsection{Environment Variables}
-
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+None.
 
 \subsubsection{Assumptions}
-
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+There is no payment handling done by this module. Any events requiring payments will have that processed separately
+before a user can register.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{registerUser(eventId, userId)}:
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+  \item transition: Update the \texttt{eventAttendees} sets with the new registered user. Update the
+    \texttt{confirmations} with the generated confirmation code.
+\item output: Provide the generated registration code.
+\item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns \texttt{InvalidEvent} if the given \texttt{eventId} does not exist.
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
+\noindent \texttt{delistUser(eventId, userId)}:
+\begin{itemize}
+  \item transition: Update the \texttt{eventAttendees} sets with removal of the specified user. Update the
+    \texttt{confirmations} with the removed confirmation code.
+  \item output: Boolean confirming that there was a change in the \texttt{eventAttendees} after the user was removed
+    from the registration of the specified event. If the user was not registered to begin with, there is no harm to the
+    system, but \texttt{false} is returned.
+\item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns \texttt{InvalidEvent}
+  if the given \texttt{eventId} does not exist.
+\end{itemize}
 
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{getRegistrationCode(confirmation)} (1):
+\begin{itemize}
+  \item transition: None.
+  \item output: A generated QRCode based on the given confirmation code.
+\item exception: Returns \texttt{InvalidConformation} if a non-existent confirmation is provided.
+\end{itemize}
+
+\noindent \texttt{getRegistrationCode(userId, eventId)} (2):
+\begin{itemize}
+  \item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns
+    \texttt{InvalidEvent} if the given \texttt{eventId} does not exist; returns \texttt{InvalidRegistration} if the
+    given user did not register for the event.
+\end{itemize}
+
+\noindent \texttt{getConfirmationInfo(confirmation)}:
+\begin{itemize}
+  \item transition: None.
+  \item output: A \texttt{(userId, eventId)} tuple to specify a registration instance.
+\item exception: Returns \texttt{InvalidConformation} if a non-existent confirmation is provided.
+\end{itemize}
 
 \subsubsection{Local Functions}
-
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+Internal functions may handle confirmation string and QR Code generation. The only specification is that the same
+confirmation string is generated for a given \texttt{(userId, eventId)} tuple, and the same QR Code is generated for a
+single registration instance (i.e. from a given confirmation string).
 
 \newpage
 
-\section{MIS of M\ref{m8}: Attendance Tracking Module}
+\section{MIS of M\ref{m9}: Attendance Tracking Module}
 
 \subsection{Module}
-
-Contains functionality for logging in and authenticating
+Contains functionality for tracking live event attendance.
 
 \subsection{Uses}
+
+\begin{itemize}
+  \item Event Management Module (M\ref{m7})
+  \item Registration Module (M\ref{m8})
+\end{itemize}
 
 
 \subsection{Syntax}
@@ -904,123 +959,141 @@ Contains functionality for logging in and authenticating
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{10em} X X X}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{markAttendance} &
+\parbox[t]{\hsize}{\texttt{code : QRCode}} &
+\texttt{confirm : bool} &
+\parbox[t]{\hsize}{\texttt{InvalidQRCode}} \\
+
+\texttt{markAttendance} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$ \\ userId : $\mathbb{N}$}} &
+\texttt{confirm : bool} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent}} \\
+
+\texttt{getAttendance} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$}} &
+\texttt{attendance : set($\mathbb{N}$)} &
+\parbox[t]{\hsize}{\texttt{InvalidEvent}} \\
 \hline
-\end{tabular}
+\end{tabularx}
 \end{center}
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
-
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+\begin{itemize}
+  \item \texttt{attendance : map(eventId : $\mathbb{N}$, users :
+    set($\mathbb{N}$))}: A set of users who have attended each event.
+\end{itemize}
 
 \subsubsection{Environment Variables}
-
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+None.
 
 \subsubsection{Assumptions}
-
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+Attendance only counts the first time a user enters the event. During the event, once a user is registered, physical
+admins can monitor re-entry of attendees.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{getRegistrationCode(code)} (1):
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+  \item transition: Update the \texttt{attendance} set for the event with the attending user if the user can attend the
+    event.
+  \item output: Boolean confirming the user has been tracked if they are allowed to attend the event.
+\item exception: Returns \texttt{InvalidQRCode} if the QR Code provided does not work, potentially implying the user
+  cannot register the even.
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
-
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{getRegistrationCode(userId, eventId)} (2):
+\begin{itemize}
+  \item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns
+    \texttt{InvalidEvent} if the given \texttt{eventId} does not exist.
+\end{itemize}
 
 \subsubsection{Local Functions}
-
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+Internal functions may handle validating QR codes for a given event registration. There must be a way for the module to
+derive the corresponding registration information from the code.
 
 \newpage
 
-\section{MIS of M\ref{m9}: Report Generation Module}
+\section{MIS of M\ref{m10}: Report Generation Module}
 
 \subsection{Module}
-
-Contains functionality for logging in and authenticating
+Contains functionality for generating data visualizations and exporting data to specified formats.
 
 \subsection{Uses}
+
+\begin{itemize}
+  \item Main System Module (M\ref{m1})
+  \item Form Submission Module (M\ref{m5})
+\end{itemize}
 
 
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
 
+\begin{itemize}
+  \item \texttt{Graphs : set(GraphType)}: The set of all valid graphs which can be rendered.
+  \item \texttt{Formats : set(FileType)}: The set of all valid file formats which can be generated.
+\end{itemize}
+
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{5.5em} X X X}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{plotData} &
+\parbox[t]{\hsize}{\texttt{data : list($\mathbb{R}$) \\ graph : GraphType}} &
+\texttt{plot : Graph} &
+\parbox[t]{\hsize}{\texttt{InvalidData \\ InvalidGraphType \\ IncompatibleData}} \\
+
+\texttt{exportData} &
+\parbox[t]{\hsize}{\texttt{data : list($\mathbb{R}$) \\ format : FileType}} &
+\texttt{file : File} &
+\parbox[t]{\hsize}{\texttt{InvalidData \\ InvalidFileType}} \\
 \hline
-\end{tabular}
+\end{tabularx}
 \end{center}
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
-
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+None.
 
 \subsubsection{Environment Variables}
-
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+None.
 
 \subsubsection{Assumptions}
-
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+When $\mathbb{R}$ is specified for data input, it means that the data can be mapped in one way or another onto
+$\mathbb{R}$.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{plotData(data, graph)}:
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+  \item transition: None.
+  \item output: Plot of the data in the specified graph type.
+  \item exception: Returns \texttt{InvalidData} if the data is corrupt; returns \texttt{InvalidGraphType} if the given
+    \texttt{GraphType} does not exist; returns \texttt{IncompatibleData} if the given data cannot be represented with
+    the given graph type.
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
-
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{exportData(data, format)}:
+\begin{itemize}
+  \item transition: None.
+  \item output: File of the data in the specified file format.
+  \item exception: Returns \texttt{InvalidData} if the data is corrupt; returns \texttt{InvalidFileType} if the given
+    \texttt{FileType} does not exist.
+\end{itemize}
 
 \subsubsection{Local Functions}
-
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+None.
 
 \newpage
 
