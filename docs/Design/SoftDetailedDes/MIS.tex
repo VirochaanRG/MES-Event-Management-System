@@ -16,6 +16,7 @@
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{comment}
 \usepackage[section]{placeins}
 \usepackage{caption}
 \usepackage{fullpage}
@@ -614,61 +615,95 @@ Contains functionality for registering users for events.
 \subsubsection{Exported Constants}
 
 \subsubsection{Exported Access Programs}
-
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{10em} X X X}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{registerUser} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$ \\ userId : $\mathbb{N}$}} &
+\texttt{confirmation : string} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent}} \\
+
+\texttt{delistUser} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$ \\ userId : $\mathbb{N}$}} &
+\texttt{removed : bool} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent}} \\
+
+\texttt{getRegistrationCode} &
+\texttt{confirmation : string} &
+\texttt{code : QRCode} &
+\texttt{InvalidConfirmation} \\
+
+\texttt{getRegistrationCode} &
+\parbox[t]{\hsize}{\texttt{userId : $\mathbb{N}$ \\ eventId : $\mathbb{N}$}} &
+\texttt{code : QRCode} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent \\ InvalidRegistration}} \\
 \hline
-\end{tabular}
+\end{tabularx}
 \end{center}
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
+\begin{itemize}
+  \item \texttt{eventAttendees : map(eventId : $\mathbb{N}$, users :
+    set($\mathbb{N}$))}: A set of users who have registered for each event.
+  \item \texttt{confirmations : set(string)}: A set of all currently valid confirmation codes.
+\end{itemize}
 
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+
 
 \subsubsection{Environment Variables}
-
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+None.
 
 \subsubsection{Assumptions}
-
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+There is no payment handling done by this module. Any events requiring payments will have that processed separately
+before a user can register.
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent \texttt{registerUser(eventId, userId)}:
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+  \item transition: Update the \texttt{eventAttendees} sets with the new registered user. Update the
+    \texttt{confirmations} with the generated confirmation code.
+\item output: Provide the generated registration code.
+\item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns \texttt{InvalidEvent} if the given \texttt{eventId} does not exist.
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
+\noindent \texttt{delistUser(eventId, userId)}:
+\begin{itemize}
+  \item transition: Update the \texttt{eventAttendees} sets with removal of the specified user. Update the
+    \texttt{confirmations} with the removed confirmation code.
+  \item output: Boolean confirming that there was a change in the \texttt{eventAttendees} after the user was removed
+    from the registration of the specified event. If the user was not registered to begin with, there is no harm to the
+    system, but \texttt{false} is returned.
+\item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns \texttt{InvalidEvent}
+  if the given \texttt{eventId} does not exist.
+\end{itemize}
 
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent \texttt{getRegistrationCode(confirmation)} (1):
+\begin{itemize}
+  \item transition: None.
+  \item output: A generated QRCode based on the given confirmation code.
+\item exception: Returns \texttt{InvalidConformation} if a non-existent confirmation is provided.
+\end{itemize}
+
+\noindent \texttt{getRegistrationCode(userId, eventId)} (2):
+\begin{itemize}
+  \item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns
+    \texttt{InvalidEvent} if the given \texttt{eventId} does not exist; returns \texttt{InvalidRegistration} if the
+    given user did not register for the event.
+\end{itemize}
 
 \subsubsection{Local Functions}
-
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+Internal functions may handle confirmation string and QR Code generation. The only specification is that the same
+confirmation string is generated for a given \texttt{(userId, eventId)} touple, and the same QR Code is generated for a
+single registration instance (i.e. from a given confirmation string).
 
 \newpage
 
-\section{MIS of M\ref{m8}: Attendance Tracking Module}
+\section{MIS of M\ref{m9}: Attendance Tracking Module}
 
 \subsection{Module}
 
