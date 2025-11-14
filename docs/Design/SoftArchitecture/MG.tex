@@ -267,14 +267,8 @@ Hardware-Hiding Module
 
 The design of the system is intended to satisfy the requirements developed in
 the SRS. In this stage, the system is decomposed into modules. The connection
-between requirements and modules is listed in Table~\ref{TblRT}.
+between requirements and modules is listed in Tables~\ref{TblRT} to~\ref{TblRT_Compliance}.
 
-\wss{The intention of this section is to document decisions that are made
-  ``between'' the requirements and the design.  To satisfy some requirements,
-  design decisions need to be made.  Rather than make these decisions implicit,
-  they are explicitly recorded here.  For instance, if a program has security
-  requirements, a specific design decision may be made to satisfy those
-  requirements with a password.}
 
 \section{Module Decomposition} \label{SecMD}
 
@@ -593,18 +587,13 @@ ST-1 & \mref{m1} \\
 \toprule
 \textbf{AC} & \textbf{Modules}\\
 \midrule
-\acref{acHardware} & \mref{mHH}\\
-\acref{acInput} & \mref{mInput}\\
-\acref{acParams} & \mref{mParams}\\
-\acref{acVerify} & \mref{mVerify}\\
-\acref{acOutput} & \mref{mOutput}\\
-\acref{acVerifyOut} & \mref{mVerifyOut}\\
-\acref{acODEs} & \mref{mODEs}\\
-\acref{acEnergy} & \mref{mEnergy}\\
-\acref{acControl} & \mref{mControl}\\
-\acref{acSeqDS} & \mref{mSeqDS}\\
-\acref{acSolver} & \mref{mSolver}\\
-\acref{acPlot} & \mref{mPlot}\\
+\acref{acUI} & \mref{m1}, \mref{m4}, \mref{m6}, \mref{m10}\\
+\acref{acForms} & \mref{m4}, \mref{m5}\\
+\acref{acAuth} & \mref{m2}, \mref{m3}\\
+\acref{acData} & \mref{m1}, \mref{m6}, \mref{m8}, \mref{m12}\\
+\acref{acNotifications} & \mref{m7}, \mref{m10}\\
+\acref{acSecurity} & \mref{m2}, \mref{m12}, \mref{m13}\\
+\acref{acIntegration} & \mref{m1}, \mref{m7}, \mref{m10}, \mref{m12}\\
 \bottomrule
 \end{tabular}
 \caption{Trace Between Anticipated Changes and Modules}
