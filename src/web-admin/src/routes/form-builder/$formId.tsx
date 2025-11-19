@@ -2,7 +2,7 @@ import { LinearScaleQuestion } from "@/components/LinearScaleQuestion";
 import MultipleChoiceQuestion from "@/components/MultipleChoiceQuestion";
 import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
 import { Form, FormQuestion } from "@/interfaces/interfaces";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 
 export const Route = createFileRoute("/form-builder/$formId")({
@@ -10,6 +10,7 @@ export const Route = createFileRoute("/form-builder/$formId")({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const { formId } = Route.useParams();
   const [formData, setFormData] = useState<Form | null>(null);
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
@@ -169,6 +170,10 @@ function RouteComponent() {
     }
   };
 
+  const handleBackToForms = () => {
+    navigate({ to: "/form-builder" });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -188,6 +193,27 @@ function RouteComponent() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={handleBackToForms}
+          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Back to Forms
+        </button>
+
         <div className="flex items-start justify-between mb-8">
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -206,7 +232,7 @@ function RouteComponent() {
             </button>
 
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border-2 border-gray-300 py-1 z-10">
                 <button
                   onClick={() => openModal("multiple_choice")}
                   className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 font-medium"
@@ -230,7 +256,7 @@ function RouteComponent() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             Components
           </h2>
@@ -270,8 +296,8 @@ function RouteComponent() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-gray-300">
+            <div className="p-6 border-b-2 border-gray-300">
               <h3 className="text-xl font-semibold text-gray-900">
                 Add {selectedQuestionType.replace("_", " ")} Question
               </h3>
@@ -287,7 +313,7 @@ function RouteComponent() {
                   type="text"
                   value={questionTitle}
                   onChange={(e) => setQuestionTitle(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter your question"
                 />
               </div>
@@ -307,7 +333,7 @@ function RouteComponent() {
                           onChange={(e) =>
                             updateMcChoice(index, e.target.value)
                           }
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           placeholder={`Choice ${index + 1}`}
                         />
                         {mcChoices.length > 2 && (
@@ -342,7 +368,7 @@ function RouteComponent() {
                         type="number"
                         value={scaleMin}
                         onChange={(e) => setScaleMin(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
                     <div>
@@ -353,7 +379,7 @@ function RouteComponent() {
                         type="number"
                         value={scaleMax}
                         onChange={(e) => setScaleMax(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -366,7 +392,7 @@ function RouteComponent() {
                         type="text"
                         value={scaleMinLabel}
                         onChange={(e) => setScaleMinLabel(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g., Not at all"
                       />
                     </div>
@@ -378,7 +404,7 @@ function RouteComponent() {
                         type="text"
                         value={scaleMaxLabel}
                         onChange={(e) => setScaleMaxLabel(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="e.g., Extremely"
                       />
                     </div>
@@ -387,10 +413,10 @@ function RouteComponent() {
               )}
             </div>
 
-            <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+            <div className="p-6 border-t-2 border-gray-300 flex justify-end gap-3">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium border-2 border-gray-300"
               >
                 Cancel
               </button>
