@@ -37,7 +37,7 @@ After having pnpm installed run `pnpm install` to download all the node modules.
 
 ### Database Setup
 
-In the root folder run `pnpm dbsetup`. This should create the database and and push the current schemas into the database as tables. You should see some output saying database created or db already exists and then something saying schema pushed.
+In the root folder run `pnpm dbsetup`. This should create the database and and push the current schemas into the database as tables. You should see some output saying database created or db already exists and then something saying schema pushed. Then run `pnpm migrate` just to make sure the schemas have been pushed in.
 
 #### Database already exists
 
