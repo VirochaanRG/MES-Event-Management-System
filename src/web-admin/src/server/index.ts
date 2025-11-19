@@ -4,7 +4,7 @@ import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
 import { events } from '../../../db/src/schemas/events';
-import { form } from './../../../db/src/schemas/form';
+import { form, formQuestions } from './../../../db/src/schemas/form';
 import { eq } from 'drizzle-orm';
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
@@ -17,6 +17,113 @@ await fastify.register(cors, {
 });
 
 await fastify.register(cookie);
+
+// CREATE a form question
+fastify.post<{
+  Params: { id: string };
+  Body: { questionType: string; questionTitle?: string; optionsCategory?: string; qorder: number };
+}>('/api/forms/:id/questions', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { questionType, questionTitle, optionsCategory, qorder } = request.body;
+
+    // Validate required fields
+    if (!questionType || questionType.trim() === '')
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'Question type is required',
+      });
+    }
+
+    if (qorder === undefined || qorder === null)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'Question order (qorder) is required',
+      });
+    }
+
+    // Check if form exists
+    const existingForm = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(id)),
+    });
+
+    if (!existingForm)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Form not found',
+      });
+    }
+
+    // Create the question
+    const newQuestion = await db
+      .insert(formQuestions)
+      .values({
+        formId: parseInt(id),
+        questionType: questionType.trim(),
+        questionTitle: questionTitle?.trim() || null,
+        optionsCategory: optionsCategory?.trim() || null,
+        qorder: qorder,
+      })
+      .returning();
+
+    return reply.code(201).send({
+      success: true,
+      data: newQuestion[0],
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to create form question');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to create form question',
+    });
+  }
+});
+
+// GET all questions for a form
+fastify.get<{ Params: { id: string } }>('/api/forms/:id/questions', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+
+    // Check if form exists
+    const existingForm = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(id)),
+    });
+
+    if (!existingForm)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Form not found',
+      });
+    }
+
+    // Fetch all questions for this form, ordered by qorder
+    const questions = await db.query.formQuestions.findMany({
+      where: eq(formQuestions.formId, parseInt(id)),
+      orderBy: (formQuestions, { asc }) => [asc(formQuestions.qorder)],
+    });
+
+    return reply.send({
+      success: true,
+      data: questions,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch questions');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch questions',
+    });
+  }
+});
 
 // Simple health check
 fastify.get('/api/health', async (request, reply) =>
