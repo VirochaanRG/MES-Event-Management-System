@@ -4,7 +4,8 @@ import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
 import { events } from '../../../db/src/schemas/events';
-
+import { form } from './../../../db/src/schemas/form';
+import { eq } from 'drizzle-orm';
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -40,6 +41,197 @@ fastify.get('/api/events', async (request, reply) =>
     return reply.code(500).send({
       success: false,
       error: 'Failed to fetch events',
+    });
+  }
+});
+
+// GET all forms
+fastify.get('/api/forms', async (request, reply) =>
+{
+  try
+  {
+    const forms = await db.query.form.findMany();
+    return reply.send({
+      success: true,
+      data: forms,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch forms');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch forms',
+    });
+  }
+});
+
+// GET single form by ID
+fastify.get<{ Params: { id: string } }>('/api/forms/:id', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const formData = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(id)),
+    });
+
+    if (!formData)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Form not found',
+      });
+    }
+
+    return reply.send({
+      success: true,
+      data: formData,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch form');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch form',
+    });
+  }
+});
+
+// CREATE a new form
+fastify.post<{
+  Body: { name: string; description?: string };
+}>('/api/forms', async (request, reply) =>
+{
+  try
+  {
+    const { name, description } = request.body;
+
+    // Validate required fields
+    if (!name || name.trim() === '')
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'Form name is required',
+      });
+    }
+
+    const newForm = await db
+      .insert(form)
+      .values({
+        name: name.trim(),
+        description: description?.trim() || null,
+      })
+      .returning();
+
+    return reply.code(201).send({
+      success: true,
+      data: newForm[0],
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to create form');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to create form',
+    });
+  }
+});
+
+// UPDATE a form
+fastify.put<{
+  Params: { id: string };
+  Body: { name?: string; description?: string };
+}>('/api/forms/:id', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { name, description } = request.body;
+
+    // Check if form exists
+    const existingForm = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(id)),
+    });
+
+    if (!existingForm)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Form not found',
+      });
+    }
+
+    // Build update object with only provided fields
+    const updateData: Record<string, any> = {};
+    if (name !== undefined)
+    {
+      updateData.name = name.trim();
+    }
+    if (description !== undefined)
+    {
+      updateData.description = description.trim() || null;
+    }
+
+    // If no fields to update, return error
+    if (Object.keys(updateData).length === 0)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'No fields to update',
+      });
+    }
+
+    const updatedForm = await db
+      .update(form)
+      .set(updateData)
+      .where(eq(form.id, parseInt(id)))
+      .returning();
+
+    return reply.send({
+      success: true,
+      data: updatedForm[0],
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to update form');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to update form',
+    });
+  }
+});
+
+// DELETE a form
+fastify.delete<{ Params: { id: string } }>('/api/forms/:id', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+
+    const existingForm = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(id)),
+    });
+
+    if (!existingForm)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Form not found',
+      });
+    }
+
+    await db.delete(form).where(eq(form.id, parseInt(id)));
+
+    return reply.send({
+      success: true,
+      message: 'Form deleted successfully',
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to delete form');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to delete form',
     });
   }
 });
