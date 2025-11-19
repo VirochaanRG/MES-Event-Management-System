@@ -10,6 +10,7 @@ export const events = pgTable("events", {
   capacity: integer("capacity").default(0),
   isPublic: boolean("is_public").default(true),
   status: varchar("status", { length: 50 }).default("scheduled"),
+  cost: integer("cost").default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

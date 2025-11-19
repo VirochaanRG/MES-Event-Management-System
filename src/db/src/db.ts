@@ -2,7 +2,8 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';
 import { events } from './schemas/events';
-
+import { form } from './schemas/form';
+import * as schemas from './schemas';
 // Load environment variables from .env
 dotenv.config();
 
@@ -21,8 +22,8 @@ pool.connect()
     console.error('❌ Failed to connect to PostgreSQL:');
     console.error(err);
   });
-// Define schema object for drizzle
-const schema = { events };
+
+
 
 // Initialize drizzle ORM
-export const db = drizzle(pool, { schema });
+export const db = drizzle(pool, { schema: schemas });
