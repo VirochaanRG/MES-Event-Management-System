@@ -4,6 +4,7 @@ import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
 import { events } from '../../../db/src/schemas/events';
+import { eq } from 'drizzle-orm';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -144,6 +145,39 @@ fastify.get('/api/events', async (request, reply) =>
     return reply.code(500).send({
       success: false,
       error: 'Failed to fetch events',
+    });
+  }
+});
+
+// GET single event by ID
+fastify.get<{ Params: { id: string } }>('/api/events/:id', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, parseInt(id)),
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    return reply.send({
+      success: true,
+      data: event,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch event');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch event',
     });
   }
 });

@@ -18,3 +18,18 @@ export const formQuestions = pgTable("form_questions", {
   qorder: integer("qorder").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
 });
+
+export const formAnswers = pgTable("form_answers", {
+  id: serial("id").primaryKey().notNull(),
+  userId: integer("user_id")
+    .notNull(),
+  formId: integer("form_id")
+    .notNull()
+    .references(() => form.id, { onDelete: "cascade" }),
+  questionType: varchar("question_type", { length: 100 }).notNull(),
+  questionId: integer("form_id")
+    .notNull()
+    .references(() => form.id, { onDelete: "cascade" }),
+  answer: text("answer"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
+});

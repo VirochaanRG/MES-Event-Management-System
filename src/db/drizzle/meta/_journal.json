@@ -29,6 +29,20 @@
       "when": 1763582433496,
       "tag": "0003_thick_donald_blake",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1763829338511,
+      "tag": "0004_special_solo",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1763829641891,
+      "tag": "0005_sleepy_silvermane",
+      "breakpoints": true
     }
   ]
 }

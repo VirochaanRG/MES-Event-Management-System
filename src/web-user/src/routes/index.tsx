@@ -34,7 +34,7 @@ function HomePage() {
   };
 
   const getVisibleImages = () => {
-    const visible = [];
+    const visible: { id: number; title: string }[] = [];
     for (let i = 0; i < 3; i++) {
       visible.push(carouselImages[(carouselIndex + i) % carouselImages.length]);
     }

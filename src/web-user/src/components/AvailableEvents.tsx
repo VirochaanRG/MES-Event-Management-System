@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 
 interface Event {
   id: number;
@@ -15,6 +16,8 @@ interface Event {
 }
 
 export default function AvailableEvents() {
+  const navigate = useNavigate();
+
   const {
     data: eventsData,
     isLoading,
@@ -39,6 +42,10 @@ export default function AvailableEvents() {
     });
   };
 
+  const handleEventClick = (eventId: number) => {
+    navigate({ to: `/events/${eventId}` });
+  };
+
   if (isLoading) {
     return <p className="text-center text-gray-600 py-8">Loading events...</p>;
   }
@@ -60,6 +67,7 @@ export default function AvailableEvents() {
       {(eventsData as Event[]).map((event) => (
         <div
           key={event.id}
+          onClick={() => handleEventClick(event.id)}
           className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 cursor-pointer hover:border-yellow-500"
         >
           {/* Event Image */}

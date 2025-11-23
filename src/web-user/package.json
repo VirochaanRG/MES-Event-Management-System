@@ -23,6 +23,7 @@
     "bcryptjs": "^3.0.2",
     "cookie": "^1.0.2",
     "date-fns": "^4.1.0",
+    "drizzle-orm": "^0.44.7",
     "fastify": "^5.2.0",
     "jsonwebtoken": "^9.0.2",
     "react": "^19.1.1",
