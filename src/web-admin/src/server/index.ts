@@ -3,9 +3,9 @@ import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
-import { events } from '../../../db/src/schemas/events';
+import { events, registeredUsers } from '../../../db/src/schemas/events';
 import { form, formQuestions } from './../../../db/src/schemas/form';
-import { eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
@@ -124,6 +124,319 @@ fastify.get<{ Params: { id: string } }>('/api/forms/:id/questions', async (reque
     });
   }
 });
+
+// DELETE a form question
+fastify.delete<{ Params: { formId: string; questionId: string } }>(
+  '/api/forms/:formId/questions/:questionId',
+  async (request, reply) =>
+  {
+    try
+    {
+      const { formId, questionId } = request.params;
+
+      // Check if form exists
+      const existingForm = await db.query.form.findFirst({
+        where: eq(form.id, parseInt(formId)),
+      });
+
+      if (!existingForm)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      // Check if question exists
+      const existingQuestion = await db.query.formQuestions.findFirst({
+        where: and(
+          eq(formQuestions.id, parseInt(questionId)),
+          eq(formQuestions.formId, parseInt(formId))
+        ),
+      });
+
+      if (!existingQuestion)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Question not found',
+        });
+      }
+
+      // Delete the question
+      await db
+        .delete(formQuestions)
+        .where(eq(formQuestions.id, parseInt(questionId)));
+
+      return reply.send({
+        success: true,
+        message: 'Question deleted successfully',
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to delete question');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to delete question',
+      });
+    }
+  }
+);
+
+// PUT/PATCH - Update a form question
+fastify.put<{
+  Params: { formId: string; questionId: string };
+  Body: {
+    questionType?: string;
+    questionTitle?: string;
+    optionsCategory?: string;
+    qorder?: number;
+  };
+}>('/api/forms/:formId/questions/:questionId', async (request, reply) =>
+{
+  try
+  {
+    const { formId, questionId } = request.params;
+    const { questionType, questionTitle, optionsCategory, qorder } = request.body;
+
+    // Check if form exists
+    const existingForm = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(formId)),
+    });
+
+    if (!existingForm)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Form not found',
+      });
+    }
+
+    // Check if question exists
+    const existingQuestion = await db.query.formQuestions.findFirst({
+      where: and(
+        eq(formQuestions.id, parseInt(questionId)),
+        eq(formQuestions.formId, parseInt(formId))
+      ),
+    });
+
+    if (!existingQuestion)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Question not found',
+      });
+    }
+
+    // Build update object with only provided fields
+    const updateData: Record<string, any> = {};
+
+    if (questionType !== undefined)
+    {
+      updateData.questionType = questionType.trim();
+    }
+    if (questionTitle !== undefined)
+    {
+      updateData.questionTitle = questionTitle.trim() || null;
+    }
+    if (optionsCategory !== undefined)
+    {
+      updateData.optionsCategory = optionsCategory.trim() || null;
+    }
+    if (qorder !== undefined)
+    {
+      updateData.qorder = qorder;
+    }
+
+    // If no fields to update, return error
+    if (Object.keys(updateData).length === 0)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'No fields to update',
+      });
+    }
+
+    // Update the question
+    const updatedQuestion = await db
+      .update(formQuestions)
+      .set(updateData)
+      .where(eq(formQuestions.id, parseInt(questionId)))
+      .returning();
+
+    return reply.send({
+      success: true,
+      data: updatedQuestion[0],
+      message: 'Question updated successfully',
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to update question');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to update question',
+    });
+  }
+});
+
+// PATCH - Move question up (decrease order)
+fastify.patch<{ Params: { formId: string; questionId: string } }>(
+  '/api/forms/:formId/questions/:questionId/move-up',
+  async (request, reply) =>
+  {
+    try
+    {
+      const { formId, questionId } = request.params;
+
+      // Get the current question
+      const currentQuestion = await db.query.formQuestions.findFirst({
+        where: and(
+          eq(formQuestions.id, parseInt(questionId)),
+          eq(formQuestions.formId, parseInt(formId))
+        ),
+      });
+
+      if (!currentQuestion)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Question not found',
+        });
+      }
+
+      // Can't move up if already first
+      if (currentQuestion.qorder === 1)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Question is already at the top',
+        });
+      }
+
+      // Find the question above (with qorder = current - 1)
+      const previousQuestion = await db.query.formQuestions.findFirst({
+        where: and(
+          eq(formQuestions.formId, parseInt(formId)),
+          eq(formQuestions.qorder, currentQuestion.qorder - 1)
+        ),
+      });
+
+      if (!previousQuestion)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Previous question not found',
+        });
+      }
+
+      // Swap the orders
+      await db
+        .update(formQuestions)
+        .set({ qorder: currentQuestion.qorder })
+        .where(eq(formQuestions.id, previousQuestion.id));
+
+      await db
+        .update(formQuestions)
+        .set({ qorder: previousQuestion.qorder })
+        .where(eq(formQuestions.id, currentQuestion.id));
+
+      return reply.send({
+        success: true,
+        message: 'Question moved up successfully',
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to move question up');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to move question up',
+      });
+    }
+  }
+);
+
+// PATCH - Move question down (increase order)
+fastify.patch<{ Params: { formId: string; questionId: string } }>(
+  '/api/forms/:formId/questions/:questionId/move-down',
+  async (request, reply) =>
+  {
+    try
+    {
+      const { formId, questionId } = request.params;
+
+      // Get the current question
+      const currentQuestion = await db.query.formQuestions.findFirst({
+        where: and(
+          eq(formQuestions.id, parseInt(questionId)),
+          eq(formQuestions.formId, parseInt(formId))
+        ),
+      });
+
+      if (!currentQuestion)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Question not found',
+        });
+      }
+
+      // Get total number of questions to check if it's the last one
+      const allQuestions = await db.query.formQuestions.findMany({
+        where: eq(formQuestions.formId, parseInt(formId)),
+      });
+
+      const maxOrder = Math.max(...allQuestions.map(q => q.qorder));
+
+      // Can't move down if already last
+      if (currentQuestion.qorder === maxOrder)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Question is already at the bottom',
+        });
+      }
+
+      // Find the question below (with qorder = current + 1)
+      const nextQuestion = await db.query.formQuestions.findFirst({
+        where: and(
+          eq(formQuestions.formId, parseInt(formId)),
+          eq(formQuestions.qorder, currentQuestion.qorder + 1)
+        ),
+      });
+
+      if (!nextQuestion)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Next question not found',
+        });
+      }
+
+      // Swap the orders
+      await db
+        .update(formQuestions)
+        .set({ qorder: currentQuestion.qorder })
+        .where(eq(formQuestions.id, nextQuestion.id));
+
+      await db
+        .update(formQuestions)
+        .set({ qorder: nextQuestion.qorder })
+        .where(eq(formQuestions.id, currentQuestion.id));
+
+      return reply.send({
+        success: true,
+        message: 'Question moved down successfully',
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to move question down');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to move question down',
+      });
+    }
+  }
+);
 
 // Simple health check
 fastify.get('/api/health', async (request, reply) =>
@@ -398,6 +711,142 @@ fastify.post('/api/event/create', async (request, reply) =>
     return reply.status(500).send({
       error: 'Failed to create event',
       message: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// POST - Register a user for an event
+fastify.post<{
+  Params: { id: string };
+  Body: { userEmail: string };
+}>('/api/events/:id/register', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { userEmail } = request.body;
+
+    // Validate required fields
+    if (!userEmail || !userEmail.trim())
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'userEmail is required',
+      });
+    }
+
+    // Check if event exists
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, parseInt(id)),
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    // Check if user is already registered
+    const existingRegistration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.eventId, parseInt(id)),
+        eq(registeredUsers.userEmail, userEmail.toLowerCase().trim())
+      ),
+    });
+
+    if (existingRegistration)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'User is already registered for this event',
+      });
+    }
+
+    // Check capacity if set
+    const capacity = event.capacity ?? 0;
+    if (capacity > 0)
+    {
+      const registrationCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(registeredUsers)
+        .where(eq(registeredUsers.eventId, parseInt(id)));
+
+      const currentCount = registrationCount[0]?.count ?? 0;
+      if (currentCount >= capacity)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Event is at full capacity',
+        });
+      }
+    }
+
+    // Register the user
+    const eventCost = event.cost ?? 0;
+    const registration = await db
+      .insert(registeredUsers)
+      .values({
+        eventId: parseInt(id),
+        userEmail: userEmail.toLowerCase().trim(),
+        status: 'confirmed',
+        paymentStatus: eventCost > 0 ? 'pending' : 'paid',
+      })
+      .returning();
+
+    return reply.code(201).send({
+      success: true,
+      data: registration[0],
+      message: 'Successfully registered for event',
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to register for event');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to register for event',
+    });
+  }
+});
+
+// GET - Check if a user is registered for an event
+fastify.get<{
+  Params: { id: string };
+  Querystring: { userEmail: string };
+}>('/api/events/:id/registration', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { userEmail } = request.query;
+
+    if (!userEmail)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'userEmail query parameter is required',
+      });
+    }
+
+    const registration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.eventId, parseInt(id)),
+        eq(registeredUsers.userEmail, userEmail.toLowerCase().trim())
+      ),
+    });
+
+    return reply.send({
+      success: true,
+      isRegistered: !!registration,
+      data: registration || null,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to check registration');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to check registration',
     });
   }
 });

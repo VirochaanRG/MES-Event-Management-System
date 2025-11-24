@@ -14,3 +14,14 @@ export const events = pgTable("events", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
+
+export const registeredUsers = pgTable("registered_users", {
+  id: serial("id").primaryKey(),
+  eventId: integer("event_id")
+    .notNull()
+    .references(() => events.id, { onDelete: "cascade" }), // Or varchar if you use string IDs
+  userEmail: varchar("user_email", { length: 255 }).notNull(),
+  registeredAt: timestamp("registered_at", { withTimezone: true }).defaultNow(),
+  status: varchar("status", { length: 50 }).default("confirmed"), // confirmed, cancelled, waitlist
+  paymentStatus: varchar("payment_status", { length: 50 }).default("pending"), // pending, paid, refunded
+});

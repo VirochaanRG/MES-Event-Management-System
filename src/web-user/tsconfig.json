@@ -20,7 +20,8 @@
     "incremental": true,
     "strictNullChecks": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@db/*": ["../db/src/*"]
     }
   },
   "include": [

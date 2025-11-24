@@ -18,6 +18,9 @@ function RouteComponent() {
   const [error, setError] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState<FormQuestion | null>(
+    null
+  );
   const [selectedQuestionType, setSelectedQuestionType] = useState<string>("");
   const [questionTitle, setQuestionTitle] = useState("");
   const [mcChoices, setMcChoices] = useState<string[]>(["", ""]);
@@ -81,6 +84,7 @@ function RouteComponent() {
   };
 
   const openModal = (questionType: string) => {
+    setEditingQuestion(null);
     setSelectedQuestionType(questionType);
     setQuestionTitle("");
     setMcChoices(["", ""]);
@@ -92,9 +96,36 @@ function RouteComponent() {
     setIsModalOpen(true);
   };
 
+  const openEditModal = (question: FormQuestion) => {
+    setEditingQuestion(question);
+    setSelectedQuestionType(question.questionType);
+    setQuestionTitle(question.questionTitle || "");
+
+    // Parse options based on question type
+    if (
+      question.questionType === "multiple_choice" &&
+      question.optionsCategory
+    ) {
+      const parsed = JSON.parse(question.optionsCategory);
+      setMcChoices(parsed.choices || ["", ""]);
+    } else if (
+      question.questionType === "linear_scale" &&
+      question.optionsCategory
+    ) {
+      const parsed = JSON.parse(question.optionsCategory);
+      setScaleMin(String(parsed.min || 1));
+      setScaleMax(String(parsed.max || 5));
+      setScaleMinLabel(parsed.minLabel || "");
+      setScaleMaxLabel(parsed.maxLabel || "");
+    }
+
+    setIsModalOpen(true);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedQuestionType("");
+    setEditingQuestion(null);
   };
 
   const addMcChoice = () => {
@@ -113,7 +144,89 @@ function RouteComponent() {
     setMcChoices(updated);
   };
 
-  const handleAddQuestion = async () => {
+  const handleDeleteQuestion = async (questionId: number) => {
+    if (!confirm("Are you sure you want to delete this question?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `/api/forms/${formId}/questions/${questionId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to delete question");
+      }
+
+      setQuestions(questions.filter((q) => q.id !== questionId));
+    } catch (err: any) {
+      console.error("Failed to delete question:", err.message);
+      alert("Failed to delete question: " + err.message);
+    }
+  };
+
+  const handleMoveUp = async (questionId: number) => {
+    try {
+      const response = await fetch(
+        `/api/forms/${formId}/questions/${questionId}/move-up`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to move question up");
+      }
+
+      // Refetch questions to get updated order
+      const questionsResponse = await fetch(`/api/forms/${formId}/questions`);
+      const questionsResult = await questionsResponse.json();
+
+      if (questionsResult.success) {
+        setQuestions(questionsResult.data || []);
+      }
+    } catch (err: any) {
+      console.error("Failed to move question up:", err.message);
+      alert("Failed to move question up: " + err.message);
+    }
+  };
+
+  const handleMoveDown = async (questionId: number) => {
+    try {
+      const response = await fetch(
+        `/api/forms/${formId}/questions/${questionId}/move-down`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to move question down");
+      }
+
+      // Refetch questions to get updated order
+      const questionsResponse = await fetch(`/api/forms/${formId}/questions`);
+      const questionsResult = await questionsResponse.json();
+
+      if (questionsResult.success) {
+        setQuestions(questionsResult.data || []);
+      }
+    } catch (err: any) {
+      console.error("Failed to move question down:", err.message);
+      alert("Failed to move question down: " + err.message);
+    }
+  };
+
+  const handleSaveQuestion = async () => {
     try {
       if (!questionTitle.trim()) {
         alert("Please enter a question title");
@@ -138,35 +251,66 @@ function RouteComponent() {
         });
       }
 
-      const nextOrder =
-        questions.length > 0
-          ? Math.max(...questions.map((q) => q.qorder)) + 1
-          : 1;
+      if (editingQuestion) {
+        // Update existing question
+        const response = await fetch(
+          `/api/forms/${formId}/questions/${editingQuestion.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              questionType: selectedQuestionType,
+              questionTitle: questionTitle.trim(),
+              optionsCategory,
+              qorder: editingQuestion.qorder,
+            }),
+          }
+        );
 
-      const response = await fetch(`/api/forms/${formId}/questions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          questionType: selectedQuestionType,
-          questionTitle: questionTitle.trim(),
-          optionsCategory,
-          qorder: nextOrder,
-        }),
-      });
+        const result = await response.json();
 
-      const result = await response.json();
+        if (!result.success) {
+          throw new Error(result.error || "Failed to update question");
+        }
 
-      if (!result.success) {
-        throw new Error(result.error || "Failed to add question");
+        setQuestions(
+          questions.map((q) => (q.id === editingQuestion.id ? result.data : q))
+        );
+      } else {
+        // Add new question
+        const nextOrder =
+          questions.length > 0
+            ? Math.max(...questions.map((q) => q.qorder)) + 1
+            : 1;
+
+        const response = await fetch(`/api/forms/${formId}/questions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            questionType: selectedQuestionType,
+            questionTitle: questionTitle.trim(),
+            optionsCategory,
+            qorder: nextOrder,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error || "Failed to add question");
+        }
+
+        setQuestions([...questions, result.data]);
       }
 
-      setQuestions([...questions, result.data]);
       closeModal();
     } catch (err: any) {
-      console.error("Failed to add question:", err.message);
-      alert("Failed to add question: " + err.message);
+      console.error("Failed to save question:", err.message);
+      alert("Failed to save question: " + err.message);
     }
   };
 
@@ -191,15 +335,15 @@ function RouteComponent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button
           onClick={handleBackToForms}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
         >
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -214,106 +358,221 @@ function RouteComponent() {
           Back to Forms
         </button>
 
-        <div className="flex items-start justify-between mb-8">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {formData?.name || "Untitled"}
-            </h1>
-            <p className="text-gray-600">
-              {formData?.description || "No description provided"}
-            </p>
-          </div>
-          <div className="relative ml-4" ref={dropdownRef}>
-            <button
-              onClick={handleAddComponent}
-              className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-            >
-              Add Component
-            </button>
-
-            {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border-2 border-gray-300 py-1 z-10">
-                <button
-                  onClick={() => openModal("multiple_choice")}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 font-medium"
-                >
-                  Multiple Choice
-                </button>
-                <button
-                  onClick={() => openModal("text_answer")}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 font-medium"
-                >
-                  Text Answer
-                </button>
-                <button
-                  onClick={() => openModal("linear_scale")}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 font-medium"
-                >
-                  Linear Scale
-                </button>
+        {/* Outer Form Border */}
+        <div className="border-2 border-gray-300 rounded-lg bg-white p-8">
+          {/* Header Section */}
+          <div className="mb-12">
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <div className="flex-1">
+                <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+                  {formData?.name || "Untitled Form"}
+                </h1>
               </div>
+              <div className="relative z-20" ref={dropdownRef}>
+                <button
+                  onClick={handleAddComponent}
+                  className="px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-all"
+                >
+                  Add Question
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30">
+                    <button
+                      onClick={() => openModal("multiple_choice")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Multiple Choice
+                    </button>
+                    <button
+                      onClick={() => openModal("text_answer")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Text Answer
+                    </button>
+                    <button
+                      onClick={() => openModal("linear_scale")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Linear Scale
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            {formData?.description && (
+              <p className="text-gray-600 text-lg mt-2">
+                {formData.description}
+              </p>
             )}
           </div>
-        </div>
 
-        <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Components
-          </h2>
-          {questions.length === 0 ? (
-            <div className="text-gray-500 text-center py-8">
-              No components added yet. Click "Add Component" to get started.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {questions.map((question) => {
-                if (question.questionType === "multiple_choice") {
-                  return (
-                    <MultipleChoiceQuestion
-                      key={question.id}
-                      question={question}
+          {/* Questions List */}
+          <div className="space-y-6">
+            {questions.length === 0 ? (
+              <div className="bg-gray-50 rounded-lg border-2 border-gray-300 p-12 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                     />
-                  );
-                } else if (question.questionType === "linear_scale") {
-                  return (
-                    <LinearScaleQuestion
-                      key={question.id}
-                      question={question}
-                    />
-                  );
-                } else if (question.questionType === "text_answer") {
-                  return (
-                    <TextAnswerQuestion key={question.id} question={question} />
-                  );
-                }
-                return null;
-              })}
-            </div>
-          )}
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">
+                  No questions yet
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  Get started by adding your first question
+                </p>
+              </div>
+            ) : (
+              questions.map((question, index) => (
+                <div key={question.id} className="relative group">
+                  {/* Question Border */}
+                  <div className="border-2 border-gray-300 rounded-lg p-6 bg-white">
+                    {/* Question Number Badge */}
+                    <div className="absolute -left-4 top-6 w-8 h-8 bg-gray-900 text-white text-xs font-medium rounded-full flex items-center justify-center">
+                      {index + 1}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      {/* Move Up Button */}
+                      {index > 0 && (
+                        <button
+                          onClick={() => handleMoveUp(question.id)}
+                          className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                          title="Move Up"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 15l7-7 7 7"
+                            />
+                          </svg>
+                        </button>
+                      )}
+
+                      {/* Move Down Button */}
+                      {index < questions.length - 1 && (
+                        <button
+                          onClick={() => handleMoveDown(question.id)}
+                          className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                          title="Move Down"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => openEditModal(question)}
+                        className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                        title="Edit"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteQuestion(question.id)}
+                        className="p-1.5 bg-white border border-gray-300 text-red-600 rounded hover:bg-red-50"
+                        title="Delete"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+
+                    {/* Question Component */}
+                    {question.questionType === "multiple_choice" && (
+                      <MultipleChoiceQuestion question={question} />
+                    )}
+                    {question.questionType === "linear_scale" && (
+                      <LinearScaleQuestion question={question} />
+                    )}
+                    {question.questionType === "text_answer" && (
+                      <TextAnswerQuestion question={question} />
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-2 border-gray-300">
-            <div className="p-6 border-b-2 border-gray-300">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
               <h3 className="text-xl font-semibold text-gray-900">
-                Add {selectedQuestionType.replace("_", " ")} Question
+                {editingQuestion ? "Edit" : "Add"} Question
               </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                {selectedQuestionType.replace("_", " ")}
+              </p>
             </div>
 
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-5">
               {/* Question Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Question Title *
+                <label className="block text-sm font-medium text-gray-900 mb-2">
+                  Question Title
                 </label>
                 <input
                   type="text"
                   value={questionTitle}
                   onChange={(e) => setQuestionTitle(e.target.value)}
-                  className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                   placeholder="Enter your question"
                 />
               </div>
@@ -321,8 +580,8 @@ function RouteComponent() {
               {/* Multiple Choice Options */}
               {selectedQuestionType === "multiple_choice" && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Choices *
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Answer Choices
                   </label>
                   <div className="space-y-2">
                     {mcChoices.map((choice, index) => (
@@ -333,13 +592,13 @@ function RouteComponent() {
                           onChange={(e) =>
                             updateMcChoice(index, e.target.value)
                           }
-                          className="flex-1 px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                           placeholder={`Choice ${index + 1}`}
                         />
                         {mcChoices.length > 2 && (
                           <button
                             onClick={() => removeMcChoice(index)}
-                            className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
                           >
                             Remove
                           </button>
@@ -349,9 +608,9 @@ function RouteComponent() {
                   </div>
                   <button
                     onClick={addMcChoice}
-                    className="mt-2 px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors text-sm font-medium"
+                    className="mt-3 text-sm font-medium text-gray-700 hover:text-gray-900"
                   >
-                    + Add Choice
+                    + Add choice
                   </button>
                 </div>
               )}
@@ -361,51 +620,51 @@ function RouteComponent() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Minimum Value *
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        From
                       </label>
                       <input
                         type="number"
                         value={scaleMin}
                         onChange={(e) => setScaleMin(e.target.value)}
-                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Maximum Value *
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        To
                       </label>
                       <input
                         type="number"
                         value={scaleMax}
                         onChange={(e) => setScaleMax(e.target.value)}
-                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Min Label (optional)
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Min label (optional)
                       </label>
                       <input
                         type="text"
                         value={scaleMinLabel}
                         onChange={(e) => setScaleMinLabel(e.target.value)}
-                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="e.g., Not at all"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Not at all"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Max Label (optional)
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Max label (optional)
                       </label>
                       <input
                         type="text"
                         value={scaleMaxLabel}
                         onChange={(e) => setScaleMaxLabel(e.target.value)}
-                        className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="e.g., Extremely"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        placeholder="Extremely"
                       />
                     </div>
                   </div>
@@ -413,18 +672,18 @@ function RouteComponent() {
               )}
             </div>
 
-            <div className="p-6 border-t-2 border-gray-300 flex justify-end gap-3">
+            <div className="p-6 border-t border-gray-200 flex justify-end gap-3 bg-gray-50">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium border-2 border-gray-300"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
-                onClick={handleAddQuestion}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                onClick={handleSaveQuestion}
+                className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800"
               >
-                Add Question
+                {editingQuestion ? "Save changes" : "Add question"}
               </button>
             </div>
           </div>
