@@ -185,69 +185,25 @@ fastify.get<{ Params: { id: string } }>('/api/events/:id', async (request, reply
   }
 });
 
-// GET all forms
-fastify.get('/api/forms', async (request, reply) => {
-  try {
+
+
+//Get forms
+fastify.get('/api/forms', async (request, reply) =>
+{
+  try
+  {
     const allForms = await db.query.form.findMany();
-    reply.send({
+
+    return reply.send({
       success: true,
       data: allForms,
     });
-  } catch (error) {
+  } catch (error)
+  {
     fastify.log.error({ err: error }, 'Failed to fetch forms');
-    reply.code(500).send({
+    return reply.code(500).send({
       success: false,
       error: 'Failed to fetch forms',
-    });
-  }
-});
-
-// GET single form by ID
-fastify.get<{ Params: { id: string } }>('/api/forms/:id', async (request, reply) => {
-  try {
-    const { id } = request.params;
-    const singleForm = await db.query.form.findFirst({
-      where: eq(form.id, parseInt(id)),
-    });
-
-    if (!singleForm) {
-      return reply.code(404).send({
-        success: false,
-        error: 'Form not found',
-      });
-    }
-
-    reply.send({
-      success: true,
-      data: singleForm,
-    });
-  } catch (error) {
-    fastify.log.error({ err: error }, 'Failed to fetch form');
-    reply.code(500).send({
-      success: false,
-      error: 'Failed to fetch form',
-    });
-  }
-});
-
-// GET all questions for a given form
-fastify.get<{ Params: { formId: string } }>('/api/forms/:formId/questions', async (request, reply) => {
-  try {
-    const { formId } = request.params;
-    const questions = await db.query.formQuestions.findMany({
-      where: eq(formQuestions.formId, parseInt(formId)),
-      orderBy: [formQuestions.qorder],
-    });
-
-    reply.send({
-      success: true,
-      data: questions,
-    });
-  } catch (error) {
-    fastify.log.error({ err: error }, 'Failed to fetch questions');
-    reply.code(500).send({
-      success: false,
-      error: 'Failed to fetch questions',
     });
   }
 });

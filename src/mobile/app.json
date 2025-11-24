@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Team D Mobile",
+    "slug": "teamd-mobile",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.largeevent.teamd"
+    },
+    "android": {
+      "package": "com.largeevent.teamd"
+    }
+  }
+}
