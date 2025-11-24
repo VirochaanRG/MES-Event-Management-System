@@ -42,8 +42,8 @@ export default function AvailableSurveys() {
     });
   };
 
-  const handleEventClick = (formId: number) => {
-    navigate({ to: `/suverys/${formId}` });
+  const handleSurveyClick = (formId: number) => {
+    navigate({ to: `/surveys/${formId}` });
   };
 
   if (isLoading) {
@@ -67,7 +67,7 @@ export default function AvailableSurveys() {
       {(formData as Form[]).map((form) => (
         <div
           key={form.id}
-          onClick={() => handleEventClick(form.id)}
+          onClick={() => handleSurveyClick(form.id)}
           className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 cursor-pointer hover:border-yellow-500"
         >
           {/* Event Image */}

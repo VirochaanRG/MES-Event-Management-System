@@ -293,14 +293,14 @@ function HomePage() {
               </div>
 
               {/* Available Surveys Content */}
-              {eventsSubTab === "available" && (
+              {surveysSubTab === "available" && (
                 <div>
                   <AvailableSurveys/>
                 </div>
               )}
 
               {/* Completed Surveys Content */}
-              {eventsSubTab === "registered" && (
+              {surveysSubTab === "completed" && (
                 <div className="bg-white rounded-lg shadow-md p-12 text-center">
                   <p className="text-gray-600 text-lg">
                     Completed surveys coming soon...

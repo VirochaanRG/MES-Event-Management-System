@@ -184,6 +184,29 @@ fastify.get<{ Params: { id: string } }>('/api/events/:id', async (request, reply
   }
 });
 
+
+
+//Get forms
+fastify.get('/api/forms', async (request, reply) =>
+{
+  try
+  {
+    const allForms = await db.query.form.findMany();
+
+    return reply.send({
+      success: true,
+      data: allForms,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch forms');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch forms',
+    });
+  }
+});
+
 // Get current user endpoint
 fastify.get('/api/auth/me', async (request, reply) =>
 {
