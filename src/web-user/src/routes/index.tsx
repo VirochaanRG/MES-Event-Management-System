@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "../contexts/AuthContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import AvailableEvents from "../components/AvailableEvents";
@@ -23,14 +23,14 @@ function HomePage() {
 
   // Fetch forms from API
   useEffect(() => {
-    if (activeTab === "forms") {
-      fetch("http://localhost:3114/api/forms", { credentials: "include" })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) setForms(data.data);
-        })
-        .catch((err) => console.error(err));
-    }
+    // if (activeTab === "forms") {
+    //   fetch("http://localhost:3114/api/forms", { credentials: "include" })
+    //     .then((res) => res.json())
+    //     .then((data) => {
+    //       if (data.success) setForms(data.data);
+    //     })
+    //     .catch((err) => console.error(err));
+    // }
   }, [activeTab]);
 
   const carouselImages = Array.from({ length: 10 }, (_, i) => ({
