@@ -4,12 +4,16 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import AvailableEvents from "../components/AvailableEvents";
 import "../styles/carousel.css";
 import { useState, useEffect } from "react";
+import AvailableSurveys from "@/components/AvailableSurveys";
 
 function HomePage() {
   const { user, logout } = useAuth();
   const [isLocalAuth, setIsLocalAuth] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "events">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "events" | "surveys">("overview");
   const [eventsSubTab, setEventsSubTab] = useState<"available" | "registered">(
+    "available"
+  );
+  const [surveysSubTab, setSurveysSubTab] = useState<"available" | "completed">(
     "available"
   );
   const [showMenu, setShowMenu] = useState(false);
@@ -123,6 +127,16 @@ function HomePage() {
               }`}
             >
               Events
+            </button>
+            <button
+              onClick={() => setActiveTab("surveys")}
+              className={`py-4 px-8 font-semibold transition-all border-b-4 ${
+                activeTab === "surveys"
+                  ? "border-yellow-500 text-red-900"
+                  : "border-transparent text-gray-600 hover:text-red-900"
+              }`}
+            >
+              Surveys
             </button>
           </div>
         </div>
@@ -240,6 +254,56 @@ function HomePage() {
                 <div className="bg-white rounded-lg shadow-md p-12 text-center">
                   <p className="text-gray-600 text-lg">
                     Registered events coming soon...
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "surveys" && (
+            <div>
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-red-900 mb-2">Surveys</h2>
+              </div>
+
+              {/* Surveys Sub-tabs */}
+              <div className="bg-white rounded-lg shadow-md mb-8 border-b border-yellow-300">
+                <div className="flex justify-center gap-8 px-6">
+                  <button
+                    onClick={() => setSurveysSubTab("available")}
+                    className={`py-4 px-6 font-semibold transition-all border-b-4 ${
+                      surveysSubTab === "available"
+                        ? "border-yellow-500 text-red-900"
+                        : "border-transparent text-gray-600 hover:text-red-900"
+                    }`}
+                  >
+                    Available Surveys
+                  </button>
+                  <button
+                    onClick={() => setSurveysSubTab("completed")}
+                    className={`py-4 px-6 font-semibold transition-all border-b-4 ${
+                      surveysSubTab === "completed"
+                        ? "bourder-yellow-500 text-red-900"
+                        : "border-transparent text-gray-600 hover:text-red-900"
+                    }`}
+                  >
+                    Completed Surveys
+                  </button>
+                </div>
+              </div>
+
+              {/* Available Surveys Content */}
+              {eventsSubTab === "available" && (
+                <div>
+                  <AvailableSurveys/>
+                </div>
+              )}
+
+              {/* Completed Surveys Content */}
+              {eventsSubTab === "registered" && (
+                <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                  <p className="text-gray-600 text-lg">
+                    Completed surveys coming soon...
                   </p>
                 </div>
               )}
