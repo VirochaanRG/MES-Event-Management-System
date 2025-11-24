@@ -4,34 +4,17 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import AvailableEvents from "../components/AvailableEvents";
 import "../styles/carousel.css";
 import { useState, useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
 
 function HomePage() {
   const { user, logout } = useAuth();
   const [isLocalAuth, setIsLocalAuth] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "events" | "forms">(
-    "overview"
-  );
+  const [activeTab, setActiveTab] = useState<"overview" | "events">("overview");
   const [eventsSubTab, setEventsSubTab] = useState<"available" | "registered">(
     "available"
   );
-  const [forms, setForms] = useState<any[]>([]);
   const [showMenu, setShowMenu] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [direction, setDirection] = useState<"next" | "prev">("next");
-  const navigate = useNavigate();
-
-  // Fetch forms from API
-  useEffect(() => {
-    if (activeTab === "forms") {
-      fetch("http://localhost:3114/api/forms", { credentials: "include" })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) setForms(data.data);
-        })
-        .catch((err) => console.error(err));
-    }
-  }, [activeTab]);
 
   const carouselImages = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
@@ -140,16 +123,6 @@ function HomePage() {
               }`}
             >
               Events
-            </button>
-            <button
-              onClick={() => setActiveTab("forms")}
-              className={`py-4 px-8 font-semibold transition-all border-b-4 ${
-                activeTab === "forms"
-                  ? "border-yellow-500 text-red-900"
-                  : "border-transparent text-gray-600 hover:text-red-900"
-              }`}
-            >
-              Forms
             </button>
           </div>
         </div>
@@ -269,34 +242,6 @@ function HomePage() {
                     Registered events coming soon...
                   </p>
                 </div>
-              )}
-            </div>
-          )}
-
-
-          {activeTab === "forms" && (
-            <div>
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-red-900 mb-2">Forms</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {forms.map((form) => (
-                  <div
-                    key={form.id}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-xl cursor-pointer transition-shadow"
-                    onClick={() => navigate({ to: "/forms/$formId", params: { formId: form.id } })}
-                  >
-                    <h3 className="text-xl font-semibold text-red-900 mb-2">
-                      {form.name}
-                    </h3>
-                    <p className="text-gray-600">{form.description}</p>
-                  </div>
-                ))}
-              </div>
-              {forms.length === 0 && (
-                <p className="text-center text-gray-500 mt-12">
-                  No forms available
-                </p>
               )}
             </div>
           )}
