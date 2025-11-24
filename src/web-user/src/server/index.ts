@@ -6,6 +6,7 @@ import { db } from '../../../db/src/db';
 import { events } from '../../../db/src/schemas/events';
 import { form } from '../../../db/src/schemas/form';
 import { eq } from 'drizzle-orm';
+import { form, formQuestions } from '@db/schemas';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
