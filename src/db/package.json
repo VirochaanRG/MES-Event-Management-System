@@ -4,6 +4,7 @@
   "description": "Team B database schema overlay and local extensions",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "scripts": {
     "init:db": "tsx src/initDb.ts",
     "build": "tsc",
