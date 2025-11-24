@@ -18,9 +18,11 @@ interface AuthUser
 
 // Mock user database for development
 const mockUsers: { [email: string]: AuthUser } = {
-  'user@teamd.local': { email: 'user@teamd.local', id: 1 },
-  'test@teamd.dev': { email: 'test@teamd.dev', id: 2 },
-  'demo@teamd.local': { email: 'demo@teamd.local', id: 3 },
+  'userViro@test.com': { email: 'userViro@test.com', id: 1 },
+  'userM@test.com': { email: 'userM@test.com', id: 2 },
+  'userI@test.com': { email: 'userI@test.com', id: 3 },
+  'userO@test.com': { email: 'userO@test.com', id: 4 },
+  'userR@test.com': { email: 'userR@test.com', id: 5 },
 };
 
 function validateUser(email: string): AuthUser | null

@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 function UnauthorizedAccess({ onLocalLogin }: { onLocalLogin: (user: AuthUser, token: string) => void }) {
-  const [showLocalLogin, setShowLocalLogin] = useState(false);
+  const [showLocalLogin, setShowLocalLogin] = useState(true); // Changed to true
 
   return (
     <div style={{
@@ -136,23 +136,23 @@ function UnauthorizedAccess({ onLocalLogin }: { onLocalLogin: (user: AuthUser, t
         </div>
       )}
 
-      {/* Back Button for Local Login */}
+      {/* Back Button for Local Login
       {showLocalLogin && (
-        <button
-          onClick={() => setShowLocalLogin(false)}
-          style={{
-            backgroundColor: '#6c757d',
-            color: 'white',
-            border: 'none',
-            padding: '8px 15px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.9rem'
-          }}
-        >
-          ← Back to Auth Options
-        </button>
-      )}
+        // <button
+        //   onClick={() => setShowLocalLogin(false)}
+        //   style={{
+        //     backgroundColor: '#6c757d',
+        //     color: 'white',
+        //     border: 'none',
+        //     padding: '8px 15px',
+        //     borderRadius: '4px',
+        //     cursor: 'pointer',
+        //     fontSize: '0.9rem'
+        //   }}
+        // >
+        //   ← Back to Auth Options
+        // </button>
+      )} */}
     </div>
   );
 }

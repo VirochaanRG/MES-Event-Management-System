@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser, AuthUser } from "../lib/auth";
 import ProtectedTeamPortal from "../components/ProtectedTeamPortal";
 import EventsTab from "@/components/EventsTab";
+import Navbar from "@/components/Navbar";
 
 function TeamBDashboard() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -21,26 +22,14 @@ function TeamBDashboard() {
   };
 
   return (
-    <main>
+    <>
+    <Navbar/>
+    <main className="m-0 p-0">
       <div className="text-center px-5 py-10 bg-gray-100 rounded-lg mx-5 my-5">
-        <h1 className="text-4xl text-gray-800 mb-5">Hi {user?.email}</h1>
-        <h2 className="text-3xl text-gray-700 mb-5">Team D Admin Dashboard</h2>
-        <p className="text-xl text-gray-600 mb-7">
-          Welcome to the Team D Administrative Dashboard
-        </p>
-        <div className="bg-blue-50 p-5 rounded border border-blue-300">
-          <p className="m-0 text-blue-700">
-            🚀 This app is running on port 3024 and ready for development!
-          </p>
-          <p className="mt-2.5 text-blue-700">
-            Session authenticated for: <strong>{user?.email}</strong>
-          </p>
-        </div>
+        <h2 className="text-3xl text-gray-700 mb-5">Admin Dashboard</h2>
 
         {/* Team D specific content */}
         <div className="mt-7 p-5 bg-gray-50 rounded-lg border border-gray-300">
-          <h3 className="text-gray-700 mb-3.5">Team D Management Tools</h3>
-
           {/* Tab Navigation */}
           <div className="flex gap-4 mb-6 border-b border-gray-300 justify-between items-end">
             <div className="flex gap-4">
@@ -116,6 +105,7 @@ function TeamBDashboard() {
         </div>
       </div>
     </main>
+    </>
   );
 }
 
