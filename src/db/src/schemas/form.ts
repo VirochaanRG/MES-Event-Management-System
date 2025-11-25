@@ -21,12 +21,12 @@ export const formQuestions = pgTable("form_questions", {
 
 export const formAnswers = pgTable("form_answers", {
   id: serial("id").primaryKey().notNull(),
-  userName: varchar("question_type", { length: 100 }).notNull(),
+  questionType: varchar("question_type", { length: 100 }).notNull(),
   formId: integer("form_id")
     .notNull()
     .references(() => form.id, { onDelete: "cascade" }),
-  questionType: varchar("question_type", { length: 100 }).notNull(),
-  questionId: integer("form_id")
+  userId: text("user_id").notNull(),
+  questionId: integer("question_id")
     .notNull()
     .references(() => form.id, { onDelete: "cascade" }),
   answer: text("answer"),
