@@ -12,6 +12,7 @@
     "generate": "node scripts/generate-migration.js",
     "generate:simple": "npx drizzle-kit generate",
     "migrate": "npx drizzle-kit migrate",
+    "gen-migrate": "npx drizzle-kit generate; npx drizzle-kit migrate",
     "push": "drizzle-kit push",
     "push:force": "drizzle-kit push --force",
     "studio": "drizzle-kit studio",

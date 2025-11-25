@@ -4,17 +4,16 @@ import { Pool } from "pg";
 import dotenv from "dotenv";
 import path from "path";
 
-dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+// dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: "postgres://postgres:password@localhost:5432/db",
 });
 
 const db = drizzle(pool);
 
 async function seed()
 {
-  console.log("DATABASE_URL =", process.env.DATABASE_URL);
   console.log("Seeding test events...");
 
   await db.insert(events).values([
