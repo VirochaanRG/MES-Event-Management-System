@@ -28,7 +28,7 @@ export const formAnswers = pgTable("form_answers", {
   userId: text("user_id").notNull(),
   questionId: integer("question_id")
     .notNull()
-    .references(() => form.id, { onDelete: "cascade" }),
+    .references(() => formQuestions.id, { onDelete: "cascade" }),
   answer: text("answer"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
 });
