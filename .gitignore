@@ -279,4 +279,5 @@ TSWLatexianTemp*
 .DS_Store
 docs/ProblemStatementAndGoals/ProblemStatement.pdf
 node_modules
+dist
 /routeTree.gen.ts
