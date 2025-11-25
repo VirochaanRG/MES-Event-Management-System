@@ -4,8 +4,8 @@ import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
 import { events } from '../../../db/src/schemas/events';
-import { eq } from 'drizzle-orm';
-import { form, formQuestions } from '@db/schemas';
+import { eq, and } from 'drizzle-orm';
+import { form, formAnswers, formQuestions } from '@db/schemas';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -266,10 +266,121 @@ fastify.get<{ Params: { id: string } }>('/api/forms/questions/:id', async (reque
     });
   } catch (error)
   {
-    fastify.log.error({ err: error }, 'Failed to fetch form');
+    fastify.log.error({ err: error }, 'Failed to fetch form questions');
     return reply.code(500).send({
       success: false,
-      error: 'Failed to fetch form',
+      error: 'Failed to fetch form questions',
+    });
+  }
+});
+
+// GET answers by form ID
+fastify.get<{ Params: { fid: string, uid: string }, }>('/api/forms/:fid/answers/:uid', async (request, reply) =>
+{
+  try
+  {
+    const { fid, uid } = request.params;
+    const selectedForm = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(fid)),
+    });
+    if (!selectedForm)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Survey not found',
+      });
+    }
+    
+    var answers = await db.select().from(formAnswers).where(
+      and(
+        eq(formAnswers.formId, selectedForm.id), 
+        eq(formAnswers.userId, uid)));
+    if(!answers) {
+      answers = [];
+    }
+    return reply.send({
+      success: true,
+      data: answers,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch user answers');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch user answers',
+    });
+  }
+});
+
+
+
+//POST reponse to question
+fastify.post<{
+  Params: { fid: string, uid : string};
+  Body: {qid: string; uid: string, answer: string, questionType: string;};
+}>('/api/forms/:fid/answers/:uid', async (request, reply) =>
+{
+  try
+  {
+    const {fid, uid} = request.params;
+    const {qid, answer, questionType} = request.body;
+    const selectedForm = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(fid)),
+    });
+    if (!selectedForm)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Survey not found',
+      });
+    }
+    const selectedQuestion = await db.query.formQuestions.findFirst({
+      where: eq(formQuestions.id, parseInt(qid)),
+    });
+    if (!selectedQuestion)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Question not found',
+      });
+    }
+
+    const existingAnswer = await db.query.formAnswers.findFirst({where : 
+      and(
+        eq(formAnswers.questionId, selectedQuestion.id),
+        eq(formAnswers.userId, uid))});
+
+    var newAnswer;
+    if (existingAnswer) {
+      newAnswer = await db
+        .update(formAnswers)
+        .set({answer : answer})
+        .where(eq(formAnswers.id, existingAnswer.id))
+        .returning();
+    }
+    else {
+      newAnswer = await db
+        .insert(formAnswers)
+        .values({
+          questionType: questionType.trim(),
+          formId: parseInt(fid),
+          userId: uid,
+          questionId: parseInt(qid),
+          answer: answer
+        })
+        .returning();
+    }
+
+    return reply.code(201).send({
+      success: true,
+      data: newAnswer[0],
+    });
+  } 
+  catch (error){ 
+    fastify.log.error({ err: error }, 'Failed to post user answers');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to post user answers',
     });
   }
 });
