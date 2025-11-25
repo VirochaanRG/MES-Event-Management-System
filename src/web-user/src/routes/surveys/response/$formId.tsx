@@ -1,8 +1,9 @@
+import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { StatSyncFn } from "fs";
 import { useState, useEffect } from "react";
 
-export const Route = createFileRoute("/surveys/$formId")({
+export const Route = createFileRoute("/surveys/response/$formId")({
   component: RouteComponent,
 });
 
@@ -10,7 +11,28 @@ interface Form {
   id: number;
   name: string;
   description: string | null;
-  createdAt: string
+  createdAt: string,
+  formQuestions: Question[]
+}
+
+interface Question {
+  id: number;
+  formId: number;
+  questionType: string;
+  questionTitle: string;
+  optionsCategory: string;
+  qOrder: number;
+  createdAt: string;
+}
+
+const fillerQuestion : Question  = {
+  id: -1,
+  formId: -1,
+  questionType: "text_answer",
+  questionTitle: "No questions found",
+  qOrder: 1,
+  optionsCategory: "",
+  createdAt: ""
 }
 
 function RouteComponent() {
@@ -20,19 +42,27 @@ function RouteComponent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [surveyProgress, setSurveyProgress] = useState<"unfilled" |"started" | "completed">("unfilled");
+  const [questions, setQuestions] = useState<Question[]>([fillerQuestion]); 
 
   useEffect(() => {
-    const fetchForm = async () => {
+    const fetchFormAndQuestions = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/forms/${formId}`);
-        const result = await response.json();
+        const formResponse = await fetch(`/api/forms/${formId}`);
+        const formResult = await formResponse.json();
 
-        if (!result.success) {
-          throw new Error(result.error || "Failed to fetch form");
+        if (!formResult.success) {
+          throw new Error(formResult.error || "Failed to fetch form");
         }
+        setForm(formResult.data);
 
-        setForm(result.data);
+        const questionsResponse = await fetch(`/api/forms/questions/${formId}`);
+        const questionsResult = await questionsResponse.json();
+
+        if (!questionsResult.success) {
+          throw new Error(questionsResult.error || "Failed to fetch form");
+        }
+        setQuestions(questionsResult.data);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -40,20 +70,12 @@ function RouteComponent() {
       }
     };
 
-    fetchForm();
+    fetchFormAndQuestions();
   }, [formId]);
 
   const handleBack = () => {
     navigate({ to: "/" });
   };
-
-  const handleFillSurvey = () => {
-    navigate({ to: `/surveys/response/${formId}` });
-  };
-
-  const handleDeleteSubmission = () => {
-    setSurveyProgress("unfilled");
-  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -156,19 +178,22 @@ function RouteComponent() {
           )}
         </div>
 
-        
+        {/* Questions */}
+        {questions.map((question : Question) => (
+          question.questionType === "text_answer" ? <TextAnswerQuestion questionTitle={question.questionTitle}/> :
+          question.questionType === "multiple_choice" ? <TextAnswerQuestion questionTitle={question.questionTitle}/> :
+          question.questionType === "linear_scale" ? <TextAnswerQuestion questionTitle={question.questionTitle}/> : <div></div> 
+        ))}
 
         {/* Action Buttons */}
         <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
           <div className="flex gap-4">
-            <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors" onClick={handleFillSurvey}>
-              {surveyProgress === "unfilled" ? "Fill out Survey" : surveyProgress === "started" ? "Continue Filling" : "Edit Submission"}
+            <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+              Save
             </button>
-            {(surveyProgress === "started" || surveyProgress == "completed") && (
-              <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors" onClick={handleDeleteSubmission}>
-                Delete Submission
-              </button>
-            )}
+            <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+              Submit
+            </button>
           </div>
         </div>
 
