@@ -25,14 +25,8 @@ interface Question {
   createdAt: string;
 }
 
-const fillerQuestion : Question  = {
-  id: -1,
-  formId: -1,
-  questionType: "text_answer",
-  questionTitle: "No questions found",
-  qOrder: 1,
-  optionsCategory: "",
-  createdAt: ""
+interface Answer {
+  
 }
 
 function RouteComponent() {
@@ -42,7 +36,7 @@ function RouteComponent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [surveyProgress, setSurveyProgress] = useState<"unfilled" |"started" | "completed">("unfilled");
-  const [questions, setQuestions] = useState<Question[]>([fillerQuestion]); 
+  const [questions, setQuestions] = useState<Question[]>([]); 
 
   useEffect(() => {
     const fetchFormAndQuestions = async () => {
