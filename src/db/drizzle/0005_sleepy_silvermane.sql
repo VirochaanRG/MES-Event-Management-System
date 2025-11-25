@@ -1,1 +1,0 @@
-ALTER TABLE "form_answers" ADD COLUMN "user_id" integer NOT NULL;

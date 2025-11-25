@@ -21,6 +21,7 @@ export const registeredUsers = pgTable("registered_users", {
     .notNull()
     .references(() => events.id, { onDelete: "cascade" }), // Or varchar if you use string IDs
   userEmail: varchar("user_email", { length: 255 }).notNull(),
+  instance: integer("instance").default(0), // number of stuff
   registeredAt: timestamp("registered_at", { withTimezone: true }).defaultNow(),
   status: varchar("status", { length: 50 }).default("confirmed"), // confirmed, cancelled, waitlist
   paymentStatus: varchar("payment_status", { length: 50 }).default("pending"), // pending, paid, refunded
