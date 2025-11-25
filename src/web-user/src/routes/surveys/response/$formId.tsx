@@ -1,5 +1,6 @@
 import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { on } from "events";
 import { StatSyncFn } from "fs";
 import { useState, useEffect } from "react";
 
@@ -26,17 +27,29 @@ interface Question {
 }
 
 interface Answer {
-  
+  id: number | undefined;
+  userId: number | undefined;
+  formId : number | undefined;
+  questionId: number | undefined;
+  questionType: string | undefined;
+  answer: string | undefined;
+  createdAt: string | undefined;
+}
+
+interface Response {
+  question: Question,
+  answer: Answer | undefined
 }
 
 function RouteComponent() {
   const navigate = useNavigate();
   const { formId } = Route.useParams();
+  const userId = sessionStorage.getItem('teamd-auth-user');
   const [form, setForm] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [surveyProgress, setSurveyProgress] = useState<"unfilled" |"started" | "completed">("unfilled");
-  const [questions, setQuestions] = useState<Question[]>([]); 
+  const [responses, setResponses] = useState<Response[]>([]);
 
   useEffect(() => {
     const fetchFormAndQuestions = async () => {
@@ -56,7 +69,19 @@ function RouteComponent() {
         if (!questionsResult.success) {
           throw new Error(questionsResult.error || "Failed to fetch form");
         }
-        setQuestions(questionsResult.data);
+        var questions : Question[] = questionsResult.data;
+
+        const answersResponse = await fetch(`/api/forms/${formId}/answers/${userId}`);
+        const answersResult = await answersResponse.json();
+        var answers : Answer[] = answersResult.success ? answersResult.data : [];
+        setResponses(questions.map(q => {
+            var response : Response = {
+              question : q,
+              answer : answers.find(a => a.questionId == q.id)
+            };
+            
+            return response;
+        }));
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -71,6 +96,46 @@ function RouteComponent() {
     navigate({ to: "/" });
   };
 
+  const handleResponseOnChange = (response: Response, answer: string) => {
+    setResponses(prev =>
+      prev.map(r => {
+        // if this is the response we want to update
+        if (r.question.id === response.question.id) {
+          // create a new Answer object
+          const newAnswer: Answer = {
+            id: r.answer?.id ?? 0, // keep id or 0 if undefined
+            userId: r.answer?.userId ?? 0,
+            formId: r.question.formId,
+            questionId: r.question.id,
+            questionType: r.question.questionType,
+            answer: answer,
+            createdAt: r.answer?.createdAt ?? ""
+          };
+          return {...r, answer: newAnswer};
+        }
+        return r;
+      })
+    );
+  };
+
+  const handleSubmit = () => {
+    const submitForm = async () => { 
+      for(const response of responses) {
+        const request = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({qid: response.question.id, answer: response.answer?.answer, questionType: response.question.questionType})
+        };
+        const submitResponse = await fetch(`/api/forms/${formId}/answers/${userId}`, request);
+        const submitResult = await submitResponse.json();
+        if(!submitResult.success) {
+          throw new Error(submitResult.error || "Could not submit question with ID: " + response.question.id);
+        }
+      }
+    };
+    submitForm();
+  } 
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -79,30 +144,6 @@ function RouteComponent() {
       month: "long",
       day: "numeric",
     });
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "scheduled":
-        return "bg-blue-100 text-blue-800";
-      case "ongoing":
-        return "bg-green-100 text-green-800";
-      case "completed":
-        return "bg-gray-100 text-gray-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
   };
 
   if (loading) {
@@ -173,10 +214,15 @@ function RouteComponent() {
         </div>
 
         {/* Questions */}
-        {questions.map((question : Question) => (
-          question.questionType === "text_answer" ? <TextAnswerQuestion questionTitle={question.questionTitle}/> :
-          question.questionType === "multiple_choice" ? <TextAnswerQuestion questionTitle={question.questionTitle}/> :
-          question.questionType === "linear_scale" ? <TextAnswerQuestion questionTitle={question.questionTitle}/> : <div></div> 
+        {responses
+        .sort((r1, r2) => r1.question.qOrder - r2.question.qOrder)
+        .map((response : Response) => (
+          response.question.questionType === "text_answer" ? 
+            <TextAnswerQuestion key={response.question.id} questionTitle={response.question.questionTitle} answer={response.answer?.answer} onChange={(e) => handleResponseOnChange(response, e)}/> :
+          response.question.questionType === "multiple_choice" ? 
+            <TextAnswerQuestion key={response.question.id} questionTitle={response.question.questionTitle} answer={response.answer?.answer} onChange={(e) => handleResponseOnChange(response, e)}/> :
+          response.question.questionType === "linear_scale" ? 
+            <TextAnswerQuestion key={response.question.id} questionTitle={response.question.questionTitle} answer={response.answer?.answer} onChange={(e) => handleResponseOnChange(response, e)}/> : <div></div> 
         ))}
 
         {/* Action Buttons */}
@@ -185,7 +231,9 @@ function RouteComponent() {
             <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
               Save
             </button>
-            <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+            <button 
+              className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={handleSubmit}>
               Submit
             </button>
           </div>
