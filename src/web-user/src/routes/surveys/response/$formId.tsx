@@ -121,6 +121,8 @@ function RouteComponent() {
   };
 
   const handleSubmit = () => {
+    const confirmation = confirm("Are you sure you want to submit?");
+    if(!confirmation) return;
     const postSubmission = async () => {
       await fetch(`/api/forms/${formId}/submit/${userId}`, {
         method: "PATCH"
