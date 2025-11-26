@@ -5,6 +5,7 @@ import AvailableEvents from "../components/AvailableEvents";
 import "../styles/carousel.css";
 import { useState, useEffect } from "react";
 import AvailableSurveys from "@/components/AvailableSurveys";
+import CompletedSurveys from "@/components/CompletedSurveys";
 
 function HomePage() {
   const { user, logout } = useAuth();
@@ -314,10 +315,8 @@ function HomePage() {
 
               {/* Completed Surveys Content */}
               {surveysSubTab === "completed" && (
-                <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                  <p className="text-gray-600 text-lg">
-                    Completed surveys coming soon...
-                  </p>
+                <div>
+                  <CompletedSurveys/>
                 </div>
               )}
             </div>
