@@ -540,26 +540,41 @@ fastify.patch<{
       });
     }
 
-    const newSubmission = await db
+    const existingSubmission = await db.query.formSubmissions.findFirst({where : 
+      and(
+        eq(formSubmissions.formId, parseInt(fid)),
+        eq(formSubmissions.userId, uid))});
+    
+    var submission;
+    if(existingSubmission) {
+      submission = await db
+        .update(formSubmissions)
+        .set({updatedAt : sql`NOW()`})
+        .where(and(
+          eq(formSubmissions.formId, parseInt(fid)),
+          eq(formSubmissions.userId, uid)))
+        .returning();
+      await db
+        .update(formAnswers)
+        .set({submissionId : submission[0].id})
+        .where(and(
+          eq(formAnswers.formId, parseInt(fid)), 
+          eq(formAnswers.userId, uid),
+          isNull(formAnswers.submissionId))
+        );
+    } else {
+      submission = await db
         .insert(formSubmissions)
         .values({
           userId: uid,
           formId: parseInt(fid)
         })
         .returning();
-    
-      await db
-        .update(formAnswers)
-        .set({submissionId : newSubmission[0].id})
-        .where(and(
-          eq(formAnswers.formId, parseInt(fid)), 
-          eq(formAnswers.userId, uid),
-          isNull(formAnswers.submissionId))
-        );
+    }
 
     return reply.code(201).send({
       success: true,
-      data: newSubmission[0],
+      data: selectedForm[0],
     });
   } 
   catch (error){ 
