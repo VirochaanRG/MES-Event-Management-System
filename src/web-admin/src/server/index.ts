@@ -851,6 +851,33 @@ fastify.get<{
   }
 });
 
+// GET - List all registered users for an event
+fastify.get<{ Params: { id: string } }>(
+  '/api/events/:id/registrationlist',
+  async (request, reply) => {
+    try {
+      const { id } = request.params;
+
+      const registrations = await db
+        .select()
+        .from(registeredUsers)
+        .where(eq(registeredUsers.eventId, parseInt(id, 10)));
+
+      return reply.send({
+        success: true,
+        data: registrations
+      });
+    } catch (error) {
+      fastify.log.error({ err: error }, 'Failed to list registrations');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to list registrations',
+      });
+    }
+  }
+);
+
+
 // Local login (for testing without main portal)
 fastify.post('/api/auth/local-login', async (request, reply) =>
 {
