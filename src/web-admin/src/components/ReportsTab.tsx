@@ -78,7 +78,9 @@ export default function ReportsTab() {
 
   return (
     <div>
-      <h4 className="text-2xl font-bold text-purple-700 mb-4">Form Reports</h4>
+      <h4 className="text-2xl font-bold text-stone-900 mb-3 border-b-2 border-red-900 pb-2 inline-block">
+        Form Reports
+      </h4>
       <p className="text-gray-600 mb-6">
         Select a form to view its submissions and analytics
       </p>
@@ -88,7 +90,7 @@ export default function ReportsTab() {
           <div
             key={form.id}
             onClick={() => handleFormClick(form.id)}
-            className="bg-white border border-gray-300 rounded-lg p-5 hover:shadow-lg hover:border-purple-500 transition-all cursor-pointer"
+            className="bg-white border border-gray-300 rounded-lg p-5 hover:shadow-lg hover:border-red-900 transition-all cursor-pointer"
           >
             <h5 className="text-lg font-semibold text-gray-800 mb-2">
               {form.name}
@@ -102,7 +104,7 @@ export default function ReportsTab() {
               <span className="text-xs text-gray-500">
                 Created: {new Date(form.createdAt).toLocaleDateString()}
               </span>
-              <span className="text-sm text-purple-600 font-medium">
+              <span className="text-sm text-red-900 font-medium">
                 View Report →
               </span>
             </div>

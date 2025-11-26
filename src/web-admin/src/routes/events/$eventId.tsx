@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/events/$eventId")({
@@ -7,7 +7,10 @@ export const Route = createFileRoute("/events/$eventId")({
 
 function EventDetail() {
   const { eventId } = Route.useParams();
-
+  const navigate = useNavigate();
+  const handleBack = () => {
+    navigate({ to: "/" });
+  };
   const {
     data: registeredList,
     isLoading,
@@ -28,9 +31,26 @@ function EventDetail() {
 
   return (
     <div className="mt-6">
-      <h2 className="text-2xl font-bold text-purple-700 mb-2">
-        Registered Users
-      </h2>
+      <button
+        onClick={handleBack}
+        className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+      >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        Back to Events
+      </button>
+      <h2 className="text-2xl font-bold text-red-900 mb-2">Registered Users</h2>
       {isLoading ? (
         <p>Loading registrations...</p>
       ) : error ? (
