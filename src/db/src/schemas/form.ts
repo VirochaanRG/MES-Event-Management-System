@@ -44,4 +44,3 @@ export const formAnswers = pgTable("form_answers", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   submissionId: integer("submission_id").references(() => formSubmissions.id, {onDelete: "cascade"})
 });
-
