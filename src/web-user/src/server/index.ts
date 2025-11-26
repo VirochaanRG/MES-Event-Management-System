@@ -417,6 +417,36 @@ fastify.delete("api/events/registration", async (request, reply) => {
   }
 });
 
+fastify.get("api/events/registration/latest-instance", async (request, reply) => {
+  try {
+    const { eventId, userEmail } = request.body as {
+      eventId: number;
+      userEmail: string;
+    };
+
+    const [{ maxInstance }] = await db.select({
+      maxInstance: max(registeredUsers.instance),
+    })
+      .from(registeredUsers)
+      .where(
+        and(
+          eq(qrCodes.eventId, eventId),
+          eq(qrCodes.userEmail, userEmail)
+        ));
+
+    return reply.send({
+      success: true,
+      instance: maxInstance ?? 0,
+    });
+  } catch (error) {
+    fastify.log.error({ err: error }, 'Failed to access DB and fetch QR codes');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to access DB and fetch QR codes',
+    });
+  }
+});
+
 // Start server
 try
 {
