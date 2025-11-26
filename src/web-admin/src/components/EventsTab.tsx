@@ -1,20 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-
-interface Event {
-  id: number;
-  title: string;
-  description: string | null;
-  location: string | null;
-  startTime: string;
-  endTime: string;
-  capacity: number;
-  isPublic: boolean;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Event } from "@/interfaces/interfaces";
 
 export default function EventsTab() {
   const [showModal, setShowModal] = useState(false);
@@ -35,75 +22,125 @@ export default function EventsTab() {
     },
   });
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const month = date.toLocaleDateString("en-US", { month: "short" });
+    const day = date.getDate();
+    const time = date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+    return { month, day, time };
+  };
+
   return (
     <div>
-      <h4 className="text-2xl font-bold text-purple-700 mb-3">Events</h4>
-      {eventsLoading && <p className="text-gray-600">Loading events...</p>}
-      {eventsError && <p className="text-red-600">Error loading events</p>}
+      <div className="flex justify-between items-center mb-6 border-b-2 border-red-900 pb-3">
+        <h2 className="text-2xl font-bold text-stone-900">Events</h2>
+        <button
+          onClick={() => setShowModal(true)}
+          className="px-5 py-2 bg-red-900 text-white hover:bg-red-950 font-medium"
+        >
+          Create Event
+        </button>
+      </div>
+
+      {eventsLoading && <p className="text-stone-600">Loading events...</p>}
+      {eventsError && (
+        <p className="text-red-900 font-medium">Error loading events</p>
+      )}
+
       {eventsData && eventsData.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {(eventsData as Event[]).map((event) => (
-            <div
-              key={event.id}
-              onClick={() => navigate({ to: `/events/${event.id}` })}
-              className="p-4 bg-white rounded-lg border border-gray-300 shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-            >
-              <h5 className="text-lg font-bold text-purple-700 mb-2">
-                {event.title}
-              </h5>
-              <p className="text-sm text-gray-600 mb-2">
-                {event.description || "No description"}
-              </p>
-              <div className="space-y-1 text-sm text-gray-700">
-                <p>
-                  <strong>Location:</strong> {event.location || "N/A"}
-                </p>
-                <p>
-                  <strong>Start:</strong>{" "}
-                  {new Date(event.startTime).toLocaleString()}
-                </p>
-                <p>
-                  <strong>End:</strong>{" "}
-                  {new Date(event.endTime).toLocaleString()}
-                </p>
-                <p>
-                  <strong>Capacity:</strong> {event.capacity}
-                </p>
-                <div className="flex justify-between items-center mt-3">
-                  <span
-                    className={`px-2 py-1 rounded text-white text-xs font-semibold ${
-                      event.status === "scheduled"
-                        ? "bg-blue-500"
-                        : "bg-green-500"
-                    }`}
-                  >
-                    {event.status}
-                  </span>
-                  <span
-                    className={`text-xs font-semibold ${
-                      event.isPublic ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {event.isPublic ? "Public" : "Private"}
-                  </span>
+        <div className="space-y-3">
+          {(eventsData as Event[]).map((event) => {
+            const startDate = formatDate(event.startTime);
+            const endDate = formatDate(event.endTime);
+            return (
+              <div
+                key={event.id}
+                onClick={() => navigate({ to: `/events/${event.id}` })}
+                className="bg-white border border-stone-300 hover:border-red-900 transition-colors cursor-pointer"
+              >
+                <div className="flex">
+                  <div className="w-20 bg-stone-100 flex flex-col items-center justify-center border-r border-stone-300">
+                    <div className="text-xs font-bold text-stone-600 uppercase">
+                      {startDate.month}
+                    </div>
+                    <div className="text-2xl font-bold text-stone-900">
+                      {startDate.day}
+                    </div>
+                  </div>
+
+                  <div className="flex-1 p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-lg font-bold text-stone-900">
+                        {event.title}
+                      </h3>
+                      <div className="flex gap-2">
+                        <span
+                          className={`px-3 py-1 text-xs font-semibold ${
+                            event.status === "scheduled"
+                              ? "bg-blue-100 text-blue-800"
+                              : event.status === "ongoing"
+                                ? "bg-green-100 text-green-800"
+                                : event.status === "completed"
+                                  ? "bg-stone-100 text-stone-800"
+                                  : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {event.status}
+                        </span>
+                        <span
+                          className={`px-3 py-1 text-xs font-semibold ${
+                            event.isPublic
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {event.isPublic ? "Public" : "Private"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {event.description && (
+                      <p className="text-sm text-stone-600 mb-3">
+                        {event.description}
+                      </p>
+                    )}
+
+                    <div className="flex gap-6 text-sm text-stone-700">
+                      {event.location && (
+                        <div className="flex items-center gap-1">
+                          <span className="font-semibold">Location:</span>
+                          <span>{event.location}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <span className="font-semibold">Time:</span>
+                        <span>
+                          {startDate.time} - {endDate.time}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          <button
-            onClick={() => setShowModal(true)}
-            className="p-4 bg-white rounded-lg border-2 border-dashed border-purple-300 shadow-md hover:shadow-lg transition-shadow flex items-center justify-center cursor-pointer hover:border-purple-500"
-          >
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-700 mb-2">+</div>
-              <p className="text-lg font-semibold text-purple-700">
-                Add New Event
-              </p>
-            </div>
-          </button>
+            );
+          })}
         </div>
       ) : (
-        <p className="text-gray-600">No events found</p>
+        !eventsLoading && (
+          <div className="bg-white border border-stone-300 p-12 text-center">
+            <p className="text-stone-600 mb-4">No events found</p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="px-5 py-2 bg-red-900 text-white hover:bg-red-950 font-medium"
+            >
+              Create Your First Event
+            </button>
+          </div>
+        )
       )}
 
       {showModal && (
@@ -183,22 +220,20 @@ function CreateEventModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-screen overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-2xl font-bold text-purple-700">
-            Create New Event
-          </h3>
+      <div className="bg-white w-full max-w-md max-h-screen overflow-y-auto">
+        <div className="bg-stone-100 border-b-2 border-red-900 p-5 flex justify-between items-center">
+          <h3 className="text-2xl font-bold text-stone-900">Create Event</h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
+            className="text-stone-500 hover:text-stone-900 text-2xl leading-none"
           >
             ×
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-bold text-stone-900 mb-2">
               Title *
             </label>
             <input
@@ -207,27 +242,27 @@ function CreateEventModal({
               value={formData.title}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 border border-stone-300 focus:outline-none focus:border-red-900"
               placeholder="Event title"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-bold text-stone-900 mb-2">
               Description
             </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 border border-stone-300 focus:outline-none focus:border-red-900"
               placeholder="Event description"
               rows={3}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-bold text-stone-900 mb-2">
               Location
             </label>
             <input
@@ -235,14 +270,14 @@ function CreateEventModal({
               name="location"
               value={formData.location}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 border border-stone-300 focus:outline-none focus:border-red-900"
               placeholder="Event location"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-bold text-stone-900 mb-2">
                 Start Time *
               </label>
               <input
@@ -251,11 +286,11 @@ function CreateEventModal({
                 value={formData.startTime}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 border border-stone-300 focus:outline-none focus:border-red-900"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-bold text-stone-900 mb-2">
                 End Time *
               </label>
               <input
@@ -264,13 +299,13 @@ function CreateEventModal({
                 value={formData.endTime}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 border border-stone-300 focus:outline-none focus:border-red-900"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-bold text-stone-900 mb-2">
               Capacity
             </label>
             <input
@@ -278,20 +313,20 @@ function CreateEventModal({
               name="capacity"
               value={formData.capacity}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 border border-stone-300 focus:outline-none focus:border-red-900"
               placeholder="0"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-bold text-stone-900 mb-2">
               Status
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 border border-stone-300 focus:outline-none focus:border-red-900"
             >
               <option value="scheduled">Scheduled</option>
               <option value="ongoing">Ongoing</option>
@@ -300,34 +335,34 @@ function CreateEventModal({
             </select>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-2 pt-2">
             <input
               type="checkbox"
               id="isPublic"
               name="isPublic"
               checked={formData.isPublic}
               onChange={handleChange}
-              className="w-4 h-4 text-purple-700 rounded focus:ring-2 focus:ring-purple-500"
+              className="w-4 h-4"
             />
             <label
               htmlFor="isPublic"
-              className="ml-2 text-sm font-semibold text-gray-700"
+              className="text-sm font-bold text-stone-900"
             >
               Make event public
             </label>
           </div>
 
-          <div className="flex gap-3 mt-6">
+          <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-400"
+              className="flex-1 px-4 py-2 bg-stone-300 text-stone-900 font-semibold hover:bg-stone-400"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-purple-700 text-white rounded-lg font-semibold hover:bg-purple-800"
+              className="flex-1 px-4 py-2 bg-red-900 text-white font-semibold hover:bg-red-950"
             >
               Create Event
             </button>

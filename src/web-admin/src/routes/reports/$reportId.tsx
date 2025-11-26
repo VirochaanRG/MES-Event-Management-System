@@ -38,10 +38,23 @@ function ReportDetailPage() {
   const [selectedSubmissions, setSelectedSubmissions] = useState<Set<string>>(
     new Set()
   );
+  const [selectedQuestions, setSelectedQuestions] = useState<Set<number>>(
+    new Set()
+  );
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
 
   useEffect(() => {
     fetchReportData();
   }, [reportId]);
+
+  useEffect(() => {
+    if (reportData && reportData.submissions.length > 0) {
+      const allQuestionIds = reportData.submissions[0].answers.map(
+        (a) => a.questionId
+      );
+      setSelectedQuestions(new Set(allQuestionIds));
+    }
+  }, [reportData]);
 
   const fetchReportData = async () => {
     try {
@@ -99,10 +112,30 @@ function ReportDetailPage() {
     setSelectedSubmissions(newSelected);
   };
 
+  const handleSelectAllQuestions = (checked: boolean) => {
+    if (checked && reportData && reportData.submissions.length > 0) {
+      const allQuestionIds = reportData.submissions[0].answers.map(
+        (a) => a.questionId
+      );
+      setSelectedQuestions(new Set(allQuestionIds));
+    } else {
+      setSelectedQuestions(new Set());
+    }
+  };
+
+  const handleSelectQuestion = (questionId: number, checked: boolean) => {
+    const newSelected = new Set(selectedQuestions);
+    if (checked) {
+      newSelected.add(questionId);
+    } else {
+      newSelected.delete(questionId);
+    }
+    setSelectedQuestions(newSelected);
+  };
+
   const exportToCSV = () => {
     if (!reportData) return;
 
-    // Determine which submissions to export
     const submissionsToExport =
       selectedSubmissions.size > 0
         ? reportData.submissions.filter((s) =>
@@ -115,27 +148,30 @@ function ReportDetailPage() {
       return;
     }
 
-    // Get all questions
+    if (selectedQuestions.size === 0) {
+      alert("Please select at least one question to export");
+      return;
+    }
+
     const allQuestions =
       reportData.submissions.length > 0
-        ? reportData.submissions[0].answers.sort((a, b) => a.qorder - b.qorder)
+        ? reportData.submissions[0].answers
+            .sort((a, b) => a.qorder - b.qorder)
+            .filter((q) => selectedQuestions.has(q.questionId))
         : [];
 
-    // Build CSV header
     const headers = [
       "Email",
       ...allQuestions.map((q) => q.questionTitle || `Question ${q.qorder}`),
       "Submitted At",
     ];
 
-    // Build CSV rows
     const rows = submissionsToExport.map((submission) => {
       const email = extractEmail(submission.userId);
       const answers = allQuestions.map((question) => {
         const answer = submission.answers.find(
           (a) => a.questionId === question.questionId
         );
-        // Escape quotes and wrap in quotes if contains comma or newline
         const value = answer?.answer || "";
         return value.includes(",") ||
           value.includes("\n") ||
@@ -147,7 +183,6 @@ function ReportDetailPage() {
       return [email, ...answers, submittedAt];
     });
 
-    // Combine headers and rows
     const csvContent = [
       headers.map((h) =>
         h.includes(",") || h.includes("\n") ? `"${h.replace(/"/g, '""')}"` : h
@@ -157,7 +192,6 @@ function ReportDetailPage() {
       .map((row) => row.join(","))
       .join("\n");
 
-    // Create and download file
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
@@ -180,11 +214,11 @@ function ReportDetailPage() {
     return (
       <>
         <Navbar />
-        <main className="m-0 p-0">
-          <div className="text-center px-5 py-10">
-            <div className="text-gray-600">Loading report data...</div>
+        <div className="min-h-screen bg-stone-50">
+          <div className="max-w-7xl mx-auto px-6 py-12">
+            <div className="text-stone-600">Loading report...</div>
           </div>
-        </main>
+        </div>
       </>
     );
   }
@@ -193,26 +227,25 @@ function ReportDetailPage() {
     return (
       <>
         <Navbar />
-        <main className="m-0 p-0">
-          <div className="text-center px-5 py-10">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-2xl mx-auto">
-              <p className="text-red-600 mb-4">
-                Error: {error || "No data found"}
+        <div className="min-h-screen bg-stone-50">
+          <div className="max-w-7xl mx-auto px-6 py-12">
+            <div className="bg-red-50 border-l-4 border-red-800 p-6">
+              <p className="text-red-900 font-medium mb-3">
+                {error || "Report not found"}
               </p>
               <button
                 onClick={handleBack}
-                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+                className="px-4 py-2 bg-stone-800 text-white hover:bg-stone-900"
               >
                 Back to Dashboard
               </button>
             </div>
           </div>
-        </main>
+        </div>
       </>
     );
   }
 
-  // Get all unique questions from submissions
   const allQuestions =
     reportData.submissions.length > 0
       ? reportData.submissions[0].answers.sort((a, b) => a.qorder - b.qorder)
@@ -223,149 +256,253 @@ function ReportDetailPage() {
     selectedSubmissions.size === reportData.submissions.length;
   const someSelected = selectedSubmissions.size > 0 && !allSelected;
 
+  const allQuestionsSelected =
+    allQuestions.length > 0 && selectedQuestions.size === allQuestions.length;
+  const someQuestionsSelected =
+    selectedQuestions.size > 0 && !allQuestionsSelected;
+
   return (
     <>
       <Navbar />
-      <main className="m-0 p-0">
-        <div className="px-5 py-10">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="mb-6">
-              <button
-                onClick={handleBack}
-                className="mb-4 px-4 py-2 text-purple-600 hover:text-purple-800 font-medium"
-              >
-                ← Back to Dashboard
-              </button>
-              <div className="flex justify-between items-start mb-2">
-                <h2 className="text-3xl font-bold text-gray-800">
-                  {reportData.form.name}
-                </h2>
-                <button
-                  onClick={exportToCSV}
-                  className="px-6 py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-700 transition-colors"
-                >
-                  Export to CSV
-                  {selectedSubmissions.size > 0 &&
-                    ` (${selectedSubmissions.size})`}
-                </button>
-              </div>
-              {reportData.form.description && (
-                <p className="text-gray-600 mb-4">
-                  {reportData.form.description}
-                </p>
-              )}
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span>Total Submissions: {reportData.totalSubmissions}</span>
-                <span>
-                  Created:{" "}
-                  {new Date(reportData.form.createdAt).toLocaleDateString()}
-                </span>
-                {selectedSubmissions.size > 0 && (
-                  <span className="text-purple-600 font-medium">
-                    {selectedSubmissions.size} selected
-                  </span>
-                )}
-              </div>
-            </div>
+      <div className="min-h-screen bg-stone-50">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="mb-8">
+            <button
+              onClick={handleBack}
+              className="text-stone-700 hover:text-stone-900 font-medium mb-6 inline-flex items-center"
+            >
+              <span className="mr-2">←</span> Back to Dashboard
+            </button>
 
-            {/* No submissions message */}
-            {reportData.submissions.length === 0 ? (
-              <div className="bg-gray-50 border border-gray-300 rounded-lg p-8 text-center">
-                <p className="text-gray-600">
-                  No submissions yet for this form
-                </p>
-              </div>
-            ) : (
-              /* Submissions Table */
-              <div className="bg-white rounded-lg border border-gray-300 overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-300">
-                      <tr>
-                        <th className="px-4 py-3 text-left">
-                          <input
-                            type="checkbox"
-                            checked={allSelected}
-                            ref={(input) => {
-                              if (input) {
-                                input.indeterminate = someSelected;
-                              }
-                            }}
-                            onChange={(e) => handleSelectAll(e.target.checked)}
-                            className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
-                          />
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                          Email
-                        </th>
-                        {allQuestions.map((question) => (
-                          <th
-                            key={question.questionId}
-                            className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-                          >
-                            {question.questionTitle ||
-                              `Question ${question.qorder}`}
-                            <span className="block text-xs font-normal text-gray-500 capitalize mt-1">
-                              ({question.questionType})
-                            </span>
-                          </th>
-                        ))}
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                          Submitted At
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {reportData.submissions.map((submission, idx) => (
-                        <tr
-                          key={submission.userId}
-                          className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
-                        >
-                          <td className="px-4 py-3">
-                            <input
-                              type="checkbox"
-                              checked={selectedSubmissions.has(
-                                submission.userId
-                              )}
-                              onChange={(e) =>
-                                handleSelectSubmission(
-                                  submission.userId,
-                                  e.target.checked
-                                )
-                              }
-                              className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
-                            />
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-900 font-medium">
-                            {extractEmail(submission.userId)}
-                          </td>
-                          {allQuestions.map((question) => {
-                            const answer = submission.answers.find(
-                              (a) => a.questionId === question.questionId
-                            );
-                            return (
-                              <td
-                                key={question.questionId}
-                                className="px-4 py-3 text-sm text-gray-700"
+            <div className="bg-white border-l-4 border-red-900 p-6 mb-6">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <h1 className="text-2xl font-bold text-stone-900 mb-2">
+                    {reportData.form.name}
+                  </h1>
+                  {reportData.form.description && (
+                    <p className="text-stone-600 mb-3">
+                      {reportData.form.description}
+                    </p>
+                  )}
+                  <div className="flex gap-6 text-sm text-stone-500">
+                    <span>
+                      <strong className="text-stone-700">
+                        {reportData.totalSubmissions}
+                      </strong>{" "}
+                      {reportData.totalSubmissions === 1
+                        ? "submission"
+                        : "submissions"}
+                    </span>
+                    <span>
+                      Created{" "}
+                      {new Date(reportData.form.createdAt).toLocaleDateString()}
+                    </span>
+                    {selectedSubmissions.size > 0 && (
+                      <span className="text-red-900 font-medium">
+                        {selectedSubmissions.size} selected
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-3 ml-4">
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+                      className="px-5 py-2 bg-red-900 text-white hover:bg-red-950 font-medium"
+                    >
+                      Options
+                      {selectedQuestions.size < allQuestions.length &&
+                        selectedQuestions.size > 0 &&
+                        ` (${selectedQuestions.size}/${allQuestions.length})`}
+                    </button>
+
+                    {showOptionsMenu && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setShowOptionsMenu(false)}
+                        />
+                        <div className="absolute right-0 mt-2 w-80 bg-white border border-stone-300 shadow-xl z-20 max-h-96 overflow-y-auto">
+                          <div className="p-5">
+                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-stone-200">
+                              <h3 className="font-bold text-stone-900">
+                                Export Options
+                              </h3>
+                              <button
+                                onClick={() => setShowOptionsMenu(false)}
+                                className="text-stone-500 hover:text-stone-700 text-xl leading-none"
                               >
-                                {answer?.answer || "-"}
-                              </td>
-                            );
-                          })}
-                          <td className="px-4 py-3 text-sm text-gray-600">
-                            {new Date(submission.submittedAt).toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                                ×
+                              </button>
+                            </div>
+
+                            <label className="flex items-center gap-3 p-2 hover:bg-stone-50 cursor-pointer mb-3 border-b border-stone-200">
+                              <input
+                                type="checkbox"
+                                checked={allQuestionsSelected}
+                                ref={(input) => {
+                                  if (input) {
+                                    input.indeterminate = someQuestionsSelected;
+                                  }
+                                }}
+                                onChange={(e) =>
+                                  handleSelectAllQuestions(e.target.checked)
+                                }
+                                className="w-4 h-4"
+                              />
+                              <span className="font-semibold text-stone-900">
+                                Select All Questions
+                              </span>
+                            </label>
+
+                            <div className="space-y-1">
+                              {allQuestions.map((question) => (
+                                <label
+                                  key={question.questionId}
+                                  className="flex items-start gap-3 p-2 hover:bg-stone-50 cursor-pointer"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedQuestions.has(
+                                      question.questionId
+                                    )}
+                                    onChange={(e) =>
+                                      handleSelectQuestion(
+                                        question.questionId,
+                                        e.target.checked
+                                      )
+                                    }
+                                    className="w-4 h-4 mt-0.5"
+                                  />
+                                  <div className="flex-1">
+                                    <div className="text-sm text-stone-900">
+                                      {question.questionTitle ||
+                                        `Question ${question.qorder}`}
+                                    </div>
+                                    <div className="text-xs text-stone-500">
+                                      {question.questionType}
+                                    </div>
+                                  </div>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={exportToCSV}
+                    className="px-5 py-2 bg-red-900 text-white hover:bg-red-950 font-medium"
+                  >
+                    Export to CSV
+                    {selectedSubmissions.size > 0 &&
+                      ` (${selectedSubmissions.size})`}
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
           </div>
+
+          {reportData.submissions.length === 0 ? (
+            <div className="bg-white border border-stone-300 p-12 text-center">
+              <p className="text-stone-600">
+                No submissions have been received yet.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-white border border-stone-300">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b-2 border-stone-300 bg-stone-100">
+                      <th className="px-4 py-3 text-left w-12">
+                        <input
+                          type="checkbox"
+                          checked={allSelected}
+                          ref={(input) => {
+                            if (input) {
+                              input.indeterminate = someSelected;
+                            }
+                          }}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          className="w-4 h-4"
+                        />
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-stone-700 uppercase">
+                        Email
+                      </th>
+                      {allQuestions.map((question) => (
+                        <th
+                          key={question.questionId}
+                          className="px-4 py-3 text-left text-xs font-bold text-stone-700 uppercase"
+                        >
+                          <div>
+                            {question.questionTitle ||
+                              `Question ${question.qorder}`}
+                          </div>
+                          <div className="text-xs font-normal text-stone-500 mt-1">
+                            {question.questionType}
+                          </div>
+                        </th>
+                      ))}
+                      <th className="px-4 py-3 text-left text-xs font-bold text-stone-700 uppercase">
+                        Submitted
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reportData.submissions.map((submission, idx) => (
+                      <tr
+                        key={submission.userId}
+                        className={`border-b border-stone-200 ${
+                          idx % 2 === 0 ? "bg-white" : "bg-stone-50"
+                        }`}
+                      >
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedSubmissions.has(submission.userId)}
+                            onChange={(e) =>
+                              handleSelectSubmission(
+                                submission.userId,
+                                e.target.checked
+                              )
+                            }
+                            className="w-4 h-4"
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-sm text-stone-900 font-medium">
+                          {extractEmail(submission.userId)}
+                        </td>
+                        {allQuestions.map((question) => {
+                          const answer = submission.answers.find(
+                            (a) => a.questionId === question.questionId
+                          );
+                          return (
+                            <td
+                              key={question.questionId}
+                              className="px-4 py-3 text-sm text-stone-700"
+                            >
+                              {answer?.answer || "—"}
+                            </td>
+                          );
+                        })}
+                        <td className="px-4 py-3 text-sm text-stone-600">
+                          {new Date(submission.submittedAt).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
-      </main>
+      </div>
     </>
   );
 }

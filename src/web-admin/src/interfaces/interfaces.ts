@@ -16,3 +16,18 @@ export interface FormQuestion
   qorder: number;
   createdAt: string;
 }
+
+export interface Event
+{
+  id: number;
+  title: string;
+  description: string | null;
+  location: string | null;
+  startTime: string;
+  endTime: string;
+  capacity: number;
+  isPublic: boolean;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
