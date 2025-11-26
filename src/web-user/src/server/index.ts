@@ -325,6 +325,50 @@ fastify.post("api/events/registration/register", async (request, reply) => {
   }
 });
 
+interface QRPayload {
+  registrationId: number;
+  eventId: number;
+  userEmail: string;
+  instance: number;
+}
+
+function buildQRContentString(payload : QRPayload) {
+return `registrationId:${payload.registrationId};eventId:${payload.eventId};userEmail:${payload.userEmail};` +
+    `instance:${payload.instance}`;
+}
+
+fastify.post("api/events/registration/generateQR", async (request, reply) => {
+  try {
+    const { registrationId, eventId, userEmail, instance } = request.body as {
+      registrationId: number;
+      eventId: number;
+      userEmail: string;
+      instance: number;
+    };
+
+    const qrString = buildQRContentString(request.body as QRPayload);
+    const qrBuffer = await QRCode.toBuffer(qrString);
+    const [entry] = await db.insert(qrCodes).values({
+      id: registrationId,
+      eventId: eventId,
+      userEmail: userEmail,
+      instance: instance,
+      image: qrBuffer,
+      content: qrString
+    }).returning();
+
+    return reply.send({
+      success: true,
+      data: entry,
+    });
+  } catch (error) {
+    fastify.log.error({ err: error }, 'Failed to generate QR code');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to generate QR code',
+    });
+  }
+});
 // Start server
 try
 {
