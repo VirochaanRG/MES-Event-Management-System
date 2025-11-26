@@ -369,6 +369,33 @@ fastify.post("api/events/registration/generateQR", async (request, reply) => {
     });
   }
 });
+
+fastify.get("api/events/registration/event-qrcodes", async (request, reply) => {
+  try {
+    const { eventId, userEmail } = request.body as {
+      eventId: number;
+      userEmail: string;
+    };
+
+    const codes = await db.select().from(qrCodes)
+      .where(
+        and(
+          eq(qrCodes.eventId, eventId),
+          eq(qrCodes.userEmail, userEmail)
+        ));
+
+    return reply.send({
+      success: true,
+      data: codes,
+    });
+  } catch (error) {
+    fastify.log.error({ err: error }, 'Failed to access DB and fetch QR codes');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to access DB and fetch QR codes',
+    });
+  }
+});
 // Start server
 try
 {
