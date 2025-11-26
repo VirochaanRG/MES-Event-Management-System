@@ -288,7 +288,7 @@ fastify.get('/api/auth/token', async (request, reply) =>
   reply.send({ token });
 });
 
-fastify.post("api/events/registration/register", async (request, reply) => {
+fastify.post("/api/events/registration/register", async (request, reply) => {
   try {
     const { eventId, userEmail, instance = 0 } = request.body as {
       eventId: number;
@@ -337,7 +337,7 @@ return `registrationId:${payload.registrationId};eventId:${payload.eventId};user
     `instance:${payload.instance}`;
 }
 
-fastify.post("api/events/registration/generateQR", async (request, reply) => {
+fastify.post("/api/events/registration/generateQR", async (request, reply) => {
   try {
     const { registrationId, eventId, userEmail, instance } = request.body as {
       registrationId: number;
@@ -370,7 +370,7 @@ fastify.post("api/events/registration/generateQR", async (request, reply) => {
   }
 });
 
-fastify.get("api/events/registration/event-qrcodes", async (request, reply) => {
+fastify.get("/api/events/registration/event-qrcodes", async (request, reply) => {
   try {
     const { eventId, userEmail } = request.body as {
       eventId: number;
@@ -397,7 +397,7 @@ fastify.get("api/events/registration/event-qrcodes", async (request, reply) => {
   }
 });
 
-fastify.delete("api/events/registration", async (request, reply) => {
+fastify.delete("/api/events/registration", async (request, reply) => {
   try {
     const { id } = request.body as {
       id: number;
@@ -417,7 +417,7 @@ fastify.delete("api/events/registration", async (request, reply) => {
   }
 });
 
-fastify.get("api/events/registration/latest-instance", async (request, reply) => {
+fastify.get("/api/events/registration/latest-instance", async (request, reply) => {
   try {
     const { eventId, userEmail } = request.body as {
       eventId: number;

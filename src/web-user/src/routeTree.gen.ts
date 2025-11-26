@@ -11,7 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SurveysFormIdRouteImport } from './routes/surveys/$formId'
 import { Route as EventsEventIdRouteImport } from './routes/events/$eventId'
+import { Route as SurveysResponseFormIdRouteImport } from './routes/surveys/response/$formId'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -23,9 +25,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SurveysFormIdRoute = SurveysFormIdRouteImport.update({
+  id: '/surveys/$formId',
+  path: '/surveys/$formId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsEventIdRoute = EventsEventIdRouteImport.update({
   id: '/events/$eventId',
   path: '/events/$eventId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SurveysResponseFormIdRoute = SurveysResponseFormIdRouteImport.update({
+  id: '/surveys/response/$formId',
+  path: '/surveys/response/$formId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -33,30 +45,54 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/events/$eventId': typeof EventsEventIdRoute
+  '/surveys/$formId': typeof SurveysFormIdRoute
+  '/surveys/response/$formId': typeof SurveysResponseFormIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/events/$eventId': typeof EventsEventIdRoute
+  '/surveys/$formId': typeof SurveysFormIdRoute
+  '/surveys/response/$formId': typeof SurveysResponseFormIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/events/$eventId': typeof EventsEventIdRoute
+  '/surveys/$formId': typeof SurveysFormIdRoute
+  '/surveys/response/$formId': typeof SurveysResponseFormIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/events/$eventId'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/events/$eventId'
+    | '/surveys/$formId'
+    | '/surveys/response/$formId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/events/$eventId'
-  id: '__root__' | '/' | '/login' | '/events/$eventId'
+  to:
+    | '/'
+    | '/login'
+    | '/events/$eventId'
+    | '/surveys/$formId'
+    | '/surveys/response/$formId'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/events/$eventId'
+    | '/surveys/$formId'
+    | '/surveys/response/$formId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
   EventsEventIdRoute: typeof EventsEventIdRoute
+  SurveysFormIdRoute: typeof SurveysFormIdRoute
+  SurveysResponseFormIdRoute: typeof SurveysResponseFormIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,11 +111,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/surveys/$formId': {
+      id: '/surveys/$formId'
+      path: '/surveys/$formId'
+      fullPath: '/surveys/$formId'
+      preLoaderRoute: typeof SurveysFormIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/events/$eventId': {
       id: '/events/$eventId'
       path: '/events/$eventId'
       fullPath: '/events/$eventId'
       preLoaderRoute: typeof EventsEventIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/surveys/response/$formId': {
+      id: '/surveys/response/$formId'
+      path: '/surveys/response/$formId'
+      fullPath: '/surveys/response/$formId'
+      preLoaderRoute: typeof SurveysResponseFormIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -89,6 +139,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
   EventsEventIdRoute: EventsEventIdRoute,
+  SurveysFormIdRoute: SurveysFormIdRoute,
+  SurveysResponseFormIdRoute: SurveysResponseFormIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
