@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { ThreeDot } from "react-loading-indicators";
 
 export const Route = createFileRoute("/events/$eventId")({
   component: RouteComponent,
@@ -23,9 +25,13 @@ interface Event {
 function RouteComponent() {
   const navigate = useNavigate();
   const { eventId } = Route.useParams();
+  const { user } = useAuth();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [registerStatus, setRegisterStatus] = useState<
+    "idle" | "loading" | "registered"
+  >("idle");
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -86,6 +92,41 @@ function RouteComponent() {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  const registerButton = async () => {
+    setRegisterStatus("loading");
+    try {
+      const response = await fetch(`/api/events/${eventId}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userEmail: user?.email }),
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        setRegisterStatus("registered");
+      } else {
+        setRegisterStatus("idle");
+        throw new Error(result.error || "Failed to fetch event");
+      }
+    } catch (err: any) {
+      setRegisterStatus("idle");
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  let buttonTitle;
+  if (registerStatus === "loading") {
+    buttonTitle = (
+      <ThreeDot color="#808980ff" size="medium" text="" textColor="" />
+    );
+  } else if (registerStatus === "registered") {
+    buttonTitle = "Registered";
+  } else {
+    buttonTitle = "Register for Event";
+  }
 
   if (loading) {
     return (
@@ -295,8 +336,10 @@ function RouteComponent() {
         {/* Action Buttons */}
         <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
           <div className="flex gap-4">
-            <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
-              Register for Event
+            <button
+              className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={registerButton}>
+              {buttonTitle}
             </button>
             <button className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
               Share Event
