@@ -105,9 +105,7 @@ function RouteComponent() {
 
       if (result.success) {
         setRegisterStatus("registered");
-        {
-          handleBack;
-        }
+        handleBack();
       } else {
         setRegisterStatus("idle");
       }
