@@ -29,6 +29,8 @@
     "qrcode": "^1.5.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-hot-toast": "^2.6.0",
+    "react-loading-indicators": "^1.0.1",
     "styled-components": "^6.1.19"
   },
   "devDependencies": {

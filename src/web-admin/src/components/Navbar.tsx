@@ -50,21 +50,6 @@ export default function Navbar() {
             "Not authenticated"
           )}
         </div>
-
-        {authSource && (
-          <span
-            className={`
-              text-xs px-3 py-1 rounded-md border font-medium tracking-wide
-              ${
-                authSource === "local"
-                  ? "bg-[#D4AF37]/20 border-[#D4AF37] text-[#800020]"
-                  : "bg-gray-100 border-gray-300 text-gray-700"
-              }
-            `}
-          >
-            {authSource === "local" ? "Local Development" : "Main Portal"}
-          </span>
-        )}
       </div>
 
       {/* Logout */}
