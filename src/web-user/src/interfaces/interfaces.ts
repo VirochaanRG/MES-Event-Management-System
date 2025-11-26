@@ -13,6 +13,21 @@ export interface FormQuestion
   questionType: string;
   questionTitle: string | null;
   optionsCategory: string | null;
-  qorder: number;
+  qOrder: number;
   createdAt: string;
+}
+
+export interface FormAnswer {
+  id: number;
+  userId: number;
+  formId: number;
+  questionId: number;
+  questionType: string;
+  answer: string;
+  createdAt: string;
+}
+
+export interface FormResponse {
+  question: FormQuestion;
+  answer: FormAnswer | undefined;
 }
