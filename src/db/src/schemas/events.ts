@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, timestamp, integer, boolean, jsonb,
+import { pgTable, serial, varchar, text, timestamp, integer, boolean,
   unique, customType } from "drizzle-orm/pg-core";
 
 export const events = pgTable("events", {
