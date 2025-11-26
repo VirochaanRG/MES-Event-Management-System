@@ -4,8 +4,9 @@ import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
 import { events } from '../../../db/src/schemas/events';
-import { eq } from 'drizzle-orm';
-import { form, formQuestions } from '@db/schemas';
+import { eq, and, or, max, InferInsertModel } from 'drizzle-orm';
+import { form, formQuestions, registeredUsers, qrCodes } from '@db/schemas';
+import QRCode from 'qrcode';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -285,6 +286,43 @@ fastify.get('/api/auth/token', async (request, reply) =>
 {
   const token = request.cookies['auth-token'];
   reply.send({ token });
+});
+
+fastify.post("api/events/registration/register", async (request, reply) => {
+  try {
+    const { eventId, userEmail, instance = 0 } = request.body as {
+      eventId: number;
+      userEmail: string;
+      instance?: number;
+    };
+
+    const registration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.eventId, eventId),
+        eq(registeredUsers.userEmail, userEmail),
+        eq(registeredUsers.instance, instance),
+      )
+    });
+
+    if (registration !== null) {
+      return reply.code(409).send({ error: "This registration instance already exists in the database"});
+    }
+
+    type Entry = InferInsertModel<typeof registeredUsers>;
+    const entry = request.body as unknown as Entry;
+    const [data] = await db.insert(registeredUsers).values(entry).returning();
+
+    return reply.send({
+      success: true,
+      entry: data,
+    });
+  } catch (error) {
+    fastify.log.error({ err: error }, 'Failed to register user');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch user',
+    });
+  }
 });
 
 // Start server

@@ -1,4 +1,5 @@
-import { pgTable, serial, varchar, text, timestamp, integer, boolean, unique, customType } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer, boolean, jsonb,
+  unique, customType } from "drizzle-orm/pg-core";
 
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),
@@ -47,5 +48,6 @@ export const qrCodes = pgTable("qr_codes", {
   userEmail: varchar("user_email", { length: 255 }).notNull(),
   instance: integer("instance").notNull(),
   image: bytea("image").notNull(),
+  content: varchar("content", {length: 255}).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
