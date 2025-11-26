@@ -4,8 +4,9 @@ import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
 import { events } from '../../../db/src/schemas/events';
-import { eq, and } from 'drizzle-orm';
-import { form, formAnswers, formQuestions } from '@db/schemas';
+import { eq, and, sql, isNull } from 'drizzle-orm';
+import { form, formAnswers, formQuestions, formSubmissions } from '@db/schemas';
+import { timeStamp } from 'console';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -294,7 +295,8 @@ fastify.get<{ Params: { fid: string, uid: string }, }>('/api/forms/:fid/answers/
     var answers = await db.select().from(formAnswers).where(
       and(
         eq(formAnswers.formId, selectedForm.id), 
-        eq(formAnswers.userId, uid)));
+        eq(formAnswers.userId, uid),
+        isNull(formAnswers.submissionId)));
     if(!answers) {
       answers = [];
     }
@@ -374,6 +376,71 @@ fastify.post<{
     return reply.code(201).send({
       success: true,
       data: newAnswer[0],
+    });
+  } 
+  catch (error){ 
+    fastify.log.error({ err: error }, 'Failed to post user answers');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to post user answers',
+    });
+  }
+});
+
+//GET completed submission id
+fastify.patch<{
+  Params: { fid: string, uid : string},
+}>('/api/forms/:fid/submit/:uid', async (request, reply) =>
+{
+  try
+  {
+    const {fid, uid} = request.params;
+    const selectedForm = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(fid)),
+    });
+    if (!selectedForm)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Survey not found',
+      });
+    }
+
+    const existingSubmission = await db.query.formSubmissions.findFirst({where : 
+      and(
+        eq(formSubmissions.formId, parseInt(fid)),
+        eq(formSubmissions.userId, uid))});
+    
+    var submission;
+    if(existingSubmission) {
+      submission = await db
+        .update(formSubmissions)
+        .set({updatedAt : sql`NOW()`})
+        .where(and(
+          eq(formSubmissions.formId, parseInt(fid)),
+          eq(formSubmissions.userId, uid)))
+        .returning();
+      await db
+        .update(formAnswers)
+        .set({submissionId : submission[0].id})
+        .where(and(
+          eq(formAnswers.formId, parseInt(fid)), 
+          eq(formAnswers.userId, uid),
+          isNull(formAnswers.submissionId))
+        );
+    } else {
+      submission = await db
+        .insert(formSubmissions)
+        .values({
+          userId: uid,
+          formId: parseInt(fid)
+        })
+        .returning();
+    }
+
+    return reply.code(201).send({
+      success: true,
+      data: selectedForm[0],
     });
   } 
   catch (error){ 

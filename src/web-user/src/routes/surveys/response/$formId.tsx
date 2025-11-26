@@ -17,10 +17,9 @@ function RouteComponent() {
   const userId = sessionStorage.getItem("teamd-auth-user");
   const [form, setForm] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [surveyProgress, setSurveyProgress] = useState<
-    "unfilled" | "started" | "completed"
-  >("unfilled");
+  const [submitted, setSubmitted] = useState(false);
   const [responses, setResponses] = useState<FormResponse[]>([]);
 
   useEffect(() => {
@@ -94,33 +93,64 @@ function RouteComponent() {
     );
   };
 
-  const handleSubmit = () => {
-    const submitForm = async () => {
-      for (const response of responses) {
-        const request = {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            qid: response.question.id,
-            uid: userId ?? "",
-            answer: response.answer?.answer,
-            questionType: response.question.questionType,
-          }),
-        };
-        const submitResponse = await fetch(
-          `/api/forms/${formId}/answers/${userId}`,
-          request
+  const saveForm = async () => {
+    for (const response of responses) {
+      if(!response.answer || response.answer.answer.length == 0) continue;
+      const request = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          qid: response.question.id,
+          uid: userId ?? "",
+          answer: response.answer?.answer,
+          questionType: response.question.questionType,
+        }),
+      };
+      const submitResponse = await fetch(
+        `/api/forms/${formId}/answers/${userId}`,
+        request
+      );
+      const submitResult = await submitResponse.json();
+      if (!submitResult.success) {
+        throw new Error(
+          submitResult.error ||
+            "Could not submit question with ID: " + response.question.id
         );
-        const submitResult = await submitResponse.json();
-        if (!submitResult.success) {
-          throw new Error(
-            submitResult.error ||
-              "Could not submit question with ID: " + response.question.id
-          );
-        }
       }
-    };
-    submitForm();
+    }
+  };
+
+  const handleSubmit = () => {
+    const confirmation = confirm("Are you sure you want to submit?");
+    if(!confirmation) return;
+    const postSubmission = async () => {
+      await fetch(`/api/forms/${formId}/submit/${userId}`, {
+        method: "PATCH"
+    });
+    }
+    try {
+      setSubmitting(true);
+      if(responses.some(r => !r.answer || !r.answer.answer)) {
+        alert("Please fill in all fields.");
+      } else {
+        saveForm();
+        postSubmission();
+        setSubmitted(true);
+      }
+    }  catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSave = () => {
+    try {
+      saveForm();
+      alert("Your response has been saved.");
+    }  catch (err: any) {
+      setError(err.message);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -156,6 +186,65 @@ function RouteComponent() {
           </button>
         </div>
       </div>
+    );
+  }
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={handleBack}
+          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Back to Surveys
+        </button>
+
+        {/* Survey Header */}
+        <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-8 mb-6">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                {form.name}
+              </h1>
+            </div>
+          </div>
+          <p className="text-gray-700 text-lg leading-relaxed">
+            {form.description}
+          </p>  
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-8 mb-6">
+          <p className="text-gray-700 text-lg leading-relaxed py-5">
+            Thank you for your submission. Your response has been recorded.
+          </p>
+          <button
+            onClick={handleBack}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Back to surveys
+          </button>
+        </div>
+        {/* Metadata */}
+        <div className="mt-6 text-center text-sm text-gray-500">
+          Created {formatDate(form.createdAt)}
+        </div>
+      </div>
+    </div>
     );
   }
 
@@ -233,13 +322,14 @@ function RouteComponent() {
         {/* Action Buttons */}
         <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
           <div className="flex gap-4">
-            <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={handleSave}>
               Save
             </button>
             <button
               className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
               onClick={handleSubmit}
-            >
+              disabled={submitting}>
               Submit
             </button>
           </div>
