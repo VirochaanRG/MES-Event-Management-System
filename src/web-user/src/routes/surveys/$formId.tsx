@@ -1,25 +1,22 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { StatSyncFn } from "fs";
+import { createFileRoute, useLocation, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { Form } from "@/interfaces/interfaces";
+import { useQueryClient } from "@tanstack/react-query";
+
 
 export const Route = createFileRoute("/surveys/$formId")({
   component: RouteComponent,
 });
 
-interface Form {
-  id: number;
-  name: string;
-  description: string | null;
-  createdAt: string
-}
-
 function RouteComponent() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { formId } = Route.useParams();
+  const userId = sessionStorage.getItem("teamd-auth-user");
   const [form, setForm] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [surveyProgress, setSurveyProgress] = useState<"unfilled" |"started" | "completed">("unfilled");
+  const [surveyProgress, setSurveyProgress] = useState<"unfilled" | "started" | "completed">("unfilled");
 
   useEffect(() => {
     const fetchForm = async () => {
@@ -31,8 +28,14 @@ function RouteComponent() {
         if (!result.success) {
           throw new Error(result.error || "Failed to fetch form");
         }
-
         setForm(result.data);
+        const statusResponse = await fetch(`/api/forms/${formId}/status/${userId}`);
+        const statusResult = await statusResponse.json();
+        if (!statusResult.success) {
+          throw new Error(result.error || "Failed to fetch form");
+        }
+        console.log(statusResult.data)
+        setSurveyProgress(statusResult.data);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -52,6 +55,21 @@ function RouteComponent() {
   };
 
   const handleDeleteSubmission = () => {
+    const deleteSubmission = async () => {
+      const confirmation = confirm("Are you sure you want to delete your submission?");
+      if(!confirmation) return;
+      const deleteResponse = await fetch(
+        `/api/forms/${formId}/delete/${userId}`, {method: "DELETE"}
+      );
+      const deleteResult = await deleteResponse.json();
+      if(!deleteResult.success) {
+          throw new Error(deleteResult.error || "Failed to delete submission");
+      }
+  
+      queryClient.invalidateQueries({queryKey : ["availableSurveys"]});
+      queryClient.invalidateQueries({queryKey : ["completedSurveys"]});
+    };
+    deleteSubmission();
     setSurveyProgress("unfilled");
   }
 
@@ -63,30 +81,6 @@ function RouteComponent() {
       month: "long",
       day: "numeric",
     });
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "scheduled":
-        return "bg-blue-100 text-blue-800";
-      case "ongoing":
-        return "bg-green-100 text-green-800";
-      case "completed":
-        return "bg-gray-100 text-gray-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
   };
 
   if (loading) {
