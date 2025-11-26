@@ -1,0 +1,1 @@
+ALTER TABLE "qr_codes" ADD COLUMN "content" varchar(255) NOT NULL;
