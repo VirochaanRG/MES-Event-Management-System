@@ -7,6 +7,17 @@ export const form = pgTable("form", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
 });
 
+export const formSubmissions = pgTable("form_submissions", {
+  id: serial("id").primaryKey().notNull(),
+  userId: text("user_id")
+    .notNull(),
+  formId: integer("form_id")
+    .notNull()
+    .references(() => form.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
 export const formQuestions = pgTable("form_questions", {
   id: serial("id").primaryKey().notNull(),
   formId: integer("form_id")
@@ -30,16 +41,6 @@ export const formAnswers = pgTable("form_answers", {
     .notNull()
     .references(() => formQuestions.id, { onDelete: "cascade" }),
   answer: text("answer"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
-});
-
-export const formSubmissions = pgTable("form_answers", {
-  id: serial("id").primaryKey().notNull(),
-  userId: integer("user_id")
-    .notNull(),
-  formId: integer("form_id")
-    .notNull()
-    .references(() => form.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  submissionId: integer("submission_id").references(() => formSubmissions.id, {onDelete: "cascade"})
 });
