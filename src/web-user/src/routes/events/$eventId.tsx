@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThreeDot } from "react-loading-indicators";
+import toast from "react-hot-toast";
 
 export const Route = createFileRoute("/events/$eventId")({
   component: RouteComponent,
@@ -105,7 +106,11 @@ function RouteComponent() {
 
       if (result.success) {
         setRegisterStatus("registered");
-        handleBack();
+        toast.success("Registration complete");
+        setTimeout(() => handleBack(), 300);
+      } else if (result.error == "User is already registered for this event") {
+        toast.error("You are already registered for this event");
+        setTimeout(() => handleBack(), 300);
       } else {
         setRegisterStatus("idle");
       }
