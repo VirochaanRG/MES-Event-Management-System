@@ -396,6 +396,27 @@ fastify.get("api/events/registration/event-qrcodes", async (request, reply) => {
     });
   }
 });
+
+fastify.delete("api/events/registration", async (request, reply) => {
+  try {
+    const { id } = request.body as {
+      id: number;
+    };
+
+    const result = await db.delete(registeredUsers).where(eq(registeredUsers.id, id));
+
+    return reply.send({
+      success: true,
+    });
+  } catch (error) {
+    fastify.log.error({ err: error }, 'Failed to delete entry');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to delete entry',
+    });
+  }
+});
+
 // Start server
 try
 {
