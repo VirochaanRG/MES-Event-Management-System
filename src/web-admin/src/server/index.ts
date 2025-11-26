@@ -4,7 +4,7 @@ import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
 import { events, registeredUsers } from '../../../db/src/schemas/events';
-import { form, formQuestions } from './../../../db/src/schemas/form';
+import { form, formAnswers, formQuestions } from './../../../db/src/schemas/form';
 import { and, eq, sql } from 'drizzle-orm';
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
@@ -850,6 +850,92 @@ fastify.get<{
     });
   }
 });
+
+// GET all answers for a specific form with question details
+fastify.get<{ Params: { id: string } }>(
+  '/api/forms/:id/answers',
+  async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+
+      // Check if form exists
+      const existingForm = await db.query.form.findFirst({
+        where: eq(form.id, parseInt(id)),
+      });
+
+      if (!existingForm)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      // Get all answers with question details using a join
+      const answers = await db
+        .select({
+          answerId: formAnswers.id,
+          userId: formAnswers.userId,
+          answer: formAnswers.answer,
+          createdAt: formAnswers.createdAt,
+          questionId: formQuestions.id,
+          questionTitle: formQuestions.questionTitle,
+          questionType: formQuestions.questionType,
+          qorder: formQuestions.qorder,
+        })
+        .from(formAnswers)
+        .innerJoin(
+          formQuestions,
+          eq(formAnswers.questionId, formQuestions.id)
+        )
+        .where(eq(formAnswers.formId, parseInt(id)))
+        .orderBy(formAnswers.userId, formQuestions.qorder);
+
+      // Group answers by userId to create submissions
+      const submissionMap = new Map<string, any>();
+
+      answers.forEach((answer) =>
+      {
+        if (!submissionMap.has(answer.userId))
+        {
+          submissionMap.set(answer.userId, {
+            userId: answer.userId,
+            submittedAt: answer.createdAt,
+            answers: [],
+          });
+        }
+
+        submissionMap.get(answer.userId).answers.push({
+          questionId: answer.questionId,
+          questionTitle: answer.questionTitle,
+          questionType: answer.questionType,
+          qorder: answer.qorder,
+          answer: answer.answer,
+        });
+      });
+
+      const submissions = Array.from(submissionMap.values());
+
+      return reply.send({
+        success: true,
+        data: {
+          form: existingForm,
+          submissions,
+          totalSubmissions: submissions.length,
+        },
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch form answers');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch form answers',
+      });
+    }
+  }
+);
 
 // Local login (for testing without main portal)
 fastify.post('/api/auth/local-login', async (request, reply) =>
