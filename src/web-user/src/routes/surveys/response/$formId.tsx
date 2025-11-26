@@ -5,43 +5,11 @@ import { StatSyncFn } from "fs";
 import { useState, useEffect } from "react";
 import MultipleChoiceAnswerQuestion from "@/components/MultipleChoiceAnswerQuestion";
 import LinearScaleAnswerQuestion from "@/components/LinearScaleAnswerQuestion";
+import { FormQuestion, FormAnswer, Form, FormResponse} from "@/interfaces/interfaces";
 
 export const Route = createFileRoute("/surveys/response/$formId")({
   component: RouteComponent,
 });
-
-interface Form {
-  id: number;
-  name: string;
-  description: string | null;
-  createdAt: string;
-  formQuestions: Question[];
-}
-
-interface Question {
-  id: number;
-  formId: number;
-  questionType: string;
-  questionTitle: string;
-  optionsCategory: string;
-  qOrder: number;
-  createdAt: string;
-}
-
-interface Answer {
-  id: number | undefined;
-  userId: number | undefined;
-  formId: number | undefined;
-  questionId: number | undefined;
-  questionType: string | undefined;
-  answer: string | undefined;
-  createdAt: string | undefined;
-}
-
-interface Response {
-  question: Question;
-  answer: Answer | undefined;
-}
 
 function RouteComponent() {
   const navigate = useNavigate();
@@ -53,7 +21,7 @@ function RouteComponent() {
   const [surveyProgress, setSurveyProgress] = useState<
     "unfilled" | "started" | "completed"
   >("unfilled");
-  const [responses, setResponses] = useState<Response[]>([]);
+  const [responses, setResponses] = useState<FormResponse[]>([]);
 
   useEffect(() => {
     const fetchFormAndQuestions = async () => {
@@ -73,16 +41,16 @@ function RouteComponent() {
         if (!questionsResult.success) {
           throw new Error(questionsResult.error || "Failed to fetch form");
         }
-        var questions: Question[] = questionsResult.data;
+        var questions: FormQuestion[] = questionsResult.data;
 
         const answersResponse = await fetch(
           `/api/forms/${formId}/answers/${userId}`
         );
         const answersResult = await answersResponse.json();
-        var answers: Answer[] = answersResult.success ? answersResult.data : [];
+        var answers: FormAnswer[] = answersResult.success ? answersResult.data : [];
         setResponses(
           questions.map((q) => {
-            var response: Response = {
+            var response: FormResponse = {
               question: q,
               answer: answers.find((a) => a.questionId == q.id),
             };
@@ -104,13 +72,13 @@ function RouteComponent() {
     navigate({ to: "/" });
   };
 
-  const handleResponseOnChange = (response: Response, answer: string) => {
+  const handleResponseOnChange = (response: FormResponse, answer: string) => {
     setResponses((prev) =>
       prev.map((r) => {
         // if this is the response we want to update
         if (r.question.id === response.question.id) {
           // create a new Answer object
-          const newAnswer: Answer = {
+          const newAnswer: FormAnswer = {
             id: r.answer?.id ?? 0, // keep id or 0 if undefined
             userId: r.answer?.userId ?? 0,
             formId: r.question.formId,
@@ -235,7 +203,7 @@ function RouteComponent() {
         {/* Questions */}
         {responses
           .sort((r1, r2) => r1.question.qOrder - r2.question.qOrder)
-          .map((response: Response) =>
+          .map((response: FormResponse) =>
             response.question.questionType === "text_answer" ? (
               <TextAnswerQuestion
                 key={response.question.id}
