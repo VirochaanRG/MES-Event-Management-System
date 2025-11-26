@@ -4,9 +4,11 @@ import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
 import { events, registeredUsers } from '../../../db/src/schemas/events';
-import { eq, and, sql, isNull } from 'drizzle-orm';
+import { eq, and, sql, isNull, is} from 'drizzle-orm';
 import { form, formAnswers, formQuestions, formSubmissions } from '@db/schemas';
 import { timeStamp } from 'console';
+import { notEqual } from 'assert';
+import { parse } from 'path';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -322,7 +324,7 @@ fastify.get<{
 });
 
 
-//Get forms
+//Get all forms
 fastify.get('/api/forms', async (request, reply) =>
 {
   try
@@ -343,15 +345,86 @@ fastify.get('/api/forms', async (request, reply) =>
   }
 });
 
-// GET single form by ID
-fastify.get<{ Params: { id: string } }>('/api/forms/:id', async (request, reply) =>
+//GET unfilled forms for user
+fastify.get<{ Params: { uid: string } }>('/api/forms/available/:uid', async (request, reply) =>
 {
   try
   {
-    const { id } = request.params;
+    const {uid} = request.params;
+    const allForms = await db
+      .select({
+        id: form.id,
+        name: form.name,
+        description: form.description,
+        createdAt: form.createdAt,
+      })
+      .from(form)
+      .leftJoin(
+        formSubmissions,
+        and(
+          eq(form.id, formSubmissions.formId),
+          eq(formSubmissions.userId, uid)
+        )
+      )
+      .where(sql`${formSubmissions.id} IS NULL`);
+
+    console.log("UNFILLED: " + allForms);
+
+    return reply.send({
+      success: true,
+      data: allForms,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch forms');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch forms',
+    });
+  }
+});
+
+//GET filled forms for user
+fastify.get<{ Params: { uid: string } }>('/api/forms/completed/:uid', async (request, reply) =>
+{
+  try
+  {
+    const {uid} = request.params;
+    const allForms = await db.select({
+        id: form.id,
+        name: form.name,
+        description: form.description,
+        createdAt: form.createdAt,
+      })
+      .from(form)
+      .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
+      .where(eq(formSubmissions.userId, uid));
+
+    console.log("FILLED: " + allForms);
+
+    return reply.send({
+      success: true,
+      data: allForms,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch forms');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch forms',
+    });
+  }
+});
+
+// GET single form by ID
+fastify.get<{ Params: { fid: string } }>('/api/forms/:fid', async (request, reply) =>
+{
+  try
+  {
+    const { fid } = request.params;
 
     const selectedForm = await db.query.form.findFirst({
-      where: eq(form.id, parseInt(id)),
+      where: eq(form.id, parseInt(fid)),
     });
 
     if (!selectedForm)
@@ -376,24 +449,57 @@ fastify.get<{ Params: { id: string } }>('/api/forms/:id', async (request, reply)
   }
 });
 
-// GET questions by form ID
-fastify.get<{ Params: { id: string } }>('/api/forms/questions/:id', async (request, reply) =>
+// GET status of form for user
+fastify.get<{ Params: { fid: string, uid: string } }>('/api/forms/:fid/status/:uid', async (request, reply) =>
 {
   try
   {
-    const { id } = request.params;
-    const selectedForm = await db.query.form.findFirst({
-      where: eq(form.id, parseInt(id)),
+    const { fid, uid } = request.params;
+
+    const submission = await db.query.formSubmissions.findFirst({
+      where: and(eq(formSubmissions.formId, parseInt(fid)), eq(formSubmissions.userId, uid))
     });
-    if (!selectedForm)
-    {
-      return reply.code(404).send({
-        success: false,
-        error: 'Survey not found',
+
+
+    if(!submission) {
+      const answer = await db.query.formAnswers.findFirst({
+      where: and(eq(formAnswers.formId, parseInt(fid)), eq(formAnswers.userId, uid))});
+      if(!answer) {
+        return reply.send({
+          success: true,
+          data: 'unfilled',
+        });
+      } else {
+        return reply.send({
+          success: true,
+          data: 'started',
+        });
+      }
+    } else {
+      return reply.send({
+        success: true,
+        data: 'completed',
       });
     }
+
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch form');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch form',
+    });
+  }
+});
+
+// GET questions by form ID
+fastify.get<{ Params: { fid: string } }>('/api/forms/questions/:fid', async (request, reply) =>
+{
+  try
+  {
+    const { fid } = request.params;
     
-    const questions = await db.select().from(formQuestions).where(eq(formQuestions.formId, selectedForm.id));
+    const questions = await db.select().from(formQuestions).where(eq(formQuestions.formId, parseInt(fid)));
 
     return reply.send({
       success: true,
@@ -415,20 +521,10 @@ fastify.get<{ Params: { fid: string, uid: string }, }>('/api/forms/:fid/answers/
   try
   {
     const { fid, uid } = request.params;
-    const selectedForm = await db.query.form.findFirst({
-      where: eq(form.id, parseInt(fid)),
-    });
-    if (!selectedForm)
-    {
-      return reply.code(404).send({
-        success: false,
-        error: 'Survey not found',
-      });
-    }
-    
+
     var answers = await db.select().from(formAnswers).where(
       and(
-        eq(formAnswers.formId, selectedForm.id), 
+        eq(formAnswers.formId, parseInt(fid)), 
         eq(formAnswers.userId, uid),
         isNull(formAnswers.submissionId)));
     if(!answers) {
@@ -448,8 +544,6 @@ fastify.get<{ Params: { fid: string, uid: string }, }>('/api/forms/:fid/answers/
   }
 });
 
-
-
 //POST reponse to question
 fastify.post<{
   Params: { fid: string, uid : string};
@@ -460,16 +554,7 @@ fastify.post<{
   {
     const {fid, uid} = request.params;
     const {qid, answer, questionType} = request.body;
-    const selectedForm = await db.query.form.findFirst({
-      where: eq(form.id, parseInt(fid)),
-    });
-    if (!selectedForm)
-    {
-      return reply.code(404).send({
-        success: false,
-        error: 'Survey not found',
-      });
-    }
+
     const selectedQuestion = await db.query.formQuestions.findFirst({
       where: eq(formQuestions.id, parseInt(qid)),
     });
@@ -529,16 +614,6 @@ fastify.patch<{
   try
   {
     const {fid, uid} = request.params;
-    const selectedForm = await db.query.form.findFirst({
-      where: eq(form.id, parseInt(fid)),
-    });
-    if (!selectedForm)
-    {
-      return reply.code(404).send({
-        success: false,
-        error: 'Survey not found',
-      });
-    }
 
     const existingSubmission = await db.query.formSubmissions.findFirst({where : 
       and(
@@ -574,7 +649,42 @@ fastify.patch<{
 
     return reply.code(201).send({
       success: true,
-      data: selectedForm[0],
+      data: submission,
+    });
+  } 
+  catch (error){ 
+    fastify.log.error({ err: error }, 'Failed to post user answers');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to post user answers',
+    });
+  }
+});
+
+//DELETE submission and answers
+fastify.delete<{
+  Params: { fid: string, uid : string},
+}>('/api/forms/:fid/delete/:uid', async (request, reply) =>
+{
+  try
+  {
+    const {fid, uid} = request.params;
+
+    await db.delete(formSubmissions)
+    .where(
+      and(
+        eq(formSubmissions.userId, uid), 
+        eq(formSubmissions.formId, parseInt(fid))));
+
+    await db.delete(formAnswers)
+    .where(
+      and(
+        eq(formAnswers.userId, uid), 
+        eq(formAnswers.formId, parseInt(fid))));
+
+    return reply.code(201).send({
+      success: true,
+      data: {formId: fid, userId: uid}
     });
   } 
   catch (error){ 
