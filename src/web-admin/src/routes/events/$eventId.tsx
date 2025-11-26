@@ -9,11 +9,11 @@ function EventDetail() {
   const { eventId } = Route.useParams();
 
   const {
-    data: { event, registeredList },
+    data: registeredList,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["event", eventId],
+    queryKey: ["eventRegistrations", eventId],
     queryFn: async () => {
       const response = await fetch(`/api/events/${eventId}/registrationlist`);
       if (!response.ok) throw new Error("Failed to fetch event");
@@ -24,7 +24,7 @@ function EventDetail() {
 
   if (isLoading) return <p>Loading event...</p>;
   if (error) return <p>Error loading event</p>;
-  if (!event) return <p>Event not found</p>;
+  // if (!event) return <p>Event not found</p>;
 
   return (
     <div className="mt-6">
@@ -34,7 +34,7 @@ function EventDetail() {
       {isLoading ? (
         <p>Loading registrations...</p>
       ) : error ? (
-        <p>Error loading registrations</p>
+        <p>Error</p>
       ) : registeredList && registeredList.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">

@@ -858,14 +858,12 @@ fastify.get<{ Params: { id: string } }>(
     try {
       const { id } = request.params;
 
-      const registrations = await db
-        .select()
-        .from(registeredUsers)
-        .where(eq(registeredUsers.eventId, parseInt(id, 10)));
+      const registeredList = await db.select().from(registeredUsers).where
+      (eq(registeredUsers.eventId, parseInt(id, 10)));
 
       return reply.send({
         success: true,
-        data: registrations
+        data: registeredList
       });
     } catch (error) {
       fastify.log.error({ err: error }, 'Failed to list registrations');

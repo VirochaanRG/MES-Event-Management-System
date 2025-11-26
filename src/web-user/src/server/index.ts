@@ -3,7 +3,7 @@ import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
-import { events } from '../../../db/src/schemas/events';
+import { events, registeredUsers } from '../../../db/src/schemas/events';
 import { eq, and, sql, isNull } from 'drizzle-orm';
 import { form, formAnswers, formQuestions, formSubmissions } from '@db/schemas';
 import { timeStamp } from 'console';
@@ -186,6 +186,140 @@ fastify.get<{ Params: { id: string } }>('/api/events/:id', async (request, reply
   }
 });
 
+fastify.post<{
+  Params: { id: string };
+  Body: { userEmail: string };
+}>('/api/events/:id/register', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { userEmail } = request.body;
+
+    // Validate required fields
+    if (!userEmail || !userEmail.trim())
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'userEmail is required',
+      });
+    }
+
+    // Check if event exists
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, parseInt(id)),
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    // Check if user is already registered
+    const existingRegistration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.eventId, parseInt(id)),
+        eq(registeredUsers.userEmail, userEmail.toLowerCase().trim())
+      ),
+    });
+
+    if (existingRegistration)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'User is already registered for this event',
+      });
+    }
+
+    // Check capacity if set
+    const capacity = event.capacity ?? 0;
+    if (capacity > 0)
+    {
+      const registrationCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(registeredUsers)
+        .where(eq(registeredUsers.eventId, parseInt(id)));
+
+      const currentCount = registrationCount[0]?.count ?? 0;
+      if (currentCount >= capacity)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Event is at full capacity',
+        });
+      }
+    }
+
+    // Register the user
+    const eventCost = event.cost ?? 0;
+    const registration = await db
+      .insert(registeredUsers)
+      .values({
+        eventId: parseInt(id),
+        userEmail: userEmail.toLowerCase().trim(),
+        status: 'confirmed',
+        paymentStatus: eventCost > 0 ? 'pending' : 'paid',
+      })
+      .returning();
+
+    return reply.code(201).send({
+      success: true,
+      data: registration[0],
+      message: 'Successfully registered for event',
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to register for event');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to register for event',
+    });
+  }
+});
+
+// GET - Check if a user is registered for an event
+fastify.get<{
+  Params: { id: string };
+  Querystring: { userEmail: string };
+}>('/api/events/:id/registration', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { userEmail } = request.query;
+
+    if (!userEmail)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'userEmail query parameter is required',
+      });
+    }
+
+    const registration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.eventId, parseInt(id)),
+        eq(registeredUsers.userEmail, userEmail.toLowerCase().trim())
+      ),
+    });
+
+    return reply.send({
+      success: true,
+      isRegistered: !!registration,
+      data: registration || null,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to check registration');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to check registration',
+    });
+  }
+});
 
 
 //Get forms

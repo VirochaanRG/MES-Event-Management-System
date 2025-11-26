@@ -105,15 +105,14 @@ function RouteComponent() {
 
       if (result.success) {
         setRegisterStatus("registered");
+        {
+          handleBack;
+        }
       } else {
         setRegisterStatus("idle");
-        throw new Error(result.error || "Failed to fetch event");
       }
     } catch (err: any) {
       setRegisterStatus("idle");
-      setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -338,7 +337,8 @@ function RouteComponent() {
           <div className="flex gap-4">
             <button
               className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              onClick={registerButton}>
+              onClick={registerButton}
+            >
               {buttonTitle}
             </button>
             <button className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
