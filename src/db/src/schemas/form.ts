@@ -33,7 +33,7 @@ export const formAnswers = pgTable("form_answers", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
 });
 
-export const formSubmissions = pgTable("form_answers", {
+export const formSubmissions = pgTable("form_submissions", {
   id: serial("id").primaryKey().notNull(),
   userId: integer("user_id")
     .notNull(),
