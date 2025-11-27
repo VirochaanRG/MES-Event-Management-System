@@ -2,6 +2,8 @@ import { createFileRoute, useLocation, useNavigate } from "@tanstack/react-route
 import { useState, useEffect } from "react";
 import { Form } from "@/interfaces/interfaces";
 import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+
 
 
 export const Route = createFileRoute("/surveys/$formId")({
@@ -63,7 +65,9 @@ function RouteComponent() {
       );
       const deleteResult = await deleteResponse.json();
       if(!deleteResult.success) {
-          throw new Error(deleteResult.error || "Failed to delete submission");
+        toast.error("Unable to delete submission");
+      } else {
+        toast.success("Submission deleted");
       }
   
       queryClient.invalidateQueries({queryKey : ["availableSurveys"]});

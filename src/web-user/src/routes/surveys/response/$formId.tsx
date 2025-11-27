@@ -7,6 +7,7 @@ import MultipleChoiceAnswerQuestion from "@/components/MultipleChoiceAnswerQuest
 import LinearScaleAnswerQuestion from "@/components/LinearScaleAnswerQuestion";
 import { FormQuestion, FormAnswer, Form, FormResponse} from "@/interfaces/interfaces";
 import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 export const Route = createFileRoute("/surveys/response/$formId")({
   component: RouteComponent,
@@ -114,24 +115,25 @@ function RouteComponent() {
       );
       const submitResult = await submitResponse.json();
       if (!submitResult.success) {
-        throw new Error(
-          submitResult.error ||
-            "Could not submit question with ID: " + response.question.id
-        );
+        toast.error("Unable to save reponse");
       }
     }
   };
 
   const handleSubmit = () => {
     const postSubmission = async () => {
-      await fetch(`/api/forms/${formId}/submit/${userId}`, {
+      const submitReponse = await fetch(`/api/forms/${formId}/submit/${userId}`, {
         method: "PATCH"
-    });
+      });
+      const submitResult = await submitReponse.json();
+      if(!submitResult.success) {
+        throw new Error(submitResult.error || "Unable to submit form");
+      }
     }
     try {
       setSubmitting(true);
       if(responses.some(r => !r.answer || !r.answer.answer)) {
-        alert("Please fill in all fields.");
+        toast.error("Please fill in all required fields");
       } else {   
         const confirmation = confirm("Are you sure you want to submit?");
         if(!confirmation) return;
@@ -141,8 +143,8 @@ function RouteComponent() {
         queryClient.invalidateQueries({queryKey : ["availableSurveys"]});
         queryClient.invalidateQueries({queryKey : ["completedSurveys"]});
       }
-    }  catch (err: any) {
-      setError(err.message);
+    } catch (err: any) {
+      toast.error("Unable to submit form");
     } finally {
       setSubmitting(false);
     }
@@ -151,7 +153,7 @@ function RouteComponent() {
   const handleSave = () => {
     try {
       saveForm();
-      alert("Your response has been saved.");
+      toast.success("Your response has been saved.");
     }  catch (err: any) {
       setError(err.message);
     }
