@@ -95,6 +95,10 @@ function RouteComponent() {
   };
 
   const registerButton = async () => {
+    if (!user?.email) {
+      toast.error("You must be logged in to register for this event");
+      return;
+    }
     setRegisterStatus("loading");
     try {
       const response = await fetch(`/api/events/${eventId}/register`, {
@@ -105,17 +109,36 @@ function RouteComponent() {
       const result = await response.json();
 
       if (result.success) {
-        setRegisterStatus("registered");
-        toast.success("Registration complete");
-        setTimeout(() => handleBack(), 300);
-      } else if (result.error == "User is already registered for this event") {
-        toast.error("You are already registered for this event");
-        setTimeout(() => handleBack(), 300);
-      } else {
-        setRegisterStatus("idle");
+        const registrationId = result.data?.id;
+        if (registrationId) {
+          const qrRes = await fetch(`/api/events/${eventId}/generateQR`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ registrationId }),
+          });
+          const qrJson = await qrRes.json();
+          if (qrJson.success) {
+            setRegisterStatus("registered");
+            toast.success("Registration complete");
+            setTimeout(() => handleBack(), 300);
+          } else {
+            toast.error("QR generation failed");
+          }
+        } else if (
+          result.error === "User is already registered for this event"
+        ) {
+          toast.error("You are already registered for this event");
+          setRegisterStatus("idle");
+          setTimeout(() => handleBack(), 300);
+        } else {
+          setRegisterStatus("idle");
+          toast.error("Failed to register for event");
+        }
       }
     } catch (err: any) {
+      console.error(err);
       setRegisterStatus("idle");
+      toast.error("Something went wrong while registering");
     }
   };
 
