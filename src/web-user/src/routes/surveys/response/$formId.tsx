@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import MultipleChoiceAnswerQuestion from "@/components/MultipleChoiceAnswerQuestion";
 import LinearScaleAnswerQuestion from "@/components/LinearScaleAnswerQuestion";
 import { FormQuestion, FormAnswer, Form, FormResponse} from "@/interfaces/interfaces";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/surveys/response/$formId")({
   component: RouteComponent,
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/surveys/response/$formId")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { formId } = Route.useParams();
   const userId = sessionStorage.getItem("teamd-auth-user");
   const [form, setForm] = useState<Form | null>(null);
@@ -121,8 +123,6 @@ function RouteComponent() {
   };
 
   const handleSubmit = () => {
-    const confirmation = confirm("Are you sure you want to submit?");
-    if(!confirmation) return;
     const postSubmission = async () => {
       await fetch(`/api/forms/${formId}/submit/${userId}`, {
         method: "PATCH"
@@ -132,10 +132,14 @@ function RouteComponent() {
       setSubmitting(true);
       if(responses.some(r => !r.answer || !r.answer.answer)) {
         alert("Please fill in all fields.");
-      } else {
+      } else {   
+        const confirmation = confirm("Are you sure you want to submit?");
+        if(!confirmation) return;
         saveForm();
         postSubmission();
         setSubmitted(true);
+        queryClient.invalidateQueries({queryKey : ["availableSurveys"]});
+        queryClient.invalidateQueries({queryKey : ["completedSurveys"]});
       }
     }  catch (err: any) {
       setError(err.message);

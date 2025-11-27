@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Form } from "@/interfaces/interfaces";
 
-export default function AvailableSurveys() {
+export default function CompletedSurveys() {
   const navigate = useNavigate();
   const userId = sessionStorage.getItem("teamd-auth-user");
 
@@ -11,9 +11,9 @@ export default function AvailableSurveys() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["availableSurveys", userId],
+    queryKey: ["completedSurveys", userId],
     queryFn: async () => {
-      const response = await fetch(`/api/forms/available/${userId}`);
+      const response = await fetch(`/api/forms/completed/${userId}`);
       if (!response.ok) throw new Error("Failed to fetch surveys");
       const json = await response.json();
       return json.data;
@@ -46,7 +46,7 @@ export default function AvailableSurveys() {
 
   if (!formData || formData.length === 0) {
     return (
-      <p className="text-center text-gray-600 py-8">No surveys available</p>
+      <p className="text-center text-gray-600 py-8">No completed surveys</p>
     );
   }
 
