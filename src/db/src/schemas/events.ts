@@ -48,6 +48,6 @@ export const qrCodes = pgTable("qr_codes", {
   userEmail: varchar("user_email", { length: 255 }).notNull(),
   instance: integer("instance").notNull(),
   image: bytea("image").notNull(),
-  content: varchar("content", {length: 255}).notNull(),
+  // content: varchar("content", {length: 255}).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });

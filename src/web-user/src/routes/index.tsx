@@ -5,11 +5,14 @@ import AvailableEvents from "../components/AvailableEvents";
 import "../styles/carousel.css";
 import { useState, useEffect } from "react";
 import AvailableSurveys from "@/components/AvailableSurveys";
+import RegisteredEvents from "@/components/RegisteredEvents";
 
 function HomePage() {
   const { user, logout } = useAuth();
   const [isLocalAuth, setIsLocalAuth] = useState(false);
-  const [activeTab, setActiveTab] = useState<"overview" | "events" | "surveys">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "events" | "surveys">(
+    "overview"
+  );
   const [eventsSubTab, setEventsSubTab] = useState<"available" | "registered">(
     "available"
   );
@@ -264,10 +267,8 @@ function HomePage() {
 
               {/* Registered Events Content */}
               {eventsSubTab === "registered" && (
-                <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                  <p className="text-gray-600 text-lg">
-                    Registered events coming soon...
-                  </p>
+                <div>
+                  <RegisteredEvents />
                 </div>
               )}
             </div>
@@ -276,7 +277,9 @@ function HomePage() {
           {activeTab === "surveys" && (
             <div>
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-red-900 mb-2">Surveys</h2>
+                <h2 className="text-3xl font-bold text-red-900 mb-2">
+                  Surveys
+                </h2>
               </div>
 
               {/* Surveys Sub-tabs */}
@@ -308,7 +311,7 @@ function HomePage() {
               {/* Available Surveys Content */}
               {surveysSubTab === "available" && (
                 <div>
-                  <AvailableSurveys/>
+                  <AvailableSurveys />
                 </div>
               )}
 

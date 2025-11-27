@@ -295,25 +295,51 @@ return `registrationId:${payload.registrationId};eventId:${payload.eventId};user
     `instance:${payload.instance}`;
 }
 
-fastify.post("/api/events/registration/generateQR", async (request, reply) => {
+fastify.post<{
+  Params: { id: string };
+  Body: { registrationId: number };}>("/api/events/:id/generateQR", async (request, reply) => {
   try {
-    const { registrationId, eventId, userEmail, instance } = request.body as {
-      registrationId: number;
-      eventId: number;
-      userEmail: string;
-      instance: number;
-    };
+    // const { registrationId, eventId, userEmail, instance } = request.body as {
+    //   registrationId: number;
+    //   eventId: number;
+    //   userEmail: string;
+    //   instance: number;
+    // };
+    const { id: eventParamId } = request.params;
+    const { registrationId } = request.body;
 
-    const qrString = buildQRContentString(request.body as QRPayload);
+    const registration = await db.query.registeredUsers.findFirst({
+      where: eq(registeredUsers.id, registrationId),
+    });
+
+    if (!registration) {
+      return reply.code(400).send({
+        success: false,
+        error: 'Registration not found',
+      });
+    }
+    
+    const eventId = registration.eventId;
+    const userEmail = registration.userEmail;
+    const instance = registration.instance ?? 0;
+
+    const payload: QRPayload = {
+      registrationId,
+      eventId,
+      userEmail,
+      instance,
+    };
+    const qrString = buildQRContentString(payload);
     const qrBuffer = await QRCode.toBuffer(qrString);
     const [entry] = await db.insert(qrCodes).values({
       id: registrationId,
-      eventId: eventId,
-      userEmail: userEmail,
-      instance: instance,
+      eventId,
+      userEmail,
+      instance,
       image: qrBuffer,
-      content: qrString
-    }).returning();
+      // content: qrString
+    })
+    .returning();
 
     return reply.send({
       success: true,
@@ -369,23 +395,32 @@ fastify.get<{
   }
 });
 
-fastify.get("/api/events/:id/event-qrcodes", async (request, reply) => {
+fastify.get<{
+  Params: { id: string };
+  Querystring: { userEmail: string };
+}>("/api/events/:id/event-qrcodes", async (request, reply) => {
   try {
-    const { eventId, userEmail } = request.body as {
-      eventId: number;
-      userEmail: string;
-    };
+    const { id } = request.params;
+    const { userEmail } = request.query;
 
     const codes = await db.select().from(qrCodes)
       .where(
         and(
-          eq(qrCodes.eventId, eventId),
-          eq(qrCodes.userEmail, userEmail)
+          eq(qrCodes.eventId, parseInt(id)),
+          eq(qrCodes.userEmail, userEmail.toLowerCase().trim())
         ));
+
+    const data = codes.map((c) => ({
+      id: c.id,
+      eventId: c.eventId,
+      userEmail: c.userEmail,
+      instance: c.instance,
+      imageBase64: (c.image as any as Buffer).toString("base64"),
+    }));  
 
     return reply.send({
       success: true,
-      data: codes,
+      data,
     });
   } catch (error) {
     fastify.log.error({ err: error }, 'Failed to access DB and fetch QR codes');
