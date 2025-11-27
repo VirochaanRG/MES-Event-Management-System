@@ -1,280 +1,337 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useAuth } from '../contexts/AuthContext';
-import ProtectedRoute from '../components/ProtectedRoute';
-import { useState, useEffect } from 'react';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useAuth } from "../contexts/AuthContext";
+import ProtectedRoute from "../components/ProtectedRoute";
+import AvailableEvents from "../components/AvailableEvents";
+import "../styles/carousel.css";
+import { useState, useEffect } from "react";
+import AvailableSurveys from "@/components/AvailableSurveys";
+import RegisteredEvents from "@/components/RegisteredEvents";
 
 function HomePage() {
   const { user, logout } = useAuth();
   const [isLocalAuth, setIsLocalAuth] = useState(false);
+  const [activeTab, setActiveTab] = useState<"overview" | "events" | "surveys">(
+    "overview"
+  );
+  const [eventsSubTab, setEventsSubTab] = useState<"available" | "registered">(
+    "available"
+  );
+  const [surveysSubTab, setSurveysSubTab] = useState<"available" | "completed">(
+    "available"
+  );
+  const [showMenu, setShowMenu] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [direction, setDirection] = useState<"next" | "prev">("next");
+  const navigate = useNavigate();
+
+  // Fetch forms from API
+  useEffect(() => {
+    // if (activeTab === "forms") {
+    //   fetch("http://localhost:3114/api/forms", { credentials: "include" })
+    //     .then((res) => res.json())
+    //     .then((data) => {
+    //       if (data.success) setForms(data.data);
+    //     })
+    //     .catch((err) => console.error(err));
+    // }
+  }, [activeTab]);
+
+  const carouselImages = Array.from({ length: 10 }, (_, i) => ({
+    id: i + 1,
+    title: `Image ${i + 1}`,
+  }));
+
+  const nextSlide = () => {
+    setDirection("next");
+    setCarouselIndex((prev) => (prev + 1) % carouselImages.length);
+  };
+
+  const prevSlide = () => {
+    setDirection("prev");
+    setCarouselIndex(
+      (prev) => (prev - 1 + carouselImages.length) % carouselImages.length
+    );
+  };
+
+  const getVisibleImages = () => {
+    const visible: { id: number; title: string }[] = [];
+    for (let i = 0; i < 3; i++) {
+      visible.push(carouselImages[(carouselIndex + i) % carouselImages.length]);
+    }
+    return visible;
+  };
 
   useEffect(() => {
-    // Check if user is authenticated via local auth (not main portal)
-    const authSource = sessionStorage.getItem('teamd-auth-source');
-    setIsLocalAuth(authSource === 'local');
+    const authSource = sessionStorage.getItem("teamd-auth-source");
+    setIsLocalAuth(authSource === "local");
   }, [user]);
 
-  const services = [
-    {
-      title: 'Service Area 1',
-      description: 'Team D service offerings and capabilities for large event support.',
-      icon: '⚙️',
-      features: ['Feature A', 'Feature B', 'Feature C', 'Feature D']
-    },
-    {
-      title: 'Service Area 2',
-      description: 'Additional team capabilities and service offerings.',
-      icon: '🛠️',
-      features: ['Feature E', 'Feature F', 'Feature G', 'Feature H']
-    },
-    {
-      title: 'Support Services',
-      description: 'Team D support and assistance for event operations.',
-      icon: '🔧',
-      features: ['Support Type 1', 'Support Type 2', 'Support Type 3', 'Support Type 4']
-    },
-    {
-      title: 'Additional Services',
-      description: 'Extended team capabilities and specialized services.',
-      icon: '📋',
-      features: ['Service 1', 'Service 2', 'Service 3', 'Service 4']
-    }
-  ];
+  const handleLogout = () => {
+    setShowMenu(false);
+    logout();
+  };
 
   return (
     <ProtectedRoute>
-      <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         {/* Header */}
-        <header style={{
-          backgroundColor: '#8b5cf6',
-          color: 'white',
-          padding: '20px 0',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '0 20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
+        <header className="bg-red-900 text-white shadow-lg sticky top-0 z-40">
+          <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
             <div>
-              <h1 style={{
-                fontSize: '1.5rem',
-                fontWeight: 'bold',
-                margin: 0
-              }}>
-                Team D - Event Services
+              <h1 className="text-3xl font-bold">
+                McMaster Engineering Society
               </h1>
-              <p style={{
-                fontSize: '0.9rem',
-                margin: '4px 0 0 0',
-                opacity: 0.9
-              }}>
-                Team D Large Event Support
+              <p className="text-yellow-300 text-sm mt-1">
+                Event Management System
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <span style={{ fontSize: '0.9rem' }}>Welcome, {user?.email}</span>
-              {isLocalAuth && (
-                <button
-                  onClick={logout}
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.2)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 16px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem'
-                  }}
-                >
-                  Logout
-                </button>
+            <div className="relative">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="bg-yellow-500 hover:bg-yellow-600 text-red-900 font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+              >
+                <span className="truncate">{user?.email}</span>
+                <span className="text-lg">▼</span>
+              </button>
+              {showMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-yellow-300 z-50">
+                  <button
+                    onClick={() => setShowMenu(false)}
+                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-yellow-50 font-medium border-b border-gray-200"
+                  >
+                    Profile
+                  </button>
+                  <button
+                    onClick={() => setShowMenu(false)}
+                    className="w-full text-left px-4 py-3 text-gray-700 hover:bg-yellow-50 font-medium border-b border-gray-200"
+                  >
+                    Settings
+                  </button>
+                  {isLocalAuth && (
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 font-medium"
+                    >
+                      Logout
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
         </header>
 
-        {/* Main Content */}
-        <main style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-          padding: '40px 20px'
-        }}>
-          {/* Welcome Section */}
-          <div style={{
-            textAlign: 'center',
-            marginBottom: '60px'
-          }}>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: 'bold',
-              color: '#1f2937',
-              marginBottom: '16px'
-            }}>
-              Welcome, {user?.email}
-            </h2>
-            <p style={{
-              fontSize: '1.2rem',
-              color: '#6b7280',
-              maxWidth: '600px',
-              margin: '0 auto'
-            }}>
-              Team D services and capabilities for large event support.
-              Access your team resources and manage event-related activities.
-            </p>
+        {/* Tab Navigation */}
+        <div className="bg-white border-b-2 border-yellow-500">
+          <div className="max-w-7xl mx-auto px-6 flex justify-center">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`py-4 px-8 font-semibold transition-all border-b-4 ${
+                activeTab === "overview"
+                  ? "border-yellow-500 text-red-900"
+                  : "border-transparent text-gray-600 hover:text-red-900"
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab("events")}
+              className={`py-4 px-8 font-semibold transition-all border-b-4 ${
+                activeTab === "events"
+                  ? "border-yellow-500 text-red-900"
+                  : "border-transparent text-gray-600 hover:text-red-900"
+              }`}
+            >
+              Events
+            </button>
+            <button
+              onClick={() => setActiveTab("surveys")}
+              className={`py-4 px-8 font-semibold transition-all border-b-4 ${
+                activeTab === "surveys"
+                  ? "border-yellow-500 text-red-900"
+                  : "border-transparent text-gray-600 hover:text-red-900"
+              }`}
+            >
+              Surveys
+            </button>
           </div>
+        </div>
 
-          {/* Services Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '30px',
-            marginBottom: '60px'
-          }}>
-            {services.map((service, index) => (
-              <div
-                key={index}
-                style={{
-                  backgroundColor: 'white',
-                  padding: '30px',
-                  borderRadius: '12px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid #e5e7eb',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                  cursor: 'pointer'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-                }}
-              >
-                <div style={{
-                  fontSize: '3rem',
-                  marginBottom: '20px',
-                  textAlign: 'center'
-                }}>
-                  {service.icon}
-                </div>
-                <h3 style={{
-                  fontSize: '1.3rem',
-                  fontWeight: 'bold',
-                  color: '#1f2937',
-                  marginBottom: '12px',
-                  textAlign: 'center'
-                }}>
-                  {service.title}
-                </h3>
-                <p style={{
-                  color: '#6b7280',
-                  marginBottom: '20px',
-                  lineHeight: '1.6',
-                  textAlign: 'center'
-                }}>
-                  {service.description}
+        {/* Main Content */}
+        <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12">
+          {activeTab === "overview" && (
+            <div className="space-y-12">
+              {/* Welcome Section */}
+              <div className="text-center">
+                <h2 className="text-4xl font-bold text-red-900 mb-4">
+                  Welcome to MES Event Management
+                </h2>
+                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                  Manage, organize, and coordinate all McMaster Engineering
+                  Society events in one place.
                 </p>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '8px'
-                }}>
-                  {service.features.map((feature, featureIndex) => (
+              </div>
+
+              {/* Photo Carousel */}
+              <div className="relative">
+                {/* Carousel Container */}
+                <div
+                  className={`carousel-container ${
+                    direction === "prev" ? "prev" : ""
+                  } flex gap-6 overflow-hidden`}
+                >
+                  {getVisibleImages().map((image) => (
                     <div
-                      key={featureIndex}
-                      style={{
-                        backgroundColor: '#f3f4f6',
-                        padding: '8px 12px',
-                        borderRadius: '6px',
-                        fontSize: '0.85rem',
-                        color: '#374151',
-                        textAlign: 'center'
-                      }}
+                      key={image.id}
+                      className="flex-1 min-w-0 bg-gradient-to-br from-red-200 to-yellow-200 rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden cursor-pointer"
                     >
-                      {feature}
+                      <div className="w-full aspect-video flex items-center justify-center">
+                        <span className="text-gray-600 font-semibold text-lg">
+                          {image.title}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            ))}
-          </div>
 
-          {/* Contact Section */}
-          <div style={{
-            backgroundColor: 'white',
-            padding: '40px',
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            textAlign: 'center'
-          }}>
-            <h3 style={{
-              fontSize: '1.8rem',
-              fontWeight: 'bold',
-              color: '#1f2937',
-              marginBottom: '16px'
-            }}>
-              Need Team D Services?
-            </h3>
-            <p style={{
-              color: '#6b7280',
-              marginBottom: '30px',
-              fontSize: '1.1rem'
-            }}>
-              Contact the team to discuss your event requirements and service needs.
-            </p>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '20px',
-              flexWrap: 'wrap'
-            }}>
-              <button style={{
-                backgroundColor: '#8b5cf6',
-                color: 'white',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: '8px',
-                fontSize: '1rem',
-                fontWeight: '500',
-                cursor: 'pointer'
-              }}>
-                Contact Team
-              </button>
-              <button style={{
-                backgroundColor: '#f3f4f6',
-                color: '#374151',
-                border: '1px solid #d1d5db',
-                padding: '12px 24px',
-                borderRadius: '8px',
-                fontSize: '1rem',
-                fontWeight: '500',
-                cursor: 'pointer'
-              }}>
-                View Services
-              </button>
+                {/* Previous Button */}
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 z-10 bg-yellow-500 hover:bg-yellow-600 text-red-900 rounded-full p-3 transition-colors font-bold text-lg"
+                >
+                  ❮
+                </button>
+
+                {/* Next Button */}
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 z-10 bg-yellow-500 hover:bg-yellow-600 text-red-900 rounded-full p-3 transition-colors font-bold text-lg"
+                >
+                  ❯
+                </button>
+              </div>
+
+              {/* Dot Indicators */}
+              <div className="flex justify-center gap-2">
+                {carouselImages.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCarouselIndex(index)}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      index === carouselIndex ? "bg-red-900" : "bg-yellow-500"
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {activeTab === "events" && (
+            <div>
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-red-900 mb-2">Events</h2>
+              </div>
+
+              {/* Events Sub-tabs */}
+              <div className="bg-white rounded-lg shadow-md mb-8 border-b border-yellow-300">
+                <div className="flex justify-center gap-8 px-6">
+                  <button
+                    onClick={() => setEventsSubTab("available")}
+                    className={`py-4 px-6 font-semibold transition-all border-b-4 ${
+                      eventsSubTab === "available"
+                        ? "border-yellow-500 text-red-900"
+                        : "border-transparent text-gray-600 hover:text-red-900"
+                    }`}
+                  >
+                    Available Events
+                  </button>
+                  <button
+                    onClick={() => setEventsSubTab("registered")}
+                    className={`py-4 px-6 font-semibold transition-all border-b-4 ${
+                      eventsSubTab === "registered"
+                        ? "border-yellow-500 text-red-900"
+                        : "border-transparent text-gray-600 hover:text-red-900"
+                    }`}
+                  >
+                    Registered Events
+                  </button>
+                </div>
+              </div>
+
+              {/* Available Events Content */}
+              {eventsSubTab === "available" && (
+                <div>
+                  <AvailableEvents />
+                </div>
+              )}
+
+              {/* Registered Events Content */}
+              {eventsSubTab === "registered" && (
+                <div>
+                  <RegisteredEvents />
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === "surveys" && (
+            <div>
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-red-900 mb-2">
+                  Surveys
+                </h2>
+              </div>
+
+              {/* Surveys Sub-tabs */}
+              <div className="bg-white rounded-lg shadow-md mb-8 border-b border-yellow-300">
+                <div className="flex justify-center gap-8 px-6">
+                  <button
+                    onClick={() => setSurveysSubTab("available")}
+                    className={`py-4 px-6 font-semibold transition-all border-b-4 ${
+                      surveysSubTab === "available"
+                        ? "border-yellow-500 text-red-900"
+                        : "border-transparent text-gray-600 hover:text-red-900"
+                    }`}
+                  >
+                    Available Surveys
+                  </button>
+                  <button
+                    onClick={() => setSurveysSubTab("completed")}
+                    className={`py-4 px-6 font-semibold transition-all border-b-4 ${
+                      surveysSubTab === "completed"
+                        ? "bourder-yellow-500 text-red-900"
+                        : "border-transparent text-gray-600 hover:text-red-900"
+                    }`}
+                  >
+                    Completed Surveys
+                  </button>
+                </div>
+              </div>
+
+              {/* Available Surveys Content */}
+              {surveysSubTab === "available" && (
+                <div>
+                  <AvailableSurveys />
+                </div>
+              )}
+
+              {/* Completed Surveys Content */}
+              {surveysSubTab === "completed" && (
+                <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                  <p className="text-gray-600 text-lg">
+                    Completed surveys coming soon...
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </main>
 
         {/* Footer */}
-        <footer style={{
-          backgroundColor: '#1f2937',
-          color: '#9ca3af',
-          padding: '30px 0',
-          marginTop: '60px'
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            padding: '0 20px',
-            textAlign: 'center'
-          }}>
-            <p style={{ margin: 0, fontSize: '0.9rem' }}>
-              © 2025 Team D Event Services. Large event support and coordination.
+        <footer className="bg-red-900 text-yellow-300 mt-12 py-8">
+          <div className="max-w-7xl mx-auto px-6 text-center">
+            <p className="text-sm">
+              © 2025 McMaster Engineering Society. Event Management System.
             </p>
           </div>
         </footer>
@@ -283,6 +340,6 @@ function HomePage() {
   );
 }
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: HomePage,
 });

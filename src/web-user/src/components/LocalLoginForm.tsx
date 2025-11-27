@@ -1,14 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthUser } from '../lib/auth';
 
 interface LocalLoginFormProps {
   onLoginSuccess: (user: AuthUser, token: string) => void;
+  prefilledEmail?: string;
 }
 
-export default function LocalLoginForm({ onLoginSuccess }: LocalLoginFormProps) {
+const TEST_ACCOUNTS = [
+  { email: 'userViro@test.com', id: 1 },
+  { email: 'userM@test.com', id: 2 },
+  { email: 'userI@test.com', id: 3 },
+  { email: 'userO@test.com', id: 4 },
+  { email: 'userR@test.com', id: 5 },
+];
+
+export default function LocalLoginForm({ onLoginSuccess, prefilledEmail }: LocalLoginFormProps) {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (prefilledEmail) {
+      setEmail(prefilledEmail);
+    }
+  }, [prefilledEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,111 +69,76 @@ export default function LocalLoginForm({ onLoginSuccess }: LocalLoginFormProps) 
   };
 
   return (
-    <div style={{
-      backgroundColor: 'white',
-      padding: '40px',
-      borderRadius: '12px',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      width: '100%',
-      maxWidth: '400px'
-    }}>
-      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-        <h2 style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold',
-          color: '#1f2937',
-          marginBottom: '8px'
-        }}>
-          🚀 Local Development Login
-        </h2>
-        <p style={{
-          color: '#6b7280',
-          fontSize: '0.9rem'
-        }}>
-          Quick login for TeamD development
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '20px' }}>
-          <label
-            htmlFor="email"
-            style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#374151',
-              marginBottom: '8px'
-            }}
-          >
-            Email Address
-          </label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            required
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
-          />
+    <div className="flex gap-6 max-w-4xl mx-auto">
+      {/* Login Form */}
+      <div className="flex-1 bg-white p-10 rounded-xl shadow-lg">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            User Portal
+          </h2>
         </div>
 
-        {error && (
-          <div style={{
-            backgroundColor: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#dc2626',
-            padding: '12px',
-            borderRadius: '6px',
-            marginBottom: '20px',
-            fontSize: '14px'
-          }}>
-            {error}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-5">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none"
+            />
           </div>
-        )}
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          style={{
-            width: '100%',
-            backgroundColor: isLoading ? '#9ca3af' : '#17a2b8',
-            color: 'white',
-            padding: '12px',
-            borderRadius: '6px',
-            border: 'none',
-            fontSize: '16px',
-            fontWeight: '500',
-            cursor: isLoading ? 'not-allowed' : 'pointer',
-            transition: 'background-color 0.2s'
-          }}
-        >
-          {isLoading ? 'Signing in...' : 'Sign In'}
-        </button>
-      </form>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-5 text-sm">
+              {error}
+            </div>
+          )}
 
-      <div style={{
-        marginTop: '24px',
-        padding: '16px',
-        backgroundColor: '#f0f9ff',
-        borderRadius: '6px',
-        fontSize: '14px',
-        color: '#0c4a6e'
-      }}>
-        <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>Valid test accounts:</p>
-        <ul style={{ margin: 0, paddingLeft: '20px' }}>
-          <li>user@teamd.local</li>
-          <li>test@teamd.dev</li>
-          <li>demo@teamd.local</li>
-        </ul>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`w-full py-3 rounded-lg border-none text-base font-medium transition-colors ${
+              isLoading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-cyan-600 hover:bg-cyan-700 cursor-pointer'
+            } text-white`}
+          >
+            {isLoading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+      </div>
+
+      {/* Test Accounts Sidebar */}
+      <div className="w-72 bg-white rounded-xl shadow-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          Test Accounts
+        </h3>
+        <p className="text-sm text-gray-600 mb-5">
+          Click to populate email field
+        </p>
+        <div className="space-y-3">
+          {TEST_ACCOUNTS.map((account) => (
+            <button
+              key={account.email}
+              onClick={() => setEmail(account.email)}
+              type="button"
+              className="w-full text-left px-4 py-3 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors"
+            >
+              <div className="font-medium text-blue-900 text-sm">
+                {account.email}
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
