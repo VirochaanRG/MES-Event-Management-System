@@ -83,7 +83,7 @@ function HomePage() {
                 McMaster Engineering Society
               </h1>
               <p className="text-yellow-300 text-sm mt-1">
-                Event Management System
+                Events and Surveys
               </p>
             </div>
             <div className="relative">
@@ -165,11 +165,10 @@ function HomePage() {
               {/* Welcome Section */}
               <div className="text-center">
                 <h2 className="text-4xl font-bold text-red-900 mb-4">
-                  Welcome to MES Event Management
+                  Welcome to MES Events
                 </h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  Manage, organize, and coordinate all McMaster Engineering
-                  Society events in one place.
+                  The one stop location to see what the MES is up to!
                 </p>
               </div>
 
