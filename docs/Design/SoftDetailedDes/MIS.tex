@@ -6,19 +6,21 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{longtable}
 \usepackage{colortbl}
 \usepackage{xr}
 \usepackage{hyperref}
-\usepackage{longtable}
 \usepackage{xfrac}
-\usepackage{tabularx}
 \usepackage{float}
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{comment}
 \usepackage[section]{placeins}
 \usepackage{caption}
 \usepackage{fullpage}
+\usepackage{float}
 
 \hypersetup{
 bookmarks=true,     % show bookmarks bar?
@@ -31,10 +33,15 @@ urlcolor=cyan          % color of external links
 
 \usepackage{array}
 
-\externaldocument{../../SRS/SRS}
+\externaldocument[]{../SoftArchitecture/MG}
+\externaldocument[SRS-]{../../SRS/SRS}
 
 \input{../../Comments}
 \input{../../Common}
+
+\newcounter{mnum}
+\newcommand{\mthemnum}{M\themnum}
+\newcommand{\mref}[1]{M\ref{#1}}
 
 \begin{document}
 
@@ -53,8 +60,7 @@ urlcolor=cyan          % color of external links
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+November 13, 2025 & 1.0 & Revision -1\\
 \bottomrule
 \end{tabularx}
 
@@ -62,9 +68,7 @@ Date 2 & 1.1 & Notes\\
 
 \section{Symbols, Abbreviations and Acronyms}
 
-See SRS Documentation at \wss{give url}
-
-\wss{Also add any additional symbols, abbreviations or acronyms}
+See \hyperref[SRS:glossary]{SRS Glossary}
 
 \newpage
 
@@ -76,17 +80,14 @@ See SRS Documentation at \wss{give url}
 
 \section{Introduction}
 
-The following document details the Module Interface Specifications for
-\wss{Fill in your project name and description}
+The following document details the Module Interface Specifications for EvENGage. 
+EvENGage is a custom event and survey management system being designed for the MES to simplify and centralize the process of hosting events, conferences, and surveys.
 
 Complementary documents include the System Requirement Specifications
-and Module Guide.  The full documentation and implementation can be
-found at \url{...}.  \wss{provide the url for your repo}
+and Module Guide. The full documentation and implementation can be
+found at \url{https://github.com/VirochaanRG/MES-Event-Management-System/}.
 
 \section{Notation}
-
-\wss{You should describe your notation.  You can use what is below as
-  a starting point.}
 
 The structure of the MIS for modules comes from \citet{HoffmanAndStrooper1995},
 with the addition that template modules have been adapted from
@@ -104,13 +105,22 @@ The following table summarizes the primitive data types used by \progname.
 \toprule 
 \textbf{Data Type} & \textbf{Notation} & \textbf{Description}\\ 
 \midrule
-character & char & a single symbol or digit\\
+character & char & a single symbol or digit \\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
 natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
-real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
+real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$) \\
+string & string & An ordered list of characters of any length \\
+Cookie & Cookie & A file stored on the client device storing user data \\
+List of type T & list(T) & A dynamically sized list of elements of type T \\
+Set of type T & set(T) & A dynamically sized set of elements of type T \\
+Map of type K to V & map(K, V) & A collection mapping keys of type K to values of type V \\
+Tuple of types T1, T2, \dots & tuple(T1, T2, \dots) & A finite ordered collection of elements of the specified types \\
+Date and time & DateTime & A specific date and time using the Gregorian calendar and 24-hour clock \\
+
 \bottomrule
-\end{tabular} 
+\end{tabular}
 \end{center}
+
 
 \noindent
 The specification of \progname \ uses some derived data types: sequences, strings, and
@@ -124,28 +134,34 @@ described by giving their type signature followed by their specification.
 
 The following table is taken directly from the Module Guide document for this project.
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{p{0.3\textwidth} p{0.6\textwidth}}
 \toprule
 \textbf{Level 1} & \textbf{Level 2}\\
 \midrule
 
-{Hardware-Hiding} & ~ \\
+Hardware-Hiding Module
+& No Modules\\
 \midrule
 
-\multirow{7}{0.3\textwidth}{Behaviour-Hiding} & Input Parameters\\
-& Output Format\\
-& Output Verification\\
-& Temperature ODEs\\
-& Energy Equations\\ 
-& Control Module\\
-& Specification Parameters Module\\
+\multirow{9}{0.3\textwidth}{Behaviour-Hiding Modules} 
+& M\ref{m1}: Main System Module\\
+& M\ref{m2}: User Authentication Module\\
+& M\ref{m3}: User Authorization Module\\
+& M\ref{m4}: Form Template Module\\
+& M\ref{m5}: Form Submission Module\\
+& M\ref{m6}: Event Management Module\\ 
+& M\ref{m7}: Event Notification Module\\
+& M\ref{m8}: Registration Module\\
+& M\ref{m9}: Attendance Tracking Module\\
+& M\ref{m10}: Report Generation Module\\
 \midrule
 
-\multirow{3}{0.3\textwidth}{Software Decision} & {Sequence Data Structure}\\
-& ODE Solver\\
-& Plotting\\
+\multirow{3}{0.3\textwidth}{Software-Decision Modules} 
+& M\ref{m11}: Analytics Module\\
+& M\ref{m12}: Database Access Module\\
+& M\ref{m13}: Audit Module\\
 \bottomrule
 
 \end{tabular}
@@ -154,20 +170,783 @@ The following table is taken directly from the Module Guide document for this pr
 \end{table}
 
 \newpage
-~\newpage
 
-\section{MIS of \wss{Module Name}} \label{Module} \wss{Use labels for
-  cross-referencing}
-
-\wss{You can reference SRS labels, such as R\ref{R_Inputs}.}
-
-\wss{It is also possible to use \LaTeX for hypperlinks to external documents.}
+\section{MIS of M\ref{m1}: Main System Module}
 
 \subsection{Module}
 
-\wss{Short name for the module}
+Acts as the entry point for all other modules
 
 \subsection{Uses}
+
+Acts as the entry point for M\ref{m2}, M\ref{m4}, M\ref{m6}, M\ref{m10}.
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+None
+
+\subsubsection{Exported Access Programs}
+
+None
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+None
+
+\subsubsection{Environment Variables}
+
+None
+
+\subsubsection{Assumptions}
+
+This module can be invoked externally by a user who has access to the backend server.
+
+\subsubsection{Access Routine Semantics}
+
+N/A
+
+\subsubsection{Local Functions}
+
+None
+
+\newpage
+
+\section{MIS of M\ref{m2}: User Authentication Module}
+
+\subsection{Module}
+
+Contains functionality for authenticating users and registering new users.
+
+\subsection{Uses}
+
+None
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+None
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.25\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{attemptLogin} & \texttt{username : string } \newline \texttt{password : string} & \texttt{sessionCookie : Cookie} & None \\
+\hline
+\texttt{logout} & \texttt{sessionCookie : Cookie }  & None & \texttt{InvalidSession} \\
+\hline
+\texttt{validateSession} & \texttt{sessionCookie : Cookie} & \texttt{sessionIsValid : bool} & None\\
+\hline
+\texttt{registerUser} & \texttt{username : string } \newline \texttt{password : string} & \texttt{registrationSuccessful : bool} & None \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\texttt{sessions : set(Session)}: Set of all active sessions
+
+\subsubsection{Environment Variables}
+
+\texttt{currentTime : DateTime}: Stores the current date and time
+
+\subsubsection{Assumptions}
+
+None
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{attemptLogin(username : string, password : string)}: \\
+Attempts a login given a username and password.
+\begin{itemize}
+\item transition: creates and adds a new session to \texttt{sessions} if login is successful
+\item output: Cookie containing session data to be sent back to the client
+\item exception: None 
+\end{itemize}
+
+\noindent \texttt{logout(sessionCookie: Cookie)}: \\
+Logs the specified user out.
+\begin{itemize}
+\item transition: Removes the specified session from \texttt{sessions}
+\item output: None
+\item exception: InvalidSession if session is not found in \texttt{sessions} 
+\end{itemize}
+
+\noindent \texttt{validateSession(sessionCookie: Cookie)}: \\
+Validates and refreshes a users session.
+\begin{itemize}
+\item transition: Refreshes the timeout of the session in \texttt{sessions} if session is valid
+\item output: Boolean indicating if sessionCookie exists in \texttt{sessions}
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{registerUser(username : string, password : string)}: \\
+Registers a new user to the database of users.
+\begin{itemize}
+\item transition: None
+\item output: Boolean stating whether registration was successful
+\item exception: None
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\noindent \texttt{refreshSessions()}:
+\begin{itemize}
+\item transition: Periodically checks \texttt{sessions} and removes any session older than 3 hours
+\item output: None
+\item exception: None 
+\end{itemize}
+
+\newpage
+
+\section{MIS of M\ref{m3}: User Authorization Module}
+
+\subsection{Module}
+
+Contains functionality for role based access management
+
+\subsection{Uses}
+
+Uses M\ref{m2} for authentication before checking authorizations.
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+\texttt{validRoles : set(Role)}: The set of all valid roles that can be assigned to users.
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.25\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{addRole} & \texttt{userId : $\mathbb{N}$} \newline \texttt{role : Role} & None & \texttt{InvalidRole} \newline \texttt{InvalidUser} \\
+\hline
+\texttt{removeRole} & \texttt{userId : $\mathbb{N}$} \newline \texttt{role : Role} & None & \texttt{InvalidRole} \newline \texttt{InvalidUser} \\
+\hline
+\texttt{hasPermission} & \texttt{userId : $\mathbb{N}$} \newline \texttt{role : Role} & \texttt{hasPermission : bool} & \texttt{InvalidRole} \newline \texttt{InvalidUser}  \\
+\hline
+\texttt{getUserRoles} & \texttt{userId : $\mathbb{N}$} & \texttt{roles : set(Role)} &  \texttt{InvalidUser}\\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\texttt{roles : map($\mathbb{N}$, set(T))}: Mapping of user ID to the set of roles the user is assigned.
+
+\subsubsection{Environment Variables}
+
+None
+
+\subsubsection{Assumptions}
+
+At least one user who has permission to assign and revoke roles already exists in the system.
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{addRole(userId : $\mathbb{N}$, role : Role)}: \\
+Assigns a role to a user.
+\begin{itemize}
+\item transition: Inserts the specified role into the set attached to the user ID in \texttt{roles}
+\item output: None 
+\item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
+\end{itemize}
+
+\noindent \texttt{removeRole(userId : $\mathbb{N}$, role : Role)}: \\
+Revokes a role from a user.
+\begin{itemize}
+\item transition: Removes the specified role from the set attached to the user ID in \texttt{roles}
+\item output: None 
+\item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
+\end{itemize}
+
+\noindent \texttt{hasPermission(userId : $\mathbb{N}$, role : Role)}: \\
+Checks if a user has a certain permission.
+\begin{itemize}
+\item transition: None
+\item output: A boolean value which is true if the set attached to the user ID in \texttt{roles} contains the specified role 
+\item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
+\end{itemize}
+
+\noindent \texttt{getUserRoles(userId : $\mathbb{N}$)}: \\
+Gets all roles assigned to a given user.
+\begin{itemize}
+\item transition: None
+\item output: The set of roles attached to the user ID in \texttt{roles} 
+\item exception: InvalidUser if the user does not exist
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None
+
+\newpage
+
+\section{MIS of M\ref{m4}: Form Template Module}
+
+\subsection{Module}
+
+Contains functionality for creating and linking form modules. 
+
+\subsection{Uses}
+
+Uses M\ref{m3} to check for form managment permissions.
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.3\textwidth} p{0.25\textwidth} p{0.2\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{createModule} & \texttt{moduleTitle : string} \newline \texttt{questions : list(Question)} & \texttt{module : FormModule} & None \\
+\hline
+\texttt{deleteModule} & \texttt{moduleId : $\mathbb{N}$} & None & \texttt{InvalidModule} \\
+\hline
+\texttt{editModule} & \texttt{moduleId : $\mathbb{N}$} \newline \texttt{newModuleName : string} \newline \texttt{newQuestions : list(Question)} & None & \texttt{InvalidModule}  \\
+\hline
+\texttt{copyModule} & \texttt{moduleId : $\mathbb{N}$} & \texttt{copiedModule : FormModule } & \texttt{InvalidModule} \\
+\hline
+\texttt{getModules} & None & \texttt{modules : set(FormModule)} & None  \\
+\hline
+\texttt{linkQuestion} & \texttt{question : Question} \newline \texttt{linkedModule: list(string)} & None & \texttt{InvalidModule} \newline \texttt{IllegalArgument} \\
+\hline
+\texttt{createForm} & \texttt{formName : string} \newline \texttt{startingModuleId : $\mathbb{N}$} \newline \texttt{formSettings : map(string, string)}  & Form & None \\
+\hline
+\texttt{deleteForm} & \texttt{formId : $\mathbb{N}$} & None & \texttt{InvalidForm} \\
+\hline
+\texttt{editForm} & \texttt{newFormName : string} \newline \texttt{startingModuleId : $\mathbb{N}$} \newline \texttt{newFormSettings : map(string, string)}  & None & \texttt{InvalidForm} \\
+\hline
+\texttt{releaseForm} & \texttt{formId : $\mathbb{N}$, deadline : DateTime} & None & \texttt{InvalidForm} \\
+\hline
+\texttt{hideForm} & \texttt{formName : string, startingModuleId : $\mathbb{N}$} & None & \texttt{InvalidForm} \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\texttt{modules : set(FormModule)}: Set of all created form modules.
+\\
+\texttt{createdForms : set(Form)}: Set of all created forms.
+
+\subsubsection{Environment Variables}
+
+\texttt{currentTime : DateTime}: The current date and time
+
+\subsubsection{Assumptions}
+
+The calculated current date and time is within 5 seconds of the real date and time 
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{createModule(moduleTitle : string, questions : list(Question))}: \\
+Creates a new module given a title and a list of questions.
+\begin{itemize}
+\item transition: Inserts the created module into \texttt{modules}
+\item output: The created FormModule
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{deleteModule(moduleId : $\mathbb{N}$)}: \\
+Deletes a module.
+\begin{itemize}
+\item transition: Removes the created module from \texttt{modules}
+\item output: None
+\item exception: InvalidModule if module does not exist
+\end{itemize}
+
+\noindent \texttt{editModule(moduleId : $\mathbb{N}$, newModuleName : string, newQuestions : list(Question))}: \\
+Edits the module, assigning a new name and question list.
+\begin{itemize}
+\item transition: Removes the specified module, then inserts the modified one into \texttt{modules}
+\item output: None
+\item exception: InvalidModule if module does not exist
+\end{itemize}
+
+\noindent \texttt{copyModule(moduleId : $\mathbb{N}$)}: \\
+Copies an existing module.
+\begin{itemize}
+\item transition: Creates a copy of the given module with a different module ID, then inserts it into \texttt{modules}
+\item output: The copied FormModule
+\item exception: InvalidModule if module does not exist
+\end{itemize}
+
+\noindent \texttt{getModules()}: \\
+Retrieves the set of all modules.
+\begin{itemize}
+\item transition: None
+\item output: A copy of \texttt{modules}
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{linkQuestion(question : Question, linkedModuleIds: list($\mathbb{N}$))}: \\
+Links the answers of a question to another module for branching forms.
+\begin{itemize}
+\item transition: Modifies the module in \texttt{modules} containing the specified Question
+\item output: None
+\item exception: InvalidModule if module does not exist, IllegalArgument if the size of linkedModuleIds does not match the number of possible answers in the question.
+\end{itemize}
+
+\noindent \texttt{createForm(formTitle : string, startingModuleId: string,  \newline formSettings : map(string, string))}: \\
+Creates a form starting from a specified module with certain settings (e.g. multiple submissions, editable submissions)
+\begin{itemize}
+\item transition: Inserts the created form into \texttt{createdForms}
+\item output: The created Form
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{deleteForm(formId : $\mathbb{N}$)}: \\
+Deletes the specified form.
+\begin{itemize}
+\item transition: Removes the specified form from \texttt{createdForms}
+\item output: None
+\item exception: InvalidForm if form does not exist
+\end{itemize}
+
+\noindent \texttt{editForm(formTitle : string, startingModuleId: string,  \newline formSettings : map(string, string))}: \\
+Edits the specified form.
+\begin{itemize}
+\item transition: Removes the specified form from \texttt{createdForms} and inserts the modified form
+\item output: None
+\item exception: InvalidForm if form does not exist
+\end{itemize}
+
+\noindent \texttt{releaseForm(formId: string, deadline : DateTime)}: \\
+Releases a form for submissions with the specified deadline.
+\begin{itemize}
+\item transition: Modifies the visibility of the specified form in \texttt{createdForms}
+\item output: None
+\item exception: InvalidForm if form does not exist
+\end{itemize}
+
+\noindent \texttt{hideForm(formId: string)}: \\
+Closes submissions for a form.
+\begin{itemize}
+\item transition: Modifies the visibility of the specified form in \texttt{createdForms}
+\item output: None
+\item exception: InvalidForm if form does not exist
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\noindent \texttt{expireForms()}: \\
+Periodically checks \texttt{createdForms} for expired deadlines and closes them.
+\begin{itemize}
+\item transition: Modifies the visibility of the forms in \texttt{createdForms}
+\item output: None
+\item exception: None
+\end{itemize}
+
+\newpage
+
+\section{MIS of M\ref{m5}: Form Submission Module}
+
+\subsection{Module}
+
+Contains functionality for submitting reponses to forms.
+
+\subsection{Uses}
+
+Uses M\ref{m4} to retreive fillable forms.
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+None
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.3\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{getFillableForms} & \texttt{userId : $\mathbb{N}$} & \texttt{fillableForms : set(Form)} & InvalidUser \\
+\hline
+\texttt{respondToForm} & \texttt{userId : $\mathbb{N}$ \newline formId : $\mathbb{N}$ \newline formResponse : map(Question, string)} & \texttt{responseId : $\mathbb{N}$} & \texttt{InvalidUser} \newline \texttt{InvalidForm} \newline \texttt{IllegalArgument} \\
+\hline
+\texttt{getResponses} & \texttt{userId : $\mathbb{N}$ \newline formId : $\mathbb{N}$} & \texttt{responseIds : set($\mathbb{N}$)} & \texttt{InvalidUser} \newline \texttt{InvalidForm} \\
+\hline
+\texttt{editResponse} & \texttt{userId : $\mathbb{N}$ \newline responseId : $\mathbb{N}$ \newline formResponse : map(Question, string)} & None & \texttt{InvalidUser} \newline \texttt{InvalidForm} \newline \texttt{IllegalArgument} \newline \texttt{UnsupportedOperation} \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\texttt{formResponses : map(form : Form, responseIds : list($\mathbb{N}$))}: A list of responses for each form 
+\\
+\texttt{userResponses : map(userId : $\mathbb{N}$, responseIds : list($\mathbb{N}$))}: A list of responses for each user 
+
+\subsubsection{Environment Variables}
+
+None
+
+\subsubsection{Assumptions}
+
+None
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{getFillableForms(userId : $\mathbb{N}$)}: \\
+Retreives all forms fillable by the user.
+\begin{itemize}
+\item transition: None 
+\item output: The set of all forms available for the user to fill
+\item exception: InvalidUser if user does not exist 
+\end{itemize}
+
+\noindent \texttt{respondToForm(userId : $\mathbb{N}$, formId: string, \newline formResponse: map(Question, string))}: \\
+Records a user's response to a form.
+\begin{itemize}
+\item transition: Inserts the created response ID into \texttt{userResponses} and \texttt{formResponses}
+\item output: None
+\item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist, IllegalArgument if the responses do not match the expected format given by the form (e.g. unidentified question)
+\end{itemize}
+
+\noindent \texttt{getResponses(userId : $\mathbb{N}$, formId: string)}: \\
+Retrieves all of a user's responses for a given forms.
+\begin{itemize}
+\item transition: None
+\item output: The set of all responses for the user in \texttt{userResponses} for a particular form in \texttt{formResponses}
+\item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist
+\end{itemize}
+
+\noindent \texttt{editResponse(userId : $\mathbb{N}$, formId: string, \newline formResponse: map(Question, string))}: \\
+Modifies a user's response to a form.
+\begin{itemize}
+\item transition: Edits the reponse for the given form (if it allows editing) in \texttt{userResponses} and \texttt{formResponses}
+\item output: None
+\item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist, IllegalArgument if the responses do not match the expected format given by the form, UnsupportedOperation if the form does not allow editing responses
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None
+
+\newpage
+
+\section{MIS of M\ref{m6}: Event Management Module}
+
+\subsection{Module}
+
+Contains functionality for creating and managing events.
+
+\subsection{Uses}
+
+Uses M\ref{m3} to check permissions for managing events, and M\ref{m7} for sending event related notifications.
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.2\textwidth} p{0.3\textwidth} p{0.3\textwidth} p{0.2\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{createEvent} & \texttt{eventDetails : EventData} & \texttt{eventId : $\mathbb{N}$} & \texttt{IllegalArgument} \\
+\hline
+\texttt{editEvent} & \texttt{eventId : $\mathbb{N}$ \newline eventDetails : $\mathbb{N}$} & None & \texttt{InvalidEvent} \newline \texttt{IllegalArgument} \\
+\hline
+\texttt{deleteEvent} & \texttt{eventId : $\mathbb{N}$} & None & \texttt{InvalidEvent} \\
+\hline
+\texttt{getAllEvents} & None & \texttt{eventIds: set($\mathbb{N}$)} & None \\
+\hline
+\texttt{getEventDetails} & \texttt{eventId : $\mathbb{N}$} & \texttt{eventData : EventData} & \texttt{InvalidEvent} \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\texttt{events : map($\mathbb{N}$, EventData)}: Mapping of all event IDs to their details
+
+\subsubsection{Environment Variables}
+
+\texttt{currentTime : DateTime}: Current date and time
+
+\subsubsection{Assumptions}
+
+The calculated current date and time is within 5 seconds of the actual date and time
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{createEvent(eventDetails : EventData)}: \\
+Creates a new event.
+\begin{itemize}
+\item transition: Inserts an event into \texttt{events}.
+\item output: ID of the created event 
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{editEvent(eventId : string, eventDetails : EventData)}:\\
+Edits an existing event.
+\begin{itemize}
+\item transition: Removes the event details in \texttt{events} with the new details for the event ID
+\item output: None
+\item exception: InvalidEvent if event does not exist
+\end{itemize}
+
+\noindent \texttt{deleteEvent(eventId : string)}:\\
+Deletes/cancels an event.
+\begin{itemize}
+\item transition: Removes the event from \texttt{events}
+\item output: None
+\item exception: InvalidEvent if event does not exist
+\end{itemize}
+
+\noindent \texttt{getAllEvents()}:\\
+Retrieves all events.
+\begin{itemize}
+\item transition: None
+\item output: A copy of all keys in \texttt{events}
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{getEventDetails(eventId : string)}:\\
+Retrieves the details of an event.
+\begin{itemize}
+\item transition: None
+\item output: The event details for the given event ID in \texttt{events}
+\item exception: InvalidEvent if event does not exist
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None
+
+\newpage
+
+\section{MIS of M\ref{m7}: Event Notification Module}
+
+\subsection{Module}
+
+Contains functionality for notifying users abouts upcoming events.
+
+\subsection{Uses}
+
+None
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+None
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.3\textwidth} p{0.3\textwidth} p{0.2\textwidth} p{0.2\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{sendNotification} & \texttt{userIds : list($\mathbb{N}$) \newline message : string} & None & InvalidUser \\
+\hline
+\texttt{scheduleNotification} & \texttt{userIds : list($\mathbb{N}$) \newline message : string \newline datetime: DateTime} & None & InvalidEvent \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+None
+
+\subsubsection{Environment Variables}
+
+None
+
+\subsubsection{Assumptions}
+
+None
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{sendNotification(userIds : list($\mathbb{N}$), message : string, \newline datetime: DateTime)}: \\
+Sends a notification to the list of users specified.
+\begin{itemize}
+\item transition: None
+\item output: None
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{scheduleNotification(userIds : list($\mathbb{N}$), message : string, \newline datetime : DateTime)}: \\
+Schedules a notification to send to the list of users specified.
+\begin{itemize}
+\item transition: None
+\item output: None
+\item exception: None
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\noindent \texttt{checkScheduleNotifications()}: \\
+Periodically checks and sends out scheduled notifications at their deadline.
+\begin{itemize}
+\item transition: None
+\item output: None
+\item exception: None
+\end{itemize}
+
+\newpage
+
+\section{MIS of M\ref{m8}: Registration Module}
+
+\subsection{Module}
+
+Contains functionality for registering users for events.
+
+\subsection{Uses}
+\begin{itemize}
+  \item Event Management Module (M\ref{m7})
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+\subsubsection{Exported Access Programs}
+\begin{center}
+\begin{tabularx}{\textwidth}{p{10em} X X X}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{registerUser} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$ \\ userId : $\mathbb{N}$}} &
+\texttt{confirmation : string} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent}} \\
+
+\texttt{delistUser} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$ \\ userId : $\mathbb{N}$}} &
+\texttt{removed : bool} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent}} \\
+
+\texttt{getRegistrationCode} &
+\texttt{confirmation : string} &
+\texttt{code : QRCode} &
+\texttt{InvalidConfirmation} \\
+
+\texttt{getRegistrationCode} &
+\parbox[t]{\hsize}{\texttt{userId : $\mathbb{N}$ \\ eventId : $\mathbb{N}$}} &
+\texttt{code : QRCode} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent \\ InvalidRegistration}} \\
+\texttt{getConfirmationInfo} &
+\texttt{confirmation : string} &
+\parbox[t]{\hsize}{\texttt{userId : $\mathbb{N}$ \\ eventId : $\mathbb{N}$}} &
+\texttt{InvalidConfirmation} \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+\begin{itemize}
+  \item \texttt{eventAttendees : map(eventId : $\mathbb{N}$, users :
+    set($\mathbb{N}$))}: A set of users who have registered for each event.
+  \item \texttt{confirmations : map(confirmation : string, registration : tuple(userId : $\mathbb{N}$, eventId :
+    $\mathbb{N}$))}: A mapping of all confirmation strings into \texttt{(userId, eventId)} tuples.
+\end{itemize}
+
+
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+There is no payment handling done by this module. Any events requiring payments will have that processed separately
+before a user can register.
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{registerUser(eventId, userId)}:
+\begin{itemize}
+  \item transition: Update the \texttt{eventAttendees} sets with the new registered user. Update the
+    \texttt{confirmations} with the generated confirmation code.
+\item output: Provide the generated registration code.
+\item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns \texttt{InvalidEvent} if the given \texttt{eventId} does not exist.
+\end{itemize}
+
+\noindent \texttt{delistUser(eventId, userId)}:
+\begin{itemize}
+  \item transition: Update the \texttt{eventAttendees} sets with removal of the specified user. Update the
+    \texttt{confirmations} with the removed confirmation code.
+  \item output: Boolean confirming that there was a change in the \texttt{eventAttendees} after the user was removed
+    from the registration of the specified event. If the user was not registered to begin with, there is no harm to the
+    system, but \texttt{false} is returned.
+\item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns \texttt{InvalidEvent}
+  if the given \texttt{eventId} does not exist.
+\end{itemize}
+
+\noindent \texttt{getRegistrationCode(confirmation)} (1):
+\begin{itemize}
+  \item transition: None.
+  \item output: A generated QRCode based on the given confirmation code.
+\item exception: Returns \texttt{InvalidConformation} if a non-existent confirmation is provided.
+\end{itemize}
+
+\noindent \texttt{getRegistrationCode(userId, eventId)} (2):
+\begin{itemize}
+  \item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns
+    \texttt{InvalidEvent} if the given \texttt{eventId} does not exist; returns \texttt{InvalidRegistration} if the
+    given user did not register for the event.
+\end{itemize}
+
+\noindent \texttt{getConfirmationInfo(confirmation)}:
+\begin{itemize}
+  \item transition: None.
+  \item output: A \texttt{(userId, eventId)} tuple to specify a registration instance.
+\item exception: Returns \texttt{InvalidConformation} if a non-existent confirmation is provided.
+\end{itemize}
+
+\subsubsection{Local Functions}
+Internal functions may handle confirmation string and QR Code generation. The only specification is that the same
+confirmation string is generated for a given \texttt{(userId, eventId)} tuple, and the same QR Code is generated for a
+single registration instance (i.e. from a given confirmation string).
+
+\newpage
+
+\section{MIS of M\ref{m9}: Attendance Tracking Module}
+
+\subsection{Module}
+Contains functionality for tracking live event attendance.
+
+\subsection{Uses}
+
+\begin{itemize}
+  \item Event Management Module (M\ref{m7})
+  \item Registration Module (M\ref{m8})
+\end{itemize}
 
 
 \subsection{Syntax}
@@ -177,55 +956,485 @@ The following table is taken directly from the Module Guide document for this pr
 \subsubsection{Exported Access Programs}
 
 \begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
+\begin{tabularx}{\textwidth}{p{10em} X X X}
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\wss{accessProg} & - & - & - \\
+\texttt{markAttendance} &
+\parbox[t]{\hsize}{\texttt{code : QRCode}} &
+\texttt{confirm : bool} &
+\parbox[t]{\hsize}{\texttt{InvalidQRCode}} \\
+
+\texttt{markAttendance} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$ \\ userId : $\mathbb{N}$}} &
+\texttt{confirm : bool} &
+\parbox[t]{\hsize}{\texttt{InvalidUser \\ InvalidEvent}} \\
+
+\texttt{getAttendance} &
+\parbox[t]{\hsize}{\texttt{eventId : $\mathbb{N}$}} &
+\texttt{attendance : set($\mathbb{N}$)} &
+\parbox[t]{\hsize}{\texttt{InvalidEvent}} \\
 \hline
-\end{tabular}
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+\begin{itemize}
+  \item \texttt{attendance : map(eventId : $\mathbb{N}$, users :
+    set($\mathbb{N}$))}: A set of users who have attended each event.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+Attendance only counts the first time a user enters the event. During the event, once a user is registered, physical
+admins can monitor re-entry of attendees.
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{getRegistrationCode(code)} (1):
+\begin{itemize}
+  \item transition: Update the \texttt{attendance} set for the event with the attending user if the user can attend the
+    event.
+  \item output: Boolean confirming the user has been tracked if they are allowed to attend the event.
+\item exception: Returns \texttt{InvalidQRCode} if the QR Code provided does not work, potentially implying the user
+  cannot register the even.
+\end{itemize}
+
+\noindent \texttt{getRegistrationCode(userId, eventId)} (2):
+\begin{itemize}
+  \item exception: Returns \texttt{InvalidUser} if the given \texttt{userId} does not exist; returns
+    \texttt{InvalidEvent} if the given \texttt{eventId} does not exist.
+\end{itemize}
+
+\subsubsection{Local Functions}
+Internal functions may handle validating QR codes for a given event registration. There must be a way for the module to
+derive the corresponding registration information from the code.
+
+\newpage
+
+\section{MIS of M\ref{m10}: Report Generation Module}
+
+\subsection{Module}
+Contains functionality for generating data visualizations and exporting data to specified formats.
+
+\subsection{Uses}
+
+\begin{itemize}
+  \item Main System Module (M\ref{m1})
+  \item Form Submission Module (M\ref{m5})
+\end{itemize}
+
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+\begin{itemize}
+  \item \texttt{Graphs : set(GraphType)}: The set of all valid graphs which can be rendered.
+  \item \texttt{Formats : set(FileType)}: The set of all valid file formats which can be generated.
+\end{itemize}
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{5.5em} X X X}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{plotData} &
+\parbox[t]{\hsize}{\texttt{data : list($\mathbb{R}$) \\ graph : GraphType}} &
+\texttt{plot : Graph} &
+\parbox[t]{\hsize}{\texttt{InvalidData \\ InvalidGraphType \\ IncompatibleData}} \\
+
+\texttt{exportData} &
+\parbox[t]{\hsize}{\texttt{data : list($\mathbb{R}$) \\ format : FileType}} &
+\texttt{file : File} &
+\parbox[t]{\hsize}{\texttt{InvalidData \\ InvalidFileType}} \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+None.
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+When $\mathbb{R}$ is specified for data input, it means that the data can be mapped in one way or another onto
+$\mathbb{R}$.
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{plotData(data, graph)}:
+\begin{itemize}
+  \item transition: None.
+  \item output: Plot of the data in the specified graph type.
+  \item exception: Returns \texttt{InvalidData} if the data is corrupt; returns \texttt{InvalidGraphType} if the given
+    \texttt{GraphType} does not exist; returns \texttt{IncompatibleData} if the given data cannot be represented with
+    the given graph type.
+\end{itemize}
+
+\noindent \texttt{exportData(data, format)}:
+\begin{itemize}
+  \item transition: None.
+  \item output: File of the data in the specified file format.
+  \item exception: Returns \texttt{InvalidData} if the data is corrupt; returns \texttt{InvalidFileType} if the given
+    \texttt{FileType} does not exist.
+\end{itemize}
+
+\subsubsection{Local Functions}
+None.
+
+\newpage
+
+\section{MIS of M\ref{m11}: Analytics Module}
+
+\subsection{Module}
+
+Contains functionality for computing summary statistics and trends for events,
+registrations, attendance, and surveys.
+
+\subsection{Uses}
+
+Database Access Module (M\ref{m12}) \\
+Registration Module (M\ref{m8}) \\
+Attendance Tracking Module (M\ref{m9}) \\
+Form Submission Module (M\ref{m5})
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+None
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.27\textwidth} p{0.19\textwidth} p{0.29\textwidth} p{0.20\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{getEventStats} &
+\texttt{eventId : $\mathbb{N}$} &
+\texttt{stats : EventStats} &
+\texttt{EventNotFound} \\
+\hline
+\texttt{getSurveyStats} &
+\texttt{surveyId : $\mathbb{N}$} &
+\texttt{summary : SurveySummary} &
+\texttt{SurveyNotFound} \\
+\hline
+\texttt{getRegistrationTrends} &
+\texttt{eventId : $\mathbb{N}$} &
+\texttt{trend : list(RegistrationPoint)} &
+\texttt{EventNotFound} \\
+\hline
+\end{tabularx}
+\end{center}
+
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+None
+
+\subsubsection{Environment Variables}
+
+None
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+  \item The Database Access Module (M\ref{m11}) correctly stores registrations,
+        attendance records, and survey responses.
+  \item The given \texttt{eventId} and \texttt{surveyId} refer to events and
+        surveys that were, if they exist, created by other modules.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\noindent \texttt{getEventStats(eventId : $\mathbb{N}$)}:
+\begin{itemize}
+  \item transition: None (read-only). Queries the database for all registrations
+        and attendance records associated with \texttt{eventId} and computes
+        totals such as number of registrations, check-ins, and attendance rate.
+  \item output: \texttt{stats} containing the computed summary values.
+  \item exception:
+    \begin{itemize}
+      \item \texttt{EventNotFound} if \texttt{eventId} does not correspond to any event.
+    \end{itemize}
+\end{itemize}
+
+\noindent \texttt{getSurveyStats(surveyId : $\mathbb{N}$)}:
+\begin{itemize}
+  \item transition: None (read-only). Queries survey responses associated with
+        \texttt{surveyId} and aggregates them per question (for example,
+        counts per option for multiple-choice questions).
+  \item output: \texttt{summary} containing aggregated statistics for each question.
+  \item exception:
+    \begin{itemize}
+      \item \texttt{SurveyNotFound} if \texttt{surveyId} does not correspond to any survey.
+    \end{itemize}
+\end{itemize}
+
+\noindent \texttt{getRegistrationTrends(eventId : $\mathbb{N}$)}:
+\begin{itemize}
+  \item transition: None (read-only). Retrieves timestamps of registrations for
+        \texttt{eventId} and computes cumulative registration counts over time.
+  \item output: \texttt{trend} as a list of \texttt{RegistrationPoint} records,
+        each containing a timestamp and cumulative registration count.
+  \item exception:
+    \begin{itemize}
+      \item \texttt{EventNotFound} if \texttt{eventId} does not correspond to any event.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+None
+
+\newpage
+
+\section{MIS of M\ref{m12}: Database Access Module}
+
+\subsection{Module}
+
+Provides a generic interface for reading from and writing to the application's
+PostgreSQL database. Responsible for connection management, transactions,
+and basic CRUD operations used by higher-level modules (e.g., event
+management, registration, analytics).
+
+\subsection{Uses}
+
+None
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+None
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.15\textwidth} p{0.36\textwidth} p{0.20\textwidth} p{0.20\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{fetchRow} &
+\texttt{table : string, id : $\mathbb{N}$} &
+\texttt{row : Record} &
+\texttt{RecordNotFound, DatabaseError} \\
+\hline
+\texttt{fetchRows} &
+\texttt{table : string, filter : FilterExpr} &
+\texttt{rows : list(Record)} &
+\texttt{DatabaseError} \\
+\hline
+\texttt{insertRow} &
+\texttt{table : string, data : Record} &
+\texttt{id : $\mathbb{N}$} &
+\texttt{DatabaseError} \\
+\hline
+\texttt{updateRow} &
+\texttt{table : string, id : $\mathbb{N}$, data : Record} &
+\texttt{-} &
+\texttt{RecordNotFound, DatabaseError} \\
+\hline
+\texttt{deleteRow} &
+\texttt{table : string, id : $\mathbb{N}$} &
+\texttt{-} &
+\texttt{RecordNotFound, DatabaseError} \\
+\hline
+
+\end{tabularx}
+\end{center}
+
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+  \item connectionPool : ConnectionPool \\
+        Pool of reusable connections to the PostgreSQL database.
+  \item activeTx : set(TransactionId) \\
+        Set of identifiers for currently active transactions.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+\begin{itemize}
+  \item dbServer : PostgreSQLInstance \\
+        Running PostgreSQL database server hosting the application schema.
+\end{itemize}
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+  \item The database schema has been created and migrated before any access
+        program is invoked.
+  \item \texttt{connectionPool} is initialized during system startup.
+  \item \texttt{Record} and \texttt{FilterExpr} are abstract data structures whose
+        concrete representation is handled by the ORM / query layer.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\noindent fetchRow(table : string, id : N):
+\begin{itemize}
+  \item transition: None.
+  \item output: Returns the row in \texttt{table} whose primary key equals \texttt{id}.
+  \item exception: 
+        \begin{itemize}
+          \item RecordNotFound if no matching row exists.
+          \item DatabaseError if a low-level database error occurs.
+        \end{itemize}
+\end{itemize}
+
+\noindent fetchRows(table : string, filter : FilterExpr):
+\begin{itemize}
+  \item transition: None.
+  \item output: Returns all rows in \texttt{table} that satisfy \texttt{filter}.
+  \item exception: DatabaseError if a low-level database error occurs.
+\end{itemize}
+
+\noindent insertRow(table : string, data : Record):
+\begin{itemize}
+  \item transition: Inserts a new row into \texttt{table} populated with the fields in \texttt{data}.
+  \item output: Returns the primary key \texttt{id} assigned to the new row.
+  \item exception: DatabaseError if the insert fails (e.g., constraint violation, connectivity issues).
+\end{itemize}
+
+\noindent updateRow(table : string, id : N, data : Record):
+\begin{itemize}
+  \item transition: Updates the existing row in \texttt{table} with primary key \texttt{id}
+        using the fields in \texttt{data}.
+  \item output: None.
+  \item exception:
+        \begin{itemize}
+          \item RecordNotFound if no matching row exists.
+          \item DatabaseError if the update fails.
+        \end{itemize}
+\end{itemize}
+
+\noindent deleteRow(table : string, id : N):
+\begin{itemize}
+  \item transition: Removes the row in \texttt{table} whose primary key equals \texttt{id}.
+  \item output: None.
+  \item exception:
+        \begin{itemize}
+          \item RecordNotFound if no matching row exists.
+          \item DatabaseError if the delete fails.
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{itemize}
+  \item acquireConnection() : Connection \\
+        Obtains a connection from \texttt{connectionPool}, opening a new one if required.
+  \item releaseConnection(c : Connection) \\
+        Returns \texttt{c} to \texttt{connectionPool} or closes it on error.
+  \item mapRowToRecord(raw : Row) : Record \\
+        Maps a raw database row to the abstract \texttt{Record} structure.
+\end{itemize}
+
+\newpage
+
+\section{MIS of M\ref{m13}: Audit Module}
+
+\subsection{Module}
+
+Contains functionality for recording administrative and sensitive system
+actions in an append-only audit log for traceability and accountability.
+
+\subsection{Uses}
+
+Database Access Module (M\ref{m12})
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+
+None
+
+\subsubsection{Exported Access Programs}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{p{0.21\textwidth} p{0.27\textwidth} p{0.20\textwidth} p{0.20\textwidth}}
+\hline
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\hline
+\texttt{recordEvent} &
+\texttt{entry : AuditEntry} &
+\texttt{-} &
+\texttt{DatabaseError} \\
+\hline
+\texttt{getAuditLog} &
+\texttt{filter : AuditFilter} &
+\texttt{entries : list(AuditEntry)} &
+\texttt{DatabaseError} \\
+\hline
+
+\end{tabularx}
 \end{center}
 
 \subsection{Semantics}
 
 \subsubsection{State Variables}
 
-\wss{Not all modules will have state variables.  State variables give the module
-  a memory.}
+\begin{itemize}
+  \item auditLog : set(AuditEntry) \\
+        Abstract representation of all recorded audit entries.
+\end{itemize}
 
 \subsubsection{Environment Variables}
 
-\wss{This section is not necessary for all modules.  Its purpose is to capture
-  when the module has external interaction with the environment, such as for a
-  device driver, screen interface, keyboard, file, etc.}
+None
 
 \subsubsection{Assumptions}
 
-\wss{Try to minimize assumptions and anticipate programmer errors via
-  exceptions, but for practical purposes assumptions are sometimes appropriate.}
+\begin{itemize}
+  \item Audit entries produced by other modules accurately describe the action taken.
+  \item The underlying database schema includes an audit log table.
+\end{itemize}
 
 \subsubsection{Access Routine Semantics}
 
-\noindent \wss{accessProg}():
+\noindent\texttt{recordEvent(entry : AuditEntry)}:
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+  \item transition: Adds \texttt{entry} to \texttt{auditLog} and persists it through
+        the Database Access Module.
+  \item output: None
+  \item exception:
+    \begin{itemize}
+      \item \texttt{DatabaseError} if the entry could not be written.
+    \end{itemize}
 \end{itemize}
 
-\wss{A module without environment variables or state variables is unlikely to
-  have a state transition.  In this case a state transition can only occur if
-  the module is changing the state of another module.}
-
-\wss{Modules rarely have both a transition and an output.  In most cases you
-  will have one or the other.}
+\noindent\texttt{getAuditLog(filter : AuditFilter)}:
+\begin{itemize}
+  \item transition: None (read-only)
+  \item output: Returns all \texttt{AuditEntry} values matching the given filter,
+        such as by user, action type, or date range.
+  \item exception:
+    \begin{itemize}
+      \item \texttt{DatabaseError} if retrieval fails.
+    \end{itemize}
+\end{itemize}
 
 \subsubsection{Local Functions}
 
-\wss{As appropriate} \wss{These functions are for the purpose of specification.
-  They are not necessarily something that is going to be implemented
-  explicitly.  Even if they are implemented, they are not exported; they only
-  have local scope.}
+None
 
 \newpage
 
