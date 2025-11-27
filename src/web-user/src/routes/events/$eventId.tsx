@@ -105,17 +105,29 @@ function RouteComponent() {
       const result = await response.json();
 
       if (result.success) {
-        setRegisterStatus("registered");
-        toast.success("Registration complete");
-        setTimeout(() => handleBack(), 300);
-      } else if (result.error == "User is already registered for this event") {
-        toast.error("You are already registered for this event");
-        setTimeout(() => handleBack(), 300);
-      } else {
-        setRegisterStatus("idle");
+        const registrationId = result.data?.id;
+        try {
+          const qrRes = await fetch(`/api/events/${eventId}/generate-qr`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ registrationId }),
+          });
+          const qrJson = await qrRes.json();
+          if (qrJson.success) {
+            setRegisterStatus("registered");
+            toast.success("Registration complete");
+            setTimeout(() => handleBack(), 300);
+          } else {
+            console.error("QR generation failed:", qrJson.error);
+          }
+        } catch (qrErr) {
+          console.error("Error generating QR:", qrErr);
+        }
       }
     } catch (err: any) {
+      console.error(err);
       setRegisterStatus("idle");
+      toast.error("Something went wrong while registering");
     }
   };
 

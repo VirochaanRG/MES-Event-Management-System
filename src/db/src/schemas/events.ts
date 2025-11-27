@@ -1,4 +1,5 @@
-import { pgTable, serial, varchar, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer, boolean,
+  unique, customType } from "drizzle-orm/pg-core";
 
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),
@@ -25,4 +26,28 @@ export const registeredUsers = pgTable("registered_users", {
   registeredAt: timestamp("registered_at", { withTimezone: true }).defaultNow(),
   status: varchar("status", { length: 50 }).default("confirmed"), // confirmed, cancelled, waitlist
   paymentStatus: varchar("payment_status", { length: 50 }).default("pending"), // pending, paid, refunded
+},
+  (t) => [
+    unique("registration_natural_key").on(
+      t.eventId,
+      t.userEmail,
+      t.instance
+    ).nullsNotDistinct()
+  ]
+);
+
+const bytea = customType<{ data: Buffer; notNull: true; }>({
+  dataType() {
+    return 'bytea';
+  },
+});
+
+export const qrCodes = pgTable("qr_codes", {
+  id: serial("id").references(() => registeredUsers.id, {onDelete: "cascade" }),
+  eventId: integer("event_id").notNull(),
+  userEmail: varchar("user_email", { length: 255 }).notNull(),
+  instance: integer("instance").notNull(),
+  image: bytea("image").notNull(),
+  content: varchar("content", {length: 255}).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });

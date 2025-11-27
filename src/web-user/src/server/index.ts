@@ -4,9 +4,10 @@ import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import { db } from '../../../db/src/db';
 import { events, registeredUsers } from '../../../db/src/schemas/events';
-import { eq, and, sql, isNull } from 'drizzle-orm';
-import { form, formAnswers, formQuestions, formSubmissions } from '@db/schemas';
+import { eq, and, sql, isNull, or, max, InferInsertModel } from 'drizzle-orm';
 import { timeStamp } from 'console';
+import { form, formQuestions, formAnswers, formSubmissions, qrCodes } from '@db/schemas';
+import QRCode from 'qrcode';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -186,15 +187,16 @@ fastify.get<{ Params: { id: string } }>('/api/events/:id', async (request, reply
   }
 });
 
+// POST - Register user for an event
 fastify.post<{
   Params: { id: string };
-  Body: { userEmail: string };
+  Body: { userEmail: string; instance?: number };
 }>('/api/events/:id/register', async (request, reply) =>
 {
   try
   {
     const { id } = request.params;
-    const { userEmail } = request.body;
+    const { userEmail, instance } = request.body;
 
     // Validate required fields
     if (!userEmail || !userEmail.trim())
@@ -260,6 +262,7 @@ fastify.post<{
       .values({
         eventId: parseInt(id),
         userEmail: userEmail.toLowerCase().trim(),
+        instance: instance ?? 0,
         status: 'confirmed',
         paymentStatus: eventCost > 0 ? 'pending' : 'paid',
       })
@@ -276,6 +279,51 @@ fastify.post<{
     return reply.code(500).send({
       success: false,
       error: 'Failed to register for event',
+    });
+  }
+});
+
+interface QRPayload {
+  registrationId: number;
+  eventId: number;
+  userEmail: string;
+  instance: number;
+}
+
+function buildQRContentString(payload : QRPayload) {
+return `registrationId:${payload.registrationId};eventId:${payload.eventId};userEmail:${payload.userEmail};` +
+    `instance:${payload.instance}`;
+}
+
+fastify.post("/api/events/registration/generateQR", async (request, reply) => {
+  try {
+    const { registrationId, eventId, userEmail, instance } = request.body as {
+      registrationId: number;
+      eventId: number;
+      userEmail: string;
+      instance: number;
+    };
+
+    const qrString = buildQRContentString(request.body as QRPayload);
+    const qrBuffer = await QRCode.toBuffer(qrString);
+    const [entry] = await db.insert(qrCodes).values({
+      id: registrationId,
+      eventId: eventId,
+      userEmail: userEmail,
+      instance: instance,
+      image: qrBuffer,
+      content: qrString
+    }).returning();
+
+    return reply.send({
+      success: true,
+      data: entry,
+    });
+  } catch (error) {
+    fastify.log.error({ err: error }, 'Failed to generate QR code');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to generate QR code',
     });
   }
 });
@@ -321,6 +369,82 @@ fastify.get<{
   }
 });
 
+fastify.get("/api/events/:id/event-qrcodes", async (request, reply) => {
+  try {
+    const { eventId, userEmail } = request.body as {
+      eventId: number;
+      userEmail: string;
+    };
+
+    const codes = await db.select().from(qrCodes)
+      .where(
+        and(
+          eq(qrCodes.eventId, eventId),
+          eq(qrCodes.userEmail, userEmail)
+        ));
+
+    return reply.send({
+      success: true,
+      data: codes,
+    });
+  } catch (error) {
+    fastify.log.error({ err: error }, 'Failed to access DB and fetch QR codes');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to access DB and fetch QR codes',
+    });
+  }
+});
+
+// fastify.delete("/api/events/registration", async (request, reply) => {
+//   try {
+//     const { id } = request.body as {
+//       id: number;
+//     };
+
+//     const result = await db.delete(registeredUsers).where(eq(registeredUsers.id, id));
+
+//     return reply.send({
+//       success: true,
+//     });
+//   } catch (error) {
+//     fastify.log.error({ err: error }, 'Failed to delete entry');
+//     return reply.code(500).send({
+//       success: false,
+//       error: 'Failed to delete entry',
+//     });
+//   }
+// });
+
+fastify.get("/api/events/:id/latest-instance", async (request, reply) => {
+  try {
+    const { eventId, userEmail } = request.body as {
+      eventId: number;
+      userEmail: string;
+    };
+
+    const [{ maxInstance }] = await db.select({
+      maxInstance: max(registeredUsers.instance),
+    })
+      .from(registeredUsers)
+      .where(
+        and(
+          eq(qrCodes.eventId, eventId),
+          eq(qrCodes.userEmail, userEmail)
+        ));
+
+    return reply.send({
+      success: true,
+      instance: maxInstance ?? 0,
+    });
+  } catch (error) {
+    fastify.log.error({ err: error }, 'Failed to access DB and fetch QR codes');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to access DB and fetch QR codes',
+    });
+  }
+});
 
 //Get forms
 fastify.get('/api/forms', async (request, reply) =>
@@ -447,8 +571,6 @@ fastify.get<{ Params: { fid: string, uid: string }, }>('/api/forms/:fid/answers/
     });
   }
 });
-
-
 
 //POST reponse to question
 fastify.post<{

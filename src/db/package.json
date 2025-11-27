@@ -26,10 +26,12 @@
     "pg": "^8.11.5"
   },
   "devDependencies": {
+    "@types/node": "^20.19.19",
     "@types/pg": "^8.11.5",
     "drizzle-kit": "^0.31.6",
     "tsx": "^4.7.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vite-plugin-node-polyfills": "^0.24.0"
   },
   "exports": {
     ".": {
