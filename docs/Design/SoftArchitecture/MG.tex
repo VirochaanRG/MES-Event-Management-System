@@ -46,8 +46,7 @@
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+November 13, 2025 & 1.0 & Rev -1\\
 \bottomrule
 \end{tabularx}
 
@@ -74,7 +73,6 @@ This section records information for easy reference.
   SRS & Software Requirements Specification\\
   \progname & Explanation of program name\\
   UC & Unlikely Change \\
-  \wss{etc.} & \wss{...}\\
   \bottomrule
 \end{tabular}\\
 
@@ -153,20 +151,24 @@ unlikely changes are listed in Section \ref{SecUchange}.
 Anticipated changes are the source of the information that is to be hidden
 inside the modules. Ideally, changing one of the anticipated changes will only
 require changing the one module that hides the associated decision. The approach
-adapted here is called design for
-change.
+adapted here is called design for change.
 
 \begin{description}
-\item[\refstepcounter{acnum} \actheacnum \label{acHardware}:] The specific
-  hardware on which the software is running.
-\item[\refstepcounter{acnum} \actheacnum \label{acInput}:] The format of the
-  initial input data.
-\item ...
+\item[\refstepcounter{acnum} \actheacnum \label{acUI}:] 
+  The user interface of the app. Modifications may be made to improve usability, accessibility, or better represent the use case (eg. MES).
+\item[\refstepcounter{acnum} \actheacnum \label{acForms}:] 
+  The form builder functionality. The structure and logic of registration and feedback forms may change to support new fields, features, or requirements.
+\item[\refstepcounter{acnum} \actheacnum \label{acAuth}:] 
+  The user authentication and authorization policy. The security and user requirements may evolve, requiring the introduction of new authentication techniques (eg. custom login, university single sign-on). There may also be a need to add new user/admin roles, or modify the permissions process based on the use case.
+\item[\refstepcounter{acnum} \actheacnum \label{acData}:] 
+  Backend functionality. The database handling or entry relationships may change to support scalability, or custom event workflows.
+\item[\refstepcounter{acnum} \actheacnum \label{acNotifications}:] 
+  Notification delivery methods. Communication channels (email, SMS, push notifications) and message formats may improve to meet updated communication needs for event reminders, updates, or confirmations.
+\item[\refstepcounter{acnum} \actheacnum \label{acSecurity}:] 
+  Security and encryption network. The app's security standards may require updated encryption algorithms, expanded input validation, and refined logging detail depending on the use case to ensure compliance.
+\item[\refstepcounter{acnum} \actheacnum \label{acIntegration}:] 
+  External integration methods. The app may be required to connect with specialized APIs, external databases, or other third-party systems (eg. payment gateways). The data formats and protocols used in these integrations may evolve over time.
 \end{description}
-
-\wss{Anticipated changes relate to changes that would be made in requirements,
-design or implementation choices.  They are not related to changes that are made
-at run-time, like the values of parameters.}
 
 \subsection{Unlikely Changes} \label{SecUchange}
 
@@ -178,10 +180,14 @@ will potentially need to be modified. Hence, it is not intended that these
 decisions will be changed.
 
 \begin{description}
-\item[\refstepcounter{ucnum} \uctheucnum \label{ucIO}:] Input/Output devices
-  (Input: File and/or Keyboard, Output: File, Memory, and/or Screen).
-\item ...
+\item[\refstepcounter{ucnum} \uctheucnum \label{ucUse}:] 
+  Changes to the primary application of events, registration, tickets, and feedback. The development is focused solely on event management and is not expected to change to accomodate other uses.
+\item[\refstepcounter{ucnum} \uctheucnum \label{ucStack}:] 
+  Migrating to a different technology stack. The current architecture is designed around an existing framework. A different technology stack would require reimplementing nearly all modules.
+\item[\refstepcounter{ucnum} \uctheucnum \label{ucData}:] 
+  Transitioning from a centralized database model. The platform relies on centralized data storage for all event management, and applies role-based access to ensure users are only viewing permitted information. Moving to a different model (eg. decentralized) would conflict with the functional requirements, and require rethinking the entire user interaction model.
 \end{description}
+
 
 \section{Module Hierarchy} \label{SecMH}
 
@@ -191,34 +197,63 @@ below, which are leaves in the hierarchy tree, are the modules that will
 actually be implemented.
 
 \begin{description}
-\item [\refstepcounter{mnum} \mthemnum \label{mHH}:] Hardware-Hiding Module
-\item ...
+\item [\refstepcounter{mnum}\mthemnum\label{m1}:] Main System Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m2}:] User Authentication Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m3}:] User Authorization Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m4}:] Form Template Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m5}:] Form Submission Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m6}:] Event Management Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m7}:] Event Notification Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m8}:] Registration Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m9}:] Attendance Tracking Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m10}:] Report Generation Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m11}:] Analytics Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m12}:] Database Access Module
+
+\item [\refstepcounter{mnum}\mthemnum\label{m13}:] Audit Module
+
 \end{description}
 
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{p{0.3\textwidth} p{0.6\textwidth}}
 \toprule
 \textbf{Level 1} & \textbf{Level 2}\\
 \midrule
 
-{Hardware-Hiding Module} & ~ \\
+Hardware-Hiding Module
+& No Modules\\
 \midrule
 
-\multirow{7}{0.3\textwidth}{Behaviour-Hiding Module} & ?\\
-& ?\\
-& ?\\
-& ?\\
-& ?\\
-& ?\\
-& ?\\ 
-& ?\\
+\multirow{9}{0.3\textwidth}{Behaviour-Hiding Modules} 
+& \mref{m1}: Main System Module\\
+& \mref{m2}: User Authentication Module\\
+& \mref{m3}: User Authorization Module\\
+& \mref{m4}: Form Template Module\\
+& \mref{m5}: Form Submission Module\\
+& \mref{m6}: Event Management Module\\
+& \mref{m7}: Event Notification Module\\
+& \mref{m8}: Registration Module\\
+& \mref{m9}: Attendance Tracking Module\\
+& \mref{m10}: Report Generation Module\\
 \midrule
 
-\multirow{3}{0.3\textwidth}{Software Decision Module} & {?}\\
-& ?\\
-& ?\\
+\multirow{3}{0.3\textwidth}{Software-Decision Modules} 
+& \mref{m11}: Analytics Module\\
+& \mref{m12}: Database Access Module\\
+& \mref{m13}: Audit Module\\
 \bottomrule
 
 \end{tabular}
@@ -230,14 +265,8 @@ actually be implemented.
 
 The design of the system is intended to satisfy the requirements developed in
 the SRS. In this stage, the system is decomposed into modules. The connection
-between requirements and modules is listed in Table~\ref{TblRT}.
+between requirements and modules is listed in Tables~\ref{TblRT} to~\ref{TblRT_Compliance}.
 
-\wss{The intention of this section is to document decisions that are made
-  ``between'' the requirements and the design.  To satisfy some requirements,
-  design decisions need to be made.  Rather than make these decisions implicit,
-  they are explicitly recorded here.  For instance, if a program has security
-  requirements, a specific design decision may be made to satisfy those
-  requirements with a password.}
 
 \section{Module Decomposition} \label{SecMD}
 
@@ -255,57 +284,119 @@ Only the leaf modules in the hierarchy have to be implemented. If a dash
 (\emph{--}) is shown, this means that the module is not a leaf and will not have
 to be implemented.
 
-\subsection{Hardware Hiding Modules (\mref{mHH})}
+\subsection{Hardware Hiding Modules}
 
-\begin{description}
-\item[Secrets:]The data structure and algorithm used to implement the virtual
-  hardware.
-\item[Services:]Serves as a virtual hardware used by the rest of the
-  system. This module provides the interface between the hardware and the
-  software. So, the system can use it to display outputs or to accept inputs.
-\item[Implemented By:] OS
-\end{description}
-
+% \begin{description}
+% \item[Secrets:]The data structure and algorithm used to implement the virtual
+%   hardware.
+% \item[Services:]Serves as a virtual hardware used by the rest of the
+%   system. This module provides the interface between the hardware and the
+%   software. So, the system can use it to display outputs or to accept inputs.
+% \item[Implemented By:] OS
+% \end{description}
+There are no hardware components for this system.
 \subsection{Behaviour-Hiding Module}
 
-\begin{description}
-\item[Secrets:]The contents of the required behaviours.
-\item[Services:]Includes programs that provide externally visible behaviour of
-  the system as specified in the software requirements specification (SRS)
-  documents. This module serves as a communication layer between the
-  hardware-hiding module and the software decision module. The programs in this
-  module will need to change if there are changes in the SRS.
-\item[Implemented By:] --
-\end{description}
+% \begin{description}
+% \item[Secrets:]The contents of the required behaviours.
+% \item[Services:]Includes programs that provide externally visible behaviour of
+%   the system as specified in the software requirements specification (SRS)
+%   documents. This module serves as a communication layer between the
+%   hardware-hiding module and the software decision module. The programs in this
+%   module will need to change if there are changes in the SRS.
+% \item[Implemented By:] --
+% \end{description}
 
-\subsubsection{Input Format Module (\mref{mInput})}
+\subsubsection{Main System Module (\mref{m1})}
+\textbf{Secrets:} Defines the business logic which allows for the communication between the different modules and with external users\\
+\textbf{Services:} Manages and stores the application states and context and serves as the central entrypoint to the system and which modules to communicate with.\\
+\textbf{Implemented By:} React and NodeJS\\
+\textbf{Module Type:} Abstract Object Module.
 
-\begin{description}
-\item[Secrets:]The format and structure of the input data.
-\item[Services:]Converts the input data into the data structure used by the
-  input parameters module.
-\item[Implemented By:] [Your Program Name Here]
-\item[Type of Module:] [Record, Library, Abstract Object, or Abstract Data Type]
-  [Information to include for leaf modules in the decomposition by secrets tree.]
-\end{description}
+\subsubsection{User Authentication Module (\mref{m2})}
+\textbf{Secrets:} The internal methods used for verifying user identities within the system.\\
+\textbf{Services:} Authenticates users by validating credentials and provides access to the system.\\
+\textbf{Implemented By:} Backend JavaScript API.\\
+\textbf{Module Type:} Abstract Object Module.
 
-\subsubsection{Etc.}
+\subsubsection{User Authorization Module (\mref{m3})}
+\textbf{Secrets:} Rules defining access levels and user roles. Defines which features are to be accessed by each role.\\
+\textbf{Services:} Provides the system with a ruleset on what each roles have access to and limits/grants access to different parts of the system to users based on credentials. \\
+\textbf{Implemented By:} Backend JavaScript API.\\
+\textbf{Module Type:} Abstract Data Type Module.
 
+\subsubsection{Form Template Module (\mref{m4})}
+\textbf{Secrets:} The structure and layout of form templates used in surveys and event creation.\\
+\textbf{Services:} Provides reusable blueprints for constructing event or survey forms. Allows for the creation of new forms and editing of preexisting forms.\\
+\textbf{Implemented By:} React Frontend, Backend PostgreSQL Database Schemas.\\
+\textbf{Module Type:} Abstract Data Type Module.
+
+\subsubsection{Form Submission Module (\mref{m5})}
+\textbf{Secrets:} Validation rules of the user input data.\\
+\textbf{Services:} Provides mechanism for user to answer and submit forms. Receives and validates user-submitted forms and stores them in database.\\
+\textbf{Implemented By:} Backend form processing JavaScript API.\\
+\textbf{Module Type:} Abstract Object Module.
+
+\subsubsection{Event Management Module (\mref{m6})}
+\textbf{Secrets:} Event data structures and scheduling rules.\\
+\textbf{Services:} Enables creation, editing, and cancellation of events by administrators.\\
+\textbf{Implemented By:} React Frontend with Backend event processing JavaScript API.\\
+\textbf{Module Type:} Abstract Object Module.
+
+\subsubsection{Event Notification Module (\mref{m7})}
+\textbf{Secrets:} Notification delivery logic and timing rules.\\
+\textbf{Services:} Sends alerts to users regarding new events, updates, or cancellations.\\
+\textbf{Implemented By:} Third-Party Messaging Apis.\\
+\textbf{Module Type:} Library.
+
+\subsubsection{Registration Module (\mref{m8})}
+\textbf{Secrets:} Mapping between users, events, and registration states.\\
+\textbf{Services:} Allows users to register, modify, or cancel event participation. Provides validation and confirmation of registration within the event. Allows for admins to view users who have registered for each event and the stage of the process they are in.\\
+\textbf{Implemented By:} Backend JavaScript APIs.\\
+\textbf{Module Type:} Abstract Data Type Module.
+
+\subsubsection{Attendance Tracking Module (\mref{m9})}
+\textbf{Secrets:} Methods for recording attendance and validating entry codes.\\
+\textbf{Services:} Tracks event attendance and verifies participant access. Allows for admins for to view \\
+\textbf{Implemented By:} Backend JavaScript APIs.\\
+\textbf{Module Type:} Abstract Data Object Module.
+
+\subsubsection{Report Generation Module (\mref{m10})}
+\textbf{Secrets:} Formatting logic for report generation and provides static data structure of the report.\\
+\textbf{Services:} Converts analytics data into exportable human-readable reports.\\
+\textbf{Implemented By:} Third Part Apis with JavaScript and React.\\
+\textbf{Module Type:} Abstract Data Object Module.
 
 \subsection{Software Decision Module}
 
-\begin{description}
-\item[Secrets:] The design decision based on mathematical theorems, physical
-  facts, or programming considerations. The secrets of this module are
-  \emph{not} described in the SRS.
-\item[Services:] Includes data structure and algorithms used in the system that
-  do not provide direct interaction with the user. 
-  % Changes in these modules are more likely to be motivated by a desire to
-  % improve performance than by externally imposed changes.
-\item[Implemented By:] --
-\end{description}
+% \begin{description}
+% \item[Secrets:] The design decision based on mathematical theorems, physical
+%   facts, or programming considerations. The secrets of this module are
+%   \emph{not} described in the SRS.
+% \item[Services:] Includes data structure and algorithms used in the system that
+%   do not provide direct interaction with the user. 
+%   % Changes in these modules are more likely to be motivated by a desire to
+%   % improve performance than by externally imposed changes.
+% \item[Implemented By:] --
+% \end{description}
 
-\subsubsection{Etc.}
+\subsubsection{Analytics Module (\mref{m11})}
+\textbf{Secrets:} Algorithms for aggregating and calculating statistics.\\
+\textbf{Services:} Computes summaries based on the data provided for set statistics and performs data analysis.\\
+\textbf{Implemented By:} Javascript Backend Library.\\
+\textbf{Module Type:} Library.
+
+\subsubsection{Database Access Module (\mref{m12})}
+\textbf{Secrets:} Database schema design and access.\\
+\textbf{Services:} Provides database operations to query and insert to database through a unified database layer.\\
+\textbf{Implemented By:} Drizzle ORM with JavaScript APIs.\\
+\textbf{Module Type:} Abstract Data Object Module.
+
+\subsubsection{Audit Module (\mref{m13})}
+\textbf{Secrets:} Policy and data structure for recording administrative actions.\\
+\textbf{Services:} Provides methods to track user and admin activities to ensure traceability and compliance.\\
+\textbf{Implemented By:} Backend Javascript API with PostgreSQL Database.\\
+\textbf{Module Type:} Abstract Data Type Module.
 
 \section{Traceability Matrix} \label{SecTM}
 
@@ -320,21 +411,172 @@ requirements and between the modules and the anticipated changes.
 \toprule
 \textbf{Req.} & \textbf{Modules}\\
 \midrule
-R1 & \mref{mHH}, \mref{mInput}, \mref{mParams}, \mref{mControl}\\
-R2 & \mref{mInput}, \mref{mParams}\\
-R3 & \mref{mVerify}\\
-R4 & \mref{mOutput}, \mref{mControl}\\
-R5 & \mref{mOutput}, \mref{mODEs}, \mref{mControl}, \mref{mSeqDS}, \mref{mSolver}, \mref{mPlot}\\
-R6 & \mref{mOutput}, \mref{mODEs}, \mref{mControl}, \mref{mSeqDS}, \mref{mSolver}, \mref{mPlot}\\
-R7 & \mref{mOutput}, \mref{mEnergy}, \mref{mControl}, \mref{mSeqDS}, \mref{mPlot}\\
-R8 & \mref{mOutput}, \mref{mEnergy}, \mref{mControl}, \mref{mSeqDS}, \mref{mPlot}\\
-R9 & \mref{mVerifyOut}\\
-R10 & \mref{mOutput}, \mref{mODEs}, \mref{mControl}\\
-R11 & \mref{mOutput}, \mref{mODEs}, \mref{mEnergy}, \mref{mControl}\\
+FR-1 & \mref{m1},\mref{m3}, \mref{m4}\\
+FR-2 & \mref{m1},\mref{m9}, \mref{m10}\\
+FR-3 & \mref{m1},\mref{m7}, \mref{m5}\\
+FR-4 & \mref{m1},\mref{m7}\\
+FR-5 & \mref{m1},\mref{m5}\\
+FR-6 & \mref{m1},\mref{m11}\\
+FR-7 & \mref{m1},\mref{m11}, \mref{m3}, \mref{m4}\\
+FR-8 & \mref{m1},\mref{m9}, \mref{m10}\\
+FR-9 & \mref{m1},\mref{m3}, \mref{m4}\\
+FR-10 & \mref{m1},\mref{m5}\\
+FR-11 & \mref{m1}, \mref{m2}\\
+
+
 \bottomrule
 \end{tabular}
-\caption{Trace Between Requirements and Modules}
+\caption{Trace Between Functional Requirements and Modules}
 \label{TblRT}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.22\textwidth} p{0.68\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+AR-1 & \mref{m1} \\
+AR-2 & \mref{m1} \\
+AR-3 & \mref{m1}, \mref{m10}, \mref{m11} \\
+SR-1 & \mref{m1}\\
+SR-2 & \mref{m1}, \mref{m4}, , \mref{m6}, \mref{m10} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Look and Feel Requirements and Modules}
+\label{TblRT_LF}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.20\textwidth} p{0.70\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+ER-1 & \mref{m4}, \mref{m5}, \mref{m8}  \\
+ER-2 & \mref{m1}, \mref{m2} \\
+ER-3 & \mref{m1}, \mref{m4}, \mref{m10}, \mref{m11} \\
+PI-1 & \mref{m4} \\
+PI-2 & \mref{m1}, \mref{m9}, \mref{m11} \\
+LR-1 & \mref{m1} \\
+LR-2 & \mref{m1}, \mref{m4} \\
+UR-1 & \mref{m1} \\
+UR-2 & \mref{m1}\\
+UR-3 & \mref{m1}, \mref{m12}, \mref{m13} \\
+UR-4 & \mref{m1} \\
+AC-1 & \mref{m1} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Usability and Humanity Requirements and Modules}
+\label{TblRT_Usability}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.20\textwidth} p{0.70\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+SL-1 & \mref{m1}, \mref{m5}, \mref{m8}, \mref{m12} \\
+SL-2 & \mref{m9}, \mref{m11}, \mref{m12} \\
+SC-1 & \mref{m1}, \mref{m12}, \mref{m13} \\
+PA-1 & \mref{m11} \\
+FT-1 & \mref{m1}, \mref{m5} \\
+FT-2 & \mref{m1}, \mref{m5}, \mref{m12} \\
+FT-3 & \mref{m1}, \mref{m4}, \mref{m12} \\
+FT-4 & \mref{m1}, \mref{m6}, \mref{m12} \\
+FT-5 & \mref{m11} \\
+CR-1 & \mref{m1}, \mref{m12} \\
+CR-2 & \mref{m12} \\
+SE-1 & \mref{m12} \\
+SE-2 & \mref{m1}, \mref{m11}, \mref{m12} \\
+LG-1 & \mref{m1} \\
+LG-2 & \mref{m1}, \mref{m12}, \mref{m10} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Performance Requirements and Modules}
+\label{TblRT_Perf}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.20\textwidth} p{0.70\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+PE-1 & \\
+IR-1 & \mref{m1} \\
+IR-2 & \mref{m1} \\
+PD-1 & \mref{m1} \\
+PD-2 & \mref{m1} \\
+RR-1 &  \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Operational \& Environmental Requirements and Modules}
+\label{TblRT_OpEnv}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.22\textwidth} p{0.68\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+MT-1 & \\
+SU-1 & \mref{m1} \\
+AD-1 & \mref{m1} \\
+AD-2 & \mref{m1} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Maintainability \& Support Requirements and Modules}
+\label{TblRT_Maintain}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.22\textwidth} p{0.68\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+AC-1 & \mref{m2} \\
+AC-2 & \mref{m2}, \mref{m3} \\
+IG-1 & \mref{m1}, \mref{m5}, \mref{m12} \\
+IG-2 & \mref{m1} \\
+PV-1 & \mref{m1}, \mref{m12}, \mref{m13} \\
+PV-2 & \mref{m1}, \mref{m2}, \mref{m12} \\
+PV-3 & \mref{m12}, \mref{m13} \\
+AU-1 & \mref{m13} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Security Requirements and Modules}
+\label{TblRT_Security}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.25\textwidth} p{0.65\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+CL-1 & \mref{m1} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Cultural Requirements and Modules}
+\label{TblRT_Cultural}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{p{0.25\textwidth} p{0.65\textwidth}}
+\toprule
+\textbf{Req.} & \textbf{Modules}\\
+\midrule
+LG-1 & \mref{m12}, \mref{m13} \\
+ST-1 & \mref{m1} \\
+\bottomrule
+\end{tabular}
+\caption{Trace between Compliance Requirements and Modules}
+\label{TblRT_Compliance}
 \end{table}
 
 \begin{table}[H]
@@ -343,18 +585,13 @@ R11 & \mref{mOutput}, \mref{mODEs}, \mref{mEnergy}, \mref{mControl}\\
 \toprule
 \textbf{AC} & \textbf{Modules}\\
 \midrule
-\acref{acHardware} & \mref{mHH}\\
-\acref{acInput} & \mref{mInput}\\
-\acref{acParams} & \mref{mParams}\\
-\acref{acVerify} & \mref{mVerify}\\
-\acref{acOutput} & \mref{mOutput}\\
-\acref{acVerifyOut} & \mref{mVerifyOut}\\
-\acref{acODEs} & \mref{mODEs}\\
-\acref{acEnergy} & \mref{mEnergy}\\
-\acref{acControl} & \mref{mControl}\\
-\acref{acSeqDS} & \mref{mSeqDS}\\
-\acref{acSolver} & \mref{mSolver}\\
-\acref{acPlot} & \mref{mPlot}\\
+\acref{acUI} & \mref{m1}, \mref{m4}, \mref{m6}, \mref{m10}\\
+\acref{acForms} & \mref{m4}, \mref{m5}\\
+\acref{acAuth} & \mref{m2}, \mref{m3}\\
+\acref{acData} & \mref{m1}, \mref{m6}, \mref{m8}, \mref{m12}\\
+\acref{acNotifications} & \mref{m7}, \mref{m10}\\
+\acref{acSecurity} & \mref{m2}, \mref{m12}, \mref{m13}\\
+\acref{acIntegration} & \mref{m1}, \mref{m7}, \mref{m10}, \mref{m12}\\
 \bottomrule
 \end{tabular}
 \caption{Trace Between Anticipated Changes and Modules}
@@ -374,18 +611,18 @@ the modules. It can be seen that the graph is a directed acyclic graph
 system, and modules in the higher level of the hierarchy are essentially simpler
 because they use modules from the lower levels.
 
-\wss{The uses relation is not a data flow diagram.  In the code there will often
-be an import statement in module A when it directly uses module B.  Module B
-provides the services that module A needs.  The code for module A needs to be
-able to see these services (hence the import statement).  Since the uses
-relation is transitive, there is a use relation without an import, but the
-arrows in the diagram typically correspond to the presence of import statement.}
+% \wss{The uses relation is not a data flow diagram.  In the code there will often
+% be an import statement in module A when it directly uses module B.  Module B
+% provides the services that module A needs.  The code for module A needs to be
+% able to see these services (hence the import statement).  Since the uses
+% relation is transitive, there is a use relation without an import, but the
+% arrows in the diagram typically correspond to the presence of import statement.}
 
-\wss{If module A uses module B, the arrow is directed from A to B.}
+% \wss{If module A uses module B, the arrow is directed from A to B.}
 
 \begin{figure}[H]
 \centering
-%\includegraphics[width=0.7\textwidth]{UsesHierarchy.png}
+\includegraphics[width=0.9\textwidth]{UsesHierarchy.png}
 \caption{Use hierarchy among modules}
 \label{FigUH}
 \end{figure}

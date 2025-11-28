@@ -273,7 +273,6 @@ TSWLatexianTemp*
 
 # DS_Store file from Mac computers
 .DS_Store
-docs/ProblemStatementAndGoals/ProblemStatement.pdf
 node_modules
 dist
 **/*/routeTree.gen.ts
