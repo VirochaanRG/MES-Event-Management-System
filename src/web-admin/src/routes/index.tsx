@@ -64,7 +64,7 @@ function TeamBDashboard() {
                       : "bg-stone-200 text-stone-700 hover:bg-stone-300"
                   }`}
                 >
-                  Reports
+                  Form Analytics
                 </button>
               </div>
               <button
@@ -87,7 +87,7 @@ function TeamBDashboard() {
                     Users
                   </h2>
                   <p className="text-stone-600 mt-4">
-                    Team member management and permissions.
+                    //TODO
                   </p>
                 </div>
               )}

@@ -126,10 +126,10 @@ function RouteComponent() {
 
   return (
     <main>
-      <div className="px-5 py-10 bg-gray-100 rounded-lg mx-5 my-5">
+      <div className="px-5 py-10 bg-gray-50 rounded-lg mx-5 my-5">
         <button
           onClick={() => navigate({ to: "/" })}
-          className="mb-6 px-4 py-2 text-gray-700 bg-gray-300 hover:bg-gray-400 rounded transition-colors font-semibold"
+          className="mb-6 px-4 py-2 text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 rounded transition-colors font-semibold"
         >
           ← Back to Home
         </button>
@@ -139,17 +139,17 @@ function RouteComponent() {
         </p>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
             {error}
           </div>
         )}
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Current Forms</h2>
             <button
               onClick={() => setShowModal(true)}
-              className="px-6 py-2 font-semibold bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded hover:from-purple-700 hover:to-purple-800 transition-all"
+              className="px-6 py-2 font-semibold bg-amber-500 text-white rounded hover:bg-amber-600 transition-colors"
             >
               + Add New Form
             </button>
@@ -161,10 +161,7 @@ function RouteComponent() {
             </div>
           ) : forms.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg mb-4">No forms yet</p>
-              <p className="text-gray-400">
-                Click "Add New Form" to get started
-              </p>
+              <p className="text-gray-500 text-lg mb-4">No forms</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -177,7 +174,7 @@ function RouteComponent() {
                       params: { formId: form.id.toString() },
                     })
                   }
-                  className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-purple-400 hover:bg-purple-50 transition-colors cursor-pointer"
+                  className="p-4 bg-white rounded-lg border border-gray-200 hover:border-amber-400 hover:bg-amber-50 transition-colors cursor-pointer"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -196,7 +193,7 @@ function RouteComponent() {
                         e.stopPropagation();
                         handleDeleteForm(form.id);
                       }}
-                      className="px-4 py-2 text-red-700 hover:bg-red-50 rounded transition-colors ml-2"
+                      className="px-4 py-2 text-red-800 hover:bg-red-50 rounded transition-colors ml-2 font-semibold"
                     >
                       Delete
                     </button>
@@ -210,7 +207,7 @@ function RouteComponent() {
         {/* Add Form Modal */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 border-2 border-amber-500">
               <h3 className="text-2xl font-bold text-gray-800 mb-4">
                 Create New Form
               </h3>
@@ -225,7 +222,7 @@ function RouteComponent() {
                     value={newFormName}
                     onChange={(e) => setNewFormName(e.target.value)}
                     placeholder="Enter form name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   />
                 </div>
 
@@ -238,7 +235,7 @@ function RouteComponent() {
                     onChange={(e) => setNewFormDescription(e.target.value)}
                     placeholder="Enter form description"
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500 resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none"
                   />
                 </div>
               </div>
@@ -258,7 +255,7 @@ function RouteComponent() {
                 <button
                   onClick={handleAddForm}
                   disabled={submitting}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all font-semibold disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-semibold disabled:opacity-50"
                 >
                   {submitting ? "Creating..." : "Create Form"}
                 </button>

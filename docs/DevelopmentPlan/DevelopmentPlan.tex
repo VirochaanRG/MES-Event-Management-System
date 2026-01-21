@@ -26,6 +26,7 @@
 09-21-2025 & Ibrahim, Mahboob, Omar & Creation of revision 0\\
 09-22-2025 & Omar & Team Charter\\
 09-22-2025 & All Members & Reflection and Review\\
+11-23-2025 & Mohammad Mahdi Mahboob & Update POC Plan\\
 ... & ... & ...\\
 \bottomrule
 \end{tabularx}
@@ -222,43 +223,46 @@ The project is scheduled to be completed over the course of two semesters. Howev
 \section{Proof of Concept Demonstration Plan}
 \begin{flushleft}
 
-The main challenges we foresee for this project are creating the form builder
-and integrating user-side and admin-side interfaces for the application. The
-form-builder needs to be modular and track all data against a user to perform
-analytics in order to minimize redundancy and improve user experience. The
-interface integration is also challenging because they demand an entirely
-different set of features for the client, yet they must interact with the same
-underlying system.
-  \newline
-  \newline
-The following are some significant risks we expect to encounter during development.
+The main challenges we foresee for this project are creating the form builder; user event registrations with QR code
+check-ins; and exporting form response data, or using it to generate visualizations and analytics. The form-builder
+needs to be modular and track all data against a user to perform analytics in order to minimize redundancy and improve
+user experience. The event registration and check-in component is also a necessary feature outlined by the client. The
+interface integration is also challenging because it demands an entirely different set of features for the client, yet
+it must interact with the same underlying system.
+\newline
+\newline
+The following are some significant risks we expect to encounter during development:
 \begin{enumerate}
-  \item \textbf{Implementation of Branching Logic} \\
-  We expect that the hardest part of the implementation for the custom form builder will be development of some sort of branching logic based on form answers. During development, we risk implementing this feature with too mcuh simplicity that does not meet the needs of the MES, or making the implementation too complicated and difficult to understand.
-  \newline
-  \newline
-  To mitigate this risk, we can study existing form building software that implements this functionality to gather ideas of how it should be implemented, as well as study previous forms created by the MES to gauge the required complexity and depth of the feature.
-  \item \textbf{Frontend and Backend Integration} \\
-  Our system is composed of many different subsystems, including the admin mobile and/or web application, end user web and/or mobile application, the backend server, and the database. A large volume of data such as user information, custom forms, user submissions, and analytical data will need to be passed between multiple subsystems. Due to this, there is a significant risk of data loss and inaccuracies between each system.
-  \newline
-  \newline
-  To mitigate the risk, it is imperative that features that require development on two or more subsystems are completed as soon as possible, and that work on each subsystem is done simultaneously. This ensures that integration between systems can be completed as quickly as possible and that developers are on the same page when developing features that require integration. This allows more time to be allotted towards testing said features and earlier detection of integration issues.
-  \item \textbf{Application Scalability} \\
-  Our system will be required to deal with a large volume of data and simultaneous users. During development, we will likely only have the capacity to test the system with a few users and much smaller volume of data. Due to this, we risk our project not being scalable to the capacity required by the MES.
-  \newline
-  \newline
-  To mitigate this risk, we should follow and conduct research on scalable practices including but not limited to breaking the system into smaller and more maintainable services and using libraries or services with built-in scalability.
-\end{enumerate}
-
-Some smaller risks associated with the project are as follows.
-
-\begin{enumerate}
-  \item \textbf{Integration Between Capstone Teams}
-  Since our project is part of a larger system being developed by multiple capstone teams, we have been asked to work with other teams to integrate our solutions into one application. There are a lot of risks involved with working with so many independent developers on a larger project such as incompatibilities between systems or miscommunication between teams.
-  \newline
-  \newline
-  We can mitigate this risk by assigning an inter-team communications lead, who will stay in contact with other teams to ensure developers are on the same page.
-
+  \item \textbf{Implementation of Modular Forms} \\
+    To reduce the size of forms while allowing for analytics over a broader set of form questions, we need to implement
+    a way for admins to create forms, record responses, and query responses from the set of questions they wish. The
+    risks involved in this process involve not displaying forms correctly on the user-side, an inadequate form builder
+    on the admin side, as well as inadequate or inefficient form queries for admins.
+    \newline
+    \newline
+    To mitigate this risk, we can study existing form building software to gather ideas of how builders are implemented,
+    as well as study previous forms created by the MES to gauge the required complexity and depth of the feature. We also
+    need to review and implement database concepts to allow for an adequate querying interface and to store form
+    questions as persistent documents.
+  \item \textbf{Form Data Exporting and Use in Analytics} \\
+    As mentioned above, form data is used by admins to run analytics, and one of the features requested by MES is the
+    ability to export form data into file formats such as CSVs. When accounting for modular forms, some risks that are
+    encountered include incorrect queries of data, incorrect file formats, and incompatible data for analytics.
+    \newline
+    \newline
+    To mitigate these risks, we plan to develop the module responsible for querying and exporting the form data
+    according to admin preferences. This ensures that the intended form data is being exported, and will serve as an
+    adequate baseline to ensure that analytics are conducted on the correct data.
+  \item \textbf{Event Registration} \\
+    Another key feature required by the MES is event registration, including user sign-ups and event-day check-ins. Some
+    risks involved with this include inconsistency or volatile storage of QR codes, inability to track event check-ins
+    correctly, and inability to register multiple instances of a user for an event.
+    \newline
+    \newline
+    To mitigate this risk, we intend to develop a consistent formula to convert event and user information into some
+    unique string which is stored in our database and embedded in the QR code used for registration. When the code is
+    scanned, the users can successfully be checked-in to the system and their entry tracked so that redundant scans are
+    impermissible.
 \end{enumerate}
 
 \end{flushleft}
