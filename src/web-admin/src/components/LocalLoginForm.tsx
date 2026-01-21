@@ -5,6 +5,14 @@ interface LocalLoginFormProps {
   onLoginSuccess: (user: AuthUser, token: string) => void;
 }
 
+const TEST_ACCOUNTS = [
+  { email: 'userViro@test.com', id: 1 },
+  { email: 'userM@test.com', id: 2 },
+  { email: 'userI@test.com', id: 3 },
+  { email: 'userO@test.com', id: 4 },
+  { email: 'userR@test.com', id: 5 },
+];
+
 export default function LocalLoginForm({ onLoginSuccess }: LocalLoginFormProps) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,7 +39,6 @@ export default function LocalLoginForm({ onLoginSuccess }: LocalLoginFormProps) 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Store local auth
         sessionStorage.setItem('teamd-auth-user', JSON.stringify(data.user));
         sessionStorage.setItem('teamd-auth-token', data.token);
         sessionStorage.setItem('teamd-auth-source', 'local');
@@ -53,119 +60,60 @@ export default function LocalLoginForm({ onLoginSuccess }: LocalLoginFormProps) 
   };
 
   return (
-    <div style={{
-      backgroundColor: '#ffffff',
-      padding: '30px',
-      borderRadius: '8px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-      maxWidth: '400px',
-      width: '100%'
-    }}>
-      <h2 style={{
-        color: '#6f42c1',
-        marginBottom: '20px',
-        fontSize: '1.5rem',
-        textAlign: 'center'
-      }}>
-        TeamD Local Development
-      </h2>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#800020]/10 to-[#D4AF37]/10 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
 
-      <p style={{
-        color: '#666',
-        fontSize: '0.9rem',
-        textAlign: 'center',
-        marginBottom: '20px'
-      }}>
-        Quick login for local development (no main portal required)
-      </p>
+        {/* Login Panel */}
+        <div className="md:col-span-2 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
+          <h2 className="text-[#800020] mb-5 text-3xl text-center font-bold tracking-tight">
+            Admin Portal - Login
+          </h2>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <input
-            type="email"
-            placeholder="Enter your TeamD email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              fontSize: '14px',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <input
+              type="email"
+              placeholder="Enter your TeamD email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+            />
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '12px',
-            backgroundColor: '#6f42c1',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            fontSize: '14px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.6 : 1
-          }}
-        >
-          {loading ? 'Logging in...' : 'Login to TeamD'}
-        </button>
-
-        {error && (
-          <div style={{
-            color: '#dc3545',
-            fontSize: '0.85rem',
-            marginTop: '10px',
-            textAlign: 'center'
-          }}>
-            {error}
-          </div>
-        )}
-      </form>
-
-      <div style={{
-        marginTop: '20px',
-        padding: '15px',
-        backgroundColor: '#f8f9fa',
-        borderRadius: '4px'
-      }}>
-        <p style={{
-          margin: '0 0 10px 0',
-          fontSize: '0.8rem',
-          color: '#6c757d',
-          fontWeight: 'bold'
-        }}>
-          Quick Login (Development):
-        </p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-          {[
-            'teamd@local.dev',
-            'dev@teamd.local',
-            'test@teamd.dev',
-            'admin@teamd.local'
-          ].map(userEmail => (
             <button
-              key={userEmail}
-              onClick={() => quickLogin(userEmail)}
-              style={{
-                padding: '4px 8px',
-                fontSize: '0.7rem',
-                backgroundColor: '#e9ecef',
-                border: '1px solid #dee2e6',
-                borderRadius: '3px',
-                cursor: 'pointer',
-                color: '#495057'
-              }}
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-[#800020] text-white rounded-lg text-sm font-semibold hover:bg-[#660018] disabled:cursor-not-allowed disabled:opacity-50 transition-colors shadow-md"
             >
-              {userEmail}
+              {loading ? 'Logging in...' : 'Login to TeamD'}
             </button>
-          ))}
+
+            {error && (
+              <div className="text-red-600 text-sm text-center font-medium">
+                {error}
+              </div>
+            )}
+          </form>
         </div>
+
+        {/* Quick Login Panel */}
+        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 h-fit">
+          <h3 className="text-gray-700 font-semibold text-md mb-4 text-center">
+            Quick Login Accounts
+          </h3>
+
+          <div className="flex flex-col gap-3">
+            {TEST_ACCOUNTS.map(account => (
+              <button
+                key={account.email}
+                onClick={() => quickLogin(account.email)}
+                className="w-full px-4 py-3 bg-[#D4AF37]/20 border border-[#D4AF37] rounded-lg cursor-pointer text-[#800020] hover:bg-[#D4AF37]/30 transition-colors text-sm shadow-sm text-left"
+              >
+                <div className="font-semibold">{account.email}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );

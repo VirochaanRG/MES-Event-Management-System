@@ -1,128 +1,117 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { getCurrentUser, AuthUser } from '../lib/auth';
-import ProtectedTeamPortal from '../components/ProtectedTeamPortal';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { getCurrentUser, AuthUser } from "../lib/auth";
+import ProtectedTeamPortal from "../components/ProtectedTeamPortal";
+import EventsTab from "@/components/EventsTab";
+import ReportsTab from "@/components/ReportsTab";
+import Navbar from "@/components/Navbar";
 
-function TeamDDashboard() {
+function TeamBDashboard() {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [activeTab, setActiveTab] = useState<"events" | "users" | "reports">(
+    "events"
+  );
+  const navigate = useNavigate();
 
   useEffect(() => {
     const authUser = getCurrentUser();
     setUser(authUser);
   }, []);
 
-  return (
-    <main>
-      <div style={{
-        textAlign: 'center',
-        padding: '40px 20px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '8px',
-        margin: '20px 0'
-      }}>
-        <h1 style={{
-          fontSize: '2.5rem',
-          color: '#333',
-          marginBottom: '20px'
-        }}>
-          Hi {user?.email}
-        </h1>
-        <h2 style={{
-          fontSize: '2rem',
-          color: '#555',
-          marginBottom: '20px'
-        }}>
-          Team D Web Admin
-        </h2>
-        <p style={{
-          fontSize: '1.2rem',
-          color: '#666',
-          marginBottom: '30px'
-        }}>
-          Welcome to the Team D Administrative Dashboard
-        </p>
-        <div style={{
-          backgroundColor: '#e7f3ff',
-          padding: '20px',
-          borderRadius: '4px',
-          border: '1px solid #b3d9ff'
-        }}>
-          <p style={{ margin: 0, color: '#0066cc' }}>
-            This app is running on port 3024 and ready for development!
-          </p>
-          <p style={{ margin: '10px 0 0 0', color: '#0066cc' }}>
-            Session authenticated for: <strong>{user?.email}</strong>
-          </p>
-        </div>
+  const handleFormBuilder = () => {
+    navigate({ to: "/form-builder" });
+  };
 
-        {/* Team D specific content */}
-        <div style={{
-          marginTop: '30px',
-          padding: '20px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '8px',
-          border: '1px solid #dee2e6'
-        }}>
-          <h3 style={{ color: '#495057', marginBottom: '15px' }}>
-            Team D Management Tools
-          </h3>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '15px',
-            marginTop: '20px'
-          }}>
-            <div style={{
-              padding: '15px',
-              backgroundColor: '#ffffff',
-              borderRadius: '6px',
-              border: '1px solid #e9ecef',
-              textAlign: 'left'
-            }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#6f42c1' }}>Events</h4>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
-                Manage Team D events and activities
-              </p>
+  return (
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-stone-50">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="bg-white border-l-4 border-red-900 p-6 mb-6">
+            <h1 className="text-3xl font-bold text-stone-900">
+              Admin Dashboard
+            </h1>
+          </div>
+
+          <div className="bg-white border border-stone-300">
+            <div className="border-b-2 border-stone-300 bg-stone-100 px-6 py-4 flex justify-between items-center">
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setActiveTab("events")}
+                  className={`px-6 py-2 font-semibold transition-colors ${
+                    activeTab === "events"
+                      ? "bg-red-900 text-white"
+                      : "bg-stone-200 text-stone-700 hover:bg-stone-300"
+                  }`}
+                >
+                  Events
+                </button>
+                <button
+                  onClick={() => setActiveTab("users")}
+                  className={`px-6 py-2 font-semibold transition-colors ${
+                    activeTab === "users"
+                      ? "bg-red-900 text-white"
+                      : "bg-stone-200 text-stone-700 hover:bg-stone-300"
+                  }`}
+                >
+                  Users
+                </button>
+                <button
+                  onClick={() => setActiveTab("reports")}
+                  className={`px-6 py-2 font-semibold transition-colors ${
+                    activeTab === "reports"
+                      ? "bg-red-900 text-white"
+                      : "bg-stone-200 text-stone-700 hover:bg-stone-300"
+                  }`}
+                >
+                  Form Analytics
+                </button>
+              </div>
+              <button
+                onClick={handleFormBuilder}
+                className="px-6 py-2 font-semibold bg-red-900 text-white hover:bg-red-950 transition-colors"
+              >
+                Form Builder
+              </button>
             </div>
-            <div style={{
-              padding: '15px',
-              backgroundColor: '#ffffff',
-              borderRadius: '6px',
-              border: '1px solid #e9ecef',
-              textAlign: 'left'
-            }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#6f42c1' }}>Users</h4>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
-                Team member management and permissions
-              </p>
-            </div>
-            <div style={{
-              padding: '15px',
-              backgroundColor: '#ffffff',
-              borderRadius: '6px',
-              border: '1px solid #e9ecef',
-              textAlign: 'left'
-            }}>
-              <h4 style={{ margin: '0 0 10px 0', color: '#6f42c1' }}>Reports</h4>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
-                Analytics and performance metrics
-              </p>
+
+            <div className="p-6">
+              {activeTab === "events" && (
+                <div>
+                  <EventsTab />
+                </div>
+              )}
+              {activeTab === "users" && (
+                <div>
+                  <h2 className="text-2xl font-bold text-stone-900 mb-3 border-b-2 border-red-900 pb-2 inline-block">
+                    Users
+                  </h2>
+                  <p className="text-stone-600 mt-4">
+                    //TODO
+                  </p>
+                </div>
+              )}
+              {activeTab === "reports" && (
+                <div>
+                  <ReportsTab />
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </main>
+    </>
   );
 }
 
 function Home() {
   return (
     <ProtectedTeamPortal>
-      <TeamDDashboard />
+      <TeamBDashboard />
     </ProtectedTeamPortal>
   );
 }
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: Home,
 });

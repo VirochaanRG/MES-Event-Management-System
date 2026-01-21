@@ -1,4 +1,4 @@
-# EventHub
+# EvENGage
 
 **Developer Names**: Virochaan Ravichandran Gowri, Omar Al-Asfar, Rayyan Suhail, Ibrahim Quraishi, Mohammad Mahdi Mahboob.
 
@@ -10,5 +10,5 @@ The folders and files for this project are as follows:
 
 docs - Documentation for the project
 refs - Reference material used for the project, including papers
-src - Source code
+src - Source code, including web administrator, web user, mobile application, database, etc.
 test - Test cases
