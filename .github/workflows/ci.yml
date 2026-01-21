@@ -41,7 +41,7 @@ jobs:
           
           # Wait for the servers (assuming ports 3014 and 3114)
           # If they don't respond in 60s, this step fails
-          wait-on http://localhost:3014 http://localhost:3114 --timeout 60000
+          wait-on http://localhost:3014 http://localhost:3024 --timeout 60000
           
           echo "Dev servers are live!"
           
