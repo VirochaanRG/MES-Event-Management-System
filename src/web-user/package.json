@@ -39,6 +39,7 @@
     "@types/bcryptjs": "^3.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.12.7",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.1.14",
     "@types/react-dom": "^19.1.9",
     "@types/styled-components": "^5.1.34",
