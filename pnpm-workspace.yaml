@@ -1,6 +1,10 @@
 packages:
-  - 'src/web-admin'
-  - 'src/web-user'
-  - 'src/api'
-  - 'src/mobile'
-  - 'src/shared'
+  - src/web-admin
+  - src/web-user
+  - src/api
+  - src/mobile
+  - src/shared
+  - src/db
+
+onlyBuiltDependencies:
+  - esbuild

@@ -18,8 +18,10 @@
     "allowJs": true,
     "esModuleInterop": true,
     "incremental": true,
+    "strictNullChecks": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@db/*": ["../db/src/*"]
     }
   },
   "include": [
@@ -29,7 +31,9 @@
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "build",
+    "vite.config.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

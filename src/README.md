@@ -22,3 +22,29 @@ src/
 - **shared/**: Common utilities, types, and shared code across components
 
 This structure supports both standalone development and integration within the larger large-event project architecture.
+
+## Setup
+
+Basic setup steps to ensure this works for us.
+
+First ensure you have Postgres and Node.js are downloaded on your local computer. **If you don't want to change the password just set the password as "password" when you download postgres**. Currently the .ENV file dooesn't work so you will have to fill in the password you do set in the postgres url.
+
+Stay in the root folder and all commands should be done in the root folder unless specified: MES-Event-Management-System (not src).
+
+Then install pnpm (faster npm) after you have node installed with `npm install -g pnpm`.
+
+After having pnpm installed run `pnpm install` to download all the node modules. **Make sure your gitignore has node_modules. You should NOT push any node_modules files to the repo.**
+
+### Database Setup
+
+In the root folder run `pnpm dbsetup`. This should create the database and and push the current schemas into the database as tables. You should see some output saying database created or db already exists and then something saying schema pushed. Then run `pnpm migrate` just to make sure the schemas have been pushed in.
+
+#### Database already exists
+
+If the database already exists and you need to update the schemas so cd int to the src/db folder and run `pnpm generate:simple` and then `pnpm migrate` and it should work. You can check if has been created by running `pnpm studio` and seeing if the tables are there.
+
+### Running the Web App
+
+Run `pnpm dev` to run both web-admin and web-user. If it is your first time you have to run `pnpm build:full` first and then run `pnpm dev`.
+
+### Running the Mobile App

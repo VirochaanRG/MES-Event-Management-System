@@ -1,0 +1,512 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import Navbar from "@/components/Navbar";
+
+interface Answer {
+  questionId: number;
+  questionTitle: string | null;
+  questionType: string;
+  qorder: number;
+  answer: string | null;
+}
+
+interface Submission {
+  userId: string;
+  submittedAt: string;
+  answers: Answer[];
+}
+
+interface FormData {
+  id: number;
+  name: string;
+  description: string | null;
+  createdAt: string;
+}
+
+interface ReportData {
+  form: FormData;
+  submissions: Submission[];
+  totalSubmissions: number;
+}
+
+function ReportDetailPage() {
+  const { reportId } = Route.useParams();
+  const navigate = useNavigate();
+  const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedSubmissions, setSelectedSubmissions] = useState<Set<string>>(
+    new Set()
+  );
+  const [selectedQuestions, setSelectedQuestions] = useState<Set<number>>(
+    new Set()
+  );
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
+
+  useEffect(() => {
+    fetchReportData();
+  }, [reportId]);
+
+  useEffect(() => {
+    if (reportData && reportData.submissions.length > 0) {
+      const allQuestionIds = reportData.submissions[0].answers.map(
+        (a) => a.questionId
+      );
+      setSelectedQuestions(new Set(allQuestionIds));
+    }
+  }, [reportData]);
+
+  const fetchReportData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `http://localhost:3124/api/forms/${reportId}/answers`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch report data");
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setReportData(data.data);
+      } else {
+        throw new Error(data.error || "Failed to fetch report data");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const extractEmail = (userId: string): string => {
+    try {
+      const parsed = JSON.parse(userId);
+      return parsed.email || userId;
+    } catch {
+      return userId;
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && reportData) {
+      setSelectedSubmissions(
+        new Set(reportData.submissions.map((s) => s.userId))
+      );
+    } else {
+      setSelectedSubmissions(new Set());
+    }
+  };
+
+  const handleSelectSubmission = (userId: string, checked: boolean) => {
+    const newSelected = new Set(selectedSubmissions);
+    if (checked) {
+      newSelected.add(userId);
+    } else {
+      newSelected.delete(userId);
+    }
+    setSelectedSubmissions(newSelected);
+  };
+
+  const handleSelectAllQuestions = (checked: boolean) => {
+    if (checked && reportData && reportData.submissions.length > 0) {
+      const allQuestionIds = reportData.submissions[0].answers.map(
+        (a) => a.questionId
+      );
+      setSelectedQuestions(new Set(allQuestionIds));
+    } else {
+      setSelectedQuestions(new Set());
+    }
+  };
+
+  const handleSelectQuestion = (questionId: number, checked: boolean) => {
+    const newSelected = new Set(selectedQuestions);
+    if (checked) {
+      newSelected.add(questionId);
+    } else {
+      newSelected.delete(questionId);
+    }
+    setSelectedQuestions(newSelected);
+  };
+
+  const exportToCSV = () => {
+    if (!reportData) return;
+
+    const submissionsToExport =
+      selectedSubmissions.size > 0
+        ? reportData.submissions.filter((s) =>
+            selectedSubmissions.has(s.userId)
+          )
+        : reportData.submissions;
+
+    if (submissionsToExport.length === 0) {
+      alert("No submissions to export");
+      return;
+    }
+
+    if (selectedQuestions.size === 0) {
+      alert("Please select at least one question to export");
+      return;
+    }
+
+    const allQuestions =
+      reportData.submissions.length > 0
+        ? reportData.submissions[0].answers
+            .sort((a, b) => a.qorder - b.qorder)
+            .filter((q) => selectedQuestions.has(q.questionId))
+        : [];
+
+    const headers = [
+      "Email",
+      ...allQuestions.map((q) => q.questionTitle || `Question ${q.qorder}`),
+      "Submitted At",
+    ];
+
+    const rows = submissionsToExport.map((submission) => {
+      const email = extractEmail(submission.userId);
+      const answers = allQuestions.map((question) => {
+        const answer = submission.answers.find(
+          (a) => a.questionId === question.questionId
+        );
+        const value = answer?.answer || "";
+        return value.includes(",") ||
+          value.includes("\n") ||
+          value.includes('"')
+          ? `"${value.replace(/"/g, '""')}"`
+          : value;
+      });
+      const submittedAt = new Date(submission.submittedAt).toLocaleString();
+      return [email, ...answers, submittedAt];
+    });
+
+    const csvContent = [
+      headers.map((h) =>
+        h.includes(",") || h.includes("\n") ? `"${h.replace(/"/g, '""')}"` : h
+      ),
+      ...rows,
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `${reportData.form.name.replace(/[^a-z0-9]/gi, "_")}_report_${new Date().toISOString().split("T")[0]}.csv`
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleBack = () => {
+    navigate({ to: "/" });
+  };
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-stone-50">
+          <div className="max-w-7xl mx-auto px-6 py-12">
+            <div className="text-stone-600">Loading report...</div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (error || !reportData) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-stone-50">
+          <div className="max-w-7xl mx-auto px-6 py-12">
+            <div className="bg-red-50 border-l-4 border-red-800 p-6">
+              <p className="text-red-900 font-medium mb-3">
+                {error || "Report not found"}
+              </p>
+              <button
+                onClick={handleBack}
+                className="px-4 py-2 bg-stone-800 text-white hover:bg-stone-900"
+              >
+                Back to Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const allQuestions =
+    reportData.submissions.length > 0
+      ? reportData.submissions[0].answers.sort((a, b) => a.qorder - b.qorder)
+      : [];
+
+  const allSelected =
+    reportData.submissions.length > 0 &&
+    selectedSubmissions.size === reportData.submissions.length;
+  const someSelected = selectedSubmissions.size > 0 && !allSelected;
+
+  const allQuestionsSelected =
+    allQuestions.length > 0 && selectedQuestions.size === allQuestions.length;
+  const someQuestionsSelected =
+    selectedQuestions.size > 0 && !allQuestionsSelected;
+
+  return (
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-stone-50">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="mb-8">
+            <button
+              onClick={handleBack}
+              className="text-stone-700 hover:text-stone-900 font-medium mb-6 inline-flex items-center"
+            >
+              <span className="mr-2">←</span> Back to Dashboard
+            </button>
+
+            <div className="bg-white border-l-4 border-red-900 p-6 mb-6">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <h1 className="text-2xl font-bold text-stone-900 mb-2">
+                    {reportData.form.name}
+                  </h1>
+                  {reportData.form.description && (
+                    <p className="text-stone-600 mb-3">
+                      {reportData.form.description}
+                    </p>
+                  )}
+                  <div className="flex gap-6 text-sm text-stone-500">
+                    <span>
+                      <strong className="text-stone-700">
+                        {reportData.totalSubmissions}
+                      </strong>{" "}
+                      {reportData.totalSubmissions === 1
+                        ? "submission"
+                        : "submissions"}
+                    </span>
+                    <span>
+                      Created{" "}
+                      {new Date(reportData.form.createdAt).toLocaleDateString()}
+                    </span>
+                    {selectedSubmissions.size > 0 && (
+                      <span className="text-red-900 font-medium">
+                        {selectedSubmissions.size} selected
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-3 ml-4">
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowOptionsMenu(!showOptionsMenu)}
+                      className="px-5 py-2 bg-red-900 text-white hover:bg-red-950 font-medium"
+                    >
+                      Options
+                      {selectedQuestions.size < allQuestions.length &&
+                        selectedQuestions.size > 0 &&
+                        ` (${selectedQuestions.size}/${allQuestions.length})`}
+                    </button>
+
+                    {showOptionsMenu && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setShowOptionsMenu(false)}
+                        />
+                        <div className="absolute right-0 mt-2 w-80 bg-white border border-stone-300 shadow-xl z-20 max-h-96 overflow-y-auto">
+                          <div className="p-5">
+                            <div className="flex justify-between items-center mb-4 pb-3 border-b border-stone-200">
+                              <h3 className="font-bold text-stone-900">
+                                Export Options
+                              </h3>
+                              <button
+                                onClick={() => setShowOptionsMenu(false)}
+                                className="text-stone-500 hover:text-stone-700 text-xl leading-none"
+                              >
+                                ×
+                              </button>
+                            </div>
+
+                            <label className="flex items-center gap-3 p-2 hover:bg-stone-50 cursor-pointer mb-3 border-b border-stone-200">
+                              <input
+                                type="checkbox"
+                                checked={allQuestionsSelected}
+                                ref={(input) => {
+                                  if (input) {
+                                    input.indeterminate = someQuestionsSelected;
+                                  }
+                                }}
+                                onChange={(e) =>
+                                  handleSelectAllQuestions(e.target.checked)
+                                }
+                                className="w-4 h-4"
+                              />
+                              <span className="font-semibold text-stone-900">
+                                Select All Questions
+                              </span>
+                            </label>
+
+                            <div className="space-y-1">
+                              {allQuestions.map((question) => (
+                                <label
+                                  key={question.questionId}
+                                  className="flex items-start gap-3 p-2 hover:bg-stone-50 cursor-pointer"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedQuestions.has(
+                                      question.questionId
+                                    )}
+                                    onChange={(e) =>
+                                      handleSelectQuestion(
+                                        question.questionId,
+                                        e.target.checked
+                                      )
+                                    }
+                                    className="w-4 h-4 mt-0.5"
+                                  />
+                                  <div className="flex-1">
+                                    <div className="text-sm text-stone-900">
+                                      {question.questionTitle ||
+                                        `Question ${question.qorder}`}
+                                    </div>
+                                    <div className="text-xs text-stone-500">
+                                      {question.questionType}
+                                    </div>
+                                  </div>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={exportToCSV}
+                    className="px-5 py-2 bg-red-900 text-white hover:bg-red-950 font-medium"
+                  >
+                    Export to CSV
+                    {selectedSubmissions.size > 0 &&
+                      ` (${selectedSubmissions.size})`}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {reportData.submissions.length === 0 ? (
+            <div className="bg-white border border-stone-300 p-12 text-center">
+              <p className="text-stone-600">
+                No submissions have been received yet.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-white border border-stone-300">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b-2 border-stone-300 bg-stone-100">
+                      <th className="px-4 py-3 text-left w-12">
+                        <input
+                          type="checkbox"
+                          checked={allSelected}
+                          ref={(input) => {
+                            if (input) {
+                              input.indeterminate = someSelected;
+                            }
+                          }}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          className="w-4 h-4"
+                        />
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-bold text-stone-700 uppercase">
+                        Email
+                      </th>
+                      {allQuestions.map((question) => (
+                        <th
+                          key={question.questionId}
+                          className="px-4 py-3 text-left text-xs font-bold text-stone-700 uppercase"
+                        >
+                          <div>
+                            {question.questionTitle ||
+                              `Question ${question.qorder}`}
+                          </div>
+                          <div className="text-xs font-normal text-stone-500 mt-1">
+                            {question.questionType}
+                          </div>
+                        </th>
+                      ))}
+                      <th className="px-4 py-3 text-left text-xs font-bold text-stone-700 uppercase">
+                        Submitted
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {reportData.submissions.map((submission, idx) => (
+                      <tr
+                        key={submission.userId}
+                        className={`border-b border-stone-200 ${
+                          idx % 2 === 0 ? "bg-white" : "bg-stone-50"
+                        }`}
+                      >
+                        <td className="px-4 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedSubmissions.has(submission.userId)}
+                            onChange={(e) =>
+                              handleSelectSubmission(
+                                submission.userId,
+                                e.target.checked
+                              )
+                            }
+                            className="w-4 h-4"
+                          />
+                        </td>
+                        <td className="px-4 py-3 text-sm text-stone-900 font-medium">
+                          {extractEmail(submission.userId)}
+                        </td>
+                        {allQuestions.map((question) => {
+                          const answer = submission.answers.find(
+                            (a) => a.questionId === question.questionId
+                          );
+                          return (
+                            <td
+                              key={question.questionId}
+                              className="px-4 py-3 text-sm text-stone-700"
+                            >
+                              {answer?.answer || "—"}
+                            </td>
+                          );
+                        })}
+                        <td className="px-4 py-3 text-sm text-stone-600">
+                          {new Date(submission.submittedAt).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+export const Route = createFileRoute("/reports/$reportId")({
+  component: ReportDetailPage,
+});

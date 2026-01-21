@@ -46,9 +46,10 @@
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
-November 13 2025 & 1.0 & Design Document Rev -1 \\
-January 21 2025 & 1.1 & Design Document Rev 0. Finished Sections 10,11,12.\\
-January 21 2025 & 1.1 & Updated Acronyms and Abbreviations Table\\
+November 13, 2025 & 1.0 & Rev -1\\
+January 21, 2025 & 1.1 & Revision 0 finished. Updated Sections 10,11,12\\
+January 21, 2025 & 1.1 & Finished Abbreviations table.\\
+
 \bottomrule
 \end{tabularx}
 
@@ -634,19 +635,179 @@ because they use modules from the lower levels.
 
 \section{User Interfaces}
 
-\wss{Design of user interface for software and hardware.  Attach an appendix if
-needed. Drawings, Sketches, Figma}
+The platform offers a web application with supporting two distinct user views, general users and administrators. 
+
+\subsection{Attendee Interface}
+
+Initially, users are presented with a sign-up/log-in Authentication screen (Figure~\ref{Fig2}). Upon authentication, users are taken to a Homepage that serves as the foundation of the user app (Figure~\ref{Fig3}). From this page, users can access the Events and Surveys sections through clearly labeled tabs, as well as profile information and the logout option.
+\\\\
+The Events page displays a list of all available events (Figure~\ref{Fig4}), each of which can be expanded to reveal detailed event information such as date, location, and description (Figure~\ref{Fig5}). Users may register for an event directly from this page, after which the event would appear in the Registered Events tab (Figure~\ref{Fig6}). In this tab, users can select registered events to view the generated QR code ticket for event check-in (Figure~\ref{Fig7}).
+\\\\
+The Surveys page operates with a similar structure. Available surveys are listed and can be selected to open a survey completion interface (Figure~\ref{Fig8}). Surveys consist of various question types presented sequentially, including multiple choice, short answer, and scale ratings (Figure~\ref{Fig9}). After submission, completed surveys are moved to the Completed Surveys tab, where users can review surveys they have already filled out (Figure~\ref{Fig10}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_1.png}
+\caption{User - Authentication Page}
+\label{Fig2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_3.png}
+\caption{User - Homepage}
+\label{Fig3}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_4.png}
+\caption{User - Available Events Page}
+\label{Fig4}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_5.png}
+\caption{User - Event Details Page}
+\label{Fig5}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_6.png}
+\caption{User - Registered Events Page}
+\label{Fig6}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_7.png}
+\caption{User - QR Code Ticket}
+\label{Fig7}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_15.png}
+\caption{User - Available Surveys Page}
+\label{Fig8}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_16.png}
+\caption{User - Survey Question Page}
+\label{Fig9}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_18.png}
+\caption{User - Completed Surveys}
+\label{Fig10}
+\end{figure}
+
+\subsection{Admin Interface}
+
+Administrators access a separate interface designed for event and survey management. They start with a similar sign-up/log-in authentication process (Figure~\ref{Fig11}). This sends the user to the Admin Dashboard which allows for navigation between different tabs (Figure~\ref{Fig12}).
+\\\\
+In the main dashboard view, the admin can view all existing events with key details, and create new ones. Clicking on existing events opens a page listing all registered users (Figure~\ref{Fig13}). Admin can also create events from the dashboard, opening a modal requesting event details such as name, time, capacity, and description (Figure~\ref{Fig14}). Upon submission, the event becomes immediately available to users in the aforementioned user Available Events Page.
+\\\\
+Admin can also use the Form Builder to create and manage surveys (Figure~\ref{Fig15}). When creating a survey, admin can add questions and customize surveys by selecting from the different supported question types (Figure~\ref{Fig16}). Completed surveys appear in the Available Surveys user list. Finally, Form Analytics allows admin to observe data and survey metrics, such as number of submissions, and response statistics. This data can be exported to a .csv file through the interactive button (Figure~\ref{Fig17}).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_2.png}
+\caption{Admin - Authentication Page}
+\label{Fig11}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_9.png}
+\caption{Admin - Dashboard}
+\label{Fig12}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_10.png}
+\caption{Admin - Event Registrations Page}
+\label{Fig13}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_11.png}
+\caption{Admin - Event Creation Page}
+\label{Fig14}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_12.png}
+\caption{Admin - Form Builder}
+\label{Fig15}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_14.png}
+\caption{Admin - Survey Creation Page}
+\label{Fig16}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{images/interface_13.png}
+\caption{Admin - Form Analytics Page}
+\label{Fig17}
+\end{figure}
 
 \section{Design of Communication Protocols}
-
-\wss{If appropriate}
+No relevant communication protocols are neccesary for this project.
 
 \section{Timeline}
+The timeline shows the development of our platform from december after our POC. It describes the deadlines for implementation of the modules and who will be taking ownership of the module. Some modules may have to be updated based on implementations of other modules but this deadline represents implementation of base feature set.
 
-\wss{Schedule of tasks and who is responsible}
-
-\wss{You can point to GitHub if this information is included there}
-
+\subsubsection*{Week 1 (December 1 - 7):} 
+\begin{itemize}
+  \item M1 - Main System Module (Ibrahim): Set up the basic framework of the application with the various servers and portals for admin and users. Define interface and connection with other modules.
+  \item M12 - Database Access Module (Virochaan): Set up the Database to work with the Main Application. Create various schema relating to the different stored data in the database.
+\end{itemize}
+\subsubsection*{Week 2 (December 8 - 14):} 
+\begin{itemize}
+  \item M2 - User Authentication Module(Mohammad): Set up basic user authentication with the server. Ensure only allowed accounts can sign up and enter the platform. Create various test accounts for development and testing.
+  \item M4 Form Template Module (Rayyan): Develop the framework to create forms including modular question types and form behaviours. Create form rendering and UI components.
+  \item M5 Form Submission Module (Virochaan): Handle form submission, saving and editing behaviour as well as connecting the form submission with the Database.  
+\end{itemize}
+\subsubsection*{Week 3, 4, 5 (December 15 - January 4):} 
+\begin{itemize}
+  \item M10 - Report Generation Module(Omar): Develop UI components to read form data and display it in an easy to read manner. Provide buttons for exporting to varying file format. Develop functionality for users to select what data they want to see and export based on predefined categories.
+  \item Testing Form Modules (Rayyan): Test full functionality of the form modules to ensure no errors. Ensure form modules are integrated well with the database and the database access module.
+\end{itemize}
+\subsubsection*{Week 6 (January 5 -  11):} 
+\begin{itemize}
+  \item M6 - Event Management Module (Mohammad): Develop the framework to create and edit events. Develop functionality for updating of details regarding events as they change. Create Event rendering and UI components. 
+  \item M8 - Event Registration Module (Ibrahim): Allow for users to register to events and submit details. Develop UI components that allows for the user to view their tickets and admins to see registered users. Integrates the Events with the Database.
+\end{itemize}
+\subsubsection*{Week 7 (January 12 -  18):} 
+\begin{itemize}
+  \item M3 - User Authorization Module (Virochaan): Develop various role types to enable feature based access control for users. Allows for admins to authorize other users to access different components of the platform.
+  \item M11 - Analytics Module (Omar): Develop the various types of data analysis and process that will be done on the form data. Integrate with the report generation module to allow for export of the data.
+\end{itemize}
+\subsubsection*{Week 8 (January 19 -  25):} 
+\begin{itemize}
+  \item M7 - Event Notification Module (Omar): Develop functionality to push notifications related to upcoming and registered events to the user. 
+  \item M11 - Attendance Tracking Module (Ibrahim): Interface for admins to view the status of registered users for each event. Provide admins with functionality to contact specific users and request more data. 
+\end{itemize}
+\subsubsection*{Week 9 and Beyond (January 26 - ):} 
+\begin{itemize}
+  \item M13 - Audit Module (Mohammade): Develop UI components for admins to view who performed privileged actions.  
+  \item Testing (Rayyan, Virochaan): Perform integration testing to ensure all modules are working as intended. Ensure modules have sufficient unit testing to ensure correct functionality. 
+  \item Feedback Implementation (Entire Team): Implement feedback based on our supervisor's comments and through stages of usability testing and general improvements for the platform.
+\end{itemize}
 \bibliographystyle {plainnat}
 \bibliography{../../../refs/References.bib}
 
