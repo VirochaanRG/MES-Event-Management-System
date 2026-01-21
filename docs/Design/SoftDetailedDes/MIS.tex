@@ -21,6 +21,7 @@
 \usepackage{caption}
 \usepackage{fullpage}
 \usepackage{float}
+\usepackage[acronym,nonumberlist]{glossaries}
 
 \hypersetup{
 bookmarks=true,     % show bookmarks bar?
@@ -29,6 +30,22 @@ linkcolor=red,          % color of internal links (change box color with linkbor
 citecolor=blue,      % color of links to bibliography
 filecolor=magenta,  % color of file links
 urlcolor=cyan          % color of external links
+}
+
+\makenoidxglossaries
+\newacronym{mes}{MES}{McMaster Engineering Society}
+\newacronym{cfes}{CFES}{Canadian Federation of Engineering Students}
+\newglossaryentry{adm}{
+  name=admin,
+  description={A privileged system user affiliated with \gls{mes} who can access survey, event, and attendee records;
+  track finances; and update event statuses.}
+  plural=admins,
+}
+\newglossaryentry{atd}{
+  name=attendee,
+  description={An individual who attends an \gls{mes} event, and uses the system to register, receive event updates,
+  provide feedback, or fill out survey responses.}
+  plural=attendees,
 }
 
 \usepackage{array}
@@ -68,7 +85,9 @@ November 13, 2025 & 1.0 & Revision -1\\
 
 \section{Symbols, Abbreviations and Acronyms}
 
-See \hyperref[SRS:glossary]{SRS Glossary}
+\glsaddall
+\printnoidxglossaries
+
 
 \newpage
 
@@ -113,7 +132,7 @@ string & string & An ordered list of characters of any length \\
 Cookie & Cookie & A file stored on the client device storing user data \\
 List of type T & list(T) & A dynamically sized list of elements of type T \\
 Set of type T & set(T) & A dynamically sized set of elements of type T \\
-Map of type K to V & map(K, V) & A collection mapping keys of type K to values of type V \\
+Map of type K to V & map(K, V) & A collection mapping keys of type K to values of type V. Shorthand notation for set(tuple(K, V)). \\
 Tuple of types T1, T2, \dots & tuple(T1, T2, \dots) & A finite ordered collection of elements of the specified types \\
 Date and time & DateTime & A specific date and time using the Gregorian calendar and 24-hour clock \\
 
@@ -253,7 +272,8 @@ None
 
 \subsubsection{State Variables}
 
-\texttt{sessions : set(Session)}: Set of all active sessions
+\texttt{sessions : set(Cookie)}: Set of all active sessions \\
+\texttt{credentials : map(string, string)}: Mapping of all registered usernames to their passwords
 
 \subsubsection{Environment Variables}
 
@@ -261,14 +281,14 @@ None
 
 \subsubsection{Assumptions}
 
-None
+Passwords are encrypted before storage.
 
 \subsubsection{Access Routine Semantics}
 
 \noindent \texttt{attemptLogin(username : string, password : string)}: \\
 Attempts a login given a username and password.
 \begin{itemize}
-\item transition: creates and adds a new session to \texttt{sessions} if login is successful
+\item transition: If \texttt{tuple(username, password) $\in$ credentials}, then \texttt{sessions := sessions $\cup$ set(generateCookie(username))}
 \item output: Cookie containing session data to be sent back to the client
 \item exception: None 
 \end{itemize}
@@ -276,7 +296,7 @@ Attempts a login given a username and password.
 \noindent \texttt{logout(sessionCookie: Cookie)}: \\
 Logs the specified user out.
 \begin{itemize}
-\item transition: Removes the specified session from \texttt{sessions}
+\item transition: \texttt{sessions := sessions - set(sessionCookie)}
 \item output: None
 \item exception: InvalidSession if session is not found in \texttt{sessions} 
 \end{itemize}
@@ -284,7 +304,7 @@ Logs the specified user out.
 \noindent \texttt{validateSession(sessionCookie: Cookie)}: \\
 Validates and refreshes a users session.
 \begin{itemize}
-\item transition: Refreshes the timeout of the session in \texttt{sessions} if session is valid
+\item transition: If \texttt{sessionCookie $\in$ sessions}, then \texttt{sessionCookie.lastRefresh := currentTime}
 \item output: Boolean indicating if sessionCookie exists in \texttt{sessions}
 \item exception: None
 \end{itemize}
@@ -292,16 +312,25 @@ Validates and refreshes a users session.
 \noindent \texttt{registerUser(username : string, password : string)}: \\
 Registers a new user to the database of users.
 \begin{itemize}
-\item transition: None
+\item transition: \texttt{credentials := credentials $\cup$ set(tuple(username, password))}
 \item output: Boolean stating whether registration was successful
 \item exception: None
 \end{itemize}
 
 \subsubsection{Local Functions}
 
-\noindent \texttt{refreshSessions()}:
+\noindent \texttt{generateCookie(username : stiring)}: \\
+Generates a cookie for a user.
 \begin{itemize}
-\item transition: Periodically checks \texttt{sessions} and removes any session older than 3 hours
+\item transition: None
+\item output: Cookie containing \texttt{username} and \texttt{lastRefresh := currentTime}
+\item exception: None 
+\end{itemize}
+
+\noindent \texttt{refreshSessions()}: \\
+Checks all sessions and invalidates old sessionss. Scheduled to run periodically.
+\begin{itemize}
+\item transition: \texttt{$\forall$ s $\in$ sessions | s.lastRefresh - currentTime > 3hrs,  sessions := sessions - s}
 \item output: None
 \item exception: None 
 \end{itemize}
