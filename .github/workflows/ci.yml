@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - dev  # This triggers the workflow on any push to the 'dev' branch
+  pull_request:
+    branches:
+      - dev  # This triggers the workflow when a PR targets the 'dev' branch
+  workflow_dispatch:
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          # This reads the version directly from your package.json
+          version: 10.23.0 
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Build (build:full)
+        run: pnpm run build:full
+
+      - name: Verify Dev Environment (dev)
+        run: |
+          # Install wait-on to check if the ports are active
+          npm install -g wait-on
+          
+          # Run the dev command in the background
+          pnpm run dev &
+          
+          # Wait for the web-admin and web-user ports (adjust ports as needed)
+          # Assuming admin is 3014 and user is 3114 based on your code
+          wait-on http://localhost:3014 http://localhost:3114 --timeout 60000
+          
+          echo "Dev servers started successfully!"
+          
+          # Kill the background dev processes to allow the job to finish
+          kill $(jobs -p)
