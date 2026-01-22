@@ -1,4 +1,4 @@
-name: CI
+name: CI - Build and Test Dev
 
 on:
   push:
@@ -31,22 +31,23 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Build (build:full)
-        run: pnpm run build:full
-
-      - name: Verify Dev Environment (dev)
+      - name: Verify Dev Environment
         run: |
-          # Install wait-on to check if the ports are active
+          # Install wait-on to ping the ports
           npm install -g wait-on
           
-          # Run the dev command in the background
+          # Start dev in the background (&)
           pnpm run dev &
           
-          # Wait for the web-admin and web-user ports (adjust ports as needed)
-          # Assuming admin is 3014 and user is 3114 based on your code
-          wait-on http://localhost:3014 http://localhost:3114 --timeout 60000
+          # Wait for the servers (assuming ports 3014 and 3114)
+          # If they don't respond in 60s, this step fails
+          wait-on http://localhost:3014 http://localhost:3024 --timeout 60000
           
-          echo "Dev servers started successfully!"
+          echo "Dev servers are live!"
           
-          # Kill the background dev processes to allow the job to finish
+          # Optional: Stop dev servers to free up memory for build
           kill $(jobs -p)
+
+      # --- 2. RUN BUILD SCRIPT SECOND ---
+      - name: Run Full Build
+        run: pnpm run build:full

@@ -727,7 +727,7 @@ fastify.post<{
     const { userEmail } = request.body;
 
     // Validate required fields
-    if (!userEmail || !userEmail.trim())
+    if (!userEmail?.trim())
     {
       return reply.code(400).send({
         success: false,

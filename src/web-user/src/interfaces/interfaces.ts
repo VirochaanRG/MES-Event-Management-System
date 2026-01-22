@@ -1,3 +1,4 @@
+//Forms.
 export interface Form
 {
   id: number;
@@ -17,7 +18,8 @@ export interface FormQuestion
   createdAt: string;
 }
 
-export interface FormAnswer {
+export interface FormAnswer
+{
   id: number;
   userId: number;
   formId: number;
@@ -27,7 +29,8 @@ export interface FormAnswer {
   createdAt: string;
 }
 
-export interface FormResponse {
+export interface FormResponse
+{
   question: FormQuestion;
   answer: FormAnswer | undefined;
 }
