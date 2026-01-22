@@ -78,6 +78,7 @@ urlcolor=cyan          % color of external links
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
 November 13, 2025 & 1.0 & Revision -1\\
+January 21, 2026 & 1.1 & Revision 0: Added formal state and transition specifications.\\
 \bottomrule
 \end{tabularx}
 
@@ -627,9 +628,20 @@ None
 
 \subsubsection{State Variables}
 
-\texttt{formResponses : map(form : Form, responseIds : list($\mathbb{N}$))}: A list of responses for each form 
-\\
-\texttt{userResponses : map(userId : $\mathbb{N}$, responseIds : list($\mathbb{N}$))}: A list of responses for each user 
+\texttt{Responses} : set(tuple(responseId : $\mathbb{N}$,
+                               userId : $\mathbb{N}$,
+                               formId : $\mathbb{N}$,
+                               answers : map(Question, string)))
+
+
+
+\subsubsection{State Invariants}
+
+\begin{itemize}
+  \item $\forall r_1, r_2 \in Responses \mid r_1.responseId = r_2.responseId \Rightarrow r_1 = r_2$
+  \item $\forall r \in Responses \mid r.userId \in \mathbb{N} \land r.formId \in \mathbb{N}$
+  \item $\forall r \in Responses \mid dom(r.answers) \subseteq Questions(r.formId)$
+\end{itemize}
 
 \subsubsection{Environment Variables}
 
@@ -1099,12 +1111,23 @@ None.
 When $\mathbb{R}$ is specified for data input, it means that the data can be mapped in one way or another onto
 $\mathbb{R}$.
 
+\subsubsection{State Invariants}
+
+\begin{itemize}
+  \item $Graphs \subseteq GraphType$
+  \item $Formats \subseteq FileType$
+\end{itemize}
+
+
 \subsubsection{Access Routine Semantics}
 
 \noindent \texttt{plotData(data, graph)}:
 \begin{itemize}
   \item transition: None.
-  \item output: Plot of the data in the specified graph type.
+  \item output:
+  \[
+  plot = Render(graph, data)
+  \]
   \item exception: Returns \texttt{InvalidData} if the data is corrupt; returns \texttt{InvalidGraphType} if the given
     \texttt{GraphType} does not exist; returns \texttt{IncompatibleData} if the given data cannot be represented with
     the given graph type.
@@ -1187,6 +1210,27 @@ None
   \item The given \texttt{eventId} and \texttt{surveyId} refer to events and
         surveys that were, if they exist, created by other modules.
 \end{itemize}
+
+\subsubsection{Formal Definitions}
+
+Let $Reg(e)$ be the set of registrations for event $e$ and $Att(e)$ be the set of attendance records for event $e$.
+
+\[
+Reg(e) = \{ u \mid (u,e) \in Registrations \}
+\]
+\[
+Att(e) = \{ u \mid (u,e) \in Attendance \}
+\]
+
+Define attendance rate:
+\[
+Rate(e) =
+\begin{cases}
+0, & |Reg(e)| = 0 \\
+\frac{|Att(e)|}{|Reg(e)|}, & \text{otherwise}
+\end{cases}
+\]
+
 
 \subsubsection{Access Routine Semantics}
 
@@ -1293,8 +1337,8 @@ None
 \subsubsection{State Variables}
 
 \begin{itemize}
-  \item connectionPool : ConnectionPool \\
-        Pool of reusable connections to the PostgreSQL database.
+  \item Tables : map(string, set(Record)) \\
+        Abstract model of database tables as sets of records.
   \item activeTx : set(TransactionId) \\
         Set of identifiers for currently active transactions.
 \end{itemize}
