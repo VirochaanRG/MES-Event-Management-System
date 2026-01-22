@@ -79,6 +79,7 @@ urlcolor=cyan          % color of external links
 \midrule
 November 13, 2025 & 1.0 & Revision -1\\
 January 21, 2026 & 1.1 & Revision 0: Added formal state and transition specifications.\\
+January 21, 2026 & 1.1 & Revision 0: Added all reflections and grammar fixes, removed all scaffolding.\\
 \bottomrule
 \end{tabularx}
 
@@ -100,7 +101,7 @@ January 21, 2026 & 1.1 & Revision 0: Added formal state and transition specifica
 
 \section{Introduction}
 
-The following document details the Module Interface Specifications for EvENGage. 
+The following document details the Module Interface Specifications for EvENGage.
 EvENGage is a custom event and survey management system being designed for the MES to simplify and centralize the process of hosting events, conferences, and surveys.
 
 Complementary documents include the System Requirement Specifications
@@ -116,14 +117,14 @@ with the addition that template modules have been adapted from
 multiple assignment statement and conditional rules follow the form $(c_1
 \Rightarrow r_1 | c_2 \Rightarrow r_2 | ... | c_n \Rightarrow r_n )$.
 
-The following table summarizes the primitive data types used by \progname. 
+The following table summarizes the primitive data types used by \progname.
 
 \begin{center}
 \renewcommand{\arraystretch}{1.2}
-\noindent 
-\begin{tabular}{l l p{7.5cm}} 
-\toprule 
-\textbf{Data Type} & \textbf{Notation} & \textbf{Description}\\ 
+\noindent
+\begin{tabular}{l l p{7.5cm}}
+\toprule
+\textbf{Data Type} & \textbf{Notation} & \textbf{Description}\\
 \midrule
 character & char & a single symbol or digit \\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
@@ -165,20 +166,20 @@ Hardware-Hiding Module
 & No Modules\\
 \midrule
 
-\multirow{9}{0.3\textwidth}{Behaviour-Hiding Modules} 
+\multirow{9}{0.3\textwidth}{Behaviour-Hiding Modules}
 & M\ref{m1}: Main System Module\\
 & M\ref{m2}: User Authentication Module\\
 & M\ref{m3}: User Authorization Module\\
 & M\ref{m4}: Form Template Module\\
 & M\ref{m5}: Form Submission Module\\
-& M\ref{m6}: Event Management Module\\ 
+& M\ref{m6}: Event Management Module\\
 & M\ref{m7}: Event Notification Module\\
 & M\ref{m8}: Registration Module\\
 & M\ref{m9}: Attendance Tracking Module\\
 & M\ref{m10}: Report Generation Module\\
 \midrule
 
-\multirow{3}{0.3\textwidth}{Software-Decision Modules} 
+\multirow{3}{0.3\textwidth}{Software-Decision Modules}
 & M\ref{m11}: Analytics Module\\
 & M\ref{m12}: Database Access Module\\
 & M\ref{m13}: Audit Module\\
@@ -291,7 +292,7 @@ Attempts a login given a username and password.
 \begin{itemize}
 \item transition: If \texttt{tuple(username, password) $\in$ credentials}, then \texttt{sessions := sessions $\cup$ set(generateCookie(username))}
 \item output: Cookie containing session data to be sent back to the client
-\item exception: None 
+\item exception: None
 \end{itemize}
 
 \noindent \texttt{logout(sessionCookie: Cookie)}: \\
@@ -299,7 +300,7 @@ Logs the specified user out.
 \begin{itemize}
 \item transition: \texttt{sessions := sessions - set(sessionCookie)}
 \item output: None
-\item exception: InvalidSession if session is not found in \texttt{sessions} 
+\item exception: InvalidSession if session is not found in \texttt{sessions}
 \end{itemize}
 
 \noindent \texttt{validateSession(sessionCookie: Cookie)}: \\
@@ -325,7 +326,7 @@ Generates a cookie for a user.
 \begin{itemize}
 \item transition: None
 \item output: Cookie containing \texttt{username} and \texttt{lastRefresh := currentTime}
-\item exception: None 
+\item exception: None
 \end{itemize}
 
 \noindent \texttt{refreshSessions()}: \\
@@ -333,7 +334,7 @@ Checks all sessions and invalidates old sessions. Scheduled to run periodically.
 \begin{itemize}
 \item transition: \texttt{$\forall$ s $\in$ sessions | s.lastRefresh - currentTime > 3hrs,  sessions := sessions - s}
 \item output: None
-\item exception: None 
+\item exception: None
 \end{itemize}
 
 \newpage
@@ -392,7 +393,7 @@ At least one user who has permission to assign and revoke roles already exists i
 Assigns a role to a user.
 \begin{itemize}
 \item transition: Inserts the specified role into the set attached to the user ID in \texttt{roles}
-\item output: None 
+\item output: None
 \item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
 \end{itemize}
 
@@ -400,7 +401,7 @@ Assigns a role to a user.
 Revokes a role from a user.
 \begin{itemize}
 \item transition: Removes the specified role from the set attached to the user ID in \texttt{roles}
-\item output: None 
+\item output: None
 \item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
 \end{itemize}
 
@@ -408,7 +409,7 @@ Revokes a role from a user.
 Checks if a user has a certain permission.
 \begin{itemize}
 \item transition: None
-\item output: A boolean value which is true if the set attached to the user ID in \texttt{roles} contains the specified role 
+\item output: A boolean value which is true if the set attached to the user ID in \texttt{roles} contains the specified role
 \item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
 \end{itemize}
 
@@ -416,7 +417,7 @@ Checks if a user has a certain permission.
 Gets all roles assigned to a given user.
 \begin{itemize}
 \item transition: None
-\item output: The set of roles attached to the user ID in \texttt{roles} 
+\item output: The set of roles attached to the user ID in \texttt{roles}
 \item exception: InvalidUser if the user does not exist
 \end{itemize}
 
@@ -430,7 +431,7 @@ None
 
 \subsection{Module}
 
-Contains functionality for creating and linking form modules. 
+Contains functionality for creating and linking form modules.
 
 \subsection{Uses}
 
@@ -486,7 +487,7 @@ Uses M\ref{m3} to check for form managment permissions.
 
 \subsubsection{Assumptions}
 
-The calculated current date and time is within 5 seconds of the real date and time 
+The calculated current date and time is within 5 seconds of the real date and time
 
 \subsubsection{Access Routine Semantics}
 
@@ -656,9 +657,9 @@ None
 \noindent \texttt{getFillableForms(userId : $\mathbb{N}$)}: \\
 Retreives all forms fillable by the user.
 \begin{itemize}
-\item transition: None 
+\item transition: None
 \item output: The set of all forms available for the user to fill
-\item exception: InvalidUser if user does not exist 
+\item exception: InvalidUser if user does not exist
 \end{itemize}
 
 \noindent \texttt{respondToForm(userId : $\mathbb{N}$, formId: string, \newline formResponse: map(Question, string))}: \\
@@ -745,7 +746,7 @@ The calculated current date and time is within 5 seconds of the actual date and 
 Creates a new event.
 \begin{itemize}
 \item transition: Inserts an event into \texttt{events}.
-\item output: ID of the created event 
+\item output: ID of the created event
 \item exception: None
 \end{itemize}
 
@@ -1042,7 +1043,7 @@ admins can monitor re-entry of attendees.
     event.
   \item output: Boolean confirming the user has been tracked if they are allowed to attend the event.
 \item exception: Returns \texttt{InvalidQRCode} if the QR Code provided does not work, potentially implying the user
-  cannot register the even.
+  cannot register for the event.
 \end{itemize}
 
 \noindent \texttt{getRegistrationCode(userId, eventId)} (2):
@@ -1366,7 +1367,7 @@ None
 \begin{itemize}
   \item transition: None.
   \item output: Returns the row in \texttt{table} whose primary key equals \texttt{id}.
-  \item exception: 
+  \item exception:
         \begin{itemize}
           \item RecordNotFound if no matching row exists.
           \item DatabaseError if a low-level database error occurs.
@@ -1582,10 +1583,27 @@ graduate attribute of Problem Analysis and Design.
 \subsubsection*{Ibrahim Quraishi Reflection}
 \begin{enumerate}
   \item \textbf{What went well while writing this deliverable?} \\
-  Once we specified the detailed design for the first module, it was very easy to define other modules based on it. This includes the formatting of the module, as well as the Uses section for linking modules together. We were also able to work as a group to ensure there were no discrepencies between modules. I feel that each module has a clear purpose and well defined functionality, and the responsibilities are split up well between modules. 
+  Once we specified the detailed design for the first module, it was very easy to define other modules based on it. This includes the formatting of the module, as well as the Uses section for linking modules together. We were also able to work as a group to ensure there were no discrepancies between modules. I feel that each module has a clear purpose and well-defined functionality, and the responsibilities are split up well between modules.
 
   \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
-  While writing the specification of each module after they had been defined was simple, deciding how to split the system up into modules beforehand was quite difficult. This is due to the fact that our system is distributed, including sub-systems such as the backend server, web clients, admin clients, and mobile clients. This made it difficult to decide which module would be a part of which system and how many modules each system needs. We were able to solve this by more clearly defining what the role of each subsystem is and what they can be expected to be responsible for. 
+  While writing the specification of each module after they had been defined was simple, deciding how to split the system up into modules beforehand was quite difficult. This is due to the fact that our system is distributed, including sub-systems such as the backend server, web clients, admin clients, and mobile clients. This made it difficult to decide which module would be a part of which system and how many modules each system needs. We were able to solve this by more clearly defining what the role of each subsystem is and what they can be expected to be responsible for.
+\end{enumerate}
+
+\subsubsection*{Mohammad Mahdi Mahboob Reflection}
+\begin{enumerate}
+  \item \textbf{What went well while writing this deliverable?} \\
+    I was able to successfully clarify the feedback given by the TA during Rev -1 for this module, which confirmed that
+    my usage of state variables was correct (in the context of our database).
+
+  \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+    I was first confused about the feedback given by the TA and did now know how to reconcile the TA feedback that QR
+    code generation should be part of state. After discussing with the TA, the confusion was clarified and the issue was
+    resolved. In addition to writing this formal document, there were some issues I faced while implementing the
+    modules as outlined in this document, mainly with the Registration Module. These were resolved by reconfiguring the
+    database to match closer to our representation of state variables through reading documentation for the technologies
+    we implemented.
+
+
 \end{enumerate}
 
 \end{document}
