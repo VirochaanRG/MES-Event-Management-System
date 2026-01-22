@@ -2,13 +2,40 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import { db } from '../../../db/src/db';
 import { events, registeredUsers } from '../../../db/src/schemas/events';
+import { users } from '../../../db/src/schemas/users';
 import { form, formAnswers, formQuestions } from './../../../db/src/schemas/form';
 import { and, eq, sql } from 'drizzle-orm';
+
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+interface AuthUser
+{
+  email: string;
+  id: number;
+  roles: string[];
+}
+
+function generateToken(user: AuthUser): string
+{
+  return jwt.sign({ user }, JWT_SECRET, { expiresIn: '24h' });
+}
+
+function verifyToken(token: string): { user: AuthUser } | null
+{
+  try
+  {
+    const decoded = jwt.verify(token, JWT_SECRET) as { user: AuthUser };
+    return decoded;
+  } catch (error)
+  {
+    return null;
+  }
+}
 
 // Register plugins
 await fastify.register(cors, {
@@ -17,6 +44,117 @@ await fastify.register(cors, {
 });
 
 await fastify.register(cookie);
+
+// Auth hook
+fastify.decorateRequest('user', null);
+
+fastify.addHook('onRequest', async (request, reply) =>
+{
+  const protectedRoutes = ['/api/auth/me'];
+
+  if (protectedRoutes.includes(request.url))
+  {
+    const token = request.cookies['admin-auth-token'];
+
+    if (!token)
+    {
+      reply.code(401).send({ error: 'Unauthorized' });
+      return;
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded)
+    {
+      reply.code(401).send({ error: 'Invalid token' });
+      return;
+    }
+
+    // Verify user has admin role
+    if (!decoded.user.roles || !decoded.user.roles.includes('admin'))
+    {
+      reply.code(403).send({ error: 'Forbidden - Admin access required' });
+      return;
+    }
+
+    (request as any).user = decoded.user;
+  }
+});
+
+// Admin Login endpoint
+fastify.post('/api/auth/login', async (request, reply) =>
+{
+  try
+  {
+    const { email, password } = request.body as { email: string; password: string };
+
+    if (!email || !password)
+    {
+      return reply.code(400).send({ error: 'Email and password are required' });
+    }
+
+    // Find user
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email.toLowerCase().trim()),
+    });
+
+    if (!user)
+    {
+      return reply.code(401).send({ error: 'Invalid email or password' });
+    }
+
+    // Verify password
+    const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!passwordMatch)
+    {
+      return reply.code(401).send({ error: 'Invalid email or password' });
+    }
+
+    // Check if user has admin role
+    if (!user.roles || !user.roles.includes('admin'))
+    {
+      return reply.code(403).send({ error: 'Access denied - Admin privileges required' });
+    }
+
+    // Generate token
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      roles: user.roles,
+    });
+
+    // Set cookie
+    reply.setCookie('admin-auth-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24,
+      path: '/',
+    });
+
+    reply.send({
+      success: true,
+      user: { id: user.id, email: user.email, roles: user.roles },
+      token,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Admin login error');
+    reply.code(500).send({ error: 'Internal server error' });
+  }
+});
+
+// Logout endpoint
+fastify.post('/api/auth/logout', async (request, reply) =>
+{
+  reply.clearCookie('admin-auth-token', { path: '/' });
+  reply.send({ success: true });
+});
+
+// Get current user endpoint
+fastify.get('/api/auth/me', async (request, reply) =>
+{
+  reply.send({ user: (request as any).user });
+});
 
 // CREATE a form question
 fastify.post<{
@@ -29,7 +167,6 @@ fastify.post<{
     const { id } = request.params;
     const { questionType, questionTitle, optionsCategory, qorder } = request.body;
 
-    // Validate required fields
     if (!questionType || questionType.trim() === '')
     {
       return reply.code(400).send({
@@ -46,7 +183,6 @@ fastify.post<{
       });
     }
 
-    // Check if form exists
     const existingForm = await db.query.form.findFirst({
       where: eq(form.id, parseInt(id)),
     });
@@ -59,7 +195,6 @@ fastify.post<{
       });
     }
 
-    // Create the question
     const newQuestion = await db
       .insert(formQuestions)
       .values({
@@ -92,7 +227,6 @@ fastify.get<{ Params: { id: string } }>('/api/forms/:id/questions', async (reque
   {
     const { id } = request.params;
 
-    // Check if form exists
     const existingForm = await db.query.form.findFirst({
       where: eq(form.id, parseInt(id)),
     });
@@ -105,7 +239,6 @@ fastify.get<{ Params: { id: string } }>('/api/forms/:id/questions', async (reque
       });
     }
 
-    // Fetch all questions for this form, ordered by qorder
     const questions = await db.query.formQuestions.findMany({
       where: eq(formQuestions.formId, parseInt(id)),
       orderBy: (formQuestions, { asc }) => [asc(formQuestions.qorder)],
@@ -134,7 +267,6 @@ fastify.delete<{ Params: { formId: string; questionId: string } }>(
     {
       const { formId, questionId } = request.params;
 
-      // Check if form exists
       const existingForm = await db.query.form.findFirst({
         where: eq(form.id, parseInt(formId)),
       });
@@ -147,7 +279,6 @@ fastify.delete<{ Params: { formId: string; questionId: string } }>(
         });
       }
 
-      // Check if question exists
       const existingQuestion = await db.query.formQuestions.findFirst({
         where: and(
           eq(formQuestions.id, parseInt(questionId)),
@@ -163,10 +294,7 @@ fastify.delete<{ Params: { formId: string; questionId: string } }>(
         });
       }
 
-      // Delete the question
-      await db
-        .delete(formQuestions)
-        .where(eq(formQuestions.id, parseInt(questionId)));
+      await db.delete(formQuestions).where(eq(formQuestions.id, parseInt(questionId)));
 
       return reply.send({
         success: true,
@@ -199,7 +327,6 @@ fastify.put<{
     const { formId, questionId } = request.params;
     const { questionType, questionTitle, optionsCategory, qorder } = request.body;
 
-    // Check if form exists
     const existingForm = await db.query.form.findFirst({
       where: eq(form.id, parseInt(formId)),
     });
@@ -212,7 +339,6 @@ fastify.put<{
       });
     }
 
-    // Check if question exists
     const existingQuestion = await db.query.formQuestions.findFirst({
       where: and(
         eq(formQuestions.id, parseInt(questionId)),
@@ -228,7 +354,6 @@ fastify.put<{
       });
     }
 
-    // Build update object with only provided fields
     const updateData: Record<string, any> = {};
 
     if (questionType !== undefined)
@@ -248,7 +373,6 @@ fastify.put<{
       updateData.qorder = qorder;
     }
 
-    // If no fields to update, return error
     if (Object.keys(updateData).length === 0)
     {
       return reply.code(400).send({
@@ -257,7 +381,6 @@ fastify.put<{
       });
     }
 
-    // Update the question
     const updatedQuestion = await db
       .update(formQuestions)
       .set(updateData)
@@ -288,7 +411,6 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
     {
       const { formId, questionId } = request.params;
 
-      // Get the current question
       const currentQuestion = await db.query.formQuestions.findFirst({
         where: and(
           eq(formQuestions.id, parseInt(questionId)),
@@ -304,7 +426,6 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
         });
       }
 
-      // Can't move up if already first
       if (currentQuestion.qorder === 1)
       {
         return reply.code(400).send({
@@ -313,7 +434,6 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
         });
       }
 
-      // Find the question above (with qorder = current - 1)
       const previousQuestion = await db.query.formQuestions.findFirst({
         where: and(
           eq(formQuestions.formId, parseInt(formId)),
@@ -329,7 +449,6 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
         });
       }
 
-      // Swap the orders
       await db
         .update(formQuestions)
         .set({ qorder: currentQuestion.qorder })
@@ -364,7 +483,6 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
     {
       const { formId, questionId } = request.params;
 
-      // Get the current question
       const currentQuestion = await db.query.formQuestions.findFirst({
         where: and(
           eq(formQuestions.id, parseInt(questionId)),
@@ -380,14 +498,12 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
         });
       }
 
-      // Get total number of questions to check if it's the last one
       const allQuestions = await db.query.formQuestions.findMany({
         where: eq(formQuestions.formId, parseInt(formId)),
       });
 
-      const maxOrder = Math.max(...allQuestions.map(q => q.qorder));
+      const maxOrder = Math.max(...allQuestions.map((q) => q.qorder));
 
-      // Can't move down if already last
       if (currentQuestion.qorder === maxOrder)
       {
         return reply.code(400).send({
@@ -396,7 +512,6 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
         });
       }
 
-      // Find the question below (with qorder = current + 1)
       const nextQuestion = await db.query.formQuestions.findFirst({
         where: and(
           eq(formQuestions.formId, parseInt(formId)),
@@ -412,7 +527,6 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
         });
       }
 
-      // Swap the orders
       await db
         .update(formQuestions)
         .set({ qorder: currentQuestion.qorder })
@@ -526,7 +640,6 @@ fastify.post<{
   {
     const { name, description } = request.body;
 
-    // Validate required fields
     if (!name || name.trim() === '')
     {
       return reply.code(400).send({
@@ -568,7 +681,6 @@ fastify.put<{
     const { id } = request.params;
     const { name, description } = request.body;
 
-    // Check if form exists
     const existingForm = await db.query.form.findFirst({
       where: eq(form.id, parseInt(id)),
     });
@@ -581,7 +693,6 @@ fastify.put<{
       });
     }
 
-    // Build update object with only provided fields
     const updateData: Record<string, any> = {};
     if (name !== undefined)
     {
@@ -592,7 +703,6 @@ fastify.put<{
       updateData.description = description.trim() || null;
     }
 
-    // If no fields to update, return error
     if (Object.keys(updateData).length === 0)
     {
       return reply.code(400).send({
@@ -681,7 +791,6 @@ fastify.post('/api/event/create', async (request, reply) =>
       status?: string;
     };
 
-    // Validate required fields
     if (!title || !startTime || !endTime)
     {
       return reply.status(400).send({
@@ -689,17 +798,19 @@ fastify.post('/api/event/create', async (request, reply) =>
       });
     }
 
-    // Create the event in the database
-    const newEvent = await db.insert(events).values({
-      title,
-      description: description || null,
-      location: location || null,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
-      capacity: capacity || 0,
-      isPublic: isPublic !== undefined ? isPublic : true,
-      status: status || 'scheduled',
-    }).returning();
+    const newEvent = await db
+      .insert(events)
+      .values({
+        title,
+        description: description || null,
+        location: location || null,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        capacity: capacity || 0,
+        isPublic: isPublic !== undefined ? isPublic : true,
+        status: status || 'scheduled',
+      })
+      .returning();
 
     return reply.status(201).send({
       success: true,
@@ -726,7 +837,6 @@ fastify.post<{
     const { id } = request.params;
     const { userEmail } = request.body;
 
-    // Validate required fields
     if (!userEmail?.trim())
     {
       return reply.code(400).send({
@@ -735,7 +845,6 @@ fastify.post<{
       });
     }
 
-    // Check if event exists
     const event = await db.query.events.findFirst({
       where: eq(events.id, parseInt(id)),
     });
@@ -748,7 +857,6 @@ fastify.post<{
       });
     }
 
-    // Check if user is already registered
     const existingRegistration = await db.query.registeredUsers.findFirst({
       where: and(
         eq(registeredUsers.eventId, parseInt(id)),
@@ -764,7 +872,6 @@ fastify.post<{
       });
     }
 
-    // Check capacity if set
     const capacity = event.capacity ?? 0;
     if (capacity > 0)
     {
@@ -783,7 +890,6 @@ fastify.post<{
       }
     }
 
-    // Register the user
     const eventCost = event.cost ?? 0;
     const registration = await db
       .insert(registeredUsers)
@@ -854,18 +960,23 @@ fastify.get<{
 // GET - List all registered users for an event
 fastify.get<{ Params: { id: string } }>(
   '/api/events/:id/registrationlist',
-  async (request, reply) => {
-    try {
+  async (request, reply) =>
+  {
+    try
+    {
       const { id } = request.params;
 
-      const registeredList = await db.select().from(registeredUsers).where
-      (eq(registeredUsers.eventId, parseInt(id, 10)));
+      const registeredList = await db
+        .select()
+        .from(registeredUsers)
+        .where(eq(registeredUsers.eventId, parseInt(id, 10)));
 
       return reply.send({
         success: true,
-        data: registeredList
+        data: registeredList,
       });
-    } catch (error) {
+    } catch (error)
+    {
       fastify.log.error({ err: error }, 'Failed to list registrations');
       return reply.code(500).send({
         success: false,
@@ -876,117 +987,79 @@ fastify.get<{ Params: { id: string } }>(
 );
 
 // GET all answers for a specific form with question details
-fastify.get<{ Params: { id: string } }>(
-  '/api/forms/:id/answers',
-  async (request, reply) =>
-  {
-    try
-    {
-      const { id } = request.params;
-
-      // Check if form exists
-      const existingForm = await db.query.form.findFirst({
-        where: eq(form.id, parseInt(id)),
-      });
-
-      if (!existingForm)
-      {
-        return reply.code(404).send({
-          success: false,
-          error: 'Form not found',
-        });
-      }
-
-      // Get all answers with question details using a join
-      const answers = await db
-        .select({
-          answerId: formAnswers.id,
-          userId: formAnswers.userId,
-          answer: formAnswers.answer,
-          createdAt: formAnswers.createdAt,
-          questionId: formQuestions.id,
-          questionTitle: formQuestions.questionTitle,
-          questionType: formQuestions.questionType,
-          qorder: formQuestions.qorder,
-        })
-        .from(formAnswers)
-        .innerJoin(
-          formQuestions,
-          eq(formAnswers.questionId, formQuestions.id)
-        )
-        .where(eq(formAnswers.formId, parseInt(id)))
-        .orderBy(formAnswers.userId, formQuestions.qorder);
-
-      // Group answers by userId to create submissions
-      const submissionMap = new Map<string, any>();
-
-      answers.forEach((answer) =>
-      {
-        if (!submissionMap.has(answer.userId))
-        {
-          submissionMap.set(answer.userId, {
-            userId: answer.userId,
-            submittedAt: answer.createdAt,
-            answers: [],
-          });
-        }
-
-        submissionMap.get(answer.userId).answers.push({
-          questionId: answer.questionId,
-          questionTitle: answer.questionTitle,
-          questionType: answer.questionType,
-          qorder: answer.qorder,
-          answer: answer.answer,
-        });
-      });
-
-      const submissions = Array.from(submissionMap.values());
-
-      return reply.send({
-        success: true,
-        data: {
-          form: existingForm,
-          submissions,
-          totalSubmissions: submissions.length,
-        },
-      });
-    } catch (error)
-    {
-      fastify.log.error({ err: error }, 'Failed to fetch form answers');
-      return reply.code(500).send({
-        success: false,
-        error: 'Failed to fetch form answers',
-      });
-    }
-  }
-);
-
-
-// Local login (for testing without main portal)
-fastify.post('/api/auth/local-login', async (request, reply) =>
+fastify.get<{ Params: { id: string } }>('/api/forms/:id/answers', async (request, reply) =>
 {
   try
   {
-    const { email } = request.body as { email: string };
+    const { id } = request.params;
 
-    if (!email)
+    const existingForm = await db.query.form.findFirst({
+      where: eq(form.id, parseInt(id)),
+    });
+
+    if (!existingForm)
     {
-      return reply.code(400).send({ error: 'Email is required' });
+      return reply.code(404).send({
+        success: false,
+        error: 'Form not found',
+      });
     }
 
-    const user = { id: 1, email };
-    const localSecret = 'teamd-local-secret';
-    const token = jwt.sign({ user }, localSecret, { expiresIn: '24h' });
+    const answers = await db
+      .select({
+        answerId: formAnswers.id,
+        userId: formAnswers.userId,
+        answer: formAnswers.answer,
+        createdAt: formAnswers.createdAt,
+        questionId: formQuestions.id,
+        questionTitle: formQuestions.questionTitle,
+        questionType: formQuestions.questionType,
+        qorder: formQuestions.qorder,
+      })
+      .from(formAnswers)
+      .innerJoin(formQuestions, eq(formAnswers.questionId, formQuestions.id))
+      .where(eq(formAnswers.formId, parseInt(id)))
+      .orderBy(formAnswers.userId, formQuestions.qorder);
 
-    reply.send({
+    const submissionMap = new Map<string, any>();
+
+    answers.forEach((answer) =>
+    {
+      if (!submissionMap.has(answer.userId))
+      {
+        submissionMap.set(answer.userId, {
+          userId: answer.userId,
+          submittedAt: answer.createdAt,
+          answers: [],
+        });
+      }
+
+      submissionMap.get(answer.userId).answers.push({
+        questionId: answer.questionId,
+        questionTitle: answer.questionTitle,
+        questionType: answer.questionType,
+        qorder: answer.qorder,
+        answer: answer.answer,
+      });
+    });
+
+    const submissions = Array.from(submissionMap.values());
+
+    return reply.send({
       success: true,
-      user,
-      token
+      data: {
+        form: existingForm,
+        submissions,
+        totalSubmissions: submissions.length,
+      },
     });
   } catch (error)
   {
-    fastify.log.error({ err: error }, 'Local login error');
-    reply.code(500).send({ error: 'Internal server error' });
+    fastify.log.error({ err: error }, 'Failed to fetch form answers');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch form answers',
+    });
   }
 });
 
