@@ -2,37 +2,24 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import { db } from '../../../db/src/db';
 import { events, registeredUsers } from '../../../db/src/schemas/events';
-import { eq, and, sql, isNull, or, max, InferInsertModel } from 'drizzle-orm';
-import { timeStamp } from 'console';
+import { users } from '../../../db/src/schemas/users';
+import { eq, and, sql, isNull, or, max } from 'drizzle-orm';
 import { form, formQuestions, formAnswers, formSubmissions, qrCodes } from '@db/schemas';
 import QRCode from 'qrcode';
-import { notEqual } from 'assert';
-import { parse } from 'path';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const SALT_ROUNDS = 10;
 
 interface AuthUser
 {
   email: string;
-  id?: number;
-}
-
-// Mock user database for development
-const mockUsers: { [email: string]: AuthUser } = {
-  'userViro@test.com': { email: 'userViro@test.com', id: 1 },
-  'userM@test.com': { email: 'userM@test.com', id: 2 },
-  'userI@test.com': { email: 'userI@test.com', id: 3 },
-  'userO@test.com': { email: 'userO@test.com', id: 4 },
-  'userR@test.com': { email: 'userR@test.com', id: 5 },
-};
-
-function validateUser(email: string): AuthUser | null
-{
-  return mockUsers[email] || null;
+  id: number;
+  roles?: string[];
 }
 
 function generateToken(user: AuthUser): string
@@ -88,38 +75,135 @@ fastify.addHook('onRequest', async (request, reply) =>
   }
 });
 
-// Login endpoint
-fastify.post('/api/auth/login', async (request, reply) =>
+// Register endpoint
+fastify.post('/api/auth/register', async (request, reply) =>
 {
   try
   {
-    const { email } = request.body as { email: string };
+    const { email, password } = request.body as { email: string; password: string };
 
-    if (!email)
+    // Validation
+    if (!email || !password)
     {
-      return reply.code(400).send({ error: 'Email is required' });
+      return reply.code(400).send({ error: 'Email and password are required' });
     }
 
-    const user = validateUser(email);
-    if (!user)
+    if (password.length < 8)
     {
-      return reply.code(401).send({ error: 'User not found' });
+      return reply.code(400).send({ error: 'Password must be at least 8 characters long' });
     }
 
-    const token = generateToken(user);
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email))
+    {
+      return reply.code(400).send({ error: 'Invalid email format' });
+    }
 
+    // Check if user already exists
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, email.toLowerCase().trim()),
+    });
+
+    if (existingUser)
+    {
+      return reply.code(409).send({ error: 'User already exists' });
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+
+    // Create user
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        email: email.toLowerCase().trim(),
+        passwordHash,
+        roles: ['user'],
+      })
+      .returning({
+        id: users.id,
+        email: users.email,
+        roles: users.roles,
+      });
+
+    // Generate token
+    const token = generateToken({
+      id: newUser.id,
+      email: newUser.email,
+      roles: newUser.roles,
+    });
+
+    // Set cookie
     reply.setCookie('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24,
-      path: '/'
+      path: '/',
+    });
+
+    reply.code(201).send({
+      success: true,
+      user: { id: newUser.id, email: newUser.email, roles: newUser.roles },
+      token,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Registration error');
+    reply.code(500).send({ error: 'Internal server error' });
+  }
+});
+
+// Login endpoint
+fastify.post('/api/auth/login', async (request, reply) =>
+{
+  try
+  {
+    const { email, password } = request.body as { email: string; password: string };
+
+    if (!email || !password)
+    {
+      return reply.code(400).send({ error: 'Email and password are required' });
+    }
+
+    // Find user
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email.toLowerCase().trim()),
+    });
+
+    if (!user)
+    {
+      return reply.code(401).send({ error: 'Invalid email or password' });
+    }
+
+    // Verify password
+    const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!passwordMatch)
+    {
+      return reply.code(401).send({ error: 'Invalid email or password' });
+    }
+
+    // Generate token
+    const token = generateToken({
+      id: user.id,
+      email: user.email,
+      roles: user.roles,
+    });
+
+    // Set cookie
+    reply.setCookie('auth-token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24,
+      path: '/',
     });
 
     reply.send({
       success: true,
-      user: { id: user.id, email: user.email },
-      token
+      user: { id: user.id, email: user.email, roles: user.roles },
+      token,
     });
   } catch (error)
   {
@@ -135,13 +219,27 @@ fastify.post('/api/auth/logout', async (request, reply) =>
   reply.send({ success: true });
 });
 
+// Get current user endpoint
+fastify.get('/api/auth/me', async (request, reply) =>
+{
+  reply.send({ user: (request as any).user });
+});
+
+// Get token endpoint
+fastify.get('/api/auth/token', async (request, reply) =>
+{
+  const token = request.cookies['auth-token'];
+  reply.send({ token });
+});
+
+// ... (rest of your existing endpoints remain the same)
+
 //Get events
 fastify.get('/api/events', async (request, reply) =>
 {
   try
   {
     const allEvents = await db.query.events.findMany();
-
     return reply.send({
       success: true,
       data: allEvents,
@@ -162,7 +260,6 @@ fastify.get<{ Params: { id: string } }>('/api/events/:id', async (request, reply
   try
   {
     const { id } = request.params;
-
     const event = await db.query.events.findFirst({
       where: eq(events.id, parseInt(id)),
     });
@@ -200,7 +297,6 @@ fastify.post<{
     const { id } = request.params;
     const { userEmail, instance } = request.body;
 
-    // Validate required fields
     if (!userEmail || !userEmail.trim())
     {
       return reply.code(400).send({
@@ -209,7 +305,6 @@ fastify.post<{
       });
     }
 
-    // Check if event exists
     const event = await db.query.events.findFirst({
       where: eq(events.id, parseInt(id)),
     });
@@ -222,7 +317,6 @@ fastify.post<{
       });
     }
 
-    // Check if user is already registered
     const existingRegistration = await db.query.registeredUsers.findFirst({
       where: and(
         eq(registeredUsers.eventId, parseInt(id)),
@@ -238,7 +332,6 @@ fastify.post<{
       });
     }
 
-    // Check capacity if set
     const capacity = event.capacity ?? 0;
     if (capacity > 0)
     {
@@ -257,7 +350,6 @@ fastify.post<{
       }
     }
 
-    // Register the user
     const eventCost = event.cost ?? 0;
     const registration = await db
       .insert(registeredUsers)
@@ -285,28 +377,26 @@ fastify.post<{
   }
 });
 
-interface QRPayload {
+interface QRPayload
+{
   registrationId: number;
   eventId: number;
   userEmail: string;
   instance: number;
 }
 
-function buildQRContentString(payload : QRPayload) {
-return `registrationId:${payload.registrationId};eventId:${payload.eventId};userEmail:${payload.userEmail};` +
-    `instance:${payload.instance}`;
+function buildQRContentString(payload: QRPayload)
+{
+  return `registrationId:${payload.registrationId};eventId:${payload.eventId};userEmail:${payload.userEmail};instance:${payload.instance}`;
 }
 
 fastify.post<{
   Params: { id: string };
-  Body: { registrationId: number };}>("/api/events/:id/generateQR", async (request, reply) => {
-  try {
-    // const { registrationId, eventId, userEmail, instance } = request.body as {
-    //   registrationId: number;
-    //   eventId: number;
-    //   userEmail: string;
-    //   instance: number;
-    // };
+  Body: { registrationId: number };
+}>('/api/events/:id/generateQR', async (request, reply) =>
+{
+  try
+  {
     const { id: eventParamId } = request.params;
     const { registrationId } = request.body;
 
@@ -314,13 +404,14 @@ fastify.post<{
       where: eq(registeredUsers.id, registrationId),
     });
 
-    if (!registration) {
+    if (!registration)
+    {
       return reply.code(400).send({
         success: false,
         error: 'Registration not found',
       });
     }
-    
+
     const eventId = registration.eventId;
     const userEmail = registration.userEmail;
     const instance = registration.instance ?? 0;
@@ -333,21 +424,23 @@ fastify.post<{
     };
     const qrString = buildQRContentString(payload);
     const qrBuffer = await QRCode.toBuffer(qrString);
-    const [entry] = await db.insert(qrCodes).values({
-      id: registrationId,
-      eventId,
-      userEmail,
-      instance,
-      image: qrBuffer,
-      // content: qrString
-    })
-    .returning();
+    const [entry] = await db
+      .insert(qrCodes)
+      .values({
+        id: registrationId,
+        eventId,
+        userEmail,
+        instance,
+        image: qrBuffer,
+      })
+      .returning();
 
     return reply.send({
       success: true,
       data: entry,
     });
-  } catch (error) {
+  } catch (error)
+  {
     fastify.log.error({ err: error }, 'Failed to generate QR code');
     return reply.code(500).send({
       success: false,
@@ -400,31 +493,37 @@ fastify.get<{
 fastify.get<{
   Params: { id: string };
   Querystring: { userEmail: string };
-}>("/api/events/:id/event-qrcodes", async (request, reply) => {
-  try {
+}>('/api/events/:id/event-qrcodes', async (request, reply) =>
+{
+  try
+  {
     const { id } = request.params;
     const { userEmail } = request.query;
 
-    const codes = await db.select().from(qrCodes)
+    const codes = await db
+      .select()
+      .from(qrCodes)
       .where(
         and(
           eq(qrCodes.eventId, parseInt(id)),
           eq(qrCodes.userEmail, userEmail.toLowerCase().trim())
-        ));
+        )
+      );
 
     const data = codes.map((c) => ({
       id: c.id,
       eventId: c.eventId,
       userEmail: c.userEmail,
       instance: c.instance,
-      imageBase64: (c.image as any as Buffer).toString("base64"),
-    }));  
+      imageBase64: (c.image as any as Buffer).toString('base64'),
+    }));
 
     return reply.send({
       success: true,
       data,
     });
-  } catch (error) {
+  } catch (error)
+  {
     fastify.log.error({ err: error }, 'Failed to access DB and fetch QR codes');
     return reply.code(500).send({
       success: false,
@@ -433,48 +532,28 @@ fastify.get<{
   }
 });
 
-// fastify.delete("/api/events/registration", async (request, reply) => {
-//   try {
-//     const { id } = request.body as {
-//       id: number;
-//     };
-
-//     const result = await db.delete(registeredUsers).where(eq(registeredUsers.id, id));
-
-//     return reply.send({
-//       success: true,
-//     });
-//   } catch (error) {
-//     fastify.log.error({ err: error }, 'Failed to delete entry');
-//     return reply.code(500).send({
-//       success: false,
-//       error: 'Failed to delete entry',
-//     });
-//   }
-// });
-
-fastify.get("/api/events/:id/latest-instance", async (request, reply) => {
-  try {
+fastify.get('/api/events/:id/latest-instance', async (request, reply) =>
+{
+  try
+  {
     const { eventId, userEmail } = request.body as {
       eventId: number;
       userEmail: string;
     };
 
-    const [{ maxInstance }] = await db.select({
-      maxInstance: max(registeredUsers.instance),
-    })
+    const [{ maxInstance }] = await db
+      .select({
+        maxInstance: max(registeredUsers.instance),
+      })
       .from(registeredUsers)
-      .where(
-        and(
-          eq(qrCodes.eventId, eventId),
-          eq(qrCodes.userEmail, userEmail)
-        ));
+      .where(and(eq(qrCodes.eventId, eventId), eq(qrCodes.userEmail, userEmail)));
 
     return reply.send({
       success: true,
       instance: maxInstance ?? 0,
     });
-  } catch (error) {
+  } catch (error)
+  {
     fastify.log.error({ err: error }, 'Failed to access DB and fetch QR codes');
     return reply.code(500).send({
       success: false,
@@ -509,7 +588,7 @@ fastify.get<{ Params: { uid: string } }>('/api/forms/available/:uid', async (req
 {
   try
   {
-    const {uid} = request.params;
+    const { uid } = request.params;
     const allForms = await db
       .select({
         id: form.id,
@@ -520,14 +599,11 @@ fastify.get<{ Params: { uid: string } }>('/api/forms/available/:uid', async (req
       .from(form)
       .leftJoin(
         formSubmissions,
-        and(
-          eq(form.id, formSubmissions.formId),
-          eq(formSubmissions.userId, uid)
-        )
+        and(eq(form.id, formSubmissions.formId), eq(formSubmissions.userId, uid))
       )
       .where(sql`${formSubmissions.id} IS NULL`);
 
-    console.log("UNFILLED: " + allForms);
+    console.log('UNFILLED: ' + allForms);
 
     return reply.send({
       success: true,
@@ -548,8 +624,9 @@ fastify.get<{ Params: { uid: string } }>('/api/forms/completed/:uid', async (req
 {
   try
   {
-    const {uid} = request.params;
-    const allForms = await db.select({
+    const { uid } = request.params;
+    const allForms = await db
+      .select({
         id: form.id,
         name: form.name,
         description: form.description,
@@ -559,7 +636,7 @@ fastify.get<{ Params: { uid: string } }>('/api/forms/completed/:uid', async (req
       .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
       .where(eq(formSubmissions.userId, uid));
 
-    console.log("FILLED: " + allForms);
+    console.log('FILLED: ' + allForms);
 
     return reply.send({
       success: true,
@@ -609,47 +686,53 @@ fastify.get<{ Params: { fid: string } }>('/api/forms/:fid', async (request, repl
 });
 
 // GET status of form for user
-fastify.get<{ Params: { fid: string, uid: string } }>('/api/forms/:fid/status/:uid', async (request, reply) =>
-{
-  try
+fastify.get<{ Params: { fid: string; uid: string } }>(
+  '/api/forms/:fid/status/:uid',
+  async (request, reply) =>
   {
-    const { fid, uid } = request.params;
+    try
+    {
+      const { fid, uid } = request.params;
 
-    const submission = await db.query.formSubmissions.findFirst({
-      where: and(eq(formSubmissions.formId, parseInt(fid)), eq(formSubmissions.userId, uid))
-    });
+      const submission = await db.query.formSubmissions.findFirst({
+        where: and(eq(formSubmissions.formId, parseInt(fid)), eq(formSubmissions.userId, uid)),
+      });
 
-
-    if(!submission) {
-      const answer = await db.query.formAnswers.findFirst({
-      where: and(eq(formAnswers.formId, parseInt(fid)), eq(formAnswers.userId, uid))});
-      if(!answer) {
-        return reply.send({
-          success: true,
-          data: 'unfilled',
+      if (!submission)
+      {
+        const answer = await db.query.formAnswers.findFirst({
+          where: and(eq(formAnswers.formId, parseInt(fid)), eq(formAnswers.userId, uid)),
         });
-      } else {
+        if (!answer)
+        {
+          return reply.send({
+            success: true,
+            data: 'unfilled',
+          });
+        } else
+        {
+          return reply.send({
+            success: true,
+            data: 'started',
+          });
+        }
+      } else
+      {
         return reply.send({
           success: true,
-          data: 'started',
+          data: 'completed',
         });
       }
-    } else {
-      return reply.send({
-        success: true,
-        data: 'completed',
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch form');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch form',
       });
     }
-
-  } catch (error)
-  {
-    fastify.log.error({ err: error }, 'Failed to fetch form');
-    return reply.code(500).send({
-      success: false,
-      error: 'Failed to fetch form',
-    });
   }
-});
+);
 
 // GET questions by form ID
 fastify.get<{ Params: { fid: string } }>('/api/forms/questions/:fid', async (request, reply) =>
@@ -657,8 +740,11 @@ fastify.get<{ Params: { fid: string } }>('/api/forms/questions/:fid', async (req
   try
   {
     const { fid } = request.params;
-    
-    const questions = await db.select().from(formQuestions).where(eq(formQuestions.formId, parseInt(fid)));
+
+    const questions = await db
+      .select()
+      .from(formQuestions)
+      .where(eq(formQuestions.formId, parseInt(fid)));
 
     return reply.send({
       success: true,
@@ -675,44 +761,53 @@ fastify.get<{ Params: { fid: string } }>('/api/forms/questions/:fid', async (req
 });
 
 // GET answers by form ID
-fastify.get<{ Params: { fid: string, uid: string }, }>('/api/forms/:fid/answers/:uid', async (request, reply) =>
-{
-  try
+fastify.get<{ Params: { fid: string; uid: string } }>(
+  '/api/forms/:fid/answers/:uid',
+  async (request, reply) =>
   {
-    const { fid, uid } = request.params;
+    try
+    {
+      const { fid, uid } = request.params;
 
-    var answers = await db.select().from(formAnswers).where(
-      and(
-        eq(formAnswers.formId, parseInt(fid)), 
-        eq(formAnswers.userId, uid),
-        isNull(formAnswers.submissionId)));
-    if(!answers) {
-      answers = [];
+      var answers = await db
+        .select()
+        .from(formAnswers)
+        .where(
+          and(
+            eq(formAnswers.formId, parseInt(fid)),
+            eq(formAnswers.userId, uid),
+            isNull(formAnswers.submissionId)
+          )
+        );
+      if (!answers)
+      {
+        answers = [];
+      }
+      return reply.send({
+        success: true,
+        data: answers,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch user answers');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch user answers',
+      });
     }
-    return reply.send({
-      success: true,
-      data: answers,
-    });
-  } catch (error)
-  {
-    fastify.log.error({ err: error }, 'Failed to fetch user answers');
-    return reply.code(500).send({
-      success: false,
-      error: 'Failed to fetch user answers',
-    });
   }
-});
+);
 
 //POST reponse to question
 fastify.post<{
-  Params: { fid: string, uid : string};
-  Body: {qid: string; uid: string, answer: string, questionType: string;};
+  Params: { fid: string; uid: string };
+  Body: { qid: string; uid: string; answer: string; questionType: string };
 }>('/api/forms/:fid/answers/:uid', async (request, reply) =>
 {
   try
   {
-    const {fid, uid} = request.params;
-    const {qid, answer, questionType} = request.body;
+    const { fid, uid } = request.params;
+    const { qid, answer, questionType } = request.body;
 
     const selectedQuestion = await db.query.formQuestions.findFirst({
       where: eq(formQuestions.id, parseInt(qid)),
@@ -725,20 +820,20 @@ fastify.post<{
       });
     }
 
-    const existingAnswer = await db.query.formAnswers.findFirst({where : 
-      and(
-        eq(formAnswers.questionId, selectedQuestion.id),
-        eq(formAnswers.userId, uid))});
+    const existingAnswer = await db.query.formAnswers.findFirst({
+      where: and(eq(formAnswers.questionId, selectedQuestion.id), eq(formAnswers.userId, uid)),
+    });
 
     var newAnswer;
-    if (existingAnswer) {
+    if (existingAnswer)
+    {
       newAnswer = await db
         .update(formAnswers)
-        .set({answer : answer})
+        .set({ answer: answer })
         .where(eq(formAnswers.id, existingAnswer.id))
         .returning();
-    }
-    else {
+    } else
+    {
       newAnswer = await db
         .insert(formAnswers)
         .values({
@@ -746,7 +841,7 @@ fastify.post<{
           formId: parseInt(fid),
           userId: uid,
           questionId: parseInt(qid),
-          answer: answer
+          answer: answer,
         })
         .returning();
     }
@@ -755,8 +850,8 @@ fastify.post<{
       success: true,
       data: newAnswer[0],
     });
-  } 
-  catch (error){ 
+  } catch (error)
+  {
     fastify.log.error({ err: error }, 'Failed to post user answers');
     return reply.code(500).send({
       success: false,
@@ -767,41 +862,42 @@ fastify.post<{
 
 //GET completed submission id
 fastify.patch<{
-  Params: { fid: string, uid : string},
+  Params: { fid: string; uid: string };
 }>('/api/forms/:fid/submit/:uid', async (request, reply) =>
 {
   try
   {
-    const {fid, uid} = request.params;
+    const { fid, uid } = request.params;
 
-    const existingSubmission = await db.query.formSubmissions.findFirst({where : 
-      and(
-        eq(formSubmissions.formId, parseInt(fid)),
-        eq(formSubmissions.userId, uid))});
-    
+    const existingSubmission = await db.query.formSubmissions.findFirst({
+      where: and(eq(formSubmissions.formId, parseInt(fid)), eq(formSubmissions.userId, uid)),
+    });
+
     var submission;
-    if(existingSubmission) {
+    if (existingSubmission)
+    {
       submission = await db
         .update(formSubmissions)
-        .set({updatedAt : sql`NOW()`})
-        .where(and(
-          eq(formSubmissions.formId, parseInt(fid)),
-          eq(formSubmissions.userId, uid)))
+        .set({ updatedAt: sql`NOW()` })
+        .where(and(eq(formSubmissions.formId, parseInt(fid)), eq(formSubmissions.userId, uid)))
         .returning();
       await db
         .update(formAnswers)
-        .set({submissionId : submission[0].id})
-        .where(and(
-          eq(formAnswers.formId, parseInt(fid)), 
-          eq(formAnswers.userId, uid),
-          isNull(formAnswers.submissionId))
+        .set({ submissionId: submission[0].id })
+        .where(
+          and(
+            eq(formAnswers.formId, parseInt(fid)),
+            eq(formAnswers.userId, uid),
+            isNull(formAnswers.submissionId)
+          )
         );
-    } else {
+    } else
+    {
       submission = await db
         .insert(formSubmissions)
         .values({
           userId: uid,
-          formId: parseInt(fid)
+          formId: parseInt(fid),
         })
         .returning();
     }
@@ -810,8 +906,8 @@ fastify.patch<{
       success: true,
       data: submission,
     });
-  } 
-  catch (error){ 
+  } catch (error)
+  {
     fastify.log.error({ err: error }, 'Failed to post user answers');
     return reply.code(500).send({
       success: false,
@@ -822,50 +918,33 @@ fastify.patch<{
 
 //DELETE submission and answers
 fastify.delete<{
-  Params: { fid: string, uid : string},
+  Params: { fid: string; uid: string };
 }>('/api/forms/:fid/delete/:uid', async (request, reply) =>
 {
   try
   {
-    const {fid, uid} = request.params;
+    const { fid, uid } = request.params;
 
-    await db.delete(formSubmissions)
-    .where(
-      and(
-        eq(formSubmissions.userId, uid), 
-        eq(formSubmissions.formId, parseInt(fid))));
+    await db
+      .delete(formSubmissions)
+      .where(and(eq(formSubmissions.userId, uid), eq(formSubmissions.formId, parseInt(fid))));
 
-    await db.delete(formAnswers)
-    .where(
-      and(
-        eq(formAnswers.userId, uid), 
-        eq(formAnswers.formId, parseInt(fid))));
+    await db
+      .delete(formAnswers)
+      .where(and(eq(formAnswers.userId, uid), eq(formAnswers.formId, parseInt(fid))));
 
     return reply.code(201).send({
       success: true,
-      data: {formId: fid, userId: uid}
+      data: { formId: fid, userId: uid },
     });
-  } 
-  catch (error){ 
+  } catch (error)
+  {
     fastify.log.error({ err: error }, 'Failed to post user answers');
     return reply.code(500).send({
       success: false,
       error: 'Failed to post user answers',
     });
   }
-});
-
-// Get current user endpoint
-fastify.get('/api/auth/me', async (request, reply) =>
-{
-  reply.send({ user: (request as any).user });
-});
-
-// Get token endpoint
-fastify.get('/api/auth/token', async (request, reply) =>
-{
-  const token = request.cookies['auth-token'];
-  reply.send({ token });
 });
 
 // Start server

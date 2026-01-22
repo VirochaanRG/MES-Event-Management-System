@@ -1,143 +1,179 @@
-import { useState, useEffect } from 'react';
-import { AuthUser } from '../lib/auth';
+import { useState, useEffect } from "react";
+import { AuthUser } from "../lib/auth";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface LocalLoginFormProps {
   onLoginSuccess: (user: AuthUser, token: string) => void;
   prefilledEmail?: string;
 }
 
-const TEST_ACCOUNTS = [
-  { email: 'userViro@test.com', id: 1 },
-  { email: 'userM@test.com', id: 2 },
-  { email: 'userI@test.com', id: 3 },
-  { email: 'userO@test.com', id: 4 },
-  { email: 'userR@test.com', id: 5 },
-];
-
-export default function LocalLoginForm({ onLoginSuccess, prefilledEmail }: LocalLoginFormProps) {
-  const [email, setEmail] = useState('');
+export default function LocalLoginForm({
+  onLoginSuccess,
+  prefilledEmail,
+}: LocalLoginFormProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (prefilledEmail) {
-      setEmail(prefilledEmail);
-    }
+    if (prefilledEmail) setEmail(prefilledEmail);
   }, [prefilledEmail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!email.trim()) {
-      setError('Please enter your email address');
-      return;
-    }
-
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email.trim() }),
+      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        if (data.user && data.token) {
-          // Store auth info
-          sessionStorage.setItem('teamd-auth-user', JSON.stringify(data.user));
-          sessionStorage.setItem('teamd-auth-token', data.token);
-          sessionStorage.setItem('teamd-auth-source', 'local');
-
-          onLoginSuccess(data.user, data.token);
-        } else {
-          setError('Invalid response from server');
-        }
+        onLoginSuccess(data.user, data.token);
       } else {
         const errorData = await response.json();
-        setError(errorData.error || 'Login failed');
+        setError(errorData.error || "Authentication failed");
       }
     } catch (error) {
-      setError('An error occurred during login. Please try again.');
+      setError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex gap-6 max-w-4xl mx-auto">
-      {/* Login Form */}
-      <div className="flex-1 bg-white p-10 rounded-xl shadow-lg">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            User Portal
-          </h2>
-        </div>
+    <div className="w-full max-w-7xl mx-auto my-12 px-4">
+      <div className="bg-white rounded-[2rem] shadow-[0_32px_64px_-12px_rgba(127,17,17,0.2)] overflow-hidden flex flex-col md:flex-row border border-gray-100 min-h-[650px]">
+        {/* Left Side: Branding/Society Info (Red-900 Area) */}
+        <div className="md:w-5/12 bg-red-900 p-12 text-yellow-300 flex flex-col justify-between relative overflow-hidden">
+          {/* Subtle Grid Pattern Overlay */}
+          {/* <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle, #fff 1px, transparent 1px)",
+              backgroundSize: "30px 30px",
+            }}
+          /> */}
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-5">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none"
-            />
+          <div className="relative z-10">
+            <h1 className="text-6xl font-black tracking-tighter uppercase mb-2 underline italic">
+              EvEngage
+            </h1>
+            {/* <div className="h-1 w-12 bg-yellow-300 mb-8" /> */}
+            <p className="text-6xl font-black leading-none uppercase italic opacity-20 absolute -left-4 bottom-48 rotate-90 origin-left whitespace-nowrap select-none">
+              MES EVENTS
+            </p>
           </div>
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-5 text-sm">
-              {error}
-            </div>
-          )}
+          <div className="relative z-10">
+            <h2 className="text-3xl font-bold leading-tight">
+              {isLogin ? "MES Events" : "Join the MES Community."}
+            </h2>
+            <p className="mt-4 text-yellow-300/70 font-medium">
+              Access the latest MES events, mixers, and technical seminars.
+            </p>
+          </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-3 rounded-lg border-none text-base font-medium transition-colors ${
-              isLoading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-cyan-600 hover:bg-cyan-700 cursor-pointer'
-            } text-white`}
-          >
-            {isLoading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+        {/* Right Side: Action Area */}
+        <div className="md:w-7/12 p-12 md:p-20 flex flex-col justify-center bg-white">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={isLogin ? "login" : "register"}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="mb-10">
+                <span className="text-red-900 font-black uppercase tracking-widest text-xs py-1 px-3 bg-red-50 rounded-full border border-red-100">
+                  {isLogin ? "Student Access" : "New Registration"}
+                </span>
+                <h3 className="text-4xl font-black text-red-900 mt-4">
+                  {isLogin ? "Login to Account" : "Create Student Profile"}
+                </h3>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">
+                      Student Email (McMaster)
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="e.g. j.doe@mcmaster.ca"
+                      className="w-full px-6 py-4 bg-gray-50 rounded-xl border-2 border-transparent focus:border-red-900 focus:bg-white outline-none transition-all text-gray-900 font-bold"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full px-6 py-4 bg-gray-50 rounded-xl border-2 border-transparent focus:border-red-900 focus:bg-white outline-none transition-all text-gray-900 font-bold"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="text-red-600 text-sm font-bold bg-red-50 p-3 rounded-lg border border-red-100">
+                    {error}
+                  </div>
+                )}
+
+                <div className="pt-4 flex flex-col sm:flex-row items-center gap-6">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full sm:w-auto px-12 py-4 bg-red-900 hover:bg-black text-yellow-300 font-black uppercase tracking-widest rounded-xl transition-all shadow-lg hover:shadow-red-900/30 active:scale-95"
+                  >
+                    {isLoading
+                      ? "Authenticating..."
+                      : isLogin
+                        ? "Login"
+                        : "Register"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      setError("");
+                    }}
+                    className="text-red-900/40 hover:text-red-900 font-bold text-sm uppercase tracking-tighter transition-colors"
+                  >
+                    {isLogin ? "Create an Account?" : "Already a member?"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* Test Accounts Sidebar */}
-      <div className="w-72 bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Test Accounts
-        </h3>
-        <p className="text-sm text-gray-600 mb-5">
-          Click to populate email field
-        </p>
-        <div className="space-y-3">
-          {TEST_ACCOUNTS.map((account) => (
-            <button
-              key={account.email}
-              onClick={() => setEmail(account.email)}
-              type="button"
-              className="w-full text-left px-4 py-3 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors"
-            >
-              <div className="font-medium text-blue-900 text-sm">
-                {account.email}
-              </div>
-            </button>
-          ))}
+      <div className="mt-8 flex justify-center gap-8 opacity-30 grayscale hover:grayscale-0 transition-all">
+        <div className="text-[10px] font-black text-red-900 uppercase tracking-widest">
+          McMaster Engineering Society
+        </div>
+        <div className="text-[10px] font-black text-red-900 uppercase tracking-widest">
+          Powered by EvEngage
         </div>
       </div>
     </div>
