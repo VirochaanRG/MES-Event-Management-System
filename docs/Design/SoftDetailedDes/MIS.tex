@@ -21,6 +21,7 @@
 \usepackage{caption}
 \usepackage{fullpage}
 \usepackage{float}
+\usepackage[acronym,nonumberlist]{glossaries}
 
 \hypersetup{
 bookmarks=true,     % show bookmarks bar?
@@ -29,6 +30,22 @@ linkcolor=red,          % color of internal links (change box color with linkbor
 citecolor=blue,      % color of links to bibliography
 filecolor=magenta,  % color of file links
 urlcolor=cyan          % color of external links
+}
+
+\makenoidxglossaries
+\newacronym{mes}{MES}{McMaster Engineering Society}
+\newacronym{cfes}{CFES}{Canadian Federation of Engineering Students}
+\newglossaryentry{adm}{
+  name=admin,
+  description={A privileged system user affiliated with \gls{mes} who can access survey, event, and attendee records;
+  track finances; and update event statuses.}
+  plural=admins,
+}
+\newglossaryentry{atd}{
+  name=attendee,
+  description={An individual who attends an \gls{mes} event, and uses the system to register, receive event updates,
+  provide feedback, or fill out survey responses.}
+  plural=attendees,
 }
 
 \usepackage{array}
@@ -62,6 +79,7 @@ urlcolor=cyan          % color of external links
 \midrule
 November 13, 2025 & 1.0 & Revision -1\\
 January 21, 2026 & 1.1 & Revision 0: Added formal state and transition specifications.\\
+January 21, 2026 & 1.1 & Revision 0: Added all reflections and grammar fixes, removed all scaffolding.\\
 \bottomrule
 \end{tabularx}
 
@@ -69,7 +87,9 @@ January 21, 2026 & 1.1 & Revision 0: Added formal state and transition specifica
 
 \section{Symbols, Abbreviations and Acronyms}
 
-See \hyperref[SRS:glossary]{SRS Glossary}
+\glsaddall
+\printnoidxglossaries
+
 
 \newpage
 
@@ -81,7 +101,7 @@ See \hyperref[SRS:glossary]{SRS Glossary}
 
 \section{Introduction}
 
-The following document details the Module Interface Specifications for EvENGage. 
+The following document details the Module Interface Specifications for EvENGage.
 EvENGage is a custom event and survey management system being designed for the MES to simplify and centralize the process of hosting events, conferences, and surveys.
 
 Complementary documents include the System Requirement Specifications
@@ -97,14 +117,14 @@ with the addition that template modules have been adapted from
 multiple assignment statement and conditional rules follow the form $(c_1
 \Rightarrow r_1 | c_2 \Rightarrow r_2 | ... | c_n \Rightarrow r_n )$.
 
-The following table summarizes the primitive data types used by \progname. 
+The following table summarizes the primitive data types used by \progname.
 
 \begin{center}
 \renewcommand{\arraystretch}{1.2}
-\noindent 
-\begin{tabular}{l l p{7.5cm}} 
-\toprule 
-\textbf{Data Type} & \textbf{Notation} & \textbf{Description}\\ 
+\noindent
+\begin{tabular}{l l p{7.5cm}}
+\toprule
+\textbf{Data Type} & \textbf{Notation} & \textbf{Description}\\
 \midrule
 character & char & a single symbol or digit \\
 integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
@@ -114,7 +134,7 @@ string & string & An ordered list of characters of any length \\
 Cookie & Cookie & A file stored on the client device storing user data \\
 List of type T & list(T) & A dynamically sized list of elements of type T \\
 Set of type T & set(T) & A dynamically sized set of elements of type T \\
-Map of type K to V & map(K, V) & A collection mapping keys of type K to values of type V \\
+Map of type K to V & map(K, V) & A collection mapping keys of type K to values of type V. Shorthand notation for set(tuple(K, V)). \\
 Tuple of types T1, T2, \dots & tuple(T1, T2, \dots) & A finite ordered collection of elements of the specified types \\
 Date and time & DateTime & A specific date and time using the Gregorian calendar and 24-hour clock \\
 
@@ -146,20 +166,20 @@ Hardware-Hiding Module
 & No Modules\\
 \midrule
 
-\multirow{9}{0.3\textwidth}{Behaviour-Hiding Modules} 
+\multirow{9}{0.3\textwidth}{Behaviour-Hiding Modules}
 & M\ref{m1}: Main System Module\\
 & M\ref{m2}: User Authentication Module\\
 & M\ref{m3}: User Authorization Module\\
 & M\ref{m4}: Form Template Module\\
 & M\ref{m5}: Form Submission Module\\
-& M\ref{m6}: Event Management Module\\ 
+& M\ref{m6}: Event Management Module\\
 & M\ref{m7}: Event Notification Module\\
 & M\ref{m8}: Registration Module\\
 & M\ref{m9}: Attendance Tracking Module\\
 & M\ref{m10}: Report Generation Module\\
 \midrule
 
-\multirow{3}{0.3\textwidth}{Software-Decision Modules} 
+\multirow{3}{0.3\textwidth}{Software-Decision Modules}
 & M\ref{m11}: Analytics Module\\
 & M\ref{m12}: Database Access Module\\
 & M\ref{m13}: Audit Module\\
@@ -220,7 +240,7 @@ None
 
 \subsection{Module}
 
-Contains functionality for authenticating users and registering new users.
+Contains functionality for authenticating users and registering new users. \textbf{Note: Parts of this module was defined using discrete math.}
 
 \subsection{Uses}
 
@@ -254,7 +274,8 @@ None
 
 \subsubsection{State Variables}
 
-\texttt{sessions : set(Session)}: Set of all active sessions
+\texttt{sessions : set(Cookie)}: Set of all active sessions \\
+\texttt{credentials : map(string, string)}: Mapping of all registered usernames to their passwords
 
 \subsubsection{Environment Variables}
 
@@ -262,30 +283,30 @@ None
 
 \subsubsection{Assumptions}
 
-None
+Passwords are encrypted before storage.
 
 \subsubsection{Access Routine Semantics}
 
 \noindent \texttt{attemptLogin(username : string, password : string)}: \\
 Attempts a login given a username and password.
 \begin{itemize}
-\item transition: creates and adds a new session to \texttt{sessions} if login is successful
+\item transition: If \texttt{tuple(username, password) $\in$ credentials}, then \texttt{sessions := sessions $\cup$ set(generateCookie(username))}
 \item output: Cookie containing session data to be sent back to the client
-\item exception: None 
+\item exception: None
 \end{itemize}
 
 \noindent \texttt{logout(sessionCookie: Cookie)}: \\
 Logs the specified user out.
 \begin{itemize}
-\item transition: Removes the specified session from \texttt{sessions}
+\item transition: \texttt{sessions := sessions - set(sessionCookie)}
 \item output: None
-\item exception: InvalidSession if session is not found in \texttt{sessions} 
+\item exception: InvalidSession if session is not found in \texttt{sessions}
 \end{itemize}
 
 \noindent \texttt{validateSession(sessionCookie: Cookie)}: \\
 Validates and refreshes a users session.
 \begin{itemize}
-\item transition: Refreshes the timeout of the session in \texttt{sessions} if session is valid
+\item transition: If \texttt{sessionCookie $\in$ sessions}, then \texttt{sessionCookie.lastRefresh := currentTime}
 \item output: Boolean indicating if sessionCookie exists in \texttt{sessions}
 \item exception: None
 \end{itemize}
@@ -293,18 +314,27 @@ Validates and refreshes a users session.
 \noindent \texttt{registerUser(username : string, password : string)}: \\
 Registers a new user to the database of users.
 \begin{itemize}
-\item transition: None
+\item transition: \texttt{credentials := credentials $\cup$ set(tuple(username, password))}
 \item output: Boolean stating whether registration was successful
 \item exception: None
 \end{itemize}
 
 \subsubsection{Local Functions}
 
-\noindent \texttt{refreshSessions()}:
+\noindent \texttt{generateCookie(username : stiring)}: \\
+Generates a cookie for a user.
 \begin{itemize}
-\item transition: Periodically checks \texttt{sessions} and removes any session older than 3 hours
+\item transition: None
+\item output: Cookie containing \texttt{username} and \texttt{lastRefresh := currentTime}
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{refreshSessions()}: \\
+Checks all sessions and invalidates old sessions. Scheduled to run periodically.
+\begin{itemize}
+\item transition: \texttt{$\forall$ s $\in$ sessions | s.lastRefresh - currentTime > 3hrs,  sessions := sessions - s}
 \item output: None
-\item exception: None 
+\item exception: None
 \end{itemize}
 
 \newpage
@@ -363,7 +393,7 @@ At least one user who has permission to assign and revoke roles already exists i
 Assigns a role to a user.
 \begin{itemize}
 \item transition: Inserts the specified role into the set attached to the user ID in \texttt{roles}
-\item output: None 
+\item output: None
 \item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
 \end{itemize}
 
@@ -371,7 +401,7 @@ Assigns a role to a user.
 Revokes a role from a user.
 \begin{itemize}
 \item transition: Removes the specified role from the set attached to the user ID in \texttt{roles}
-\item output: None 
+\item output: None
 \item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
 \end{itemize}
 
@@ -379,7 +409,7 @@ Revokes a role from a user.
 Checks if a user has a certain permission.
 \begin{itemize}
 \item transition: None
-\item output: A boolean value which is true if the set attached to the user ID in \texttt{roles} contains the specified role 
+\item output: A boolean value which is true if the set attached to the user ID in \texttt{roles} contains the specified role
 \item exception: InvalidRole if the role does not exist, InvalidUser if the user does not exist
 \end{itemize}
 
@@ -387,7 +417,7 @@ Checks if a user has a certain permission.
 Gets all roles assigned to a given user.
 \begin{itemize}
 \item transition: None
-\item output: The set of roles attached to the user ID in \texttt{roles} 
+\item output: The set of roles attached to the user ID in \texttt{roles}
 \item exception: InvalidUser if the user does not exist
 \end{itemize}
 
@@ -401,7 +431,7 @@ None
 
 \subsection{Module}
 
-Contains functionality for creating and linking form modules. 
+Contains functionality for creating and linking form modules.
 
 \subsection{Uses}
 
@@ -457,7 +487,7 @@ Uses M\ref{m3} to check for form managment permissions.
 
 \subsubsection{Assumptions}
 
-The calculated current date and time is within 5 seconds of the real date and time 
+The calculated current date and time is within 5 seconds of the real date and time
 
 \subsubsection{Access Routine Semantics}
 
@@ -627,9 +657,9 @@ None
 \noindent \texttt{getFillableForms(userId : $\mathbb{N}$)}: \\
 Retreives all forms fillable by the user.
 \begin{itemize}
-\item transition: None 
+\item transition: None
 \item output: The set of all forms available for the user to fill
-\item exception: InvalidUser if user does not exist 
+\item exception: InvalidUser if user does not exist
 \end{itemize}
 
 \noindent \texttt{respondToForm(userId : $\mathbb{N}$, formId: string, \newline formResponse: map(Question, string))}: \\
@@ -716,7 +746,7 @@ The calculated current date and time is within 5 seconds of the actual date and 
 Creates a new event.
 \begin{itemize}
 \item transition: Inserts an event into \texttt{events}.
-\item output: ID of the created event 
+\item output: ID of the created event
 \item exception: None
 \end{itemize}
 
@@ -1013,7 +1043,7 @@ admins can monitor re-entry of attendees.
     event.
   \item output: Boolean confirming the user has been tracked if they are allowed to attend the event.
 \item exception: Returns \texttt{InvalidQRCode} if the QR Code provided does not work, potentially implying the user
-  cannot register the even.
+  cannot register for the event.
 \end{itemize}
 
 \noindent \texttt{getRegistrationCode(userId, eventId)} (2):
@@ -1337,7 +1367,7 @@ None
 \begin{itemize}
   \item transition: None.
   \item output: Returns the row in \texttt{table} whose primary key equals \texttt{id}.
-  \item exception: 
+  \item exception:
         \begin{itemize}
           \item RecordNotFound if no matching row exists.
           \item DatabaseError if a low-level database error occurs.
@@ -1485,39 +1515,102 @@ None
 \bibliographystyle {plainnat}
 \bibliography {../../../refs/References}
 
-\newpage
-
-\section{Appendix} \label{Appendix}
-
-\wss{Extra information if required}
-
 \newpage{}
 
 \section*{Appendix --- Reflection}
-
-\wss{Not required for CAS 741 projects}
 
 The information in this section will be used to evaluate the team members on the
 graduate attribute of Problem Analysis and Design.
 
 \input{../../Reflection.tex}
 
+\subsubsection*{Group Reflection}
 \begin{enumerate}
-  \item What went well while writing this deliverable? 
-  \item What pain points did you experience during this deliverable, and how
-    did you resolve them?
   \item Which of your design decisions stemmed from speaking to your client(s)
   or a proxy (e.g. your peers, stakeholders, potential users)? For those that
   were not, why, and where did they come from?
+  
+  Some of our design decision in relation to the seperation of the modules into the event related modules and form related modules was decided through consultation with our clients. This was an important distinction for us to make because there were some design solutions where we could have had these components together. We found through dicussion that seperating these two functions into seperate module (or group of modules) would probably be the best for future maintainability, testing these modules and actually implementing them. We also had discussions relating to the report generation and data analytics module. We found that seperating these modules would be good for expandability in the future if we wanted to perform further analysis or in a different form. 
+
+  Our other design sources primarily came from our past experiences working with these types of web applications and how we wanted to develop it to make it a seamless development experience. For instance, creating a seperate data access layer module was decison we made since some team members learned from past projects that it would be redundant to try and access the database directly from the other modules and a unified interface would be better. For some other decisions we decided to look into best practices when designing web applications to ensure that our structure and implementation was good.
+
   \item While creating the design doc, what parts of your other documents (e.g.
   requirements, hazard analysis, etc), it any, needed to be changed, and why?
+
+  We found that in general that our other documents didn't really need to be modified when creating this documentation. This was because we had to essentielly utilize the requirements to inform our design decisions and the seperation of modules to implement our requirements. This meant that we built off our design from these documents so we didn't feel had any changes that needed to be made currently for the past documents in relation to our design.
+
   \item What are the limitations of your solution?  Put another way, given
   unlimited resources, what could you do to make the project better? (LO\_ProbSolutions)
+
+  The primary limitations of our solution pertain to practicality and realism due to our constraints as a student team with limited time and resources. Due to hardware limitations, we are not be able to fully test the scalability of our system under strenuous conditions, which could impact performance in real-world scenarios, including include registration capacity and concurrent use. With additional resources, we could perform comprhensive testing, fine-tuning the ability of the system to handle large input.
+
+  In addition, the system is lacking in terms of security, particularly in the area of user authentication and data encryption. We are limited to using straightforward security mechanisms due to the minimal timeframe. While the information of our system is not entirely critical, being limited to simple user information which is generally public, it would still be an asset and open up future possibilities regarding the level of data we are entrusted with.
+
+  While we designed our system to be modular and extensible, these improvements would take time and resources. Given unlimited resources, we would ultimately be able to optimize our design, making it more robust and reliable. There are various supplementary features we could implement as well, such as AI based analytics and reports, increasingly flexible notification systems, and live event monitoring.
+
   \item Give a brief overview of other design solutions you considered.  What
   are the benefits and tradeoffs of those other designs compared with the chosen
   design?  From all the potential options, why did you select the documented design?
   (LO\_Explores)
+
+  We considered various different design approaches, particularly in terms of how to structure the modules and their interactions. One option was integrating the database access logic directly into each module, rather than having a separate database module. While this would simplify the architecture and module implementation, it would likely lead to redundancy and complicate future modifications. We ultimately decided that a dedicated database access module would be cleaner and more maintainable.
+
+  Likewise, we explored the possibility of implementing the authentication and authorization logic directly into the system modules. In a similar manner, we decided to separate these responsiblities into their own modules to prioritize clarity, modularity, and consistency.
+
+  Another alternative choice involved a registration model that accounted for guests, allowing users to register multiple instances for a given event. This would increase flexibility and usability, better supporting real-world expectations. However, it would introduce complexity in registration, attendance tracking, analytics, and data management. Given our time constraints and the current scope, we decided to proceed with a simpler single registration design for now.
+
+\end{enumerate}
+\subsubsection*{Virochaan Ravichandran Gowri Reflection}
+\begin{enumerate}
+ \item \textbf{What went well while writing this deliverable?} \\
+ Overall we had a good understanding of what we wanted to do when designing and creating our platform. We had a general idea of what the structure of the system was going to be and we also knew what kind of modules that we wanted to actually deliver. We had some more discussions to finetune our modules to ensure that they weren't too large or encompassing too much functionality but since we had a good understanding of it in the first place it was quite easy for us to develop a effective architecture. We also managed to have a good timeline as we had a plan for what we wanted develop and in what order already in place and we discussed before hand what sections each person would try and do.
+  
+ \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+ The main painpoint was understanding the different terms in the MIS and how to properly fill them for each module. We had the added difficulty of having multiple UI related components so it added an added difficulty to properly ensure we completed the sections. We had a small challenge in the Module Guide in ensuring that the structure and hierarchy of the modules made sense. This was because we had the possibility of cyclic dependencies so we resolved this by decomposing some of the modules further.
+\end {enumerate}
+
+\subsubsection*{Omar Al-Asfar Reflection}
+\begin{enumerate}
+ \item \textbf{What went well while writing this deliverable?} \\
+ Ultimately, our team worked well together to break down the system into feasible modules. We always had a solid idea of the general stucture of our system, so the design process was quite straightforward. All the major functionalities, and their interactions with one another were discussed in detail beforehand, which allowed us to focus on finer details, such as efficiency and user experience.
+
+ \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+ The main challenge invovled applying our design ideas into the report format. Although we had a clear understanding of the system structure, it was nontheless challenging to express it in terms of the MIS semantics, especially for more abstract modules. Moreover, it was also difficult maintaining a consistent level of detail, ensuring the specification was clear but also not a full implementation. This was resolved by regularly referencing the Module Guide to ensure that we remained aligned with expectations.
+ \end {enumerate}
+
+\subsubsection*{Rayyan Suhail Reflection}
+\begin{enumerate}
+\item \textbf{What went well while writing this deliverable?} \\
+  What went well was having a clear overall system structure early on, which made it easier to break the platform into well-defined modules. Aligning the MIS closely with the Module Guide helped keep responsibilities clear and avoid overlap between modules. Once the structure was set, translating the design into consistent specifications was relatively straightforward and efficient.
+
+\item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+  One of the main challenges was ensuring consistency between modules, especially with data types and interfaces across different specifications. This was resolved through multiple review passes and cross-checking modules against the rubric and Module Guide, which helped identify and correct mismatches early.
 \end{enumerate}
 
+\subsubsection*{Ibrahim Quraishi Reflection}
+\begin{enumerate}
+  \item \textbf{What went well while writing this deliverable?} \\
+  Once we specified the detailed design for the first module, it was very easy to define other modules based on it. This includes the formatting of the module, as well as the Uses section for linking modules together. We were also able to work as a group to ensure there were no discrepancies between modules. I feel that each module has a clear purpose and well-defined functionality, and the responsibilities are split up well between modules.
+
+  \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+  While writing the specification of each module after they had been defined was simple, deciding how to split the system up into modules beforehand was quite difficult. This is due to the fact that our system is distributed, including sub-systems such as the backend server, web clients, admin clients, and mobile clients. This made it difficult to decide which module would be a part of which system and how many modules each system needs. We were able to solve this by more clearly defining what the role of each subsystem is and what they can be expected to be responsible for.
+\end{enumerate}
+
+\subsubsection*{Mohammad Mahdi Mahboob Reflection}
+\begin{enumerate}
+  \item \textbf{What went well while writing this deliverable?} \\
+    I was able to successfully clarify the feedback given by the TA during Rev -1 for this module, which confirmed that
+    my usage of state variables was correct (in the context of our database).
+
+  \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+    I was first confused about the feedback given by the TA and did now know how to reconcile the TA feedback that QR
+    code generation should be part of state. After discussing with the TA, the confusion was clarified and the issue was
+    resolved. In addition to writing this formal document, there were some issues I faced while implementing the
+    modules as outlined in this document, mainly with the Registration Module. These were resolved by reconfiguring the
+    database to match closer to our representation of state variables through reading documentation for the technologies
+    we implemented.
+
+
+\end{enumerate}
 
 \end{document}
