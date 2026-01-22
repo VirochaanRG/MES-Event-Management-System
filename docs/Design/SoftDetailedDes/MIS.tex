@@ -239,7 +239,7 @@ None
 
 \subsection{Module}
 
-Contains functionality for authenticating users and registering new users.
+Contains functionality for authenticating users and registering new users. \textbf{Note: Parts of this module was defined using discrete math.}
 
 \subsection{Uses}
 
@@ -329,7 +329,7 @@ Generates a cookie for a user.
 \end{itemize}
 
 \noindent \texttt{refreshSessions()}: \\
-Checks all sessions and invalidates old sessionss. Scheduled to run periodically.
+Checks all sessions and invalidates old sessions. Scheduled to run periodically.
 \begin{itemize}
 \item transition: \texttt{$\forall$ s $\in$ sessions | s.lastRefresh - currentTime > 3hrs,  sessions := sessions - s}
 \item output: None
@@ -1514,12 +1514,6 @@ None
 \bibliographystyle {plainnat}
 \bibliography {../../../refs/References}
 
-\newpage
-
-\section{Appendix} \label{Appendix}
-
-\wss{Extra information if required}
-
 \newpage{}
 
 \section*{Appendix --- Reflection}
@@ -1565,7 +1559,13 @@ graduate attribute of Problem Analysis and Design.
   One of the main challenges was ensuring consistency between modules, especially with data types and interfaces across different specifications. This was resolved through multiple review passes and cross-checking modules against the rubric and Module Guide, which helped identify and correct mismatches early.
 \end{enumerate}
 
+\subsubsection*{Ibrahim Quraishi Reflection}
+\begin{enumerate}
+  \item \textbf{What went well while writing this deliverable?} \\
+  Once we specified the detailed design for the first module, it was very easy to define other modules based on it. This includes the formatting of the module, as well as the Uses section for linking modules together. We were also able to work as a group to ensure there were no discrepencies between modules. I feel that each module has a clear purpose and well defined functionality, and the responsibilities are split up well between modules. 
 
-
+  \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+  While writing the specification of each module after they had been defined was simple, deciding how to split the system up into modules beforehand was quite difficult. This is due to the fact that our system is distributed, including sub-systems such as the backend server, web clients, admin clients, and mobile clients. This made it difficult to decide which module would be a part of which system and how many modules each system needs. We were able to solve this by more clearly defining what the role of each subsystem is and what they can be expected to be responsible for. 
+\end{enumerate}
 
 \end{document}
