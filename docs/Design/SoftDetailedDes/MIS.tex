@@ -1552,6 +1552,13 @@ graduate attribute of Problem Analysis and Design.
   are the benefits and tradeoffs of those other designs compared with the chosen
   design?  From all the potential options, why did you select the documented design?
   (LO\_Explores)
+
+  We considered various different design approaches, particularly in terms of how to structure the modules and their interactions. One option was integrating the database access logic directly into each module, rather than having a separate database module. While this would simplify the architecture and module implementation, it would likely lead to redundancy and complicate future modifications. We ultimately decided that a dedicated database access module would be cleaner and more maintainable.
+
+  Likewise, we explored the possibility of implementing the authentication and authorization logic directly into the system modules. In a similar manner, we decided to separate these responsiblities into their own modules to prioritize clarity, modularity, and consistency.
+
+  Another alternative choice involved a registration model that accounted for guests, allowing users to register multiple instances for a given event. This would increase flexibility and usability, better supporting real-world expectations. However, it would introduce complexity in registration, attendance tracking, analytics, and data management. Given our time constraints and the current scope, we decided to proceed with a simpler single registration design for now.
+
 \end{enumerate}
 \subsubsection*{Virochaan Ravichandran Gowri Reflection}
 \begin{enumerate}
@@ -1573,10 +1580,10 @@ graduate attribute of Problem Analysis and Design.
 
 \subsubsection*{Rayyan Suhail Reflection}
 \begin{enumerate}
-  \item \textbf{What went well while writing this deliverable?} \\
+\item \textbf{What went well while writing this deliverable?} \\
   What went well was having a clear overall system structure early on, which made it easier to break the platform into well-defined modules. Aligning the MIS closely with the Module Guide helped keep responsibilities clear and avoid overlap between modules. Once the structure was set, translating the design into consistent specifications was relatively straightforward and efficient.
 
-  \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+\item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
   One of the main challenges was ensuring consistency between modules, especially with data types and interfaces across different specifications. This was resolved through multiple review passes and cross-checking modules against the rubric and Module Guide, which helped identify and correct mismatches early.
 \end{enumerate}
 
