@@ -1,0 +1,41 @@
+name: Linting
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0 
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint Web Admin
+        # continue-on-error ensures the "check" doesn't block your push/PR
+        continue-on-error: true
+        run: pnpm --filter ./src/web-admin run lint
+
+      - name: Lint Web User
+        continue-on-error: true
+        run: pnpm --filter ./src/web-user run lint
