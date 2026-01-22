@@ -1527,15 +1527,21 @@ graduate attribute of Problem Analysis and Design.
 \begin{enumerate}
   \item Which of your design decisions stemmed from speaking to your client(s)
   or a proxy (e.g. your peers, stakeholders, potential users)? For those that
-  were not, why, and where did they come from?
+  were not, why, and where did they come from?\\
   Some of our design decision in relation to the seperation of the modules into the event related modules and form related modules was decided through consultation with our clients. This was an important distinction for us to make because there were some design solutions where we could have had these components together. We found through dicussion that seperating these two functions into seperate module (or group of modules) would probably be the best for future maintainability, testing these modules and actually implementing them. We also had discussions relating to the report generation and data analytics module. We found that seperating these modules would be good for expandability in the future if we wanted to perform further analysis or in a different form. \\   
 
   Our other design sources primarily came from our past experiences working with these types of web applications and how we wanted to develop it to make it a seamless development experience. For instance, creating a seperate data access layer module was decison we made since some team members learned from past projects that it would be redundant to try and access the database directly from the other modules and a unified interface would be better. For some other decisions we decided to look into best practices when designing web applications to ensure that our structure and implementation was good.
+
   \item While creating the design doc, what parts of your other documents (e.g.
-  requirements, hazard analysis, etc), it any, needed to be changed, and why?
+  requirements, hazard analysis, etc), it any, needed to be changed, and why?\\
   We found that in general that our other documents didn't really need to be modified when creating this documentation. This was because we had to essentielly utilize the requirements to inform our design decisions and the seperation of modules to implement our requirements. This meant that we built off our design from these documents so we didn't feel had any changes that needed to be made currently for the past documents in relation to our design.
+
   \item What are the limitations of your solution?  Put another way, given
-  unlimited resources, what could you do to make the project better? (LO\_ProbSolutions)
+  unlimited resources, what could you do to make the project better? (LO\_ProbSolutions)\\
+  The primary limitations of our solution pertain to practicality and realism due to our constraints as a student team with limited time and resources. Due to hardware limitations, we are not be able to fully test the scalability of our system under strenuous conditions, which could impact performance in real-world scenarios, including include registration capacity and concurrent use. With additional resources, we could perform comprhensive testing, fine-tuning the ability of the system to handle large input.\\
+  In addition, the system is lacking in terms of security, particularly in the area of user authentication and data encryption. We are limited to using straightforward security mechanisms due to the minimal timeframe. While the information of our system is not entirely critical, being limited to simple user information which is generally public, it would still be an asset and open up future possibilities regarding the level of data we are entrusted with.\\
+  While we designed our system to be modular and extensible, these improvements would take time and resources. Given unlimited resources, we would ultimately be able to optimize our design, making it more robust and reliable. There are various supplementary features we could implement as well, such as AI based analytics and reports, increasingly flexible notification systems, and live event monitoring.
+
   \item Give a brief overview of other design solutions you considered.  What
   are the benefits and tradeoffs of those other designs compared with the chosen
   design?  From all the potential options, why did you select the documented design?
@@ -1546,9 +1552,18 @@ graduate attribute of Problem Analysis and Design.
  \item \textbf{What went well while writing this deliverable?} \\
  Overall we had a good understanding of what we wanted to do when designing and creating our platform. We had a general idea of what the structure of the system was going to be and we also knew what kind of modules that we wanted to actually deliver. We had some more discussions to finetune our modules to ensure that they weren't too large or encompassing too much functionality but since we had a good understanding of it in the first place it was quite easy for us to develop a effective architecture. We also managed to have a good timeline as we had a plan for what we wanted develop and in what order already in place and we discussed before hand what sections each person would try and do.
   
- \item What pain points did you experience during this deliverable, and how did you resolve them? \\
+ \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
  The main painpoint was understanding the different terms in the MIS and how to properly fill them for each module. We had the added difficulty of having multiple UI related components so it added an added difficulty to properly ensure we completed the sections. We had a small challenge in the Module Guide in ensuring that the structure and hierarchy of the modules made sense. This was because we had the possibility of cyclic dependencies so we resolved this by decomposing some of the modules further.
 \end {enumerate}
+
+\subsubsection*{Omar Al-Asfar Reflection}
+\begin{enumerate}
+ \item \textbf{What went well while writing this deliverable?} \\
+ Ultimately, our team worked well together to break down the system into feasible modules. We always had a solid idea of the general stucture of our system, so the design process was quite straightforward. All the major functionalities, and their interactions with one another were discussed in detail beforehand, which allowed us to focus on finer details, such as efficiency and user experience.
+
+ \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
+ The main challenge invovled applying our design ideas into the report format. Although we had a clear understanding of the system structure, it was nontheless challenging to express it in terms of the MIS semantics, especially for more abstract modules. Moreover, it was also difficult maintaining a consistent level of detail, ensuring the specification was clear but also not a full implementation. This was resolved by regularly referencing the Module Guide to ensure that we remained aligned with expectations.
+ \end {enumerate}
 
 \subsubsection*{Rayyan Suhail Reflection}
 \begin{enumerate}
