@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getCurrentUser, AuthUser } from "../lib/auth";
+import { getCurrentUser, AuthUser, logout } from "../lib/auth";
 import ProtectedTeamPortal from "../components/ProtectedTeamPortal";
 import EventsTab from "@/components/EventsTab";
 import ReportsTab from "@/components/ReportsTab";
@@ -8,29 +8,98 @@ import Navbar from "@/components/Navbar";
 
 function TeamBDashboard() {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"events" | "users" | "reports">(
-    "events"
+    "events",
   );
   const navigate = useNavigate();
 
   useEffect(() => {
-    const authUser = getCurrentUser();
-    setUser(authUser);
-  }, []);
+    const initAuth = () => {
+      // Check session storage
+      const sessionUser = getCurrentUser("admin");
+      console.log(sessionUser);
+      if (sessionUser) {
+        // Verify user has admin role
+        if (sessionUser.roles && sessionUser.roles.includes("admin")) {
+          setUser(sessionUser);
+        } else {
+          console.error("User does not have admin role");
+          logout("admin");
+          navigate({ to: "" });
+        }
+      } else {
+        // No session, redirect to login
+        navigate({ to: "" });
+      }
+
+      setIsLoading(false);
+    };
+
+    initAuth();
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      logout("admin");
+      navigate({ to: "" });
+    }
+  };
 
   const handleFormBuilder = () => {
     navigate({ to: "/form-builder" });
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-900 mx-auto mb-4"></div>
+          <p className="text-stone-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <>
-      <Navbar />
+      <Navbar onLogout={handleLogout} user={user} />
       <div className="min-h-screen bg-stone-50">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="bg-white border-l-4 border-red-900 p-6 mb-6">
-            <h1 className="text-3xl font-bold text-stone-900">
-              Admin Dashboard
-            </h1>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold text-stone-900">
+                  Admin Dashboard
+                </h1>
+                <p className="text-stone-600 mt-2">
+                  Logged in as:{" "}
+                  <span className="font-semibold">{user.email}</span>
+                  {user.roles && (
+                    <span className="ml-2 px-2 py-1 bg-red-900 text-white text-xs rounded">
+                      {user.roles.join(", ")}
+                    </span>
+                  )}
+                </p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-stone-200 text-stone-700 hover:bg-stone-300 font-semibold rounded transition-colors"
+              >
+                Logout
+              </button>
+            </div>
           </div>
 
           <div className="bg-white border border-stone-300">
@@ -87,7 +156,7 @@ function TeamBDashboard() {
                     Users
                   </h2>
                   <p className="text-stone-600 mt-4">
-                    //TODO
+                    User management coming soon...
                   </p>
                 </div>
               )}

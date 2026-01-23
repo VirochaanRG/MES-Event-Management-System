@@ -60,14 +60,9 @@ export default function LocalLoginForm({
     }
   };
 
-  const quickLogin = (account: (typeof TEST_ACCOUNTS)[0]) => {
-    setEmail(account.email);
-    setPassword(account.password);
-  };
-
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#800020]/10 to-[#D4AF37]/10 p-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+      <div className="gap-8 w-3/4 max-w-5xl">
         {/* Login Panel */}
         <div className="md:col-span-2 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
           <h2 className="text-[#800020] mb-5 text-3xl text-center font-bold tracking-tight">
@@ -134,7 +129,7 @@ export default function LocalLoginForm({
           </div>
         </div>
 
-        {/* Quick Login Panel */}
+        {/* Quick Login Panel
         <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 h-fit">
           <h3 className="text-gray-700 font-semibold text-md mb-4 text-center">
             Test Admin Accounts
@@ -161,7 +156,7 @@ export default function LocalLoginForm({
               have the 'admin' role in the database.
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

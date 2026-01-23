@@ -1,9 +1,11 @@
-export interface AuthUser {
+export interface AuthUser
+{
   id: number;
   email: string;
 }
 
-export interface AuthToken {
+export interface AuthToken
+{
   user: AuthUser;
   exp: number;
   iat: number;
@@ -11,40 +13,49 @@ export interface AuthToken {
 
 // Simple JWT decoder for client-side (no verification, just decode)
 // Server should verify the token
-function decodeJWT(token: string): AuthToken | null {
-  try {
+function decodeJWT(token: string): AuthToken | null
+{
+  try
+  {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
 
     const payload = JSON.parse(atob(parts[1]));
     return payload as AuthToken;
-  } catch (error) {
+  } catch (error)
+  {
     console.error('Error decoding JWT:', error);
     return null;
   }
 }
 
-export function verifyToken(token: string): AuthToken | null {
-  try {
+export function verifyToken(token: string): AuthToken | null
+{
+  try
+  {
     const decoded = decodeJWT(token);
 
     // Check if token is expired
-    if (decoded && decoded.exp) {
+    if (decoded && decoded.exp)
+    {
       const now = Math.floor(Date.now() / 1000);
-      if (decoded.exp < now) {
+      if (decoded.exp < now)
+      {
         console.log('Token expired');
         return null;
       }
     }
 
     return decoded;
-  } catch (error) {
+  } catch (error)
+  {
     console.error('Error verifying token:', error);
     return null;
   }
 }
 
-export function getAuthFromUrl(): AuthUser | null {
+export function getAuthFromUrl(): AuthUser | null
+{
   if (typeof window === 'undefined') return null;
 
   console.log('Current URL:', window.location.href); // Debug log
@@ -57,7 +68,8 @@ export function getAuthFromUrl(): AuthUser | null {
   const decoded = verifyToken(authToken);
   console.log('Decoded token:', decoded); // Debug log
 
-  if (decoded?.user) {
+  if (decoded?.user)
+  {
     // Store the auth info in sessionStorage for persistence
     sessionStorage.setItem('teamd-auth-user', JSON.stringify(decoded.user));
     sessionStorage.setItem('teamd-auth-token', authToken);
@@ -72,10 +84,12 @@ export function getAuthFromUrl(): AuthUser | null {
   return decoded?.user || null;
 }
 
-export function getStoredAuth(): AuthUser | null {
+export function getStoredAuth(): AuthUser | null
+{
   if (typeof window === 'undefined') return null;
 
-  try {
+  try
+  {
     const storedUser = sessionStorage.getItem('teamd-auth-user');
     const storedToken = sessionStorage.getItem('teamd-auth-token');
     console.log('Stored user from sessionStorage:', storedUser); // Debug log
@@ -87,7 +101,8 @@ export function getStoredAuth(): AuthUser | null {
     const decoded = verifyToken(storedToken);
     console.log('Decoded stored token:', decoded); // Debug log
 
-    if (!decoded) {
+    if (!decoded)
+    {
       console.log('Token invalid, clearing storage'); // Debug log
       clearStoredAuth();
       return null;
@@ -96,62 +111,34 @@ export function getStoredAuth(): AuthUser | null {
     const parsedUser = JSON.parse(storedUser);
     console.log('Returning parsed user:', parsedUser); // Debug log
     return parsedUser;
-  } catch (error) {
+  } catch (error)
+  {
     console.log('Error in getStoredAuth:', error); // Debug log
     clearStoredAuth();
     return null;
   }
 }
 
-export function clearStoredAuth(): void {
+export function clearStoredAuth(): void
+{
   if (typeof window === 'undefined') return;
 
   sessionStorage.removeItem('teamd-auth-user');
   sessionStorage.removeItem('teamd-auth-token');
 }
 
-export function getCurrentUser(): AuthUser | null {
-  console.log('getCurrentUser called'); // Debug log
 
-  // First try to get from URL (new session)
-  const urlUser = getAuthFromUrl();
-  console.log('URL user:', urlUser); // Debug log
-  if (urlUser) return urlUser;
-
-  // Then try stored session
-  const storedUser = getStoredAuth();
-  console.log('Stored user:', storedUser); // Debug log
-  return storedUser;
+export function getCurrentUser(portal: 'user' | 'admin' = 'user'): AuthUser | null
+{
+  const prefix = portal === 'admin' ? 'teamd-admin-auth' : 'teamd-auth';
+  const userJson = sessionStorage.getItem(`${prefix}-user`);
+  return userJson ? JSON.parse(userJson) : null;
 }
 
-export async function checkMainPortalAuth(): Promise<AuthUser | null> {
-  try {
-    console.log('Checking main portal auth...');
-    const response = await fetch('http://localhost:4001/api/auth/token', {
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Main portal auth response:', data);
-
-      if (data.user && data.token) {
-        // Store the auth info locally
-        sessionStorage.setItem('teamd-auth-user', JSON.stringify(data.user));
-        sessionStorage.setItem('teamd-auth-token', data.token);
-        sessionStorage.setItem('teamd-auth-source', 'main');
-        console.log('Stored auth from main portal');
-        return data.user;
-      }
-    } else {
-      console.log('Main portal auth failed:', response.status);
-    }
-  } catch (error) {
-    console.log('Error checking main portal auth:', error);
-  }
-
-  return null;
+export function logout(portal: 'user' | 'admin' = 'user'): void
+{
+  const prefix = portal === 'admin' ? 'teamd-admin-auth' : 'teamd-auth';
+  sessionStorage.removeItem(`${prefix}-user`);
+  sessionStorage.removeItem(`${prefix}-token`);
+  sessionStorage.removeItem(`${prefix}-source`);
 }
