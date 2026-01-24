@@ -53,7 +53,7 @@ export default function EventsTab() {
 
       {eventsData && eventsData.length > 0 ? (
         <div className="space-y-3">
-          {(eventsData as Event[]).map((event) => {
+          {(eventsData.slice(0, 3) as Event[]).map((event) => {
             const startDate = formatDate(event.startTime);
             const endDate = formatDate(event.endTime);
             return (
@@ -174,7 +174,7 @@ function CreateEventModal({
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
