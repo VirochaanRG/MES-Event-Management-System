@@ -68,7 +68,6 @@ async function seed()
       status: "scheduled",
     },
   ]);
-
   console.log("5 test events inserted successfully!");
   await pool.end();
 }
