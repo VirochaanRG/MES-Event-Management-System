@@ -25,6 +25,7 @@
     "drizzle-orm": "^0.44.7",
     "fastify": "^5.2.0",
     "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.563.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

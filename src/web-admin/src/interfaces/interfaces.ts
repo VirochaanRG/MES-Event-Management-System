@@ -31,3 +31,10 @@ export interface Event
   createdAt: string;
   updatedAt: string;
 }
+
+interface AuthUser
+{
+  email: string;
+  id: number;
+  roles: string[];
+}

@@ -4,23 +4,26 @@ import { getCurrentUser, AuthUser, logout } from "../lib/auth";
 import ProtectedTeamPortal from "../components/ProtectedTeamPortal";
 import EventsTab from "@/components/EventsTab";
 import ReportsTab from "@/components/ReportsTab";
-import Navbar from "@/components/Navbar";
+import AdminLayout from "@/components/AdminLayout";
+import { Calendar, Users, FileText } from "lucide-react";
+
+interface DashboardStats {
+  totalEvents: number;
+  totalUsers: number;
+  totalFormResponses: number;
+}
 
 function TeamBDashboard() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"events" | "users" | "reports">(
-    "events",
-  );
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const initAuth = () => {
-      // Check session storage
       const sessionUser = getCurrentUser("admin");
-      console.log(sessionUser);
       if (sessionUser) {
-        // Verify user has admin role
         if (sessionUser.roles && sessionUser.roles.includes("admin")) {
           setUser(sessionUser);
         } else {
@@ -29,40 +32,41 @@ function TeamBDashboard() {
           navigate({ to: "" });
         }
       } else {
-        // No session, redirect to login
         navigate({ to: "" });
       }
-
       setIsLoading(false);
     };
 
     initAuth();
   }, [navigate]);
 
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      logout("admin");
-      navigate({ to: "" });
-    }
-  };
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("/api/dashboard/stats");
+        const data = await response.json();
 
-  const handleFormBuilder = () => {
-    navigate({ to: "/form-builder" });
-  };
+        if (data.success) {
+          setStats(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats:", error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchStats();
+    }
+  }, [user]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-900 mx-auto mb-4"></div>
-          <p className="text-stone-600">Loading admin dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading admin dashboard...</p>
         </div>
       </div>
     );
@@ -72,104 +76,85 @@ function TeamBDashboard() {
     return null;
   }
 
-  return (
-    <>
-      <Navbar onLogout={handleLogout} user={user} />
-      <div className="min-h-screen bg-stone-50">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="bg-white border-l-4 border-red-900 p-6 mb-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-bold text-stone-900">
-                  Admin Dashboard
-                </h1>
-                <p className="text-stone-600 mt-2">
-                  Logged in as:{" "}
-                  <span className="font-semibold">{user.email}</span>
-                  {user.roles && (
-                    <span className="ml-2 px-2 py-1 bg-red-900 text-white text-xs rounded">
-                      {user.roles.join(", ")}
-                    </span>
-                  )}
-                </p>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-stone-200 text-stone-700 hover:bg-stone-300 font-semibold rounded transition-colors"
-              >
-                Logout
-              </button>
-            </div>
+  const StatCard = ({
+    title,
+    value,
+    icon: Icon,
+    bgColor,
+  }: {
+    title: string;
+    value: number;
+    icon: any;
+    bgColor: string;
+  }) => {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            {statsLoading ? (
+              <div className="h-10 w-20 bg-gray-200 animate-pulse rounded mt-2"></div>
+            ) : (
+              <p className="text-4xl font-bold text-gray-900 mt-2">{value}</p>
+            )}
           </div>
-
-          <div className="bg-white border border-stone-300">
-            <div className="border-b-2 border-stone-300 bg-stone-100 px-6 py-4 flex justify-between items-center">
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setActiveTab("events")}
-                  className={`px-6 py-2 font-semibold transition-colors ${
-                    activeTab === "events"
-                      ? "bg-red-900 text-white"
-                      : "bg-stone-200 text-stone-700 hover:bg-stone-300"
-                  }`}
-                >
-                  Events
-                </button>
-                <button
-                  onClick={() => setActiveTab("users")}
-                  className={`px-6 py-2 font-semibold transition-colors ${
-                    activeTab === "users"
-                      ? "bg-red-900 text-white"
-                      : "bg-stone-200 text-stone-700 hover:bg-stone-300"
-                  }`}
-                >
-                  Users
-                </button>
-                <button
-                  onClick={() => setActiveTab("reports")}
-                  className={`px-6 py-2 font-semibold transition-colors ${
-                    activeTab === "reports"
-                      ? "bg-red-900 text-white"
-                      : "bg-stone-200 text-stone-700 hover:bg-stone-300"
-                  }`}
-                >
-                  Form Analytics
-                </button>
-              </div>
-              <button
-                onClick={handleFormBuilder}
-                className="px-6 py-2 font-semibold bg-red-900 text-white hover:bg-red-950 transition-colors"
-              >
-                Form Builder
-              </button>
-            </div>
-
-            <div className="p-6">
-              {activeTab === "events" && (
-                <div>
-                  <EventsTab />
-                </div>
-              )}
-              {activeTab === "users" && (
-                <div>
-                  <h2 className="text-2xl font-bold text-stone-900 mb-3 border-b-2 border-red-900 pb-2 inline-block">
-                    Users
-                  </h2>
-                  <p className="text-stone-600 mt-4">
-                    User management coming soon...
-                  </p>
-                </div>
-              )}
-              {activeTab === "reports" && (
-                <div>
-                  <ReportsTab />
-                </div>
-              )}
-            </div>
+          <div
+            className={`w-14 h-14 ${bgColor} rounded-lg flex items-center justify-center`}
+          >
+            <Icon className="w-7 h-7 text-white" />
           </div>
         </div>
       </div>
-    </>
+    );
+  };
+
+  return (
+    <AdminLayout
+      user={user}
+      title="Dashboard"
+      subtitle={`Welcome back, ${user.email?.split("@")[0]}`}
+    >
+      <div className="p-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <StatCard
+            title="Total Events"
+            value={stats?.totalEvents ?? 0}
+            icon={Calendar}
+            bgColor="bg-red-600"
+          />
+
+          <StatCard
+            title="Total Users"
+            value={stats?.totalUsers ?? 0}
+            icon={Users}
+            bgColor="bg-yellow-600"
+          />
+
+          <StatCard
+            title="Form Responses"
+            value={stats?.totalFormResponses ?? 0}
+            icon={FileText}
+            bgColor="bg-red-600"
+          />
+        </div>
+
+        {/* Content Sections */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-red-600">
+            Recent Activity
+          </h2>
+          <EventsTab />
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-yellow-500">
+            Analytics Overview
+          </h2>
+          <ReportsTab />
+        </div>
+      </div>
+    </AdminLayout>
   );
 }
 
