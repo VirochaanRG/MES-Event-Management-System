@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  getCurrentUser,
-  clearStoredAuth,
-  checkMainPortalAuth,
-  AuthUser,
-} from "../lib/auth";
+import { getCurrentUser, AuthUser } from "../lib/auth";
 import LocalLoginForm from "./LocalLoginForm";
 
 interface ProtectedTeamPortalProps {
@@ -100,54 +95,5 @@ export default function ProtectedTeamPortal({
     return <UnauthorizedAccess onLocalLogin={handleLocalLogin} />;
   }
 
-  return (
-    <div>{children}</div>
-    // <div>
-    //   {/* Auth info header */}
-    //   <div style={{
-    //     backgroundColor: '#d4edda',
-    //     borderBottom: '1px solid #c3e6cb',
-    //     padding: '10px 20px',
-    //     display: 'flex',
-    //     justifyContent: 'space-between',
-    //     alignItems: 'center'
-    //   }}>
-    //     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-    //       <span style={{ color: '#155724', fontSize: '0.9rem' }}>
-    //         ✅ Authenticated as: <strong>{user.email}</strong>
-    //       </span>
-    //       <span style={{
-    //         color: '#0c5460',
-    //         fontSize: '0.8rem',
-    //         backgroundColor: '#d1ecf1',
-    //         padding: '2px 8px',
-    //         borderRadius: '3px',
-    //         border: '1px solid #bee5eb'
-    //       }}>
-    //         {sessionStorage.getItem('teamd-auth-source') === 'local' ? '🚀 Local Dev' : '🌐 Main Portal'}
-    //       </span>
-    //     </div>
-    //     {sessionStorage.getItem('teamd-auth-source') === 'local' && (
-    //       <button
-    //         onClick={() => {
-    //           clearStoredAuth();
-    //           window.location.reload();
-    //         }}
-    //         style={{
-    //           backgroundColor: '#dc3545',
-    //           color: 'white',
-    //           border: 'none',
-    //           padding: '5px 10px',
-    //           borderRadius: '4px',
-    //           fontSize: '0.8rem',
-    //           cursor: 'pointer'
-    //         }}
-    //       >
-    //         Logout
-    //       </button>
-    //     )}
-    //   </div>
-    //   {children}
-    // </div>
-  );
+  return <div>{children}</div>;
 }

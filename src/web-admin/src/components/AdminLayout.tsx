@@ -4,7 +4,7 @@ import { AuthUser } from "../lib/auth";
 
 interface AdminLayoutProps {
   user: AuthUser;
-  children: ReactNode;
+  children: React.ReactNode;
   title?: string;
   subtitle?: string;
 }

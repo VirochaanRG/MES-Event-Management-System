@@ -181,26 +181,12 @@ function UsersPageContent() {
 
   const toggleRole = (role: string, isCreate: boolean = false) => {
     if (isCreate) {
-      setCreateFormData((prev) => ({
-        ...prev,
-        roles: prev.roles.includes(role)
-          ? prev.roles.filter((r) => r !== role)
-          : [...prev.roles, role],
-      }));
+      console.log("");
     } else {
       setEditRolesData((prev) =>
         prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role],
       );
     }
-  };
-
-  const resetCreateForm = () => {
-    setCreateFormData({
-      email: "",
-      password: "",
-      confirmPassword: "",
-      roles: [],
-    });
   };
 
   const formatDate = (dateString: string) => {
@@ -261,13 +247,13 @@ function UsersPageContent() {
                   <Tag className="w-5 h-5" />
                   Create Role
                 </button>
-                <button
+                {/* <button
                   onClick={() => setShowCreateModal(true)}
                   className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors"
                 >
                   <Plus className="w-5 h-5" />
                   Add User
-                </button>
+                </button> */}
               </div>
             </div>
           </div>

@@ -29,10 +29,18 @@ function TeamBDashboard() {
         } else {
           console.error("User does not have admin role");
           logout("admin");
-          navigate({ to: "" });
+          if (window.location.pathname === "/") {
+            window.location.reload();
+          } else {
+            navigate({ to: "/" });
+          }
         }
       } else {
-        navigate({ to: "" });
+        if (window.location.pathname === "/") {
+          window.location.reload();
+        } else {
+          navigate({ to: "/" });
+        }
       }
       setIsLoading(false);
     };

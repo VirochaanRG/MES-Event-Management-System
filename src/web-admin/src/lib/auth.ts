@@ -1,5 +1,6 @@
 export interface AuthUser
 {
+  roles: string[];
   id: number;
   email: string;
 }
@@ -128,7 +129,7 @@ export function clearStoredAuth(): void
 }
 
 
-export function getCurrentUser(portal: 'user' | 'admin' = 'user'): AuthUser | null
+export function getCurrentUser(portal: string): AuthUser | null
 {
   const prefix = portal === 'admin' ? 'teamd-admin-auth' : 'teamd-auth';
   const userJson = sessionStorage.getItem(`${prefix}-user`);
