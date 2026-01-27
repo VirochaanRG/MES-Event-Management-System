@@ -4,10 +4,19 @@ import { useNavigate } from "@tanstack/react-router";
 import { FormQuestion } from "@/interfaces/interfaces";
 
 export default function MultipleChoiceQuestion({
-  question,
+  question, questionsList
 }: {
   question: FormQuestion;
+  questionsList: FormQuestion[]
 }) {
+  const parentQuestion = question.parentQuestionId && question
+    ? questionsList.find((q) => q.id === question.parentQuestionId)
+    : null;
+
+  const parentOptions = parentQuestion?.optionsCategory
+    ? JSON.parse(parentQuestion.optionsCategory).choices
+    : [];
+
   const options = question.optionsCategory
     ? JSON.parse(question.optionsCategory).choices
     : [];
@@ -19,6 +28,7 @@ export default function MultipleChoiceQuestion({
           <div className="text-sm text-blue-600 font-medium mb-2">
             MULTIPLE CHOICE
           </div>
+           {parentQuestion && (<div className="text-sm text-gray-400">Follow up to "{parentQuestion?.questionTitle}" when answering {question?.enablingAnswers.map((i) => '"' + parentOptions[i] + '"').join(",")}</div>)}
           <div className="text-lg text-gray-900 font-medium">
             {question.questionTitle || "Untitled Question"}
           </div>

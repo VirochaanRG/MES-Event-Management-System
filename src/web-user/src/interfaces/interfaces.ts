@@ -16,6 +16,8 @@ export interface FormQuestion
   optionsCategory: string | null;
   qOrder: number;
   createdAt: string;
+  parentQuestionId: number | null;
+  enablingAnswers: number[];
 }
 
 export interface FormAnswer

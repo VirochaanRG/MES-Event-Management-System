@@ -97,7 +97,7 @@ function RouteComponent() {
   };
 
   const saveForm = async () => {
-    for (const response of responses) {
+    for (const response of getAllVisibleResponses()) {
       if(!response.answer || response.answer.answer.length == 0) continue;
       const request = {
         method: "POST",
@@ -132,7 +132,7 @@ function RouteComponent() {
     }
     try {
       setSubmitting(true);
-      if(responses.some(r => !r.answer || !r.answer.answer)) {
+      if(getAllVisibleResponses().some(r => !r.answer || !r.answer.answer)) {
         toast.error("Please fill in all required fields");
       } else {   
         const confirmation = confirm("Are you sure you want to submit?");
@@ -254,6 +254,21 @@ function RouteComponent() {
     );
   }
 
+  function getAllVisibleResponses() {
+    return responses
+      .sort((r1, r2) => r1.question.qOrder - r2.question.qOrder)
+      .filter((r) => { //show follow-up question if correct answer selected
+          const parentQuestionId = r.question.parentQuestionId;
+          if (!parentQuestionId) return true;
+          const parentResponse = responses.find(r => r.question.id === parentQuestionId);
+          if (!parentResponse) return true;
+          const parsedOptions = parentResponse.question.optionsCategory ? JSON.parse(parentResponse.question.optionsCategory) : null;
+          const choices: string[] = parsedOptions?.choices ?? [];
+          const enablingAnswers = r.question.enablingAnswers.map(i => choices[i] + "");
+          return enablingAnswers.includes(parentResponse.answer?.answer ?? "");
+      });
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
@@ -296,9 +311,7 @@ function RouteComponent() {
         </div>
 
         {/* Questions */}
-        {responses
-          .sort((r1, r2) => r1.question.qOrder - r2.question.qOrder)
-          .map((response: FormResponse) =>
+        {getAllVisibleResponses().map((response: FormResponse) =>
             response.question.questionType === "text_answer" ? (
               <TextAnswerQuestion
                 key={response.question.id}

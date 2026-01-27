@@ -160,13 +160,13 @@ fastify.get('/api/auth/me', async (request, reply) =>
 // CREATE a form question
 fastify.post<{
   Params: { id: string };
-  Body: { questionType: string; questionTitle?: string; optionsCategory?: string; qorder: number };
+  Body: { questionType: string; questionTitle?: string; optionsCategory?: string; qorder: number; parentQuestionId?: number; enablingAnswers?: number[]};
 }>('/api/forms/:id/questions', async (request, reply) =>
 {
   try
   {
     const { id } = request.params;
-    const { questionType, questionTitle, optionsCategory, qorder } = request.body;
+    const { questionType, questionTitle, optionsCategory, qorder, parentQuestionId, enablingAnswers} = request.body;
 
     if (!questionType || questionType.trim() === '')
     {
@@ -204,6 +204,8 @@ fastify.post<{
         questionTitle: questionTitle?.trim() || null,
         optionsCategory: optionsCategory?.trim() || null,
         qorder: qorder,
+        parentQuestionId: parentQuestionId || null,
+        enablingAnswers: enablingAnswers || []
       })
       .returning();
 
@@ -320,13 +322,14 @@ fastify.put<{
     questionTitle?: string;
     optionsCategory?: string;
     qorder?: number;
+    enablingAnswers?: number[];
   };
 }>('/api/forms/:formId/questions/:questionId', async (request, reply) =>
 {
   try
   {
     const { formId, questionId } = request.params;
-    const { questionType, questionTitle, optionsCategory, qorder } = request.body;
+    const { questionType, questionTitle, optionsCategory, qorder, enablingAnswers} = request.body;
 
     const existingForm = await db.query.form.findFirst({
       where: eq(form.id, parseInt(formId)),
@@ -373,6 +376,11 @@ fastify.put<{
     {
       updateData.qorder = qorder;
     }
+    if (enablingAnswers !== undefined)
+    {
+      updateData.enablingAnswers = enablingAnswers;
+    }
+
 
     if (Object.keys(updateData).length === 0)
     {

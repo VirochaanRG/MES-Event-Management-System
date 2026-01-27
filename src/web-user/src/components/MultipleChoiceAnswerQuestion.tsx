@@ -24,7 +24,7 @@ export default function MultipleChoiceAnswerQuestion({
       </div>
       <div className="space-y-2 mt-4">
         {choices.map((choice, index) => {
-          const id = `choice-${index}`;
+          const id = `question-${question.id}-choice-${index}`;
           return (
             <label
               key={id}
@@ -34,7 +34,7 @@ export default function MultipleChoiceAnswerQuestion({
               <input
                 type="radio"
                 id={id}
-                name={questionTitle}
+                name={`question-${question.id}`}
                 value={choice}
                 checked={answer === choice}
                 onChange={() => onChange(choice)}
