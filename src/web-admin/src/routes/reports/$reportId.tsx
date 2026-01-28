@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { BarChartExport, HistogramExport, WordCloudExport } from "@/components/ReportVisualizations";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 
@@ -30,6 +31,90 @@ interface ReportData {
 }
 
 function ReportDetailPage() {
+    const [showVisualizationModal, setShowVisualizationModal] = useState(false);
+    const [visualizeQuestion, setVisualizeQuestion] = useState<Answer | null>(null);
+
+    function getSelectedSubmissions() {
+      if (!reportData) return [];
+      return selectedSubmissions.size > 0
+        ? reportData.submissions.filter((s) => selectedSubmissions.has(s.userId))
+        : reportData.submissions;
+    }
+    function getBarChartData(question: Answer) {
+      const submissions = getSelectedSubmissions();
+      const counts: Record<string, number> = {};
+      submissions.forEach((sub) => {
+        const ans = sub.answers.find((a) => a.questionId === question.questionId);
+        if (ans && ans.answer) {
+          counts[ans.answer] = (counts[ans.answer] || 0) + 1;
+        }
+      });
+      return {
+        labels: Object.keys(counts),
+        datasets: [
+          {
+            label: question.questionTitle,
+            data: Object.values(counts),
+            backgroundColor: '#b91c1c',
+          },
+        ],
+      };
+    }
+    function getHistogramData(question: Answer) {
+      const submissions = getSelectedSubmissions();
+      const values: number[] = submissions
+        .map((sub) => {
+          const ans = sub.answers.find((a) => a.questionId === question.questionId);
+          return ans && ans.answer ? Number(ans.answer) : null;
+        })
+        .filter((v): v is number => v !== null && !isNaN(v));
+      if (values.length === 0) return { labels: [], datasets: [] };
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const binCount = Math.min(10, max - min + 1);
+      const bins = Array(binCount).fill(0);
+      const binLabels = Array(binCount)
+        .fill(0)
+        .map((_, i) => `${min + i}`);
+      values.forEach((v) => {
+        const idx = Math.min(binCount - 1, Math.floor(((v - min) / (max - min + 1)) * binCount));
+        bins[idx]++;
+      });
+      return {
+        labels: binLabels,
+        datasets: [
+          {
+            label: question.questionTitle,
+            data: bins,
+            backgroundColor: '#b91c1c',
+          },
+        ],
+      };
+    }
+    function getWordCloudData(question: Answer) {
+      const submissions = getSelectedSubmissions();
+      const wordCounts: Record<string, number> = {};
+      submissions.forEach((sub) => {
+        const ans = sub.answers.find((a) => a.questionId === question.questionId);
+        if (ans && ans.answer) {
+          ans.answer.split(/\s+/).forEach((word) => {
+            if (word.length > 2) wordCounts[word.toLowerCase()] = (wordCounts[word.toLowerCase()] || 0) + 1;
+          });
+        }
+      });
+      return Object.entries(wordCounts).map(([text, value]) => ({ text, value }));
+    }
+    const exportVisualization = () => {
+      // Check if there are submissions to visualize
+      const submissionsToExport = selectedSubmissions.size > 0
+        ? reportData?.submissions.filter((s) => selectedSubmissions.has(s.userId))
+        : reportData?.submissions;
+      if (!submissionsToExport || submissionsToExport.length === 0) {
+        alert("No submissions to export");
+        return;
+      }
+      setShowVisualizationModal(true);
+    };
   const { reportId } = Route.useParams();
   const navigate = useNavigate();
   const [reportData, setReportData] = useState<ReportData | null>(null);
@@ -393,7 +478,71 @@ function ReportDetailPage() {
                       </>
                     )}
                   </div>
+                  <button
+                    onClick={exportVisualization}
+                    className="px-5 py-2 bg-red-900 text-white hover:bg-red-950 font-medium"
+                  >
+                    Export Visualization
+                    {selectedSubmissions.size > 0 &&
+                      ` (${selectedSubmissions.size})`}
+                  </button>
+                        {showVisualizationModal && (
+                          <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-40">
+                            <div className="bg-white p-6 rounded shadow-xl max-w-lg w-full">
+                              <h2 className="text-lg font-bold mb-4">Export Visualization</h2>
+                              <p className="mb-2">Select a question to visualize and export:</p>
+                              <div className="space-y-2 mb-4">
+                                {allQuestions.map((question) => {
+                                  // Only show button if there are answers for this question in the selected submissions
+                                  const submissions = selectedSubmissions.size > 0
+                                    ? reportData?.submissions.filter((s) => selectedSubmissions.has(s.userId))
+                                    : reportData?.submissions;
+                                  const hasAnswers = submissions && submissions.some((sub) =>
+                                    sub.answers.find((a) => a.questionId === question.questionId && a.answer)
+                                  );
+                                  return (
+                                    <button
+                                      key={question.questionId}
+                                      className="block w-full text-left px-4 py-2 border rounded hover:bg-stone-100"
+                                      onClick={() => {
+                                        if (!hasAnswers) {
+                                          alert("No answers to export for this question");
+                                          return;
+                                        }
+                                        setShowVisualizationModal(false);
+                                        setTimeout(() => setVisualizeQuestion(question), 100);
+                                      }}
+                                      disabled={!hasAnswers}
+                                      style={hasAnswers ? {} : { opacity: 0.5, cursor: 'not-allowed' }}
+                                    >
+                                      <span className="font-semibold">{question.questionTitle || `Question ${question.qorder}`}</span>
+                                      <span className="ml-2 text-xs text-stone-500">{question.questionType}</span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <button className="mt-2 px-4 py-2 bg-stone-700 text-white" onClick={() => setShowVisualizationModal(false)}>
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
 
+                        {visualizeQuestion && (
+                          <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-40">
+                            <div className="bg-white p-6 rounded shadow-xl max-w-lg w-full">
+                              <h2 className="text-lg font-bold mb-4">{visualizeQuestion.questionTitle}</h2>
+                              {visualizeQuestion.questionType.toLowerCase().includes("multiple") ? (
+                                <BarChartExport data={getBarChartData(visualizeQuestion)} filename={`${visualizeQuestion.questionTitle || 'bar'}-chart.png`} />
+                              ) : visualizeQuestion.questionType.toLowerCase().includes("linear") ? (
+                                <HistogramExport data={getHistogramData(visualizeQuestion)} filename={`${visualizeQuestion.questionTitle || 'histogram'}-chart.png`} />
+                              ) : visualizeQuestion.questionType.toLowerCase().includes("text") ? (
+                                <WordCloudExport words={getWordCloudData(visualizeQuestion)} filename={`${visualizeQuestion.questionTitle || 'wordcloud'}-cloud.png`} />
+                              ) : null}
+                              <button className="mt-4 px-4 py-2 bg-stone-700 text-white" onClick={() => setVisualizeQuestion(null)}>Close</button>
+                            </div>
+                          </div>
+                        )}
                   <button
                     onClick={exportToCSV}
                     className="px-5 py-2 bg-red-900 text-white hover:bg-red-950 font-medium"
