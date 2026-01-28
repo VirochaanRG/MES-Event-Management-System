@@ -218,77 +218,127 @@ function ReportDetailPage() {
     setSelectedQuestions(newSelected);
   };
 
-  const exportToCSV = () => {
-    if (!reportData) return;
+  // General export data modal state
+  const [showExportDataModal, setShowExportDataModal] = useState(false);
 
+  const exportData = (format: 'csv' | 'json' | 'xml') => {
+    if (!reportData) return;
     const submissionsToExport =
       selectedSubmissions.size > 0
-        ? reportData.submissions.filter((s) =>
-            selectedSubmissions.has(s.userId)
-          )
+        ? reportData.submissions.filter((s) => selectedSubmissions.has(s.userId))
         : reportData.submissions;
-
     if (submissionsToExport.length === 0) {
       alert("No submissions to export");
       return;
     }
-
     if (selectedQuestions.size === 0) {
       alert("Please select at least one question to export");
       return;
     }
-
     const allQuestions =
       reportData.submissions.length > 0
         ? reportData.submissions[0].answers
             .sort((a, b) => a.qorder - b.qorder)
             .filter((q) => selectedQuestions.has(q.questionId))
         : [];
-
-    const headers = [
-      "Email",
-      ...allQuestions.map((q) => q.questionTitle || `Question ${q.qorder}`),
-      "Submitted At",
-    ];
-
-    const rows = submissionsToExport.map((submission) => {
-      const email = extractEmail(submission.userId);
-      const answers = allQuestions.map((question) => {
-        const answer = submission.answers.find(
-          (a) => a.questionId === question.questionId
-        );
-        const value = answer?.answer || "";
-        return value.includes(",") ||
-          value.includes("\n") ||
-          value.includes('"')
-          ? `"${value.replace(/"/g, '""')}"`
-          : value;
+    if (format === 'csv') {
+      const headers = [
+        "Email",
+        ...allQuestions.map((q) => q.questionTitle || `Question ${q.qorder}`),
+        "Submitted At",
+      ];
+      const rows = submissionsToExport.map((submission) => {
+        const email = extractEmail(submission.userId);
+        const answers = allQuestions.map((question) => {
+          const answer = submission.answers.find((a) => a.questionId === question.questionId);
+          const value = answer?.answer || "";
+          return value.includes(",") || value.includes("\n") || value.includes('"')
+            ? `"${value.replace(/"/g, '""')}"`
+            : value;
+        });
+        const submittedAt = new Date(submission.submittedAt).toLocaleString();
+        return [email, ...answers, submittedAt];
       });
-      const submittedAt = new Date(submission.submittedAt).toLocaleString();
-      return [email, ...answers, submittedAt];
-    });
-
-    const csvContent = [
-      headers.map((h) =>
-        h.includes(",") || h.includes("\n") ? `"${h.replace(/"/g, '""')}"` : h
-      ),
-      ...rows,
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `${reportData.form.name.replace(/[^a-z0-9]/gi, "_")}_report_${new Date().toISOString().split("T")[0]}.csv`
-    );
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const csvContent = [
+        headers.map((h) => h.includes(",") || h.includes("\n") ? `"${h.replace(/"/g, '""')}"` : h),
+        ...rows,
+      ]
+        .map((row) => row.join(","))
+        .join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `${reportData.form.name.replace(/[^a-z0-9]/gi, "_")}_report_${new Date().toISOString().split("T")[0]}.csv`
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (format === 'json') {
+      const exportData = submissionsToExport.map((submission) => {
+        const answers = allQuestions.map((question) => {
+          const answer = submission.answers.find((a) => a.questionId === question.questionId);
+          return {
+            questionId: question.questionId,
+            questionTitle: question.questionTitle,
+            questionType: question.questionType,
+            answer: answer?.answer || ""
+          };
+        });
+        return {
+          email: extractEmail(submission.userId),
+          submittedAt: submission.submittedAt,
+          answers
+        };
+      });
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `${reportData.form.name.replace(/[^a-z0-9]/gi, "_")}_report_${new Date().toISOString().split("T")[0]}.json`
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (format === 'xml') {
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<submissions>\n';
+      submissionsToExport.forEach((submission) => {
+        xml += '  <submission>\n';
+        xml += `    <email>${extractEmail(submission.userId)}</email>\n`;
+        xml += `    <submittedAt>${submission.submittedAt}</submittedAt>\n`;
+        xml += '    <answers>\n';
+        allQuestions.forEach((question) => {
+          const answer = submission.answers.find((a) => a.questionId === question.questionId);
+          xml += '      <answer>\n';
+          xml += `        <questionId>${question.questionId}</questionId>\n`;
+          xml += `        <questionTitle>${question.questionTitle || ''}</questionTitle>\n`;
+          xml += `        <questionType>${question.questionType}</questionType>\n`;
+          xml += `        <value>${answer?.answer || ''}</value>\n`;
+          xml += '      </answer>\n';
+        });
+        xml += '    </answers>\n';
+        xml += '  </submission>\n';
+      });
+      xml += '</submissions>\n';
+      const blob = new Blob([xml], { type: "application/xml" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `${reportData.form.name.replace(/[^a-z0-9]/gi, "_")}_report_${new Date().toISOString().split("T")[0]}.xml`
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   const handleBack = () => {
@@ -544,13 +594,45 @@ function ReportDetailPage() {
                           </div>
                         )}
                   <button
-                    onClick={exportToCSV}
+                    onClick={() => setShowExportDataModal(true)}
                     className="px-5 py-2 bg-red-900 text-white hover:bg-red-950 font-medium"
                   >
-                    Export to CSV
+                    Export Data
                     {selectedSubmissions.size > 0 &&
                       ` (${selectedSubmissions.size})`}
                   </button>
+                      {/* Export Data Modal */}
+                      {showExportDataModal && (
+                        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-40">
+                          <div className="bg-white p-6 rounded shadow-xl max-w-xs w-full">
+                            <h2 className="text-lg font-bold mb-4">Export Data</h2>
+                            <p className="mb-2">Choose a format to export:</p>
+                            <div className="flex flex-col gap-3 mb-4">
+                              <button
+                                className="px-4 py-2 bg-stone-800 text-white rounded hover:bg-stone-900"
+                                onClick={() => { setShowExportDataModal(false); setTimeout(() => exportData('csv'), 100); }}
+                              >
+                                Export as CSV
+                              </button>
+                              <button
+                                className="px-4 py-2 bg-stone-800 text-white rounded hover:bg-stone-900"
+                                onClick={() => { setShowExportDataModal(false); setTimeout(() => exportData('json'), 100); }}
+                              >
+                                Export as JSON
+                              </button>
+                              <button
+                                className="px-4 py-2 bg-stone-800 text-white rounded hover:bg-stone-900"
+                                onClick={() => { setShowExportDataModal(false); setTimeout(() => exportData('xml'), 100); }}
+                              >
+                                Export as XML
+                              </button>
+                            </div>
+                            <button className="mt-2 px-4 py-2 bg-stone-700 text-white" onClick={() => setShowExportDataModal(false)}>
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      )}
                 </div>
               </div>
             </div>
