@@ -1,0 +1,3 @@
+ALTER TABLE "form_questions" ADD COLUMN "parent_question_id" integer;--> statement-breakpoint
+ALTER TABLE "form_questions" ADD COLUMN "enabling_answers" json;--> statement-breakpoint
+ALTER TABLE "form_questions" ADD CONSTRAINT "form_questions_parent_question_id_form_questions_id_fk" FOREIGN KEY ("parent_question_id") REFERENCES "public"."form_questions"("id") ON DELETE no action ON UPDATE no action;
