@@ -38,8 +38,8 @@ export default function ReportsTab() {
 
   const handleFormClick = (formId: number) => {
     navigate({
-      to: "/reports/$reportId",
-      params: { reportId: formId.toString() },
+      to: "/analytics/$analyticsId",
+      params: { analyticsId: formId.toString() },
     });
   };
 
