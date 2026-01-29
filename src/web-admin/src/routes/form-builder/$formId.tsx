@@ -18,7 +18,9 @@ function RouteComponent() {
   const [error, setError] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState<FormQuestion | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<FormQuestion | null>(
+    null,
+  );
   const [openFollowupFor, setOpenFollowupFor] = useState<number | null>(null);
   const [followupParentId, setFollowupParentId] = useState<number | null>(null);
   const [selectedTriggers, setSelectedTriggers] = useState<number[]>([]);
@@ -35,6 +37,13 @@ function RouteComponent() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      // Don't close if clicking a button inside the dropdown
+      if (target.tagName === "BUTTON") {
+        return;
+      }
+
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
@@ -51,7 +60,7 @@ function RouteComponent() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, openFollowupFor]);
 
   useEffect(() => {
     const fetchFormData = async () => {
@@ -100,9 +109,13 @@ function RouteComponent() {
     setScaleMaxLabel("");
     setIsDropdownOpen(false);
     setIsModalOpen(true);
+    setOpenFollowupFor(null);
   };
 
-  const openFollowUpModal = (questionType: string, parentQuestionId: number) => {
+  const openFollowUpModal = (
+    questionType: string,
+    parentQuestionId: number,
+  ) => {
     openModal(questionType);
     setFollowupParentId(parentQuestionId);
   };
@@ -145,6 +158,9 @@ function RouteComponent() {
     setIsModalOpen(false);
     setSelectedQuestionType("");
     setEditingQuestion(null);
+    setFollowupParentId(null); // Add this line
+    setSelectedTriggers([]); // Add this line
+    setOpenFollowupFor(null);
   };
 
   const addMcChoice = () => {
@@ -173,7 +189,7 @@ function RouteComponent() {
         `/api/forms/${formId}/questions/${questionId}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       const result = await response.json();
@@ -195,7 +211,7 @@ function RouteComponent() {
         `/api/forms/${formId}/questions/${questionId}/move-up`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       const result = await response.json();
@@ -223,7 +239,7 @@ function RouteComponent() {
         `/api/forms/${formId}/questions/${questionId}/move-down`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       const result = await response.json();
@@ -276,7 +292,10 @@ function RouteComponent() {
           max: scaleMax,
           minLabel: scaleMinLabel,
           maxLabel: scaleMaxLabel,
-          choices: Array.from({ length: scaleMax - scaleMin + 1 }, (_, i) => scaleMin + i)
+          choices: Array.from(
+            { length: scaleMax - scaleMin + 1 },
+            (_, i) => scaleMin + i,
+          ),
         });
       }
 
@@ -296,9 +315,9 @@ function RouteComponent() {
               optionsCategory,
               qorder: editingQuestion.qorder,
               parentQuestionId: followupParentId || undefined,
-              enablingAnswers: selectedTriggers || []
+              enablingAnswers: selectedTriggers || [],
             }),
-          }
+          },
         );
 
         result = await response.json();
@@ -308,7 +327,7 @@ function RouteComponent() {
         }
 
         setQuestions(
-          questions.map((q) => (q.id === editingQuestion.id ? result.data : q))
+          questions.map((q) => (q.id === editingQuestion.id ? result.data : q)),
         );
       } else {
         // Add new question
@@ -328,7 +347,7 @@ function RouteComponent() {
             optionsCategory,
             qorder: nextOrder,
             parentQuestionId: followupParentId || undefined,
-            enablingAnswers: selectedTriggers || []
+            enablingAnswers: selectedTriggers || [],
           }),
         });
 
@@ -342,6 +361,7 @@ function RouteComponent() {
       }
 
       closeModal();
+      setOpenFollowupFor(null); // ADD THIS LINE - Reset follow-up dropdown state after saving
     } catch (err: any) {
       console.error("Failed to save question:", err.message);
       alert("Failed to save question: " + err.message);
@@ -523,57 +543,75 @@ function RouteComponent() {
                       )}
 
                       {/* Add Follow-up Button */}
-                      {allowedTypesForFollowUp.includes(question.questionType) && (<div className="relative" ref={dropdownRef}>
-                        <button
-                          onClick={() =>
-                            setOpenFollowupFor(
-                              openFollowupFor === question.id ? null : question.id
-                            )
-                          }
-                          className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
-                          title="Add follow-up question"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                      {allowedTypesForFollowUp.includes(
+                        question.questionType,
+                      ) && (
+                        <div className="relative" ref={dropdownRef}>
+                          <button
+                            onClick={() =>
+                              setOpenFollowupFor(
+                                openFollowupFor === question.id
+                                  ? null
+                                  : question.id,
+                              )
+                            }
+                            className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                            title="Add follow-up question"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </button>
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </button>
 
-                        {openFollowupFor === question.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30" ref={dropdownRef}>
-                            <span className="w-full text-left px-4 py-2 text-sm text-gray-400 italic">
-                              Add a follow-up question    
-                            </span>
-                            <button
-                              onClick={() => openFollowUpModal("multiple_choice", question.id)}
-                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          {openFollowupFor === question.id && (
+                            <div
+                              className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30"
+                              ref={dropdownRef}
                             >
-                              Multiple Choice
-                            </button>
-                            <button
-                              onClick={() => openFollowUpModal("text_answer", question.id)}
-                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                            >
-                              Text Answer
-                            </button>
-                            <button
-                              onClick={() => openFollowUpModal("linear_scale", question.id)}
-                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                            >
-                              Linear Scale
-                            </button>
-                          </div>
-                        )}
-                      </div>)}
+                              <span className="w-full text-left px-4 py-2 text-sm text-gray-400 italic">
+                                Add a follow-up question
+                              </span>
+                              <button
+                                onClick={() =>
+                                  openFollowUpModal(
+                                    "multiple_choice",
+                                    question.id,
+                                  )
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                Multiple Choice
+                              </button>
+                              <button
+                                onClick={() =>
+                                  openFollowUpModal("text_answer", question.id)
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                Text Answer
+                              </button>
+                              <button
+                                onClick={() =>
+                                  openFollowUpModal("linear_scale", question.id)
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                Linear Scale
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
 
                       <button
                         onClick={() => openEditModal(question)}
@@ -617,13 +655,22 @@ function RouteComponent() {
 
                     {/* Question Component */}
                     {question.questionType === "multiple_choice" && (
-                      <MultipleChoiceQuestion question={question} questionsList={questions} />
+                      <MultipleChoiceQuestion
+                        question={question}
+                        questionsList={questions}
+                      />
                     )}
                     {question.questionType === "linear_scale" && (
-                      <LinearScaleQuestion question={question} questionsList={questions}/>
+                      <LinearScaleQuestion
+                        question={question}
+                        questionsList={questions}
+                      />
                     )}
                     {question.questionType === "text_answer" && (
-                      <TextAnswerQuestion question={question} questionsList={questions}/>
+                      <TextAnswerQuestion
+                        question={question}
+                        questionsList={questions}
+                      />
                     )}
                   </div>
                 </div>
@@ -636,67 +683,80 @@ function RouteComponent() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div
+            role="dialog"
+            className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
             <div className="p-6 border-b border-gray-200">
               <h3 className="text-xl font-semibold text-gray-900">
-                {editingQuestion ? "Edit" : "Add"} {followupParentId ? "Follow-up" : ""} Question
+                {editingQuestion ? "Edit" : "Add"}{" "}
+                {followupParentId ? "Follow-up" : ""} Question
               </h3>
               <p className="text-sm text-gray-500 mt-1">
                 {selectedQuestionType.replace("_", " ")}
               </p>
             </div>
 
-            <div className="p-6 space-y-5">             
+            <div className="p-6 space-y-5">
               {/* Follow up answers */}
-                {followupParentId && (
-                  (() => {
-                    const parentQuestion = questions.find(q => q.id === followupParentId);
-                    const answers = parentQuestion?.optionsCategory
-                      ? JSON.parse(parentQuestion.optionsCategory).choices
-                      : [];
+              {followupParentId &&
+                (() => {
+                  const parentQuestion = questions.find(
+                    (q) => q.id === followupParentId,
+                  );
+                  const answers = parentQuestion?.optionsCategory
+                    ? JSON.parse(parentQuestion.optionsCategory).choices
+                    : [];
 
-                    if (!parentQuestion) return null;
-                    if (!allowedTypesForFollowUp.includes(parentQuestion.questionType)) return null;
+                  if (!parentQuestion) return null;
+                  if (
+                    !allowedTypesForFollowUp.includes(
+                      parentQuestion.questionType,
+                    )
+                  )
+                    return null;
 
-                    return (
-                      <div className="mt-4">
-                        <label className="block text-sm font-medium text-gray-900 mb-2">
-                          Show question when answering with...
-                        </label>
+                  return (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Show question when answering with...
+                      </label>
 
-                       <div className="space-y-2">
-                          {answers?.map((answer, index) => (
-                            <label
-                              key={index}
-                              className="flex items-center gap-3 text-sm text-gray-700"
-                            >
-                              <input
-                                type="checkbox"
-                                value={index} // store the index
-                                checked={selectedTriggers?.includes(index) || false} // check against index
-                                onChange={(e) => {
-                                  const checked = e.target.checked;
-                                  setSelectedTriggers((prev) => {
-                                    if (checked) {
-                                      // add index if not already in array
-                                      return prev ? [...prev, index] : [index];
-                                    } else {
-                                      // remove index
-                                      return (prev || []).filter((i) => i !== index);
-                                    }
-                                  });
-                                }}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-                              />
-                              <span className="truncate">{answer}</span>
-                            </label>
-                          ))}
-                        </div>
-
+                      <div className="space-y-2">
+                        {answers?.map((answer, index) => (
+                          <label
+                            key={index}
+                            className="flex items-center gap-3 text-sm text-gray-700"
+                          >
+                            <input
+                              type="checkbox"
+                              value={index} // store the index
+                              checked={
+                                selectedTriggers?.includes(index) || false
+                              } // check against index
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setSelectedTriggers((prev) => {
+                                  if (checked) {
+                                    // add index if not already in array
+                                    return prev ? [...prev, index] : [index];
+                                  } else {
+                                    // remove index
+                                    return (prev || []).filter(
+                                      (i) => i !== index,
+                                    );
+                                  }
+                                });
+                              }}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                            />
+                            <span className="truncate">{answer}</span>
+                          </label>
+                        ))}
                       </div>
-                    );
-                  })()
-                )}
+                    </div>
+                  );
+                })()}
 
               {/* Question Title */}
               <div>
