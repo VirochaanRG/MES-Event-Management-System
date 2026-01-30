@@ -89,8 +89,6 @@ Omar Al-Asfar & 0\\
 \end{tabular}
 \end{table}
 
-\wss{If needed, an explanation for the lecture attendance can be provided here.}
-
 \section{TA Document Discussion Attendance}
 
 
@@ -116,31 +114,23 @@ The final TA meeting for the Design Documentation was cancelled due to a snow da
 
 \section{Commits}
 
-\wss{For each team member how many commits to the main branch have been made
-over the time period of interest.  The total is the total number of commits for
-the entire team since the beginning of the term.  The percentage is the
-percentage of the total commits made by each team member.}
-
 \begin{table}[H]
 \centering
 \begin{tabular}{lll}
 \toprule
 \textbf{Student} & \textbf{Commits} & \textbf{Percent}\\
 \midrule
-Total & Num & 100\% \\
-Name 1 & Num & \% \\
-Name 2 & Num & \% \\
-Name 3 & Num & \% \\
-Name 4 & Num & \% \\
-Name 5 & Num & \% \\
+Total & 180 & 100\% \\
+Ibrahim Quraishi & 48 & 26.7\% \\
+Virochaan Ravichandran Gowri & 58 & 32.2\% \\
+Rayyan Suhail & 13 & 7.2\% \\
+Mohammad Mahdi Mahboob & 28 & 15.6\% \\
+Omar Al-Asfar & 32 & 17.8\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\wss{If needed, an explanation for the counts can be provided here.  For
-instance, if a team member has more commits to unmerged branches, these numbers
-can be provided here.  If multiple people contribute to a commit, git allows for
-multi-author commits.}
+While there are visible differences in contribution percentages, there is a similar pattern to the POC Team Contribution report. The differences can be attributed to the same reasoning as before, with members commiting at different frequencies. For instance, Virochaan and Ibrahim tend to commit more frequently than the rest. Omar ranks 3rd in commit count, but contributed the highest in terms of lines of code, with Mohammad following a similar pattern. The line contributions can also be misleading since Virochaan and Omar were responsible for app setup and integration of provided templates, resulting in a higher number of lines than the rest. Rayyan focused more on testing and developed components with less volume, but still essential to the project. Overall, while commit counts vary, all members are comfortable with the workload distribution.
 
 \section{Issue Tracker}
 
@@ -159,27 +149,45 @@ Omar Al-Asfar & 7 & 13\\
 \end{tabular}
 \end{table}
 
-Some issues
 
 \section{CICD}
 
-\wss{Say how CICD is used in your project}
+CI/CI is still intended to be implemented in a later phase of the project. It's primary application remains to be to support regression testing, with the pipeline accomodating verified unit tests to ensure functionality over time. It will also be used to ensure compliance with Airbnb JavaScript and JSX guidelines. Overall, the team has made progress in setting up the necessary infrastructure and is actively working towards the deployment of the CI/CD pipeline.
 
 \section{Team Charter Trigger Items}
 
-\wss{Provide a summary of the quantified triggers identified in the team's
-charter.}
-
-\wss{Provide a list of any violations of the triggers.  If the team wishes, the
-violations can be summarized on aggregate, instead of naming specific team
-members.}
-
-\wss{Provide a plan to address the violations.  This could include revising the
-triggers, if they are found to be too weak, strong or ambiguous.}
+The team charter triggers are defined in the Development Plan, aiming to assess team performance. The triggers are as follows:
+\begin{itemize}
+    \item \textbf{Attendance:} All members are expected to attend meetings punctually for the entire agreed upon duration. Repeated unexcused absences constitue a trigger violation.
+    \item \textbf{Communication:} All members are expected to respond to team communications within 24 hours. Failure to respond within this timeframe is considered a trigger violation. Moreover, failure to communicate scheduling difficulties or absences in advance is also considered a communication violation.
+    \item \textbf{Quality:} All members are expected to complete their assigned tasks to an agreed upon standard. Repeated and blatant lack of effort or quality in completed tasks is considered a trigger violation. Members are expected to seek help from the team if they are struggling to complete their tasks to the expected standard. Failure to do so reflects on the entire team and is therefore a quality violation.
+    \item \textbf{Attitude:} All members are expected to maintain a respectful and open-minded attitude towards each other. A good attitude facilitates effective teamwork and communication. Repeated negative or disrespectful behaviour is considered a trigger violation. Differences of opinion and conflict are not excusable under this trigger. All members are expected to address any issues maturely and professionally based on the team charter guidelines.
+    \item \textbf{Contribution:} All members are expected to contribute equitably to the workload. Members are expected to proactively seek out tasks and responsibilities to support the team. Failure to achieve agreed upon performance metrics is a trigger violation. These expectations differ depending on the task, and may include number of commits, software features, lines of code, or even idea generation. The team will agree upon these metrics and expectations at the start of each phase.
+\end{itemize}
+All members agree that expectations have been met and no trigger violations have occurred thus far. We regularly communicate to ensure universal satisfaction with workload distribution, task quality, and the general direction of the project. Overall, the team is functioning well and there are no concerns regarding team performance at this time.
 
 \section{Additional Productivity Metrics}
 
-\wss{If your team has additional metrics of productivity, please feel free to
-add them to this report.}
+The additional productivity metrics we considered previously were pull requests and task completion time. The latter was deemed an ineffective measure due to the varying complexity of tasks, which made it difficult to draw meaningful conclusions. The pull request contributions since the POC are as follows: 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Student} & \textbf{Pull Requests} & \textbf{Percent}\\
+\midrule
+Total & 22 & 100\% \\
+Ibrahim Quraishi & 5 & 22.7\% \\
+Virochaan Ravichandran Gowri & 4 & 18.2\% \\
+Rayyan Suhail & 3 & 13.6\% \\
+Mohammad Mahdi Mahboob & 4 & 18.2\% \\
+Omar Al-Asfar & 6 & 27.3\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent We can see that this metric demonstrates a far more balanced contribution percentage compared to commits and issues. Pull requests are a more broad action, generally created per major task, and consisting of multiple commits and issues. This makes it a more reliable indicator of team contributions. There are still discrepancies due to varying task complexities, but it is more resistant to inflation than the other metrics. 
+\\\\
+\noindent In the future, it may be beneficial to separately track coding and documentation pull requests to more fairly assess contributions. Coding tasks typically require more effort and time, so they should be valued more heavily than documentation tasks.
 
 \end{document}
