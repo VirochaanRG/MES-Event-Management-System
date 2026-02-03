@@ -1,13 +1,12 @@
 import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { on } from "events";
-import { StatSyncFn } from "fs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import MultipleChoiceAnswerQuestion from "@/components/MultipleChoiceAnswerQuestion";
 import LinearScaleAnswerQuestion from "@/components/LinearScaleAnswerQuestion";
 import { FormQuestion, FormAnswer, Form, FormResponse} from "@/interfaces/interfaces";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import MultipleSelectAnswerQuestion from "@/components/MultipleSelectAnswerQuestion";
 
 export const Route = createFileRoute("/surveys/response/$formId")({
   component: RouteComponent,
@@ -24,6 +23,40 @@ function RouteComponent() {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [responses, setResponses] = useState<FormResponse[]>([]);
+
+  const visibleResponses = useMemo(() => {
+    return [...responses]
+      .sort((a, b) => (a.question.qorder ?? 0) - (b.question.qorder ?? 0))
+      .filter((r) => {
+        const parentId = r.question.parentQuestionId;
+        if (!parentId) return true;
+
+        const parentResponse = responses.find(
+          (x) => x.question.id === parentId
+        );
+        if (!parentResponse) return false;
+
+        const parsedOptions = parentResponse.question.optionsCategory
+          ? JSON.parse(parentResponse.question.optionsCategory)
+          : null;
+
+        const choices: string[] = parsedOptions?.choices ?? [];
+        const enablingAnswers = r.question.enablingAnswers.map(
+          (i) => choices[i] + ""
+        );
+
+        const parentAnswer = parentResponse.answer?.answer;
+
+        if (Array.isArray(parentAnswer)) {
+          return parentAnswer.some((a) => enablingAnswers.includes(a));
+        }
+        console.log(parentResponse.question.questionTitle, enablingAnswers, parentAnswer)
+
+        const visible = enablingAnswers.includes(parentAnswer ?? "");
+        if(!visible && r.answer) r.answer.answer = "";
+        return visible
+      });
+  }, [responses]);
 
   useEffect(() => {
     const fetchFormAndQuestions = async () => {
@@ -74,30 +107,42 @@ function RouteComponent() {
     navigate({ to: "/" });
   };
 
-  const handleResponseOnChange = (response: FormResponse, answer: string) => {
+  const handleResponseOnChange = ( response: FormResponse, value: string) => {
     setResponses((prev) =>
       prev.map((r) => {
-        // if this is the response we want to update
-        if (r.question.id === response.question.id) {
-          // create a new Answer object
-          const newAnswer: FormAnswer = {
-            id: r.answer?.id ?? 0, // keep id or 0 if undefined
-            userId: r.answer?.userId ?? 0,
-            formId: r.question.formId,
-            questionId: r.question.id,
-            questionType: r.question.questionType,
-            answer: answer,
-            createdAt: r.answer?.createdAt ?? "",
-          };
-          return { ...r, answer: newAnswer };
+        if (r.question.id !== response.question.id) return r;
+
+        let updatedAnswer: string | string[];
+
+        if (r.question.questionType === "multi_select") {
+          const prevAnswers = Array.isArray(r.answer?.answer)
+            ? r.answer!.answer
+            : [];
+
+          updatedAnswer = prevAnswers.includes(value)
+            ? prevAnswers.filter((v) => v !== value) // uncheck
+            : [...prevAnswers, value]; // check
+        } else {
+          updatedAnswer = value;
         }
-        return r;
+
+        const newAnswer: FormAnswer = {
+          id: r.answer?.id ?? 0,
+          userId: r.answer?.userId ?? 0,
+          formId: r.question.formId,
+          questionId: r.question.id,
+          questionType: r.question.questionType,
+          createdAt: r.answer?.createdAt ?? "",
+          answer: updatedAnswer,
+        };
+
+        return { ...r, answer: newAnswer };
       })
     );
   };
 
   const saveForm = async () => {
-    for (const response of getAllVisibleResponses()) {
+    for (const response of visibleResponses) {
       if(!response.answer || response.answer.answer.length == 0) continue;
       const request = {
         method: "POST",
@@ -132,7 +177,7 @@ function RouteComponent() {
     }
     try {
       setSubmitting(true);
-      if(getAllVisibleResponses().some(r => !r.answer || !r.answer.answer)) {
+      if(visibleResponses.some(r => !r.answer || !r.answer.answer)) {
         toast.error("Please fill in all required fields");
       } else {   
         const confirmation = confirm("Are you sure you want to submit?");
@@ -254,21 +299,6 @@ function RouteComponent() {
     );
   }
 
-  function getAllVisibleResponses() {
-    return responses
-      .sort((r1, r2) => r1.question.qOrder - r2.question.qOrder)
-      .filter((r) => { //show follow-up question if correct answer selected
-          const parentQuestionId = r.question.parentQuestionId;
-          if (!parentQuestionId) return true;
-          const parentResponse = responses.find(r => r.question.id === parentQuestionId);
-          if (!parentResponse) return true;
-          const parsedOptions = parentResponse.question.optionsCategory ? JSON.parse(parentResponse.question.optionsCategory) : null;
-          const choices: string[] = parsedOptions?.choices ?? [];
-          const enablingAnswers = r.question.enablingAnswers.map(i => choices[i] + "");
-          return enablingAnswers.includes(parentResponse.answer?.answer ?? "");
-      });
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
@@ -311,7 +341,7 @@ function RouteComponent() {
         </div>
 
         {/* Questions */}
-        {getAllVisibleResponses().map((response: FormResponse) =>
+        {visibleResponses.map((response: FormResponse) =>
             response.question.questionType === "text_answer" ? (
               <TextAnswerQuestion
                 key={response.question.id}
@@ -328,6 +358,13 @@ function RouteComponent() {
               />
             ) : response.question.questionType === "linear_scale" ? (
               <LinearScaleAnswerQuestion
+                key={response.question.id}
+                question={response.question}
+                answer={response.answer?.answer}
+                onChange={(e) => handleResponseOnChange(response, e)}
+              />
+            ) : response.question.questionType === "multi_select" ? (
+              <MultipleSelectAnswerQuestion
                 key={response.question.id}
                 question={response.question}
                 answer={response.answer?.answer}

@@ -426,6 +426,7 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
           eq(formQuestions.formId, parseInt(formId))
         ),
       });
+      console.log(currentQuestion)
 
       if (!currentQuestion)
       {
@@ -457,7 +458,24 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
           error: 'Previous question not found',
         });
       }
+      
+      if(currentQuestion.parentQuestionId) {
+        const parentQuestion = await db.query.formQuestions.findFirst({
+        where: and(
+          eq(formQuestions.id, parseInt(currentQuestion.parentQuestionId)),
+          eq(formQuestions.formId, parseInt(formId))
+        ),
+      });
+    
+      if (parentQuestion && currentQuestion.qorder - parentQuestion.qorder <= 1) {
+        return reply.code(400).send({
+          success: false,
+          error: "Follow-up question cannot be moved above parent question",
+        });
+      }
 
+      }
+        
       await db
         .update(formQuestions)
         .set({ qorder: currentQuestion.qorder })
@@ -533,6 +551,20 @@ fastify.patch<{ Params: { formId: string; questionId: string } }>(
         return reply.code(404).send({
           success: false,
           error: 'Next question not found',
+        });
+      }
+
+      const childQuestion = await db.query.formQuestions.findFirst({
+        where: and(
+          eq(formQuestions.parentQuestionId, parseInt(currentQuestion.id)),
+          eq(formQuestions.formId, parseInt(formId))
+        ),
+      });
+    
+      if (childQuestion && childQuestion.qorder - currentQuestion.qorder <= 1) {
+        return reply.code(400).send({
+          success: false,
+          error: "Cannot move question below its follow-up",
         });
       }
 

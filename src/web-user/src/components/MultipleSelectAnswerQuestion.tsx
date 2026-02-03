@@ -1,0 +1,59 @@
+import { FormQuestion } from "@/interfaces/interfaces";
+
+export default function MultipleSelectAnswerQuestion({
+  question,
+  answer,
+  onChange,
+}) {
+  const { questionTitle, optionsCategory } = question;
+
+  let choices: string[] = [];
+  let minSelect = 0;
+  let maxSelect;
+  if (optionsCategory) {
+    const parsed = JSON.parse(optionsCategory);
+    if (Array.isArray(parsed.choices)) {
+      choices = parsed.choices;
+    }
+    minSelect = parsed.min;
+    maxSelect = parsed.max;
+  }
+
+  return (
+    <div className="p-6 border border-gray-200 rounded-lg hover:border-gray-300 bg-white">
+      <div className="mb-4">
+        <div className="text-lg text-gray-900 font-medium">
+          {questionTitle || "Untitled Question"}
+        </div>
+      </div>          
+      <div className="text-sm text-gray-400">
+        { minSelect == maxSelect ? "Select exactly " + minSelect :
+          minSelect !== 0 && maxSelect === null ? "Select at least " + minSelect :
+          maxSelect !== null && minSelect === 0 ? "Select up to " + maxSelect :
+          minSelect > 0 && maxSelect !== null ? "Select between "  + minSelect + " and " + maxSelect : ""}
+      </div>
+      <div className="space-y-2 mt-4">
+        {choices.map((choice, index) => {
+          const id = `question-${question.id}-choice-${index}`;
+          return (
+            <label
+              key={id}
+              htmlFor={id}
+              className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+            >
+              <input
+                type="checkbox"
+                id={id}
+                name={`question-${question.id}`}
+                checked={Array.isArray(answer) && answer.includes(choice)}
+                onChange={() => onChange(choice)}
+                className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+              />
+              <span className="text-gray-700">{choice}</span>
+            </label>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

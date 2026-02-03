@@ -1,5 +1,6 @@
 import { LinearScaleQuestion } from "@/components/LinearScaleQuestion";
 import MultipleChoiceQuestion from "@/components/MultipleChoiceQuestion";
+import MultiSelectQuestion from "@/components/MultiSelectQuestion";
 import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
 import { Form, FormQuestion } from "@/interfaces/interfaces";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -29,6 +30,8 @@ function RouteComponent() {
   const [mcChoices, setMcChoices] = useState<string[]>(["", ""]);
   const [scaleMin, setScaleMin] = useState(1);
   const [scaleMax, setScaleMax] = useState(5);
+  const [selectionsMin, setSelectionsMin] = useState<number>(0);
+  const [selectionsMax, setSelectionsMax] = useState<number | null>(null);
   const [scaleMinLabel, setScaleMinLabel] = useState("");
   const [scaleMaxLabel, setScaleMaxLabel] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -142,12 +145,17 @@ function RouteComponent() {
       setScaleMax(parsed.max || 5);
       setScaleMinLabel(parsed.minLabel || "");
       setScaleMaxLabel(parsed.maxLabel || "");
+    } else if (
+      question.questionType === "multi_select" &&
+      question.optionsCategory
+    ) {
+      const parsed = JSON.parse(question.optionsCategory);
+      setMcChoices(parsed.choices || ["", ""]);
+      setSelectionsMin(parsed.min);
+      setSelectionsMax(parsed.max);
     }
-    //If question is a followup
     if (question.parentQuestionId && question.enablingAnswers) {
-      // Convert to numbers just in case
-      const triggers = question.enablingAnswers.map((i: any) => Number(i));
-      setSelectedTriggers(triggers);
+      setSelectedTriggers(question.enablingAnswers);
     } else {
       setSelectedTriggers([]);
     }
@@ -158,8 +166,8 @@ function RouteComponent() {
     setIsModalOpen(false);
     setSelectedQuestionType("");
     setEditingQuestion(null);
-    setFollowupParentId(null); // Add this line
-    setSelectedTriggers([]); // Add this line
+    setFollowupParentId(null);
+    setSelectedTriggers([]);
     setOpenFollowupFor(null);
   };
 
@@ -296,6 +304,21 @@ function RouteComponent() {
             { length: scaleMax - scaleMin + 1 },
             (_, i) => scaleMin + i,
           ),
+        });
+      } else if (selectedQuestionType === "multi_select") {
+        const validChoices = mcChoices.filter((c) => c.trim() !== "");
+        if (validChoices.length < 2) {
+          alert("Please provide at least 2 choices");
+          return;
+        }
+        if (new Set(validChoices).size !== validChoices.length) {
+          alert("Duplicate choices are not allowed");
+          return;
+        }
+        optionsCategory = JSON.stringify({ 
+          choices: validChoices,
+          min: selectionsMin >= 0 ? selectionsMin : 0,
+          max: (selectionsMax ?? Infinity) < validChoices.length ? selectionsMax : null
         });
       }
 
@@ -449,6 +472,12 @@ function RouteComponent() {
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       Linear Scale
+                    </button>
+                    <button
+                      onClick={() => openModal("multi_select")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Multiple Selection
                     </button>
                   </div>
                 )}
@@ -672,6 +701,12 @@ function RouteComponent() {
                         questionsList={questions}
                       />
                     )}
+                    {question.questionType === "multi_select" && (
+                      <MultiSelectQuestion
+                        question={question}
+                        questionsList={questions}
+                      />
+                    )}
                   </div>
                 </div>
               ))
@@ -863,6 +898,70 @@ function RouteComponent() {
                       />
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* Multi Select Options */}
+              {selectedQuestionType === "multi_select" && (
+                <div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Minimum required selections
+                      </label>
+                      <input
+                        min={0}
+                        type="number"
+                        value={selectionsMin}
+                        onChange={(e) => setSelectionsMin(parseInt(e.target.value ?? "0"))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Maximum required selections
+                      </label>
+                      <input
+                        min={1}
+                        type="number"
+                        value={selectionsMax ?? ""}
+                        onChange={(e) => setSelectionsMax(parseInt(e.target.value))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Answer Choices
+                  </label>
+                  <div className="space-y-2">
+                    {mcChoices.map((choice, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={choice}
+                          onChange={(e) =>
+                            updateMcChoice(index, e.target.value)
+                          }
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          placeholder={`Choice ${index + 1}`}
+                        />
+                        {mcChoices.length > 2 && (
+                          <button
+                            onClick={() => removeMcChoice(index)}
+                            className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={addMcChoice}
+                    className="mt-3 text-sm font-medium text-gray-700 hover:text-gray-900"
+                  >
+                    + Add choice
+                  </button>
                 </div>
               )}
             </div>

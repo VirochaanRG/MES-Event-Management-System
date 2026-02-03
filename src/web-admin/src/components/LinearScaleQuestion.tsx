@@ -10,8 +10,6 @@ export function LinearScaleQuestion({ question, questionsList }: { question: For
     ? JSON.parse(parentQuestion.optionsCategory).choices
     : [];
 
-  console.log(parentQuestion);
-
   const config = question.optionsCategory
     ? JSON.parse(question.optionsCategory)
     : { min: 1, max: 5, minLabel: "", maxLabel: "" };
