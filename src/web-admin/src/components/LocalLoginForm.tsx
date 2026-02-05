@@ -5,12 +5,6 @@ interface LocalLoginFormProps {
   onLoginSuccess: (user: AuthUser, token: string) => void;
 }
 
-const TEST_ACCOUNTS = [
-  { email: "admin1@teamd.com", password: "admin123456" },
-  { email: "admin2@teamd.com", password: "admin123456" },
-  { email: "admin3@teamd.com", password: "admin123456" },
-];
-
 export default function LocalLoginForm({
   onLoginSuccess,
 }: LocalLoginFormProps) {

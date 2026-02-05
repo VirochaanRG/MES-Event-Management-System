@@ -37,6 +37,9 @@ export default function LocalLoginForm({
       if (response.ok) {
         const data = await response.json();
         onLoginSuccess(data.user, data.token);
+        sessionStorage.setItem("teamd-auth-user", JSON.stringify(data.user));
+        sessionStorage.setItem("teamd-auth-token", data.token);
+        sessionStorage.setItem("teamd-auth-source", "local");
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Authentication failed");
