@@ -1,6 +1,6 @@
 {
-  "id": "8e435943-792f-488b-bff0-5e61aabf03e4",
-  "prevId": "6814ebf7-39d5-43ae-aeb4-e509c90d2f28",
+  "id": "d077f3d1-78e3-4a0d-b480-f44240236628",
+  "prevId": "8e435943-792f-488b-bff0-5e61aabf03e4",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -440,6 +440,13 @@
           "type": "json",
           "primaryKey": false,
           "notNull": false
+        },
+        "required": {
+          "name": "required",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
