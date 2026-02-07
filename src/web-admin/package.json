@@ -19,6 +19,7 @@
   "dependencies": {
     "@fastify/cookie": "^10.0.1",
     "@fastify/cors": "^10.0.1",
+    "@fastify/multipart": "^9.4.0",
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-router": "^1.58.3",
     "bcrypt": "^6.0.0",
