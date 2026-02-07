@@ -22,7 +22,9 @@ function RouteComponent() {
   const [error, setError] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState<FormQuestion | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<FormQuestion | null>(
+    null,
+  );
   const [openFollowupFor, setOpenFollowupFor] = useState<number | null>(null);
   const [followupParentId, setFollowupParentId] = useState<number | null>(null);
   const [selectedTriggers, setSelectedTriggers] = useState<number[]>([]);
@@ -41,24 +43,24 @@ function RouteComponent() {
   const allowedTypesForFollowUp = ["multiple_choice", "linear_scale"];
 
   useEffect(() => {
-      const initAuth = () => {
-        const sessionUser = getCurrentUser("admin");
-        if (sessionUser) {
-          if (sessionUser.roles && sessionUser.roles.includes("admin")) {
-            setCurrentUser(sessionUser);
-          } else {
-            console.error("User does not have admin role");
-            logout("admin");
-            navigate({ to: "/" });
-          }
+    const initAuth = () => {
+      const sessionUser = getCurrentUser("admin");
+      if (sessionUser) {
+        if (sessionUser.roles && sessionUser.roles.includes("admin")) {
+          setCurrentUser(sessionUser);
         } else {
+          console.error("User does not have admin role");
+          logout("admin");
           navigate({ to: "/" });
         }
-        setLoading(false);
-      };
-  
-      initAuth();
-    }, [navigate]);
+      } else {
+        navigate({ to: "/" });
+      }
+      setLoading(false);
+    };
+
+    initAuth();
+  }, [navigate]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -151,7 +153,7 @@ function RouteComponent() {
     setFollowupParentId(question.parentQuestionId);
     setSelectedQuestionType(question.questionType);
     setQuestionTitle(question.questionTitle || "");
-    setRequired(question.required)
+    setRequired(question.required);
     // Parse options based on question type
     if (
       question.questionType === "multiple_choice" &&
@@ -338,10 +340,13 @@ function RouteComponent() {
           alert("Duplicate choices are not allowed");
           return;
         }
-        optionsCategory = JSON.stringify({ 
+        optionsCategory = JSON.stringify({
           choices: validChoices,
           min: selectionsMin >= 0 ? selectionsMin : 0,
-          max: (selectionsMax ?? Infinity) < validChoices.length ? selectionsMax : null
+          max:
+            (selectionsMax ?? Infinity) < validChoices.length
+              ? selectionsMax
+              : null,
         });
       }
 
@@ -362,7 +367,7 @@ function RouteComponent() {
               qorder: editingQuestion.qorder,
               parentQuestionId: followupParentId || undefined,
               enablingAnswers: selectedTriggers || [],
-              required : required
+              required: required,
             }),
           },
         );
@@ -395,7 +400,7 @@ function RouteComponent() {
             qorder: nextOrder,
             parentQuestionId: followupParentId || undefined,
             enablingAnswers: selectedTriggers || [],
-            required: required
+            required: required,
           }),
         });
 
@@ -439,10 +444,11 @@ function RouteComponent() {
     return null;
   }
   return (
-    <AdminLayout 
-        user={currentUser}
-        title="Form Builder"
-        subtitle="Create and edit forms">
+    <AdminLayout
+      user={currentUser}
+      title="Form Builder"
+      subtitle="Create and edit forms"
+    >
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button
@@ -767,7 +773,8 @@ function RouteComponent() {
               <div className="flex items-center gap-2">
                 <label
                   htmlFor="required"
-                  className="text-sm font-medium text-gray-900">
+                  className="text-sm font-medium text-gray-900"
+                >
                   Required Question
                 </label>
                 <input
@@ -775,7 +782,8 @@ function RouteComponent() {
                   id="required"
                   checked={required}
                   onChange={(e) => setRequired(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"/>
+                  className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                />
               </div>
 
               {/* Follow up answers */}
@@ -958,7 +966,9 @@ function RouteComponent() {
                         min={0}
                         type="number"
                         value={selectionsMin}
-                        onChange={(e) => setSelectionsMin(parseInt(e.target.value ?? "0"))}
+                        onChange={(e) =>
+                          setSelectionsMin(parseInt(e.target.value ?? "0"))
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                       />
                     </div>
@@ -970,7 +980,9 @@ function RouteComponent() {
                         min={1}
                         type="number"
                         value={selectionsMax ?? ""}
-                        onChange={(e) => setSelectionsMax(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          setSelectionsMax(parseInt(e.target.value))
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                       />
                     </div>

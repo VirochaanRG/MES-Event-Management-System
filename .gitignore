@@ -281,3 +281,11 @@ docs/ProblemStatementAndGoals/ProblemStatement.pdf
 node_modules
 dist
 **/routeTree.gen.ts
+src/db/drizzle/0002_black_shotgun.sql
+src/db/drizzle/meta/_journal.json
+src/db/drizzle/meta/0002_snapshot.json
+src/db/drizzle/meta/_journal.json
+src/db/drizzle/meta/0002_snapshot.json
+src/db/drizzle/meta/_journal.json
+src/db/drizzle/meta/0002_snapshot.json
+src/db/drizzle/meta/_journal.json

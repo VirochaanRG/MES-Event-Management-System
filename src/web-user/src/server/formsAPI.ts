@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
 import { form, formAnswers, formQuestions, formSubmissions } from './../../../db/src/schemas/form';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, isNull, notInArray, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
 {
@@ -31,21 +31,42 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { uid } = request.params;
-      const allForms = await db
-        .select({
-          id: form.id,
-          name: form.name,
-          description: form.description,
-          createdAt: form.createdAt,
-        })
-        .from(form)
-        .leftJoin(
-          formSubmissions,
-          and(eq(form.id, formSubmissions.formId), eq(formSubmissions.userId, uid))
-        )
-        .where(sql`${formSubmissions.id} IS NULL`);
 
-      console.log('UNFILLED: ' + allForms);
+      // Get all form IDs that the user has submitted
+      const submittedFormIds = await db
+        .select({ formId: formSubmissions.formId })
+        .from(formSubmissions)
+        .where(eq(formSubmissions.userId, uid));
+
+      const submittedIds = submittedFormIds.map(s => s.formId);
+
+      // Get all forms NOT in the submitted list
+      let allForms;
+      if (submittedIds.length > 0)
+      {
+        allForms = await db
+          .select({
+            id: form.id,
+            name: form.name,
+            description: form.description,
+            createdAt: form.createdAt,
+          })
+          .from(form)
+          .where(notInArray(form.id, submittedIds));
+      } else
+      {
+        // If no submissions, return all forms
+        allForms = await db
+          .select({
+            id: form.id,
+            name: form.name,
+            description: form.description,
+            createdAt: form.createdAt,
+          })
+          .from(form);
+      }
+
+      console.log('UNFILLED: ', allForms);
 
       return reply.send({
         success: true,
@@ -60,7 +81,6 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
-
   //GET filled forms for user
   fastify.get<{ Params: { uid: string } }>('/api/forms/completed/:uid', async (request, reply) =>
   {
@@ -78,7 +98,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
         .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
         .where(eq(formSubmissions.userId, uid));
 
-      console.log('FILLED: ' + allForms);
+      console.log('FILLED: ', allForms);
 
       return reply.send({
         success: true,
@@ -136,16 +156,37 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         const { fid, uid } = request.params;
 
-        const submission = await db.query.formSubmissions.findFirst({
-          where: and(eq(formSubmissions.formId, parseInt(fid)), eq(formSubmissions.userId, uid)),
-        });
+        console.log('Checking status for:', { fid, uid }); // Debug log
 
-        if (!submission)
+        const submission = await db
+          .select()
+          .from(formSubmissions)
+          .where(
+            and(
+              eq(formSubmissions.formId, parseInt(fid)),
+              eq(formSubmissions.userId, uid)
+            )
+          )
+          .limit(1);
+
+        console.log('Submission found:', submission); // Debug log
+
+        if (!submission || submission.length === 0)
         {
-          const answer = await db.query.formAnswers.findFirst({
-            where: and(eq(formAnswers.formId, parseInt(fid)), eq(formAnswers.userId, uid)),
-          });
-          if (!answer)
+          const answer = await db
+            .select()
+            .from(formAnswers)
+            .where(
+              and(
+                eq(formAnswers.formId, parseInt(fid)),
+                eq(formAnswers.userId, uid)
+              )
+            )
+            .limit(1);
+
+          console.log('Answer found:', answer); // Debug log
+
+          if (!answer || answer.length === 0)
           {
             return reply.send({
               success: true,
@@ -167,10 +208,11 @@ export default async function formsRoutes(fastify: FastifyInstance)
         }
       } catch (error)
       {
-        fastify.log.error({ err: error }, 'Failed to fetch form');
+        fastify.log.error({ err: error }, 'Failed to fetch form status');
+        console.error('Status check error:', error); // Debug log
         return reply.code(500).send({
           success: false,
-          error: 'Failed to fetch form',
+          error: 'Failed to fetch form status',
         });
       }
     }
@@ -342,6 +384,16 @@ export default async function formsRoutes(fastify: FastifyInstance)
             formId: parseInt(fid),
           })
           .returning();
+        await db
+          .update(formAnswers)
+          .set({ submissionId: submission[0].id })
+          .where(
+            and(
+              eq(formAnswers.formId, parseInt(fid)),
+              eq(formAnswers.userId, uid),
+              isNull(formAnswers.submissionId)
+            )
+          );
       }
 
       return reply.code(201).send({
