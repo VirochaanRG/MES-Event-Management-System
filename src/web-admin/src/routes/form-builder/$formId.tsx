@@ -441,8 +441,8 @@ function RouteComponent() {
   return (
     <AdminLayout 
         user={currentUser}
-        title="Form Analytics"
-        subtitle="View and analyze form submissions and responses">
+        title="Form Builder"
+        subtitle="Create and edit forms">
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button
