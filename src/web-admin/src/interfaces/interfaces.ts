@@ -17,6 +17,7 @@ export interface FormQuestion
   createdAt: string;
   parentQuestionId: number | null;
   enablingAnswers: number[];
+  required : boolean
 }
 
 export interface Event

@@ -1,3 +1,4 @@
+import { boolean } from "drizzle-orm/gel-core";
 import { pgTable, serial, varchar, text, timestamp, integer, json } from "drizzle-orm/pg-core";
 
 export const form = pgTable("form", {
@@ -29,7 +30,8 @@ export const formQuestions = pgTable("form_questions", {
   qorder: integer("qorder").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   parentQuestionId: integer("parent_question_id").references(() => formQuestions.id),
-  enablingAnswers: json("enabling_answers").$type<number[]>()
+  enablingAnswers: json("enabling_answers").$type<number[]>(),
+  required: boolean("required").notNull().default(false)
 });
 
 export const formAnswers = pgTable("form_answers", {

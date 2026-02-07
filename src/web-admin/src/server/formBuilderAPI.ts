@@ -9,13 +9,13 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
   // CREATE a form question
   fastify.post<{
     Params: { id: string };
-    Body: { questionType: string; questionTitle?: string; optionsCategory?: string; qorder: number; parentQuestionId?: number; enablingAnswers?: number[] };
+    Body: { questionType: string; questionTitle?: string; optionsCategory?: string; qorder: number; parentQuestionId?: number; enablingAnswers?: number[]; required : boolean };
   }>('/api/forms/:id/questions', async (request, reply) =>
   {
     try
     {
       const { id } = request.params;
-      const { questionType, questionTitle, optionsCategory, qorder, parentQuestionId, enablingAnswers } = request.body;
+      const { questionType, questionTitle, optionsCategory, qorder, parentQuestionId, enablingAnswers, required } = request.body;
 
       if (!questionType || questionType.trim() === '')
       {
@@ -54,7 +54,8 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
           optionsCategory: optionsCategory?.trim() || null,
           qorder: qorder,
           parentQuestionId: parentQuestionId || null,
-          enablingAnswers: enablingAnswers || []
+          enablingAnswers: enablingAnswers || [],
+          required : required
         })
         .returning();
 
@@ -172,13 +173,14 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       optionsCategory?: string;
       qorder?: number;
       enablingAnswers?: number[];
+      required?: boolean
     };
   }>('/api/forms/:formId/questions/:questionId', async (request, reply) =>
   {
     try
     {
       const { formId, questionId } = request.params;
-      const { questionType, questionTitle, optionsCategory, qorder, enablingAnswers } = request.body;
+      const { questionType, questionTitle, optionsCategory, qorder, enablingAnswers, required } = request.body;
 
       const existingForm = await db.query.form.findFirst({
         where: eq(form.id, parseInt(formId)),
@@ -229,7 +231,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       {
         updateData.enablingAnswers = enablingAnswers;
       }
-
+      updateData.required = required;
 
       if (Object.keys(updateData).length === 0)
       {

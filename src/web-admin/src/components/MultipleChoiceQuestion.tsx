@@ -33,7 +33,7 @@ export default function MultipleChoiceQuestion({
             {question.questionTitle || "Untitled Question"}
           </div>
         </div>
-        <div className="text-sm text-gray-400">#{question.qorder}</div>
+        {question.required && <div className="text-sm text-red-600 font-small mb-2">* Required</div>}
       </div>
       <div className="space-y-2 mt-4">
         {options.map((choice: string, index: number) => (

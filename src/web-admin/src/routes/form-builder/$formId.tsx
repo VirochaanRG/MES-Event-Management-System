@@ -1,8 +1,10 @@
+import AdminLayout from "@/components/AdminLayout";
 import { LinearScaleQuestion } from "@/components/LinearScaleQuestion";
 import MultipleChoiceQuestion from "@/components/MultipleChoiceQuestion";
 import MultiSelectQuestion from "@/components/MultiSelectQuestion";
 import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
 import { Form, FormQuestion } from "@/interfaces/interfaces";
+import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 
@@ -12,6 +14,7 @@ export const Route = createFileRoute("/form-builder/$formId")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const { formId } = Route.useParams();
   const [formData, setFormData] = useState<Form | null>(null);
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
@@ -19,14 +22,13 @@ function RouteComponent() {
   const [error, setError] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState<FormQuestion | null>(
-    null,
-  );
+  const [editingQuestion, setEditingQuestion] = useState<FormQuestion | null>(null);
   const [openFollowupFor, setOpenFollowupFor] = useState<number | null>(null);
   const [followupParentId, setFollowupParentId] = useState<number | null>(null);
   const [selectedTriggers, setSelectedTriggers] = useState<number[]>([]);
   const [selectedQuestionType, setSelectedQuestionType] = useState<string>("");
   const [questionTitle, setQuestionTitle] = useState("");
+  const [required, setRequired] = useState(false);
   const [mcChoices, setMcChoices] = useState<string[]>(["", ""]);
   const [scaleMin, setScaleMin] = useState(1);
   const [scaleMax, setScaleMax] = useState(5);
@@ -37,6 +39,26 @@ function RouteComponent() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const allowedTypesForFollowUp = ["multiple_choice", "linear_scale"];
+
+  useEffect(() => {
+      const initAuth = () => {
+        const sessionUser = getCurrentUser("admin");
+        if (sessionUser) {
+          if (sessionUser.roles && sessionUser.roles.includes("admin")) {
+            setCurrentUser(sessionUser);
+          } else {
+            console.error("User does not have admin role");
+            logout("admin");
+            navigate({ to: "/" });
+          }
+        } else {
+          navigate({ to: "/" });
+        }
+        setLoading(false);
+      };
+  
+      initAuth();
+    }, [navigate]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -129,6 +151,7 @@ function RouteComponent() {
     setFollowupParentId(question.parentQuestionId);
     setSelectedQuestionType(question.questionType);
     setQuestionTitle(question.questionTitle || "");
+    setRequired(question.required)
     // Parse options based on question type
     if (
       question.questionType === "multiple_choice" &&
@@ -339,6 +362,7 @@ function RouteComponent() {
               qorder: editingQuestion.qorder,
               parentQuestionId: followupParentId || undefined,
               enablingAnswers: selectedTriggers || [],
+              required : required
             }),
           },
         );
@@ -371,6 +395,7 @@ function RouteComponent() {
             qorder: nextOrder,
             parentQuestionId: followupParentId || undefined,
             enablingAnswers: selectedTriggers || [],
+            required: required
           }),
         });
 
@@ -410,9 +435,14 @@ function RouteComponent() {
       </div>
     );
   }
-
+  if (!currentUser) {
+    return null;
+  }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <AdminLayout 
+        user={currentUser}
+        title="Form Analytics"
+        subtitle="View and analyze form submissions and responses">
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button
@@ -733,6 +763,21 @@ function RouteComponent() {
             </div>
 
             <div className="p-6 space-y-5">
+              {/* Required Question */}
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="required"
+                  className="text-sm font-medium text-gray-900">
+                  Required Question
+                </label>
+                <input
+                  type="checkbox"
+                  id="required"
+                  checked={required}
+                  onChange={(e) => setRequired(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"/>
+              </div>
+
               {/* Follow up answers */}
               {followupParentId &&
                 (() => {
@@ -983,6 +1028,6 @@ function RouteComponent() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }

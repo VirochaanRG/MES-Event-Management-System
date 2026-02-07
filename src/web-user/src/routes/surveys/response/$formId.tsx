@@ -21,7 +21,7 @@ function RouteComponent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { formId } = Route.useParams();
-  const userId = JSON.parse(sessionStorage.getItem("teamd-auth-user")).email;
+  const userId = JSON.parse(sessionStorage.getItem("teamd-auth-user") ?? "{\"email\" : \"\"}").email;
   const [form, setForm] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -191,7 +191,7 @@ function RouteComponent() {
     };
     try {
       setSubmitting(true);
-      if (visibleResponses.some((r) => !r.answer || !r.answer.answer)) {
+      if (visibleResponses.filter(r => r.question.required).some((r) => !r.answer || !r.answer.answer || (Array.isArray(r.answer.answer) && r.answer.answer.length === 0))) {
         toast.error("Please fill in all required fields");
       } else {
         const confirmation = confirm("Are you sure you want to submit?");
@@ -359,7 +359,7 @@ function RouteComponent() {
           response.question.questionType === "text_answer" ? (
             <TextAnswerQuestion
               key={response.question.id}
-              questionTitle={response.question.questionTitle}
+              question={response.question}
               answer={response.answer?.answer}
               onChange={(e) => handleResponseOnChange(response, e)}
             />
