@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import multipart from '@fastify/multipart';
 import { db } from '../../../db/src/db';
 import { images } from '../../../db/src/schemas/images';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 // Type definitions for route parameters and body
 interface UploadBody
@@ -240,8 +240,12 @@ export default async function imageRoutes(fastify: FastifyInstance)
         const result = await db
           .select()
           .from(images)
-          .where(eq(images.component, component))
-          .where(eq(images.index, parseInt(index)))
+          .where(
+            and(
+              eq(images.component, component),
+              eq(images.index, parseInt(index))
+            )
+          )
           .limit(1);
 
         if (result.length === 0)
@@ -263,6 +267,47 @@ export default async function imageRoutes(fastify: FastifyInstance)
           success: false,
           error: 'Failed to fetch image',
         });
+      }
+    }
+  );
+
+
+  // Get event image
+  fastify.get<{ Params: { eventId: string } }>(
+    '/api/images/event/:eventId',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { eventId } = request.params;
+        const eventIdNum = parseInt(eventId);
+
+        if (isNaN(eventIdNum))
+        {
+          return reply.code(400).send({ success: false, error: 'Invalid event ID' });
+        }
+
+        const result = await db
+          .select()
+          .from(images)
+          .where(and(eq(images.component, 'event'), eq(images.index, eventIdNum)))
+          .limit(1);
+
+        if (result.length === 0)
+        {
+          return reply.code(404).send({ success: false, error: 'Image not found' });
+        }
+
+        const image = result[0];
+
+        return reply
+          .header('Content-Type', image.mimeType || 'image/jpeg')
+          .header('Cache-Control', 'public, max-age=3600')
+          .send(image.imageData);
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Error fetching image');
+        return reply.code(500).send({ success: false, error: 'Failed to fetch image' });
       }
     }
   );
