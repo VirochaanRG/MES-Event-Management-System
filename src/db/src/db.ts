@@ -1,15 +1,12 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import * as dotenv from 'dotenv';
-import { events } from './schemas/events';
-import { form } from './schemas/form';
 import * as schemas from './schemas';
 // Load environment variables from .env
-dotenv.config();
+import { config } from "../../config/config";
 
 // Create a Postgres connection pool
 const pool = new Pool({
-  connectionString: "postgres://postgres:password@localhost:5432/db",
+  connectionString: config.DATABASE_URL,
 });
 pool.connect()
   .then((client) =>
