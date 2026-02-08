@@ -1,5 +1,8 @@
-import { pgTable, serial, varchar, text, timestamp, integer, boolean,
-  unique, customType } from "drizzle-orm/pg-core";
+import
+{
+  pgTable, serial, varchar, text, timestamp, integer, boolean,
+  unique, customType
+} from "drizzle-orm/pg-core";
 
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),
@@ -37,13 +40,14 @@ export const registeredUsers = pgTable("registered_users", {
 );
 
 const bytea = customType<{ data: Buffer; notNull: true; }>({
-  dataType() {
+  dataType()
+  {
     return 'bytea';
   },
 });
 
 export const qrCodes = pgTable("qr_codes", {
-  id: serial("id").references(() => registeredUsers.id, {onDelete: "cascade" }),
+  id: serial("id").references(() => registeredUsers.id, { onDelete: "cascade" }),
   eventId: integer("event_id").notNull(),
   userEmail: varchar("user_email", { length: 255 }).notNull(),
   instance: integer("instance").notNull(),
@@ -51,3 +55,7 @@ export const qrCodes = pgTable("qr_codes", {
   // content: varchar("content", {length: 255}).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
+
+
+
+
