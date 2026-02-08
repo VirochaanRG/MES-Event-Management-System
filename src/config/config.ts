@@ -3,12 +3,13 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // For ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const rootPath = path.resolve(process.cwd(), ".ENV");
 
-// Load environment variables from root .env file
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
-
+const result = dotenv.config({ path: rootPath })
+if (result.error)
+{
+  console.error("❌ Dotenv Error:", result.error);
+}
 export const config = {
   DATABASE_URL: process.env.DATABASE_URL || "",
   ENVIRONMENT: process.env.ENVIRONMENT || "dev",
