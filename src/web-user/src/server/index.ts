@@ -572,29 +572,6 @@ await fastify.register(formsRoutes)
 await fastify.register(publicImageRoutes)
 
 
-if (config.ENVIRONMENT === 'production')
-{
-  // Serve static files (CSS, JS, images, etc.)
-  await fastify.register(fastifyStatic, {
-    root: path.join(__dirname, '../../client'),
-    prefix: '/',
-  });
-
-  // Fallback to index.html for client-side routing
-  // This allows React Router (or TanStack Router) to handle routes
-  fastify.setNotFoundHandler((request, reply) =>
-  {
-    // Don't catch API routes
-    if (request.url.startsWith('/api'))
-    {
-      reply.code(404).send({ error: 'API endpoint not found' });
-      return;
-    }
-    // Send index.html for all other routes (SPA routing)
-    reply.sendFile('index.html');
-  });
-}
-
 // Start server
 try
 {

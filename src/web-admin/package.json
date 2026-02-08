@@ -11,7 +11,7 @@
     "build:client": "vite build",
     "build:server": "tsc -p tsconfig.server.json --listFiles --listEmittedFiles",
     "preview": "vite preview",
-    "start": "node --import tsx dist/server/index.js",
+    "start": "node --import tsx dist/server/web-admin/src/server/index.js",
     "clean": "rm -rf dist .next",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
