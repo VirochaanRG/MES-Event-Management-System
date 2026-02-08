@@ -1,3 +1,4 @@
+import { fastifyStatic } from '@fastify/static';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
@@ -11,6 +12,8 @@ import { form, formQuestions, formAnswers, formSubmissions, qrCodes } from '@db/
 import QRCode from 'qrcode';
 import formsRoutes from './formsAPI';
 import publicImageRoutes from './imagesAPI';
+import { config } from '../../../config/config';
+import path from 'path';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -567,6 +570,31 @@ fastify.get('/api/events/:id/latest-instance', async (request, reply) =>
 await fastify.register(formsRoutes)
 
 await fastify.register(publicImageRoutes)
+
+
+if (config.ENVIRONMENT === 'production')
+{
+  // Serve static files (CSS, JS, images, etc.)
+  await fastify.register(fastifyStatic, {
+    root: path.join(__dirname, '../../client'),
+    prefix: '/',
+  });
+
+  // Fallback to index.html for client-side routing
+  // This allows React Router (or TanStack Router) to handle routes
+  fastify.setNotFoundHandler((request, reply) =>
+  {
+    // Don't catch API routes
+    if (request.url.startsWith('/api'))
+    {
+      reply.code(404).send({ error: 'API endpoint not found' });
+      return;
+    }
+    // Send index.html for all other routes (SPA routing)
+    reply.sendFile('index.html');
+  });
+}
+
 // Start server
 try
 {
