@@ -1,7 +1,7 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
 import { images } from '../../../db/src/schemas/images';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 // Type definitions
 interface ComponentParams
@@ -16,6 +16,46 @@ interface IdParams
 
 export default async function publicImageRoutes(fastify: FastifyInstance)
 {
+  // Get event image
+  fastify.get<{ Params: { eventId: string } }>(
+    '/api/images/event/:eventId',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { eventId } = request.params;
+        const eventIdNum = parseInt(eventId);
+
+        if (isNaN(eventIdNum))
+        {
+          return reply.code(400).send({ success: false, error: 'Invalid event ID' });
+        }
+
+        const result = await db
+          .select()
+          .from(images)
+          .where(and(eq(images.component, 'event'), eq(images.index, eventIdNum)))
+          .limit(1);
+
+        if (result.length === 0)
+        {
+          return reply.code(404).send({ success: false, error: 'Image not found' });
+        }
+
+        const image = result[0];
+
+        return reply
+          .header('Content-Type', image.mimeType || 'image/jpeg')
+          .header('Cache-Control', 'public, max-age=3600')
+          .send(image.imageData);
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Error fetching image');
+        return reply.code(500).send({ success: false, error: 'Failed to fetch image' });
+      }
+    }
+  );
+
   // Get all images for a specific component (public route)
   fastify.get<{ Params: ComponentParams }>(
     '/api/public/images/:component',
