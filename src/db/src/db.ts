@@ -1,8 +1,8 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import * as schemas from './schemas';
+import { config } from '../../config/config';
+import * as schemas from './schemas/';
 // Load environment variables from .env
-import { config } from "../../config/config";
 
 // Create a Postgres connection pool
 const pool = new Pool({
@@ -16,6 +16,7 @@ pool.connect()
   })
   .catch((err) =>
   {
+    console.log(config.DATABASE_URL)
     console.error('❌ Failed to connect to PostgreSQL:');
     console.error(err);
   });

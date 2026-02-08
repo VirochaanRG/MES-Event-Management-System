@@ -9,7 +9,8 @@
     "src/api",
     "src/mobile",
     "src/shared",
-    "src/db"
+    "src/db",
+    "src/config"
   ],
   "packageManager": "pnpm@10.23.0",
   "scripts": {
