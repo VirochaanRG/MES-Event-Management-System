@@ -15,6 +15,20 @@
       "when": 1769099034733,
       "tag": "0001_chief_mongoose",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770495880976,
+      "tag": "0002_black_shotgun",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770502731851,
+      "tag": "0003_dapper_whirlwind",
+      "breakpoints": true
     }
   ]
 }

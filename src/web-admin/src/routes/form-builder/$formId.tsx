@@ -1,7 +1,10 @@
+import AdminLayout from "@/components/AdminLayout";
 import { LinearScaleQuestion } from "@/components/LinearScaleQuestion";
 import MultipleChoiceQuestion from "@/components/MultipleChoiceQuestion";
+import MultiSelectQuestion from "@/components/MultiSelectQuestion";
 import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
 import { Form, FormQuestion } from "@/interfaces/interfaces";
+import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 
@@ -11,6 +14,7 @@ export const Route = createFileRoute("/form-builder/$formId")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const { formId } = Route.useParams();
   const [formData, setFormData] = useState<Form | null>(null);
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
@@ -19,35 +23,71 @@ function RouteComponent() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<FormQuestion | null>(
-    null
+    null,
   );
+  const [openFollowupFor, setOpenFollowupFor] = useState<number | null>(null);
+  const [followupParentId, setFollowupParentId] = useState<number | null>(null);
+  const [selectedTriggers, setSelectedTriggers] = useState<number[]>([]);
   const [selectedQuestionType, setSelectedQuestionType] = useState<string>("");
   const [questionTitle, setQuestionTitle] = useState("");
+  const [required, setRequired] = useState(false);
   const [mcChoices, setMcChoices] = useState<string[]>(["", ""]);
-  const [scaleMin, setScaleMin] = useState("1");
-  const [scaleMax, setScaleMax] = useState("5");
+  const [scaleMin, setScaleMin] = useState(1);
+  const [scaleMax, setScaleMax] = useState(5);
+  const [selectionsMin, setSelectionsMin] = useState<number>(0);
+  const [selectionsMax, setSelectionsMax] = useState<number | null>(null);
   const [scaleMinLabel, setScaleMinLabel] = useState("");
   const [scaleMaxLabel, setScaleMaxLabel] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const allowedTypesForFollowUp = ["multiple_choice", "linear_scale"];
+
+  useEffect(() => {
+    const initAuth = () => {
+      const sessionUser = getCurrentUser("admin");
+      if (sessionUser) {
+        if (sessionUser.roles && sessionUser.roles.includes("admin")) {
+          setCurrentUser(sessionUser);
+        } else {
+          console.error("User does not have admin role");
+          logout("admin");
+          navigate({ to: "/" });
+        }
+      } else {
+        navigate({ to: "/" });
+      }
+      setLoading(false);
+    };
+
+    initAuth();
+  }, [navigate]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      // Don't close if clicking a button inside the dropdown
+      if (target.tagName === "BUTTON") {
+        return;
+      }
+
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsDropdownOpen(false);
+        setOpenFollowupFor(null);
       }
     };
 
-    if (isDropdownOpen) {
+    if (isDropdownOpen || openFollowupFor) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isDropdownOpen]);
+  }, [isDropdownOpen, openFollowupFor]);
 
   useEffect(() => {
     const fetchFormData = async () => {
@@ -85,22 +125,35 @@ function RouteComponent() {
 
   const openModal = (questionType: string) => {
     setEditingQuestion(null);
+    setFollowupParentId(null);
+    setSelectedTriggers([]);
     setSelectedQuestionType(questionType);
     setQuestionTitle("");
     setMcChoices(["", ""]);
-    setScaleMin("1");
-    setScaleMax("5");
+    setScaleMin(1);
+    setScaleMax(5);
     setScaleMinLabel("");
     setScaleMaxLabel("");
     setIsDropdownOpen(false);
     setIsModalOpen(true);
+    setOpenFollowupFor(null);
+  };
+
+  const openFollowUpModal = (
+    questionType: string,
+    parentQuestionId: number,
+  ) => {
+    openModal(questionType);
+    setFollowupParentId(parentQuestionId);
   };
 
   const openEditModal = (question: FormQuestion) => {
     setEditingQuestion(question);
+    console.log(question.parentQuestionId);
+    setFollowupParentId(question.parentQuestionId);
     setSelectedQuestionType(question.questionType);
     setQuestionTitle(question.questionTitle || "");
-
+    setRequired(question.required);
     // Parse options based on question type
     if (
       question.questionType === "multiple_choice" &&
@@ -113,12 +166,24 @@ function RouteComponent() {
       question.optionsCategory
     ) {
       const parsed = JSON.parse(question.optionsCategory);
-      setScaleMin(String(parsed.min || 1));
-      setScaleMax(String(parsed.max || 5));
+      setScaleMin(parsed.min || 1);
+      setScaleMax(parsed.max || 5);
       setScaleMinLabel(parsed.minLabel || "");
       setScaleMaxLabel(parsed.maxLabel || "");
+    } else if (
+      question.questionType === "multi_select" &&
+      question.optionsCategory
+    ) {
+      const parsed = JSON.parse(question.optionsCategory);
+      setMcChoices(parsed.choices || ["", ""]);
+      setSelectionsMin(parsed.min);
+      setSelectionsMax(parsed.max);
     }
-
+    if (question.parentQuestionId && question.enablingAnswers) {
+      setSelectedTriggers(question.enablingAnswers);
+    } else {
+      setSelectedTriggers([]);
+    }
     setIsModalOpen(true);
   };
 
@@ -126,6 +191,9 @@ function RouteComponent() {
     setIsModalOpen(false);
     setSelectedQuestionType("");
     setEditingQuestion(null);
+    setFollowupParentId(null);
+    setSelectedTriggers([]);
+    setOpenFollowupFor(null);
   };
 
   const addMcChoice = () => {
@@ -154,7 +222,7 @@ function RouteComponent() {
         `/api/forms/${formId}/questions/${questionId}`,
         {
           method: "DELETE",
-        }
+        },
       );
 
       const result = await response.json();
@@ -176,7 +244,7 @@ function RouteComponent() {
         `/api/forms/${formId}/questions/${questionId}/move-up`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       const result = await response.json();
@@ -204,7 +272,7 @@ function RouteComponent() {
         `/api/forms/${formId}/questions/${questionId}/move-down`,
         {
           method: "PATCH",
-        }
+        },
       );
 
       const result = await response.json();
@@ -233,6 +301,11 @@ function RouteComponent() {
         return;
       }
 
+      if (followupParentId && selectedTriggers.length == 0) {
+        alert("Please select atleast one answer to follow up to");
+        return;
+      }
+
       let optionsCategory = "";
 
       if (selectedQuestionType === "multiple_choice") {
@@ -241,16 +314,43 @@ function RouteComponent() {
           alert("Please provide at least 2 choices");
           return;
         }
+        if (new Set(validChoices).size !== validChoices.length) {
+          alert("Duplicate choices are not allowed");
+          return;
+        }
         optionsCategory = JSON.stringify({ choices: validChoices });
       } else if (selectedQuestionType === "linear_scale") {
         optionsCategory = JSON.stringify({
-          min: parseInt(scaleMin),
-          max: parseInt(scaleMax),
+          min: scaleMin,
+          max: scaleMax,
           minLabel: scaleMinLabel,
           maxLabel: scaleMaxLabel,
+          choices: Array.from(
+            { length: scaleMax - scaleMin + 1 },
+            (_, i) => scaleMin + i,
+          ),
+        });
+      } else if (selectedQuestionType === "multi_select") {
+        const validChoices = mcChoices.filter((c) => c.trim() !== "");
+        if (validChoices.length < 2) {
+          alert("Please provide at least 2 choices");
+          return;
+        }
+        if (new Set(validChoices).size !== validChoices.length) {
+          alert("Duplicate choices are not allowed");
+          return;
+        }
+        optionsCategory = JSON.stringify({
+          choices: validChoices,
+          min: selectionsMin >= 0 ? selectionsMin : 0,
+          max:
+            (selectionsMax ?? Infinity) < validChoices.length
+              ? selectionsMax
+              : null,
         });
       }
 
+      let result;
       if (editingQuestion) {
         // Update existing question
         const response = await fetch(
@@ -265,18 +365,21 @@ function RouteComponent() {
               questionTitle: questionTitle.trim(),
               optionsCategory,
               qorder: editingQuestion.qorder,
+              parentQuestionId: followupParentId || undefined,
+              enablingAnswers: selectedTriggers || [],
+              required: required,
             }),
-          }
+          },
         );
 
-        const result = await response.json();
+        result = await response.json();
 
         if (!result.success) {
           throw new Error(result.error || "Failed to update question");
         }
 
         setQuestions(
-          questions.map((q) => (q.id === editingQuestion.id ? result.data : q))
+          questions.map((q) => (q.id === editingQuestion.id ? result.data : q)),
         );
       } else {
         // Add new question
@@ -295,10 +398,13 @@ function RouteComponent() {
             questionTitle: questionTitle.trim(),
             optionsCategory,
             qorder: nextOrder,
+            parentQuestionId: followupParentId || undefined,
+            enablingAnswers: selectedTriggers || [],
+            required: required,
           }),
         });
 
-        const result = await response.json();
+        result = await response.json();
 
         if (!result.success) {
           throw new Error(result.error || "Failed to add question");
@@ -308,6 +414,7 @@ function RouteComponent() {
       }
 
       closeModal();
+      setOpenFollowupFor(null); // ADD THIS LINE - Reset follow-up dropdown state after saving
     } catch (err: any) {
       console.error("Failed to save question:", err.message);
       alert("Failed to save question: " + err.message);
@@ -333,9 +440,15 @@ function RouteComponent() {
       </div>
     );
   }
-
+  if (!currentUser) {
+    return null;
+  }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <AdminLayout
+      user={currentUser}
+      title="Form Builder"
+      subtitle="Create and edit forms"
+    >
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button
@@ -395,6 +508,12 @@ function RouteComponent() {
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       Linear Scale
+                    </button>
+                    <button
+                      onClick={() => openModal("multi_select")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Multiple Selection
                     </button>
                   </div>
                 )}
@@ -488,6 +607,77 @@ function RouteComponent() {
                         </button>
                       )}
 
+                      {/* Add Follow-up Button */}
+                      {allowedTypesForFollowUp.includes(
+                        question.questionType,
+                      ) && (
+                        <div className="relative" ref={dropdownRef}>
+                          <button
+                            onClick={() =>
+                              setOpenFollowupFor(
+                                openFollowupFor === question.id
+                                  ? null
+                                  : question.id,
+                              )
+                            }
+                            className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                            title="Add follow-up question"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </button>
+
+                          {openFollowupFor === question.id && (
+                            <div
+                              className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30"
+                              ref={dropdownRef}
+                            >
+                              <span className="w-full text-left px-4 py-2 text-sm text-gray-400 italic">
+                                Add a follow-up question
+                              </span>
+                              <button
+                                onClick={() =>
+                                  openFollowUpModal(
+                                    "multiple_choice",
+                                    question.id,
+                                  )
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                Multiple Choice
+                              </button>
+                              <button
+                                onClick={() =>
+                                  openFollowUpModal("text_answer", question.id)
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                Text Answer
+                              </button>
+                              <button
+                                onClick={() =>
+                                  openFollowUpModal("linear_scale", question.id)
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                Linear Scale
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       <button
                         onClick={() => openEditModal(question)}
                         className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
@@ -530,13 +720,28 @@ function RouteComponent() {
 
                     {/* Question Component */}
                     {question.questionType === "multiple_choice" && (
-                      <MultipleChoiceQuestion question={question} />
+                      <MultipleChoiceQuestion
+                        question={question}
+                        questionsList={questions}
+                      />
                     )}
                     {question.questionType === "linear_scale" && (
-                      <LinearScaleQuestion question={question} />
+                      <LinearScaleQuestion
+                        question={question}
+                        questionsList={questions}
+                      />
                     )}
                     {question.questionType === "text_answer" && (
-                      <TextAnswerQuestion question={question} />
+                      <TextAnswerQuestion
+                        question={question}
+                        questionsList={questions}
+                      />
+                    )}
+                    {question.questionType === "multi_select" && (
+                      <MultiSelectQuestion
+                        question={question}
+                        questionsList={questions}
+                      />
                     )}
                   </div>
                 </div>
@@ -549,10 +754,14 @@ function RouteComponent() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div
+            role="dialog"
+            className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
             <div className="p-6 border-b border-gray-200">
               <h3 className="text-xl font-semibold text-gray-900">
-                {editingQuestion ? "Edit" : "Add"} Question
+                {editingQuestion ? "Edit" : "Add"}{" "}
+                {followupParentId ? "Follow-up" : ""} Question
               </h3>
               <p className="text-sm text-gray-500 mt-1">
                 {selectedQuestionType.replace("_", " ")}
@@ -560,6 +769,83 @@ function RouteComponent() {
             </div>
 
             <div className="p-6 space-y-5">
+              {/* Required Question */}
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="required"
+                  className="text-sm font-medium text-gray-900"
+                >
+                  Required Question
+                </label>
+                <input
+                  type="checkbox"
+                  id="required"
+                  checked={required}
+                  onChange={(e) => setRequired(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                />
+              </div>
+
+              {/* Follow up answers */}
+              {followupParentId &&
+                (() => {
+                  const parentQuestion = questions.find(
+                    (q) => q.id === followupParentId,
+                  );
+                  const answers = parentQuestion?.optionsCategory
+                    ? JSON.parse(parentQuestion.optionsCategory).choices
+                    : [];
+
+                  if (!parentQuestion) return null;
+                  if (
+                    !allowedTypesForFollowUp.includes(
+                      parentQuestion.questionType,
+                    )
+                  )
+                    return null;
+
+                  return (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Show question when answering with...
+                      </label>
+
+                      <div className="space-y-2">
+                        {answers?.map((answer, index) => (
+                          <label
+                            key={index}
+                            className="flex items-center gap-3 text-sm text-gray-700"
+                          >
+                            <input
+                              type="checkbox"
+                              value={index} // store the index
+                              checked={
+                                selectedTriggers?.includes(index) || false
+                              } // check against index
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setSelectedTriggers((prev) => {
+                                  if (checked) {
+                                    // add index if not already in array
+                                    return prev ? [...prev, index] : [index];
+                                  } else {
+                                    // remove index
+                                    return (prev || []).filter(
+                                      (i) => i !== index,
+                                    );
+                                  }
+                                });
+                              }}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                            />
+                            <span className="truncate">{answer}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+
               {/* Question Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -623,7 +909,7 @@ function RouteComponent() {
                       <input
                         type="number"
                         value={scaleMin}
-                        onChange={(e) => setScaleMin(e.target.value)}
+                        onChange={(e) => setScaleMin(parseInt(e.target.value))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                       />
                     </div>
@@ -634,7 +920,7 @@ function RouteComponent() {
                       <input
                         type="number"
                         value={scaleMax}
-                        onChange={(e) => setScaleMax(e.target.value)}
+                        onChange={(e) => setScaleMax(parseInt(e.target.value))}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                       />
                     </div>
@@ -667,6 +953,74 @@ function RouteComponent() {
                   </div>
                 </div>
               )}
+
+              {/* Multi Select Options */}
+              {selectedQuestionType === "multi_select" && (
+                <div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Minimum required selections
+                      </label>
+                      <input
+                        min={0}
+                        type="number"
+                        value={selectionsMin}
+                        onChange={(e) =>
+                          setSelectionsMin(parseInt(e.target.value ?? "0"))
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Maximum required selections
+                      </label>
+                      <input
+                        min={1}
+                        type="number"
+                        value={selectionsMax ?? ""}
+                        onChange={(e) =>
+                          setSelectionsMax(parseInt(e.target.value))
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Answer Choices
+                  </label>
+                  <div className="space-y-2">
+                    {mcChoices.map((choice, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={choice}
+                          onChange={(e) =>
+                            updateMcChoice(index, e.target.value)
+                          }
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          placeholder={`Choice ${index + 1}`}
+                        />
+                        {mcChoices.length > 2 && (
+                          <button
+                            onClick={() => removeMcChoice(index)}
+                            className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={addMcChoice}
+                    className="mt-3 text-sm font-medium text-gray-700 hover:text-gray-900"
+                  >
+                    + Add choice
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="p-6 border-t border-gray-200 flex justify-end gap-3 bg-gray-50">
@@ -686,6 +1040,6 @@ function RouteComponent() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }

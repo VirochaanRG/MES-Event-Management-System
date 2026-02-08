@@ -1,4 +1,6 @@
-export default function MultipleChoiceAnswerQuestion({
+import { FormQuestion } from "@/interfaces/interfaces";
+
+export default function MultipleSelectAnswerQuestion({
   question,
   answer,
   onChange,
@@ -6,11 +8,15 @@ export default function MultipleChoiceAnswerQuestion({
   const { questionTitle, optionsCategory, required } = question;
 
   let choices: string[] = [];
+  let minSelect = 0;
+  let maxSelect;
   if (optionsCategory) {
     const parsed = JSON.parse(optionsCategory);
     if (Array.isArray(parsed.choices)) {
       choices = parsed.choices;
     }
+    minSelect = parsed.min;
+    maxSelect = parsed.max;
   }
 
   return (
@@ -20,6 +26,19 @@ export default function MultipleChoiceAnswerQuestion({
           <div className="text-lg text-gray-900 font-medium">
             {question.questionTitle || "Untitled Question"}
           </div>
+          {(minSelect !== 0 || maxSelect !== null) && (
+            <div className="text-sm text-gray-400 mt-2">
+              {minSelect == maxSelect
+                ? "Select exactly " + minSelect
+                : minSelect !== 0 && maxSelect === null
+                  ? "Select at least " + minSelect
+                  : maxSelect !== null && minSelect === 0
+                    ? "Select up to " + maxSelect
+                    : minSelect > 0 && maxSelect !== null
+                      ? "Select between " + minSelect + " and " + maxSelect
+                      : ""}
+            </div>
+          )}
         </div>
         {question.required && (
           <div className="text-sm text-red-600 font-small mb-2">* Required</div>
@@ -35,11 +54,10 @@ export default function MultipleChoiceAnswerQuestion({
               className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
             >
               <input
-                type="radio"
+                type="checkbox"
                 id={id}
                 name={`question-${question.id}`}
-                value={choice}
-                checked={answer === choice}
+                checked={Array.isArray(answer) && answer.includes(choice)}
                 onChange={() => onChange(choice)}
                 className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
               />

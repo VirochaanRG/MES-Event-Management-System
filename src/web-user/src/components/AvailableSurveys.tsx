@@ -4,7 +4,9 @@ import { Form } from "@/interfaces/interfaces";
 
 export default function AvailableSurveys() {
   const navigate = useNavigate();
-  const userId = sessionStorage.getItem("teamd-auth-user");
+  const userId = JSON.parse(
+    sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
+  ).email;
 
   const {
     data: formData,
@@ -66,9 +68,7 @@ export default function AvailableSurveys() {
           {/* Event Content */}
           <div className="p-6">
             {/* Event Title */}
-            <h3 className="text-xl font-bold text-red-900 mb-2">
-              {form.name}
-            </h3>
+            <h3 className="text-xl font-bold text-red-900 mb-2">{form.name}</h3>
 
             {/* Event Description */}
             <p className="text-gray-600 text-sm mb-4">

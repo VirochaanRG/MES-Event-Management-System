@@ -1,10 +1,12 @@
-import { createFileRoute, useLocation, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useLocation,
+  useNavigate,
+} from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Form } from "@/interfaces/interfaces";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-
-
 
 export const Route = createFileRoute("/surveys/$formId")({
   component: RouteComponent,
@@ -14,11 +16,15 @@ function RouteComponent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { formId } = Route.useParams();
-  const userId = sessionStorage.getItem("teamd-auth-user");
+  const userId = JSON.parse(
+    sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
+  ).email;
   const [form, setForm] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [surveyProgress, setSurveyProgress] = useState<"unfilled" | "started" | "completed">("unfilled");
+  const [surveyProgress, setSurveyProgress] = useState<
+    "unfilled" | "started" | "completed"
+  >("unfilled");
 
   useEffect(() => {
     const fetchForm = async () => {
@@ -31,12 +37,14 @@ function RouteComponent() {
           throw new Error(result.error || "Failed to fetch form");
         }
         setForm(result.data);
-        const statusResponse = await fetch(`/api/forms/${formId}/status/${userId}`);
+        const statusResponse = await fetch(
+          `/api/forms/${formId}/status/${userId}`,
+        );
         const statusResult = await statusResponse.json();
         if (!statusResult.success) {
           throw new Error(result.error || "Failed to fetch form");
         }
-        console.log(statusResult.data)
+        console.log(statusResult.data);
         setSurveyProgress(statusResult.data);
       } catch (err: any) {
         setError(err.message);
@@ -58,24 +66,27 @@ function RouteComponent() {
 
   const handleDeleteSubmission = () => {
     const deleteSubmission = async () => {
-      const confirmation = confirm("Are you sure you want to delete your submission?");
-      if(!confirmation) return;
+      const confirmation = confirm(
+        "Are you sure you want to delete your submission?",
+      );
+      if (!confirmation) return;
       const deleteResponse = await fetch(
-        `/api/forms/${formId}/delete/${userId}`, {method: "DELETE"}
+        `/api/forms/${formId}/delete/${userId}`,
+        { method: "DELETE" },
       );
       const deleteResult = await deleteResponse.json();
-      if(!deleteResult.success) {
+      if (!deleteResult.success) {
         toast.error("Unable to delete submission");
       } else {
         toast.success("Submission deleted");
       }
-  
-      queryClient.invalidateQueries({queryKey : ["availableSurveys"]});
-      queryClient.invalidateQueries({queryKey : ["completedSurveys"]});
+
+      queryClient.invalidateQueries({ queryKey: ["availableSurveys"] });
+      queryClient.invalidateQueries({ queryKey: ["completedSurveys"] });
     };
     deleteSubmission();
     setSurveyProgress("unfilled");
-  }
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -154,16 +165,25 @@ function RouteComponent() {
           )}
         </div>
 
-        
-
         {/* Action Buttons */}
         <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
           <div className="flex gap-4">
-            <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors" onClick={handleFillSurvey}>
-              {surveyProgress === "unfilled" ? "Fill out Survey" : surveyProgress === "started" ? "Continue Filling" : "Edit Submission"}
+            <button
+              className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={handleFillSurvey}
+            >
+              {surveyProgress === "unfilled"
+                ? "Fill out Survey"
+                : surveyProgress === "started"
+                  ? "Continue Filling"
+                  : "Edit Submission"}
             </button>
-            {(surveyProgress === "started" || surveyProgress == "completed") && (
-              <button className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors" onClick={handleDeleteSubmission}>
+            {(surveyProgress === "started" ||
+              surveyProgress == "completed") && (
+              <button
+                className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                onClick={handleDeleteSubmission}
+              >
                 Delete Submission
               </button>
             )}

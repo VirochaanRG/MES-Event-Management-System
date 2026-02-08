@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { FormQuestion } from "@/interfaces/interfaces";
 
-export default function MultipleChoiceQuestion({
+export default function MultiSelectQuestion({
   question, questionsList
 }: {
   question: FormQuestion;
@@ -21,16 +21,30 @@ export default function MultipleChoiceQuestion({
     ? JSON.parse(question.optionsCategory).choices
     : [];
 
+  const minSelect = question.optionsCategory 
+    ? JSON.parse(question.optionsCategory).min : 0;
+
+  const maxSelect = question.optionsCategory 
+    ? JSON.parse(question.optionsCategory).max : null;
+
+  console.log(question + " " + minSelect + " " + maxSelect);
+
   return (
     <div className="p-6 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors bg-white">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <div className="text-sm text-blue-600 font-medium mb-2">
-            MULTIPLE CHOICE
+          <div className="text-sm text-orange-600 font-medium mb-2">
+            MULTIPLE SELECTION
           </div>
            {parentQuestion && (<div className="text-sm text-gray-400">Follow up to "{parentQuestion?.questionTitle}" when answering {question?.enablingAnswers.map((i) => '"' + parentOptions[i] + '"').join(",")}</div>)}
           <div className="text-lg text-gray-900 font-medium">
             {question.questionTitle || "Untitled Question"}
+          </div>          
+          <div className="text-sm text-gray-400">
+            { minSelect == maxSelect ? "Select exactly " + minSelect :
+              minSelect !== 0 && maxSelect === null ? "Select at least " + minSelect :
+              maxSelect !== null && minSelect === 0 ? "Select up to " + maxSelect :
+              minSelect > 0 && maxSelect !== null ? "Select between "  + minSelect + " and " + maxSelect : ""}
           </div>
         </div>
         {question.required && <div className="text-sm text-red-600 font-small mb-2">* Required</div>}
@@ -41,7 +55,7 @@ export default function MultipleChoiceQuestion({
             key={index}
             className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
           >
-            <div className="w-4 h-4 rounded-full border-2 border-gray-400"></div>
+            <div className="w-4 h-4 border-2 border-gray-400"></div>
             <span className="text-gray-700">{choice}</span>
           </div>
         ))}

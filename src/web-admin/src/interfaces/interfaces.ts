@@ -15,6 +15,9 @@ export interface FormQuestion
   optionsCategory: string | null;
   qorder: number;
   createdAt: string;
+  parentQuestionId: number | null;
+  enablingAnswers: number[];
+  required : boolean
 }
 
 export interface Event

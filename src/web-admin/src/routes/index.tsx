@@ -5,6 +5,7 @@ import ProtectedTeamPortal from "../components/ProtectedTeamPortal";
 import EventsTab from "@/components/EventsTab";
 import ReportsTab from "@/components/ReportsTab";
 import AdminLayout from "@/components/AdminLayout";
+import HomePageManagement from "@/components/HomePageManagement";
 import { Calendar, Users, FileText } from "lucide-react";
 
 interface DashboardStats {
@@ -147,7 +148,15 @@ function TeamBDashboard() {
           />
         </div>
 
-        {/* Content Sections */}
+        {/* Home Page Management Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-red-600">
+            Home Page Management
+          </h2>
+          <HomePageManagement />
+        </div>
+
+        {/* Recent Activity Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-red-600">
             Recent Activity
@@ -155,6 +164,7 @@ function TeamBDashboard() {
           <EventsTab />
         </div>
 
+        {/* Analytics Overview Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-yellow-500">
             Analytics Overview
