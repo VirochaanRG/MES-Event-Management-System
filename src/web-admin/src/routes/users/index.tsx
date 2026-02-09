@@ -73,7 +73,7 @@ function UsersPageContent() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("/api/users");
+      const response = await fetch("http://localhost:3124/api/users");
       const data = await response.json();
       if (data.success) {
         setUsers(data.data);

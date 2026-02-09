@@ -14,16 +14,14 @@ export default function MultipleChoiceAnswerQuestion({
   }
 
   return (
-    <div className="p-6 border-2 border-gray-300 rounded-lg hover:border-gray-400 transition-colors bg-white">
+    <div className="p-6 border border-gray-200 rounded-lg hover:border-gray-300 bg-white">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="text-lg text-gray-900 font-medium">
             {question.questionTitle || "Untitled Question"}
           </div>
         </div>
-        {question.required && (
-          <div className="text-sm text-red-600 font-small mb-2">* Required</div>
-        )}
+      {question.required && <div className="text-sm text-red-600 font-small mb-2">* Required</div>}
       </div>
       <div className="space-y-2 mt-4">
         {choices.map((choice, index) => {

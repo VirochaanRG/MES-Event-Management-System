@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "init:db": "tsx src/initDb.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc",
     "dev": "tsc --watch",
     "generate": "node scripts/generate-migration.js",
     "generate:simple": "npx drizzle-kit generate",

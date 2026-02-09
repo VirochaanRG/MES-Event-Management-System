@@ -1,4 +1,3 @@
-import { fastifyStatic } from '@fastify/static';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
@@ -11,9 +10,6 @@ import { eq, and, sql, isNull, or, max } from 'drizzle-orm';
 import { form, formQuestions, formAnswers, formSubmissions, qrCodes } from '@db/schemas';
 import QRCode from 'qrcode';
 import formsRoutes from './formsAPI';
-import publicImageRoutes from './imagesAPI';
-import { config } from '../../../config/config';
-import path from 'path';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -568,9 +564,6 @@ fastify.get('/api/events/:id/latest-instance', async (request, reply) =>
 });
 
 await fastify.register(formsRoutes)
-
-await fastify.register(publicImageRoutes)
-
 
 // Start server
 try

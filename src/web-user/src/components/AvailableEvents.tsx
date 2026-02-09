@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
 
 interface Event {
   id: number;
@@ -18,9 +17,6 @@ interface Event {
 
 export default function AvailableEvents() {
   const navigate = useNavigate();
-  const [eventImages, setEventImages] = useState<Map<number, string>>(
-    new Map(),
-  );
 
   const {
     data: eventsData,
@@ -35,33 +31,6 @@ export default function AvailableEvents() {
       return json.data;
     },
   });
-
-  const fetchEventImage = async (eventId: number) => {
-    try {
-      const response = await fetch(`/api/images/event/${eventId}`);
-      if (response.ok) {
-        const blob = await response.blob();
-        const imageUrl = URL.createObjectURL(blob);
-        setEventImages((prev) => new Map(prev).set(eventId, imageUrl));
-      }
-    } catch (error) {
-      // Image doesn't exist, keep placeholder
-      console.log(`No image for event ${eventId}`);
-    }
-  };
-
-  useEffect(() => {
-    if (eventsData) {
-      eventsData.forEach((event: Event) => {
-        fetchEventImage(event.id);
-      });
-    }
-
-    // Cleanup blob URLs on unmount
-    return () => {
-      eventImages.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [eventsData]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -102,19 +71,9 @@ export default function AvailableEvents() {
           className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 cursor-pointer hover:border-yellow-500"
         >
           {/* Event Image */}
-          {eventImages.has(event.id) ? (
-            <div className="w-full h-48 overflow-hidden">
-              <img
-                src={eventImages.get(event.id)}
-                alt={event.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
-              <span className="text-4xl">📅</span>
-            </div>
-          )}
+          <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
+            <span className="text-4xl">📅</span>
+          </div>
 
           {/* Event Content */}
           <div className="p-6">

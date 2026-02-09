@@ -31,9 +31,6 @@ export default function RegisteredEvents() {
   const { user } = useAuth();
   const [registeredEvents, setRegisteredEvents] = useState<Event[]>([]);
   const [loadingRegistered, setLoadingRegistered] = useState(false);
-  const [eventImages, setEventImages] = useState<Map<number, string>>(
-    new Map(),
-  );
   const [qrModal, setQrModal] = useState<{
     eventTitle: string;
     src: string;
@@ -53,20 +50,6 @@ export default function RegisteredEvents() {
     },
   });
 
-  const fetchEventImage = async (eventId: number) => {
-    try {
-      const response = await fetch(`/api/images/event/${eventId}`);
-      if (response.ok) {
-        const blob = await response.blob();
-        const imageUrl = URL.createObjectURL(blob);
-        setEventImages((prev) => new Map(prev).set(eventId, imageUrl));
-      }
-    } catch (error) {
-      // Image doesn't exist, keep placeholder
-      console.log(`No image for event ${eventId}`);
-    }
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -81,7 +64,7 @@ export default function RegisteredEvents() {
     try {
       const email = user?.email;
       const res = await fetch(
-        `/api/events/${eventId}/event-qrcodes?userEmail=${email}`,
+        `/api/events/${eventId}/event-qrcodes?userEmail=${email}`
       );
       const json = await res.json();
 
@@ -110,13 +93,11 @@ export default function RegisteredEvents() {
         const results: Event[] = [];
         for (const e of eventsData) {
           const res = await fetch(
-            `/api/events/${e.id}/registration?userEmail=${email}`,
+            `/api/events/${e.id}/registration?userEmail=${email}`
           );
           const json = await res.json();
           if (json.success && json.isRegistered) {
             results.push(e);
-            // Fetch image for registered events
-            fetchEventImage(e.id);
           }
         }
         setRegisteredEvents(results);
@@ -128,11 +109,6 @@ export default function RegisteredEvents() {
       }
     };
     fetchRegisteredEvents();
-
-    // Cleanup blob URLs on unmount
-    return () => {
-      eventImages.forEach((url) => URL.revokeObjectURL(url));
-    };
   }, [user?.email, eventsData]);
 
   if (isLoading || loadingRegistered) {
@@ -163,19 +139,9 @@ export default function RegisteredEvents() {
             className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 cursor-pointer hover:border-yellow-500"
           >
             {/* Event Image */}
-            {eventImages.has(event.id) ? (
-              <div className="w-full h-48 overflow-hidden">
-                <img
-                  src={eventImages.get(event.id)}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
-                <span className="text-4xl">📅</span>
-              </div>
-            )}
+            <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
+              <span className="text-4xl">📅</span>
+            </div>
 
             {/* Event Content */}
             <div className="p-6">

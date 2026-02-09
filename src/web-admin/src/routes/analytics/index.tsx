@@ -264,8 +264,7 @@ function AnalyticsPageContent() {
               return (
                 <Link
                   key={form.id}
-                  to={`/analytics/$analyticsId`}
-                  params={{ analyticsId: form.id.toString() }}
+                  to={`/analytics/${form.id}`}
                   className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow overflow-hidden group"
                 >
                   <div className="p-6">

@@ -1,12 +1,13 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { events } from "./schemas/events"; // adjust the import path if needed
 import { Pool } from "pg";
-import { config } from "../../config/config";
+import dotenv from "dotenv";
+import path from "path";
 
 // dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 const pool = new Pool({
-  connectionString: config.DATABASE_URL,
+  connectionString: "postgres://postgres:password@localhost:5432/db",
 });
 
 const db = drizzle(pool);

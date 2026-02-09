@@ -15,6 +15,8 @@ interface Form {
   createdAt: string;
 }
 
+const API_URL = "http://localhost:3124";
+
 function RouteComponent() {
   const navigate = useNavigate();
   const [forms, setForms] = useState<Form[]>([]);
@@ -54,7 +56,7 @@ function RouteComponent() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`/api/forms`);
+      const response = await fetch(`${API_URL}/api/forms`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch forms");
@@ -84,7 +86,7 @@ function RouteComponent() {
       setSubmitting(true);
       setError(null);
 
-      const response = await fetch(`/api/forms`, {
+      const response = await fetch(`${API_URL}/api/forms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -125,7 +127,7 @@ function RouteComponent() {
 
     try {
       setError(null);
-      const response = await fetch(`/api/forms/${id}`, {
+      const response = await fetch(`${API_URL}/api/forms/${id}`, {
         method: "DELETE",
       });
 

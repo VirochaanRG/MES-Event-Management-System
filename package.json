@@ -9,8 +9,7 @@
     "src/api",
     "src/mobile",
     "src/shared",
-    "src/db",
-    "src/config"
+    "src/db"
   ],
   "packageManager": "pnpm@10.23.0",
   "scripts": {
@@ -21,7 +20,6 @@
     "build": "pnpm -r build",
     "build:full": "concurrently \"pnpm --filter @teamb/web-admin build\" \"pnpm --filter @teamb/web-user build\"",
     "start": "concurrently \"pnpm --filter @teamb/web-admin start\" \"pnpm --filter @teamb/web-user start\"",
-    "preview": "concurrently \"pnpm --filter @teamb/web-admin preview\" \"pnpm --filter @teamb/web-user preview\"",
     "lint": "pnpm -r lint",
     "clean": "pnpm -r clean"
   },

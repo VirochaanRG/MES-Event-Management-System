@@ -1,6 +1,6 @@
 {
-  "id": "69a514c3-f104-4662-82ab-f9c14be4d1c9",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "d077f3d1-78e3-4a0d-b480-f44240236628",
+  "prevId": "8e435943-792f-488b-bff0-5e61aabf03e4",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -428,6 +428,25 @@
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
+        },
+        "parent_question_id": {
+          "name": "parent_question_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "enabling_answers": {
+          "name": "enabling_answers",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "required": {
+          "name": "required",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
@@ -443,6 +462,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "form_questions_parent_question_id_form_questions_id_fk": {
+          "name": "form_questions_parent_question_id_form_questions_id_fk",
+          "tableFrom": "form_questions",
+          "tableTo": "form_questions",
+          "columnsFrom": [
+            "parent_question_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -507,6 +539,66 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "roles": {
+          "name": "roles",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{\"user\"}'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
