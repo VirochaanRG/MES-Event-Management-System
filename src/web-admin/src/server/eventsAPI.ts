@@ -41,7 +41,18 @@ export default async function eventsRoutes(fastify: FastifyInstance)
   {
     try
     {
-      const { title, description, location, startTime, endTime, capacity, isPublic, status } = request.body as {
+      const {
+        title,
+        description,
+        location,
+        startTime,
+        endTime,
+        capacity,
+        isPublic,
+        status,
+        cost,
+        registrationForm
+      } = request.body as {
         title: string;
         description?: string;
         location?: string;
@@ -50,6 +61,8 @@ export default async function eventsRoutes(fastify: FastifyInstance)
         capacity?: number;
         isPublic?: boolean;
         status?: string;
+        cost?: number;
+        registrationForm?: any;
       };
 
       if (!title || !startTime || !endTime)
@@ -66,6 +79,8 @@ export default async function eventsRoutes(fastify: FastifyInstance)
         capacity: capacity || 0,
         isPublic: isPublic !== undefined ? isPublic : true,
         status: status || 'scheduled',
+        cost: cost || 0,
+        registrationForm: registrationForm || null,
       }).returning();
 
       return reply.status(201).send({ success: true, data: newEvent[0] });
@@ -80,14 +95,14 @@ export default async function eventsRoutes(fastify: FastifyInstance)
   });
 
   // Register for event
-  fastify.post<{ Params: { id: string }; Body: { userEmail: string } }>(
+  fastify.post<{ Params: { id: string }; Body: { userEmail: string; details?: any } }>(
     '/api/events/:id/register',
     async (request, reply) =>
     {
       try
       {
         const { id } = request.params;
-        const { userEmail } = request.body;
+        const { userEmail, details } = request.body;
 
         if (!userEmail?.trim())
         {
@@ -134,6 +149,7 @@ export default async function eventsRoutes(fastify: FastifyInstance)
           userEmail: userEmail.toLowerCase().trim(),
           status: 'confirmed',
           paymentStatus: eventCost > 0 ? 'pending' : 'paid',
+          details: details || null,
         }).returning();
 
         return reply.code(201).send({ success: true, data: registration[0], message: 'Successfully registered for event' });

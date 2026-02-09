@@ -1,4 +1,5 @@
 import { pgTable, serial, varchar, text, timestamp, integer, json, boolean } from "drizzle-orm/pg-core";
+import { events } from "./events"; // Import events table
 
 export const modularForms = pgTable("modular_forms", {
   id: serial("id").primaryKey().notNull(),
@@ -12,7 +13,8 @@ export const form = pgTable("form", {
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-  moduleId: integer("module_id").references(() => modularForms.id, { onDelete: "cascade" })
+  moduleId: integer("module_id").references(() => modularForms.id, { onDelete: "cascade" }),
+  eventId: integer("event_id").references(() => events.id, { onDelete: "cascade" }) // NEW: Reference to events
 });
 
 export const formSubmissions = pgTable("form_submissions", {

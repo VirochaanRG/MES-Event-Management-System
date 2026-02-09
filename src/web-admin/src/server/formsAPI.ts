@@ -59,12 +59,12 @@ export default async function formsRoutes(fastify: FastifyInstance)
 
   // CREATE a new form
   fastify.post<{
-    Body: { name: string; description?: string };
+    Body: { name: string; description?: string; eventId?: number };
   }>('/api/forms', async (request, reply) =>
   {
     try
     {
-      const { name, description } = request.body;
+      const { name, description, eventId } = request.body;
 
       if (!name || name.trim() === '')
       {
@@ -79,6 +79,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
         .values({
           name: name.trim(),
           description: description?.trim() || null,
+          eventId: eventId || null,
         })
         .returning();
 
@@ -99,13 +100,13 @@ export default async function formsRoutes(fastify: FastifyInstance)
   // UPDATE a form
   fastify.put<{
     Params: { id: string };
-    Body: { name?: string; description?: string };
+    Body: { name?: string; description?: string; eventId?: number };
   }>('/api/forms/:id', async (request, reply) =>
   {
     try
     {
       const { id } = request.params;
-      const { name, description } = request.body;
+      const { name, description, eventId } = request.body;
 
       const existingForm = await db.query.form.findFirst({
         where: eq(form.id, parseInt(id)),
@@ -127,6 +128,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
       if (description !== undefined)
       {
         updateData.description = description.trim() || null;
+      }
+      if (eventId !== undefined)
+      {
+        updateData.eventId = eventId || null;
       }
 
       if (Object.keys(updateData).length === 0)
@@ -269,4 +274,3 @@ export default async function formsRoutes(fastify: FastifyInstance)
     }
   });
 }
-

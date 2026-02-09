@@ -1,14 +1,16 @@
 import { FormQuestion } from "@/interfaces/interfaces";
 
 export function TextAnswerQuestion({
-  question, questionsList
+  question,
+  questionsList,
 }: {
   question: FormQuestion;
-  questionsList: FormQuestion[]
+  questionsList: FormQuestion[];
 }) {
-  const parentQuestion = question.parentQuestionId && question
-    ? questionsList.find((q) => q.id === question.parentQuestionId)
-    : null;
+  const parentQuestion =
+    question.parentQuestionId && question
+      ? questionsList.find((q) => q.id === question.parentQuestionId)
+      : null;
 
   const parentOptions = parentQuestion?.optionsCategory
     ? JSON.parse(parentQuestion.optionsCategory).choices
@@ -21,12 +23,21 @@ export function TextAnswerQuestion({
           <div className="text-sm text-purple-600 font-medium mb-2">
             TEXT ANSWER
           </div>
-           {parentQuestion && (<div className="text-sm text-gray-400">Follow up to "{parentQuestion?.questionTitle}" when answering {question?.enablingAnswers.map((i) => '"' + parentOptions[i] + '"').join(",")}</div>)}
+          {parentQuestion && (
+            <div className="text-sm text-gray-400">
+              Follow up to "{parentQuestion?.questionTitle}" when answering{" "}
+              {question?.enablingAnswers
+                .map((i) => '"' + parentOptions[i] + '"')
+                .join(",")}
+            </div>
+          )}
           <div className="text-lg text-gray-900 font-medium">
             {question.questionTitle || "Untitled Question"}
           </div>
         </div>
-        {question.required && <div className="text-sm text-red-600 font-small mb-2">* Required</div>}
+        {question.required && (
+          <div className="text-sm text-red-600 font-small mb-2">* Required</div>
+        )}
       </div>
       <div className="mt-4">
         <textarea
