@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { AuthUser } from "../lib/auth";
 import { motion, AnimatePresence } from "framer-motion";
+import { config } from "../../../config/config";
 
 interface LocalLoginFormProps {
   onLoginSuccess: (user: AuthUser, token: string) => void;
@@ -28,6 +29,7 @@ export default function LocalLoginForm({
 
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
+      console.log(config.VITE_API_URL);
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
