@@ -13,10 +13,10 @@ import {
   Trash2,
   Search,
   Filter,
-  Eye,
   X,
   Upload,
   Image as ImageIcon,
+  Edit,
 } from "lucide-react";
 import RequireRole from "@/components/RequireRole";
 
@@ -63,6 +63,7 @@ function EventsPageContent() {
     new Map(),
   );
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -127,11 +128,22 @@ function EventsPageContent() {
 
   const fetchEventImage = async (eventId: number) => {
     try {
-      const response = await fetch(`/api/images/event/${eventId}`);
+      // Adding a timestamp (?t=...) forces the browser to bypass the cache
+      const response = await fetch(
+        `/api/images/event/${eventId}?t=${Date.now()}`,
+      );
+
       if (response.ok) {
         const blob = await response.blob();
-        const imageUrl = URL.createObjectURL(blob);
-        setEventImages((prev) => new Map(prev).set(eventId, imageUrl));
+        const newImageUrl = URL.createObjectURL(blob);
+
+        setEventImages((prev) => {
+          // CLEANUP: Revoke the old URL to prevent memory leaks
+          const oldUrl = prev.get(eventId);
+          if (oldUrl) URL.revokeObjectURL(oldUrl);
+
+          return new Map(prev).set(eventId, newImageUrl);
+        });
       }
     } catch (error) {
       console.error(`Failed to fetch image for event ${eventId}:`, error);
@@ -261,10 +273,42 @@ function EventsPageContent() {
     }
   };
 
+  const handleUpdateEvent = async () => {
+    if (!selectedEvent) return;
+    try {
+      const response = await fetch(`/api/events/${selectedEvent.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchEvents();
+        setIsEditing(false);
+        setShowDetailModal(false);
+        alert("Event updated successfully!");
+      }
+    } catch (error) {
+      console.error("Failed to update event:", error);
+    }
+  };
+
   const handleViewDetails = (event: Event) => {
     setSelectedEvent(event);
+    setFormData({
+      title: event.title,
+      description: event.description || "",
+      location: event.location || "",
+      startTime: event.startTime.split(".")[0],
+      endTime: event.endTime.split(".")[0],
+      capacity: event.capacity,
+      isPublic: event.isPublic,
+      status: event.status,
+      cost: event.cost,
+    });
     fetchRegisteredUsers(event.id);
     setShowDetailModal(true);
+    setIsEditing(false);
   };
 
   const resetForm = () => {
@@ -470,10 +514,7 @@ function EventsPageContent() {
                   </div>
                 )}
 
-                <div
-                  className="p-6 cursor-pointer"
-                  onClick={() => navigate({ to: `/events/${event.id}` })}
-                >
+                <div className="p-6">
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="text-lg font-bold text-gray-900 flex-1">
                       {event.title}
@@ -531,10 +572,10 @@ function EventsPageContent() {
                         e.stopPropagation();
                         handleViewDetails(event);
                       }}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded transition-colors"
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                      title="Edit Event"
                     >
-                      <Eye className="w-4 h-4" />
-                      View
+                      <Edit className="w-5 h-5" />
                     </button>
                     <button
                       onClick={(e) => {
@@ -757,142 +798,341 @@ function EventsPageContent() {
           </div>
         )}
 
-        {/* Event Detail Modal */}
+        {/* Event Detail/Edit Modal - SINGLE COMBINED MODAL */}
         {showDetailModal && selectedEvent && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-gray-200 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {selectedEvent.title}
+                  {isEditing ? "Edit Event" : selectedEvent.title}
                 </h2>
-                <button
-                  onClick={() => setShowDetailModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex gap-2">
+                  {!isEditing && (
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors"
+                    >
+                      Edit Details
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      setShowDetailModal(false);
+                      setIsEditing(false);
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               <div className="p-6 space-y-6">
-                {/* Event Image in Detail Modal */}
-                {eventImages.has(selectedEvent.id) && (
-                  <div className="w-full">
-                    <img
-                      src={eventImages.get(selectedEvent.id)}
-                      alt={selectedEvent.title}
-                      className="w-full h-64 object-cover rounded-lg"
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <span
-                    className={`px-3 py-1 text-sm font-semibold rounded border ${getStatusColor(selectedEvent.status)}`}
-                  >
-                    {selectedEvent.status}
-                  </span>
-                </div>
-
-                {selectedEvent.description && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                      Description
-                    </h3>
-                    <p className="text-gray-600">{selectedEvent.description}</p>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                      Location
-                    </h3>
-                    <p className="text-gray-600">
-                      {selectedEvent.location || "Not specified"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                      Capacity
-                    </h3>
-                    <p className="text-gray-600">
-                      {selectedEvent.capacity} attendees
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                      Start Time
-                    </h3>
-                    <p className="text-gray-600">
-                      {formatDate(selectedEvent.startTime)} at{" "}
-                      {formatTime(selectedEvent.startTime)}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                      End Time
-                    </h3>
-                    <p className="text-gray-600">
-                      {formatDate(selectedEvent.endTime)} at{" "}
-                      {formatTime(selectedEvent.endTime)}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                      Cost
-                    </h3>
-                    <p className="text-gray-600">
-                      {selectedEvent.cost > 0
-                        ? `$${selectedEvent.cost}`
-                        : "Free"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                      Visibility
-                    </h3>
-                    <p className="text-gray-600">
-                      {selectedEvent.isPublic ? "Public" : "Private"}
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                    Registered Users ({registeredUsers.length})
-                  </h3>
-                  {registeredUsers.length > 0 ? (
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {registeredUsers.map((user) => (
-                        <div
-                          key={user.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200"
-                        >
-                          <span className="text-sm text-gray-700">
-                            {user.userEmail}
-                          </span>
-                          <div className="flex gap-2">
-                            <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">
-                              {user.status}
-                            </span>
-                            <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
-                              {user.paymentStatus}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                {isEditing ? (
+                  /* EDIT MODE FORM */
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Event Title *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.title}
+                        onChange={(e) =>
+                          setFormData({ ...formData, title: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      />
                     </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm">
-                      No registered users yet
-                    </p>
-                  )}
-                </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        value={formData.description}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            description: e.target.value,
+                          })
+                        }
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Location
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.location}
+                        onChange={(e) =>
+                          setFormData({ ...formData, location: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Start Time *
+                        </label>
+                        <input
+                          type="datetime-local"
+                          required
+                          value={formData.startTime}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              startTime: e.target.value,
+                            })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          End Time *
+                        </label>
+                        <input
+                          type="datetime-local"
+                          required
+                          value={formData.endTime}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              endTime: e.target.value,
+                            })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Capacity
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.capacity}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              capacity: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Cost ($)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.cost}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              cost: parseInt(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Status
+                      </label>
+                      <select
+                        value={formData.status}
+                        onChange={(e) =>
+                          setFormData({ ...formData, status: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      >
+                        <option value="scheduled">Scheduled</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="isPublicEdit"
+                        checked={formData.isPublic}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            isPublic: e.target.checked,
+                          })
+                        }
+                        className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                      />
+                      <label
+                        htmlFor="isPublicEdit"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Public Event
+                      </label>
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <button
+                        onClick={handleUpdateEvent}
+                        className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors"
+                      >
+                        Save Changes
+                      </button>
+                      <button
+                        onClick={() => setIsEditing(false)}
+                        className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* VIEW MODE */
+                  <>
+                    {/* Event Image in Detail Modal */}
+                    {eventImages.has(selectedEvent.id) && (
+                      <div className="w-full">
+                        <img
+                          src={eventImages.get(selectedEvent.id)}
+                          alt={selectedEvent.title}
+                          className="w-full h-64 object-cover rounded-lg"
+                        />
+                      </div>
+                    )}
+
+                    <div>
+                      <span
+                        className={`px-3 py-1 text-sm font-semibold rounded border ${getStatusColor(selectedEvent.status)}`}
+                      >
+                        {selectedEvent.status}
+                      </span>
+                    </div>
+
+                    {selectedEvent.description && (
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                          Description
+                        </h3>
+                        <p className="text-gray-600">
+                          {selectedEvent.description}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                          Location
+                        </h3>
+                        <p className="text-gray-600">
+                          {selectedEvent.location || "Not specified"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                          Capacity
+                        </h3>
+                        <p className="text-gray-600">
+                          {selectedEvent.capacity} attendees
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                          Start Time
+                        </h3>
+                        <p className="text-gray-600">
+                          {formatDate(selectedEvent.startTime)} at{" "}
+                          {formatTime(selectedEvent.startTime)}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                          End Time
+                        </h3>
+                        <p className="text-gray-600">
+                          {formatDate(selectedEvent.endTime)} at{" "}
+                          {formatTime(selectedEvent.endTime)}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                          Cost
+                        </h3>
+                        <p className="text-gray-600">
+                          {selectedEvent.cost > 0
+                            ? `$${selectedEvent.cost}`
+                            : "Free"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                          Visibility
+                        </h3>
+                        <p className="text-gray-600">
+                          {selectedEvent.isPublic ? "Public" : "Private"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-700 mb-3">
+                        Registered Users ({registeredUsers.length})
+                      </h3>
+                      {registeredUsers.length > 0 ? (
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                          {registeredUsers.map((user) => (
+                            <div
+                              key={user.id}
+                              className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200"
+                            >
+                              <span className="text-sm text-gray-700">
+                                {user.userEmail}
+                              </span>
+                              <div className="flex gap-2">
+                                <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">
+                                  {user.status}
+                                </span>
+                                <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                  {user.paymentStatus}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-sm">
+                          No registered users yet
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

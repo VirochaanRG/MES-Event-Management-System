@@ -53,7 +53,6 @@ export default async function eventsRoutes(fastify: FastifyInstance)
           if (isAFuture && isBFuture) return dateA.getTime() - dateB.getTime();
           return dateB.getTime() - dateA.getTime();
         })
-        .slice(0, 3);
 
       return reply.send({ success: true, data: sortedEvents });
     } catch (error)
@@ -120,6 +119,43 @@ export default async function eventsRoutes(fastify: FastifyInstance)
       });
     }
   });
+
+  // Update an existing event
+  fastify.put<{ Params: { id: string }; Body: Partial<typeof events.$inferInsert> }>(
+    '/api/events/:id',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { id } = request.params;
+        const updateData = request.body;
+
+        const updatedEvent = await db
+          .update(events)
+          .set({
+            ...updateData,
+            updatedAt: new Date(),
+          })
+          .where(eq(events.id, parseInt(id)))
+          .returning();
+
+        if (updatedEvent.length === 0)
+        {
+          return reply.code(404).send({ success: false, error: 'Event not found' });
+        }
+
+        return reply.send({
+          success: true,
+          data: updatedEvent[0],
+          message: 'Event updated successfully',
+        });
+      } catch (error)
+      {
+        fastify.log.error(error);
+        return reply.code(500).send({ success: false, error: 'Failed to update event' });
+      }
+    }
+  );
 
   // Register for event
   fastify.post<{ Params: { id: string }; Body: { userEmail: string; details?: any } }>(

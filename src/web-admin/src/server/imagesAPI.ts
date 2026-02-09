@@ -35,7 +35,7 @@ export default async function imageRoutes(fastify: FastifyInstance)
     },
   });
 
-  // Upload image
+  // Upload image (or replace if exists)
   fastify.post('/api/images/upload', async (request: FastifyRequest, reply: FastifyReply) =>
   {
     try
@@ -75,19 +75,60 @@ export default async function imageRoutes(fastify: FastifyInstance)
         });
       }
 
-      const result = await db
-        .insert(images)
-        .values({
-          imageData: buffer,
-          component: component,
-          index: indexStr ? parseInt(indexStr) : null,
-          fileName: data.filename,
-          mimeType: data.mimetype,
-          fileSize: buffer.length,
-        })
-        .returning();
+      const indexValue = indexStr ? parseInt(indexStr) : null;
 
-      return reply.code(201).send({
+      // Check if an image already exists for this component and index
+      const existingImage = await db
+        .select()
+        .from(images)
+        .where(
+          indexValue !== null
+            ? and(
+              eq(images.component, component),
+              eq(images.index, indexValue)
+            )
+            : eq(images.component, component)
+        )
+        .limit(1);
+
+      let result;
+
+      if (existingImage.length > 0)
+      {
+        // Update existing image
+        result = await db
+          .update(images)
+          .set({
+            imageData: buffer,
+            fileName: data.filename,
+            mimeType: data.mimetype,
+            fileSize: buffer.length,
+            updatedAt: new Date(),
+          })
+          .where(eq(images.id, existingImage[0].id))
+          .returning();
+
+        fastify.log.info(`Updated existing image for component: ${component}, index: ${indexValue}`);
+      }
+      else
+      {
+        // Insert new image
+        result = await db
+          .insert(images)
+          .values({
+            imageData: buffer,
+            component: component,
+            index: indexValue,
+            fileName: data.filename,
+            mimeType: data.mimetype,
+            fileSize: buffer.length,
+          })
+          .returning();
+
+        fastify.log.info(`Created new image for component: ${component}, index: ${indexValue}`);
+      }
+
+      return reply.code(existingImage.length > 0 ? 200 : 201).send({
         success: true,
         data: {
           id: result[0].id,
@@ -95,6 +136,7 @@ export default async function imageRoutes(fastify: FastifyInstance)
           component: result[0].component,
           index: result[0].index,
         },
+        message: existingImage.length > 0 ? 'Image updated successfully' : 'Image created successfully',
       });
     } catch (error)
     {
@@ -270,7 +312,6 @@ export default async function imageRoutes(fastify: FastifyInstance)
       }
     }
   );
-
 
   // Get event image
   fastify.get<{ Params: { eventId: string } }>(

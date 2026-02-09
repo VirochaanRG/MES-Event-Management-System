@@ -44,15 +44,25 @@ export default function AvailableEvents() {
 
   const fetchEventImage = async (eventId: number) => {
     try {
-      const response = await fetch(`/api/images/event/${eventId}`);
+      // Adding a timestamp (?t=...) forces the browser to bypass the cache
+      const response = await fetch(
+        `/api/images/event/${eventId}?t=${Date.now()}`,
+      );
+
       if (response.ok) {
         const blob = await response.blob();
-        const imageUrl = URL.createObjectURL(blob);
-        setEventImages((prev) => new Map(prev).set(eventId, imageUrl));
+        const newImageUrl = URL.createObjectURL(blob);
+
+        setEventImages((prev) => {
+          // CLEANUP: Revoke the old URL to prevent memory leaks
+          const oldUrl = prev.get(eventId);
+          if (oldUrl) URL.revokeObjectURL(oldUrl);
+
+          return new Map(prev).set(eventId, newImageUrl);
+        });
       }
     } catch (error) {
-      // Image doesn't exist, keep placeholder
-      console.log(`No image for event ${eventId}`);
+      console.error(`Failed to fetch image for event ${eventId}:`, error);
     }
   };
 
