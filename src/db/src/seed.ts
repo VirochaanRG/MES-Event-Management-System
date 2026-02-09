@@ -17,7 +17,31 @@ const db = drizzle(pool);
 async function seed()
 {
   console.log("Seeding test events...");
-
+  const DEFAULT_REGISTRATION_FORM = {
+    questions: [
+      {
+        id: '1',
+        label: 'First Name',
+        question_type: 'text_answer',
+        options: [],
+        required: true
+      },
+      {
+        id: '2',
+        label: 'Last Name',
+        question_type: 'text_answer',
+        options: [],
+        required: true
+      },
+      {
+        id: '3',
+        label: 'Email',
+        question_type: 'text_answer',
+        options: [],
+        required: true
+      }
+    ]
+  };
   await db.insert(events).values([
     {
       title: "Test Event 1",
@@ -28,6 +52,7 @@ async function seed()
       capacity: 50,
       isPublic: true,
       status: "scheduled",
+      registrationForm: DEFAULT_REGISTRATION_FORM,
     },
     {
       title: "Test Event 2",
@@ -38,6 +63,7 @@ async function seed()
       capacity: 30,
       isPublic: false,
       status: "scheduled",
+      registrationForm: DEFAULT_REGISTRATION_FORM,
     },
     {
       title: "Test Event 3",
@@ -48,6 +74,7 @@ async function seed()
       capacity: 100,
       isPublic: true,
       status: "scheduled",
+      registrationForm: DEFAULT_REGISTRATION_FORM,
     },
     {
       title: "Test Event 4",
@@ -58,6 +85,7 @@ async function seed()
       capacity: 75,
       isPublic: true,
       status: "scheduled",
+      registrationForm: DEFAULT_REGISTRATION_FORM,
     },
     {
       title: "Test Event 5",
@@ -68,6 +96,7 @@ async function seed()
       capacity: 25,
       isPublic: false,
       status: "scheduled",
+      registrationForm: DEFAULT_REGISTRATION_FORM,
     },
   ]);
   console.log("5 test events inserted successfully!");
