@@ -4,6 +4,8 @@ import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
 import path from 'path';
 import { config } from '../config/config'
 
+console.log('🚀 PROXY TARGET:', config.VITE_API_URL || 'http://localhost:3124');
+
 export default defineConfig({
   plugins: [
     react(),
