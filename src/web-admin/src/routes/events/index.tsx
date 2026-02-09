@@ -460,6 +460,7 @@ function EventsPageContent() {
             {filteredEvents.map((event) => (
               <div
                 key={event.id}
+                onClick={() => navigate({ to: `/events/${event.id}` })}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
               >
                 {/* Event Image */}

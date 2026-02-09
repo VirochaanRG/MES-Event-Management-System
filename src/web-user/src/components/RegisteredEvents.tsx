@@ -35,9 +35,13 @@ export default function RegisteredEvents() {
     new Map(),
   );
   const [qrModal, setQrModal] = useState<{
+    eventId: number;
     eventTitle: string;
     src: string;
   } | null>(null);
+  const [deregisteringEventId, setDeregisteringEventId] = useState<
+    number | null
+  >(null);
 
   const {
     data: eventsData,
@@ -102,12 +106,52 @@ export default function RegisteredEvents() {
 
       const qr: QrCodeEntry = json.data[0];
       setQrModal({
+        eventId,
         eventTitle,
         src: `data:image/png;base64,${qr.imageBase64}`,
       });
     } catch (err) {
       console.error(err);
       toast.error("Failed to load QR code");
+    }
+  };
+
+  const handleDeregister = async (eventId: number, eventTitle: string) => {
+    if (!confirm(`Are you sure you want to deregister from "${eventTitle}"?`)) {
+      return;
+    }
+
+    setDeregisteringEventId(eventId);
+    try {
+      const email = user?.email;
+      const res = await fetch(
+        `/api/events/${eventId}/register?userEmail=${email}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      const json = await res.json();
+
+      if (!json.success) {
+        toast.error(json.error || "Failed to deregister from event");
+        return;
+      }
+
+      toast.success("Successfully deregistered from event");
+
+      // Remove the event from the registered events list
+      setRegisteredEvents((prev) => prev.filter((e) => e.id !== eventId));
+
+      // Close modal if it's open for this event
+      if (qrModal && qrModal.eventId === eventId) {
+        setQrModal(null);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to deregister from event");
+    } finally {
+      setDeregisteringEventId(null);
     }
   };
 
@@ -175,23 +219,27 @@ export default function RegisteredEvents() {
         {registeredEvents.map((event) => (
           <div
             key={event.id}
-            onClick={() => handleEventClick(event.id, event.title)}
-            className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 cursor-pointer hover:border-yellow-500"
+            className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200"
           >
             {/* Event Image */}
-            {eventImages.has(event.id) ? (
-              <div className="w-full h-48 overflow-hidden">
-                <img
-                  src={eventImages.get(event.id)}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ) : (
-              <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
-                <span className="text-4xl">📅</span>
-              </div>
-            )}
+            <div
+              onClick={() => handleEventClick(event.id, event.title)}
+              className="cursor-pointer hover:opacity-90 transition-opacity"
+            >
+              {eventImages.has(event.id) ? (
+                <div className="w-full h-48 overflow-hidden">
+                  <img
+                    src={eventImages.get(event.id)}
+                    alt={event.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
+                  <span className="text-4xl">📅</span>
+                </div>
+              )}
+            </div>
 
             {/* Event Content */}
             <div className="p-6">
@@ -220,7 +268,7 @@ export default function RegisteredEvents() {
               </div>
 
               {/* Status Badge */}
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mb-4">
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-semibold text-white ${
                     event.status === "scheduled"
@@ -234,30 +282,69 @@ export default function RegisteredEvents() {
                   {event.capacity} capacity
                 </span>
               </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleEventClick(event.id, event.title)}
+                  className="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors font-semibold"
+                >
+                  View Ticket
+                </button>
+                <button
+                  onClick={() => handleDeregister(event.id, event.title)}
+                  disabled={deregisteringEventId === event.id}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {deregisteringEventId === event.id
+                    ? "Removing..."
+                    : "Deregister"}
+                </button>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
       {qrModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
-            <h3 className="text-lg font-bold text-red-900 mb-4">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setQrModal(null)}
+        >
+          <div
+            className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-2xl font-bold text-red-900 mb-6">
               Ticket for {qrModal.eventTitle}
             </h3>
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-6">
               <img
                 src={qrModal.src}
                 alt="Event QR Code"
-                className="w-48 h-48 object-contain"
+                className="w-80 h-80 object-contain border-4 border-gray-200 rounded-lg"
               />
             </div>
-            <button
-              onClick={() => setQrModal(null)}
-              className="mt-2 px-4 py-2 bg-red-900 text-white rounded-md hover:bg-red-800 transition-colors"
-            >
-              Close
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setQrModal(null)}
+                className="flex-1 px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors font-semibold"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  setQrModal(null);
+                  handleDeregister(qrModal.eventId, qrModal.eventTitle);
+                }}
+                disabled={deregisteringEventId === qrModal.eventId}
+                className="flex-1 px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deregisteringEventId === qrModal.eventId
+                  ? "Removing..."
+                  : "Deregister"}
+              </button>
+            </div>
           </div>
         </div>
       )}

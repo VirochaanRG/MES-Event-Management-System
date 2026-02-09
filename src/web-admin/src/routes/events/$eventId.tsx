@@ -38,7 +38,7 @@ function EventDetail() {
   const [optionInput, setOptionInput] = useState("");
 
   const handleBack = () => {
-    navigate({ to: "/" });
+    navigate({ to: "/events" });
   };
 
   const {

@@ -677,6 +677,84 @@ fastify.get<{ Params: { id: string } }>('/api/events/:id/registration-form', asy
   }
 });
 
+// DELETE - Deregister user from an event
+fastify.delete<{
+  Params: { id: string };
+  Querystring: { userEmail: string };
+}>('/api/events/:id/register', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { userEmail } = request.query;
+
+    if (!userEmail || !userEmail.trim())
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'userEmail query parameter is required',
+      });
+    }
+
+    // Check if the event exists
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, parseInt(id)),
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    // Check if the registration exists
+    const registration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.eventId, parseInt(id)),
+        eq(registeredUsers.userEmail, userEmail.toLowerCase().trim())
+      ),
+    });
+
+    if (!registration)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Registration not found',
+      });
+    }
+
+    // Delete the QR code (cascade will handle this automatically due to foreign key)
+    // But we'll explicitly delete it to be sure
+    await db
+      .delete(qrCodes)
+      .where(eq(qrCodes.id, registration.id));
+
+    // Delete the registration
+    await db
+      .delete(registeredUsers)
+      .where(
+        and(
+          eq(registeredUsers.eventId, parseInt(id)),
+          eq(registeredUsers.userEmail, userEmail.toLowerCase().trim())
+        )
+      );
+
+    return reply.send({
+      success: true,
+      message: 'Successfully deregistered from event',
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to deregister from event');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to deregister from event',
+    });
+  }
+});
+
 await fastify.register(formsRoutes)
 await fastify.register(publicImageRoutes)
 
