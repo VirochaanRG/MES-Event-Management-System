@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) =>
         '/api': {
           target: 'http://web-user-api.railway.internal',
           changeOrigin: true,
+
         },
       },
       allowedHosts: [

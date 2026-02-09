@@ -30,7 +30,7 @@ export default defineConfig({
     host: '0.0.0.0', // IMPORTANT: Allows Railway to access it
     proxy: {
       '/api': {
-        target: 'http://web-admin-api.railway.internal',
+        target: 'https://web-admin-production-2b44.up.railway.app',
         changeOrigin: true,
       },
     },
