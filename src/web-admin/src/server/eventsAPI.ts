@@ -8,7 +8,7 @@ const DEFAULT_REGISTRATION_FORM = {
   questions: [
     {
       qorder: '1',
-      question_title: 'First Name',
+      label: 'First Name',
       question_type: 'text_answer',
       options: [],
       required: true

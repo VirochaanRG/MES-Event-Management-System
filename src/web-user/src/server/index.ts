@@ -450,7 +450,58 @@ fastify.post<{
     });
   }
 });
+// GET available events (not started yet and not registered by user)
+fastify.get<{
+  Querystring: { userEmail?: string };
+}>('/api/events/available', async (request, reply) =>
+{
+  try
+  {
+    const { userEmail } = request.query;
+    const now = new Date();
 
+    // Get all events that haven't started yet
+    const upcomingEvents = await db.query.events.findMany({
+      where: sql`${events.startTime} > ${now}`,
+    });
+
+    // If no userEmail provided, return all upcoming events
+    if (!userEmail || !userEmail.trim())
+    {
+      return reply.send({
+        success: true,
+        data: upcomingEvents,
+      });
+    }
+
+    // Get all registrations for this user
+    const userRegistrations = await db.query.registeredUsers.findMany({
+      where: eq(registeredUsers.userEmail, userEmail.toLowerCase().trim()),
+    });
+
+    // Create a set of event IDs the user is already registered for
+    const registeredEventIds = new Set(
+      userRegistrations.map((reg) => reg.eventId)
+    );
+
+    // Filter out events the user is already registered for
+    const availableEvents = upcomingEvents.filter(
+      (event) => !registeredEventIds.has(event.id)
+    );
+
+    return reply.send({
+      success: true,
+      data: availableEvents,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch available events');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch available events',
+    });
+  }
+});
 // GET - Check if a user is registered for an event
 fastify.get<{
   Params: { id: string };
@@ -560,6 +611,68 @@ fastify.get('/api/events/:id/latest-instance', async (request, reply) =>
     return reply.code(500).send({
       success: false,
       error: 'Failed to access DB and fetch QR codes',
+    });
+  }
+});
+
+// GET event registration form
+fastify.get<{ Params: { id: string } }>('/api/events/:id/registration-form', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, parseInt(id))
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    const registrationForm = event.registrationForm as any;
+
+    if (!registrationForm || !registrationForm.questions)
+    {
+      return reply.send({
+        success: true,
+        questions: [],
+      });
+    }
+
+    // Transform questions to match FormQuestion interface
+    const transformedQuestions = registrationForm.questions.map((q: any, index: number) => ({
+      id: q.id,
+      formId: parseInt(id),
+      questionType: q.question_type,
+      questionTitle: q.label,
+      optionsCategory: q.options?.length > 0 ? JSON.stringify({
+        choices: q.options,
+        min: q.min,
+        max: q.max
+      }) : null,
+      qorder: index + 1,
+      parentQuestionId: null,
+      enablingAnswers: [],
+      required: q.required || false,
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt,
+    }));
+
+    return reply.send({
+      success: true,
+      questions: transformedQuestions,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch event registration form');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch event registration form',
     });
   }
 });

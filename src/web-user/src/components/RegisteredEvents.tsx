@@ -103,9 +103,14 @@ export default function RegisteredEvents() {
 
   useEffect(() => {
     const fetchRegisteredEvents = async () => {
+      // Check if user and eventsData are available
+      if (!user?.email || !eventsData || !Array.isArray(eventsData)) {
+        return;
+      }
+
       setLoadingRegistered(true);
       try {
-        const email = user?.email;
+        const email = user.email;
 
         const results: Event[] = [];
         for (const e of eventsData) {
@@ -127,6 +132,7 @@ export default function RegisteredEvents() {
         setLoadingRegistered(false);
       }
     };
+
     fetchRegisteredEvents();
 
     // Cleanup blob URLs on unmount

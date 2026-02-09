@@ -23,6 +23,16 @@ interface Event {
   updatedAt: string;
 }
 
+interface FormQuestion {
+  id?: string;
+  formId: number;
+  questionType: "text_answer" | "multiple_choice" | "multi_select";
+  questionTitle: string;
+  optionsCategory: string | null;
+  qorder: number;
+  required: boolean;
+}
+
 function RouteComponent() {
   const navigate = useNavigate();
   const { eventId } = Route.useParams();
@@ -33,6 +43,12 @@ function RouteComponent() {
   const [registerStatus, setRegisterStatus] = useState<
     "idle" | "loading" | "registered"
   >("idle");
+
+  // Registration form modal state
+  const [showRegistrationForm, setShowRegistrationForm] = useState(false);
+  const [formQuestions, setFormQuestions] = useState<FormQuestion[]>([]);
+  const [formAnswers, setFormAnswers] = useState<Record<string, any>>({});
+  const [formLoading, setFormLoading] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -94,17 +110,115 @@ function RouteComponent() {
     }
   };
 
-  const registerButton = async () => {
+  const openRegistrationForm = async () => {
     if (!user?.email) {
       toast.error("You must be logged in to register for this event");
       return;
     }
+
+    try {
+      setFormLoading(true);
+      const response = await fetch(`/api/events/${eventId}/registration-form`);
+      const result = await response.json();
+
+      if (result.success) {
+        setFormQuestions(result.questions || []);
+        setShowRegistrationForm(true);
+      } else {
+        toast.error("Failed to load registration form");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load registration form");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const closeRegistrationForm = () => {
+    setShowRegistrationForm(false);
+    setFormAnswers({});
+  };
+
+  const handleInputChange = (questionOrder: string, value: any) => {
+    setFormAnswers((prev) => ({
+      ...prev,
+      [questionOrder]: value,
+    }));
+  };
+
+  const handleMultiSelectChange = (
+    questionOrder: string,
+    optionIndex: number,
+  ) => {
+    setFormAnswers((prev) => {
+      const current = prev[questionOrder] || [];
+      const newValue = current.includes(optionIndex)
+        ? current.filter((i: number) => i !== optionIndex)
+        : [...current, optionIndex];
+      return {
+        ...prev,
+        [questionOrder]: newValue,
+      };
+    });
+  };
+
+  const validateForm = () => {
+    for (const question of formQuestions) {
+      if (question.required) {
+        const answer = formAnswers[question.qorder.toString()];
+
+        if (
+          answer === null ||
+          answer === undefined ||
+          (Array.isArray(answer) && answer.length === 0) ||
+          answer === ""
+        ) {
+          toast.error(`Please answer: ${question.questionTitle}`);
+          return false;
+        }
+      }
+
+      // Validate multi-select min/max
+      if (
+        question.questionType === "multi_select" &&
+        question.optionsCategory
+      ) {
+        const options = JSON.parse(question.optionsCategory);
+        const answer = formAnswers[question.qorder.toString()] || [];
+
+        if (options.min && answer.length < options.min) {
+          toast.error(
+            `${question.questionTitle}: Select at least ${options.min} option(s)`,
+          );
+          return false;
+        }
+
+        if (options.max && answer.length > options.max) {
+          toast.error(
+            `${question.questionTitle}: Select at most ${options.max} option(s)`,
+          );
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
+  const submitRegistration = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     setRegisterStatus("loading");
     try {
       const response = await fetch(`/api/events/${eventId}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userEmail: user?.email }),
+        body: JSON.stringify({
+          userEmail: user?.email,
+          details: formAnswers,
+        }),
       });
       const result = await response.json();
 
@@ -120,20 +234,20 @@ function RouteComponent() {
           if (qrJson.success) {
             setRegisterStatus("registered");
             toast.success("Registration complete");
+            closeRegistrationForm();
             setTimeout(() => handleBack(), 300);
           } else {
             toast.error("QR generation failed");
           }
-        } else if (
-          result.error === "User is already registered for this event"
-        ) {
-          toast.error("You are already registered for this event");
-          setRegisterStatus("idle");
-          setTimeout(() => handleBack(), 300);
-        } else {
-          setRegisterStatus("idle");
-          toast.error("Failed to register for event");
         }
+      } else if (result.error === "User is already registered for this event") {
+        toast.error("You are already registered for this event");
+        setRegisterStatus("idle");
+        closeRegistrationForm();
+        setTimeout(() => handleBack(), 300);
+      } else {
+        setRegisterStatus("idle");
+        toast.error(result.error || "Failed to register for event");
       }
     } catch (err: any) {
       console.error(err);
@@ -142,16 +256,128 @@ function RouteComponent() {
     }
   };
 
-  let buttonTitle;
-  if (registerStatus === "loading") {
-    buttonTitle = (
-      <ThreeDot color="#808980ff" size="medium" text="" textColor="" />
-    );
-  } else if (registerStatus === "registered") {
-    buttonTitle = "Registered";
-  } else {
-    buttonTitle = "Register for Event";
-  }
+  const renderQuestion = (question: FormQuestion) => {
+    const questionKey = question.qorder.toString();
+    const options = question.optionsCategory
+      ? JSON.parse(question.optionsCategory)
+      : null;
+
+    switch (question.questionType) {
+      case "text_answer":
+        return (
+          <div key={questionKey} className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {question.questionTitle}
+              {question.required && (
+                <span className="text-red-600 ml-1">*</span>
+              )}
+            </label>
+            <textarea
+              value={formAnswers[questionKey] || ""}
+              onChange={(e) => handleInputChange(questionKey, e.target.value)}
+              placeholder="Enter your answer..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              rows={2}
+            />
+          </div>
+        );
+
+      case "multiple_choice":
+        return (
+          <div key={questionKey} className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {question.questionTitle}
+              {question.required && (
+                <span className="text-red-600 ml-1">*</span>
+              )}
+            </label>
+            <div className="space-y-2">
+              {options?.choices?.map((choice: string, index: number) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleInputChange(questionKey, index)}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      formAnswers[questionKey] === index
+                        ? "border-blue-600 bg-blue-600"
+                        : "border-gray-400"
+                    }`}
+                  >
+                    {formAnswers[questionKey] === index && (
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    )}
+                  </div>
+                  <span className="text-gray-700">{choice}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case "multi_select":
+        const selectedOptions = formAnswers[questionKey] || [];
+        return (
+          <div key={questionKey} className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {question.questionTitle}
+              {question.required && (
+                <span className="text-red-600 ml-1">*</span>
+              )}
+            </label>
+            {options?.min || options?.max ? (
+              <div className="text-sm text-gray-500 mb-2">
+                {options.min === options.max
+                  ? `Select exactly ${options.min}`
+                  : options.min && options.max
+                    ? `Select between ${options.min} and ${options.max}`
+                    : options.min
+                      ? `Select at least ${options.min}`
+                      : `Select up to ${options.max}`}
+              </div>
+            ) : null}
+            <div className="space-y-2">
+              {options?.choices?.map((choice: string, index: number) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+                  onClick={() => handleMultiSelectChange(questionKey, index)}
+                >
+                  <div
+                    className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
+                      selectedOptions.includes(index)
+                        ? "border-blue-600 bg-blue-600"
+                        : "border-gray-400"
+                    }`}
+                  >
+                    {selectedOptions.includes(index) && (
+                      <svg
+                        className="w-3 h-3 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="text-gray-700">{choice}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   if (loading) {
     return (
@@ -213,7 +439,7 @@ function RouteComponent() {
               <div className="flex items-center gap-3">
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                    event.status
+                    event.status,
                   )}`}
                 >
                   {event.status.toUpperCase()}
@@ -362,10 +588,17 @@ function RouteComponent() {
         <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
           <div className="flex gap-4">
             <button
-              className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-              onClick={registerButton}
+              className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              onClick={openRegistrationForm}
+              disabled={formLoading || registerStatus === "loading"}
             >
-              {buttonTitle}
+              {formLoading ? (
+                <ThreeDot color="#ffffff" size="medium" text="" textColor="" />
+              ) : registerStatus === "registered" ? (
+                "Registered"
+              ) : (
+                "Register for Event"
+              )}
             </button>
             <button className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
               Share Event
@@ -379,6 +612,81 @@ function RouteComponent() {
           {formatDate(event.updatedAt)}
         </div>
       </div>
+
+      {/* Registration Form Modal */}
+      {showRegistrationForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 z-10">
+              <div className="flex justify-between items-center">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  Registration Form
+                </h3>
+                <button
+                  onClick={closeRegistrationForm}
+                  className="text-gray-500 hover:text-gray-700"
+                  disabled={registerStatus === "loading"}
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {formQuestions.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">
+                  No registration questions available
+                </p>
+              ) : (
+                <div>
+                  {formQuestions.map((question) => renderQuestion(question))}
+                </div>
+              )}
+            </div>
+
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-6 flex justify-end gap-4">
+              <button
+                onClick={closeRegistrationForm}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                disabled={registerStatus === "loading"}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitRegistration}
+                disabled={registerStatus === "loading"}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+              >
+                {registerStatus === "loading" ? (
+                  <>
+                    <ThreeDot
+                      color="#ffffff"
+                      size="small"
+                      text=""
+                      textColor=""
+                    />
+                    <span>Registering...</span>
+                  </>
+                ) : (
+                  "Submit Registration"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

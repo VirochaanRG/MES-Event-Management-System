@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Event {
   id: number;
@@ -18,6 +19,7 @@ interface Event {
 
 export default function AvailableEvents() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [eventImages, setEventImages] = useState<Map<number, string>>(
     new Map(),
   );
@@ -27,9 +29,13 @@ export default function AvailableEvents() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["availableEvents"],
+    queryKey: ["availableEvents", user?.email],
     queryFn: async () => {
-      const response = await fetch("/api/events");
+      const url = user?.email
+        ? `/api/events/available?userEmail=${encodeURIComponent(user.email)}`
+        : "/api/events/available";
+
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch events");
       const json = await response.json();
       return json.data;
