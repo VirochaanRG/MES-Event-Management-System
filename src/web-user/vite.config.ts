@@ -3,11 +3,11 @@ import react from '@vitejs/plugin-react';
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
 import path from 'path';
 import { config } from '../config/config'
-
+console.log('🚀 PROXY TARGET:', config.VITE_API_URL || 'http://localhost:3114');
 export default defineConfig(({ mode }) =>
 {
   const env = loadEnv(mode, process.cwd(), '');
-
+  console.log('🚀 PROXY TARGET:', config.VITE_API_URL || 'http://localhost:3114');
   return {
     plugins: [
       react(),
