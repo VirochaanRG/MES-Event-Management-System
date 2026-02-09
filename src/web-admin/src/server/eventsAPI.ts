@@ -134,6 +134,8 @@ export default async function eventsRoutes(fastify: FastifyInstance)
           .update(events)
           .set({
             ...updateData,
+            startTime: updateData.startTime ? new Date(updateData.startTime) : undefined,
+            endTime: updateData.endTime ? new Date(updateData.endTime) : undefined,
             updatedAt: new Date(),
           })
           .where(eq(events.id, parseInt(id)))
