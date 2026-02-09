@@ -1,11 +1,19 @@
 import { boolean } from "drizzle-orm/gel-core";
 import { pgTable, serial, varchar, text, timestamp, integer, json } from "drizzle-orm/pg-core";
 
-export const form = pgTable("form", {
+export const modularForms = pgTable("modular_forms", {
   id: serial("id").primaryKey().notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
+});
+
+export const form = pgTable("form", {
+  id: serial("id").primaryKey().notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  moduleId : integer("module_id").references(() => modularForms.id, {onDelete : "cascade"})
 });
 
 export const formSubmissions = pgTable("form_submissions", {
