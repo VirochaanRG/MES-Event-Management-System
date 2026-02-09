@@ -36,6 +36,9 @@ export default defineConfig(({ mode }) =>
           changeOrigin: true,
         },
       },
+      allowedHosts: [
+        'mes-event.up.railway.app'
+      ]
     },
     build: {
       outDir: 'dist/client',
