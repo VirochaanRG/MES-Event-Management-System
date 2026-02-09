@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) =>
         },
       },
       allowedHosts: [
-        'mes-event.up.railway.app'
+        'mes-event-user.up.railway.app'
       ]
     },
     build: {
