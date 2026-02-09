@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) =>
       host: '0.0.0.0', // IMPORTANT: Allows Railway to access it
       proxy: {
         '/api': {
-          target: 'http://web-user-api.railway.internal',
+          target: 'https://web-user-production-f2a0.up.railway.app',
           changeOrigin: true,
 
         },
