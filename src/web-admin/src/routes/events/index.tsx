@@ -15,6 +15,8 @@ import {
   Filter,
   Eye,
   X,
+  Upload,
+  Image as ImageIcon,
 } from "lucide-react";
 import RequireRole from "@/components/RequireRole";
 
@@ -54,6 +56,12 @@ function EventsPageContent() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
+  const [uploadingImageFor, setUploadingImageFor] = useState<number | null>(
+    null,
+  );
+  const [eventImages, setEventImages] = useState<Map<number, string>>(
+    new Map(),
+  );
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -105,12 +113,87 @@ function EventsPageContent() {
       if (data.success) {
         setEvents(data.data);
         setFilteredEvents(data.data);
+        // Fetch images for all events
+        data.data.forEach((event: Event) => {
+          fetchEventImage(event.id);
+        });
       }
     } catch (error) {
       console.error("Failed to fetch events:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchEventImage = async (eventId: number) => {
+    try {
+      const response = await fetch(`/api/images/event/${eventId}`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setEventImages((prev) => new Map(prev).set(eventId, imageUrl));
+      }
+    } catch (error) {
+      console.error(`Failed to fetch image for event ${eventId}:`, error);
+    }
+  };
+
+  const handleImageUpload = async (eventId: number, file: File) => {
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
+      return;
+    }
+
+    // Validate file size (e.g., max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size should be less than 5MB");
+      return;
+    }
+
+    setUploadingImageFor(eventId);
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("component", "event");
+      formData.append("index", eventId.toString());
+
+      const response = await fetch("/api/images/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Refresh the image for this event
+        fetchEventImage(eventId);
+        alert("Image uploaded successfully!");
+      } else {
+        alert("Failed to upload image: " + (data.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      alert("Failed to upload image");
+    } finally {
+      setUploadingImageFor(null);
+    }
+  };
+
+  const triggerFileInput = (eventId: number) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        handleImageUpload(eventId, file);
+      }
+    };
+    input.click();
   };
 
   const fetchRegisteredUsers = async (eventId: number) => {
@@ -333,10 +416,64 @@ function EventsPageContent() {
             {filteredEvents.map((event) => (
               <div
                 key={event.id}
-                onClick={() => navigate({ to: `/events/${event.id}` })}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
               >
-                <div className="p-6">
+                {/* Event Image */}
+                {eventImages.has(event.id) ? (
+                  <div className="relative h-48 w-full bg-gray-100">
+                    <img
+                      src={eventImages.get(event.id)}
+                      alt={event.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerFileInput(event.id);
+                      }}
+                      disabled={uploadingImageFor === event.id}
+                      className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white rounded-lg shadow-md transition-colors disabled:opacity-50"
+                      title="Change image"
+                    >
+                      {uploadingImageFor === event.id ? (
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600"></div>
+                      ) : (
+                        <Upload className="w-5 h-5 text-gray-700" />
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="relative h-48 w-full bg-gray-100 flex items-center justify-center">
+                    <div className="text-center">
+                      <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          triggerFileInput(event.id);
+                        }}
+                        disabled={uploadingImageFor === event.id}
+                        className="flex items-center gap-2 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {uploadingImageFor === event.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4" />
+                            Upload Image
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div
+                  className="p-6 cursor-pointer"
+                  onClick={() => navigate({ to: `/events/${event.id}` })}
+                >
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="text-lg font-bold text-gray-900 flex-1">
                       {event.title}
@@ -390,14 +527,20 @@ function EventsPageContent() {
 
                   <div className="flex gap-2 pt-4 border-t border-gray-200">
                     <button
-                      onClick={() => handleViewDetails(event)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewDetails(event);
+                      }}
                       className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded transition-colors"
                     >
                       <Eye className="w-4 h-4" />
                       View
                     </button>
                     <button
-                      onClick={() => handleDeleteEvent(event.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteEvent(event.id);
+                      }}
                       className="flex items-center justify-center gap-2 px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -631,6 +774,17 @@ function EventsPageContent() {
               </div>
 
               <div className="p-6 space-y-6">
+                {/* Event Image in Detail Modal */}
+                {eventImages.has(selectedEvent.id) && (
+                  <div className="w-full">
+                    <img
+                      src={eventImages.get(selectedEvent.id)}
+                      alt={selectedEvent.title}
+                      className="w-full h-64 object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+
                 <div>
                   <span
                     className={`px-3 py-1 text-sm font-semibold rounded border ${getStatusColor(selectedEvent.status)}`}

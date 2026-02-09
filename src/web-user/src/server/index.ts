@@ -10,6 +10,7 @@ import { eq, and, sql, isNull, or, max } from 'drizzle-orm';
 import { form, formQuestions, formAnswers, formSubmissions, qrCodes } from '@db/schemas';
 import QRCode from 'qrcode';
 import formsRoutes from './formsAPI';
+import publicImageRoutes from './imagesAPI';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -564,6 +565,8 @@ fastify.get('/api/events/:id/latest-instance', async (request, reply) =>
 });
 
 await fastify.register(formsRoutes)
+await fastify.register(publicImageRoutes)
+
 
 // Start server
 try
