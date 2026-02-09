@@ -13,6 +13,7 @@ interface Form {
   name: string;
   description: string | null;
   createdAt: string;
+  isPublic: boolean;
 }
 
 const API_URL = "http://localhost:3124";
@@ -146,6 +147,36 @@ function RouteComponent() {
       console.error("Delete error:", err);
     }
   };
+
+  const handleToggleVisibility = async (id: number, isPublic: boolean) => {
+    try {
+      const response = await fetch(`${API_URL}/api/forms/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isPublic }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update visibility");
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setForms((prev) =>
+          prev.map((f) => (f.id === id ? data.data : f))
+        );
+      } else {
+        throw new Error(data.error || "Failed to update visibility");
+      }
+    } catch (err) {
+      console.error("Visibility toggle error:", err);
+      setError("Failed to update form visibility");
+    }
+  };
+
+
   if (!user) {
     return null;
   }
@@ -227,15 +258,26 @@ function RouteComponent() {
                             {new Date(form.createdAt).toLocaleDateString()}
                           </p>
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteForm(form.id);
-                          }}
-                          className="px-4 py-2 text-red-800 hover:bg-red-50 rounded transition-colors ml-2 font-semibold"
-                        >
-                          Delete
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleVisibility(form.id, !form.isPublic);
+                            }}
+                            className="px-4 py-2 text-amber-800 hover:bg-amber-50 rounded transition-colors font-semibold"
+                          >
+                            {form.isPublic ? "Make Private" : "Make Public"}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteForm(form.id);
+                            }}
+                            className="px-4 py-2 text-red-800 hover:bg-red-50 rounded transition-colors ml-2 font-semibold"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
