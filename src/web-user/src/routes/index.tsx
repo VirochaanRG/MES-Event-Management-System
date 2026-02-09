@@ -7,18 +7,19 @@ import { useState, useEffect } from "react";
 import AvailableSurveys from "@/components/AvailableSurveys";
 import RegisteredEvents from "@/components/RegisteredEvents";
 import CompletedSurveys from "@/components/CompletedSurveys";
+import { PhotoCarousel } from "@/components/PhotoCarousel";
 
 function HomePage() {
   const { user, logout } = useAuth();
   const [isLocalAuth, setIsLocalAuth] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "events" | "surveys">(
-    "overview"
+    "overview",
   );
   const [eventsSubTab, setEventsSubTab] = useState<"available" | "registered">(
-    "available"
+    "available",
   );
   const [surveysSubTab, setSurveysSubTab] = useState<"available" | "completed">(
-    "available"
+    "available",
   );
   const [showMenu, setShowMenu] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -50,7 +51,7 @@ function HomePage() {
   const prevSlide = () => {
     setDirection("prev");
     setCarouselIndex(
-      (prev) => (prev - 1 + carouselImages.length) % carouselImages.length
+      (prev) => (prev - 1 + carouselImages.length) % carouselImages.length,
     );
   };
 
@@ -82,9 +83,7 @@ function HomePage() {
               <h1 className="text-3xl font-bold">
                 McMaster Engineering Society
               </h1>
-              <p className="text-yellow-300 text-sm mt-1">
-                Events and Surveys
-              </p>
+              <p className="text-yellow-300 text-sm mt-1">Events and Surveys</p>
             </div>
             <div className="relative">
               <button
@@ -171,57 +170,10 @@ function HomePage() {
                   The one stop location to see what the MES is up to!
                 </p>
               </div>
-
-              {/* Photo Carousel */}
-              <div className="relative">
-                {/* Carousel Container */}
-                <div
-                  className={`carousel-container ${
-                    direction === "prev" ? "prev" : ""
-                  } flex gap-6 overflow-hidden`}
-                >
-                  {getVisibleImages().map((image) => (
-                    <div
-                      key={image.id}
-                      className="flex-1 min-w-0 bg-gradient-to-br from-red-200 to-yellow-200 rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden cursor-pointer"
-                    >
-                      <div className="w-full aspect-video flex items-center justify-center">
-                        <span className="text-gray-600 font-semibold text-lg">
-                          {image.title}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Previous Button */}
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 z-10 bg-yellow-500 hover:bg-yellow-600 text-red-900 rounded-full p-3 transition-colors font-bold text-lg"
-                >
-                  ❮
-                </button>
-
-                {/* Next Button */}
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 z-10 bg-yellow-500 hover:bg-yellow-600 text-red-900 rounded-full p-3 transition-colors font-bold text-lg"
-                >
-                  ❯
-                </button>
-              </div>
-
-              {/* Dot Indicators */}
-              <div className="flex justify-center gap-2">
-                {carouselImages.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCarouselIndex(index)}
-                    className={`w-3 h-3 rounded-full transition-colors ${
-                      index === carouselIndex ? "bg-red-900" : "bg-yellow-500"
-                    }`}
-                  />
-                ))}
+              <div className="w-full max-w-5xl mx-auto min-h-[400px]">
+                {" "}
+                {/* Add a min-height */}
+                <PhotoCarousel />
               </div>
             </div>
           )}
