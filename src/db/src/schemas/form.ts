@@ -1,5 +1,4 @@
-import { boolean } from "drizzle-orm/gel-core";
-import { pgTable, serial, varchar, text, timestamp, integer, json } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer, json, boolean } from "drizzle-orm/pg-core";
 
 export const modularForms = pgTable("modular_forms", {
   id: serial("id").primaryKey().notNull(),
@@ -54,5 +53,5 @@ export const formAnswers = pgTable("form_answers", {
     .references(() => formQuestions.id, { onDelete: "cascade" }),
   answer: text("answer"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-  submissionId: integer("submission_id").references(() => formSubmissions.id, {onDelete: "cascade"})
+  submissionId: integer("submission_id").references(() => formSubmissions.id, { onDelete: "cascade" })
 });

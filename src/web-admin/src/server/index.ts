@@ -11,6 +11,10 @@ import { and, eq, sql } from 'drizzle-orm';
 import eventsRoutes from './eventsAPI';
 import formsRoutes from './formsAPI';
 import formBuilderRoutes from './formBuilderAPI';
+import imageRoutes from './imageAPI';
+import fastifyStatic from '@fastify/static';
+import { config } from '../../../config/config';
+import path from 'path';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
@@ -427,6 +431,8 @@ fastify.get('/api/roles', async (request, reply) =>
 await fastify.register(eventsRoutes)
 await fastify.register(formsRoutes)
 await fastify.register(formBuilderRoutes)
+await fastify.register(imageRoutes)
+
 
 // Start server
 try

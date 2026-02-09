@@ -5,13 +5,14 @@
     "moduleResolution": "bundler",
     "target": "ES2020",
     "outDir": "./dist/server",
-    "rootDir": "./src/server",
     "noEmit": false,
     "allowImportingTsExtensions": false
   },
   "include": [
     "src/server/**/*",
-    "src/lib/auth.ts"
+    "src/lib/auth.ts",
+    "../db/src/**/*",
+    "../config/**/*"
   ],
   "exclude": [
     "node_modules",

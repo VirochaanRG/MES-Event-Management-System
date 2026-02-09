@@ -58,7 +58,10 @@ CREATE TABLE "form_questions" (
 	"question_title" text,
 	"options_category" text,
 	"qorder" integer NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now()
+	"created_at" timestamp with time zone DEFAULT now(),
+	"parent_question_id" integer,
+	"enabling_answers" json,
+	"required" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "form_submissions" (
@@ -69,10 +72,33 @@ CREATE TABLE "form_submissions" (
 	"updated_at" timestamp with time zone DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "images" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"image_data" "bytea" NOT NULL,
+	"component" varchar(255) NOT NULL,
+	"index" integer,
+	"file_name" varchar(255),
+	"mime_type" varchar(100),
+	"file_size" integer,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "users" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"email" varchar(255) NOT NULL,
+	"password_hash" varchar(255) NOT NULL,
+	"roles" text[] DEFAULT '{"user"}' NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "users_email_unique" UNIQUE("email")
+);
+--> statement-breakpoint
 ALTER TABLE "qr_codes" ADD CONSTRAINT "qr_codes_id_registered_users_id_fk" FOREIGN KEY ("id") REFERENCES "public"."registered_users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "registered_users" ADD CONSTRAINT "registered_users_event_id_events_id_fk" FOREIGN KEY ("event_id") REFERENCES "public"."events"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "form_answers" ADD CONSTRAINT "form_answers_form_id_form_id_fk" FOREIGN KEY ("form_id") REFERENCES "public"."form"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "form_answers" ADD CONSTRAINT "form_answers_question_id_form_questions_id_fk" FOREIGN KEY ("question_id") REFERENCES "public"."form_questions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "form_answers" ADD CONSTRAINT "form_answers_submission_id_form_submissions_id_fk" FOREIGN KEY ("submission_id") REFERENCES "public"."form_submissions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "form_questions" ADD CONSTRAINT "form_questions_form_id_form_id_fk" FOREIGN KEY ("form_id") REFERENCES "public"."form"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "form_questions" ADD CONSTRAINT "form_questions_parent_question_id_form_questions_id_fk" FOREIGN KEY ("parent_question_id") REFERENCES "public"."form_questions"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "form_submissions" ADD CONSTRAINT "form_submissions_form_id_form_id_fk" FOREIGN KEY ("form_id") REFERENCES "public"."form"("id") ON DELETE cascade ON UPDATE no action;
