@@ -30,7 +30,7 @@ export default defineConfig({
     host: '0.0.0.0', // IMPORTANT: Allows Railway to access it
     proxy: {
       '/api': {
-        target: config.VITE_API_URL || 'http://localhost:3124',
+        target: 'web-admin-api.railway.internal',
         changeOrigin: true,
       },
     },
