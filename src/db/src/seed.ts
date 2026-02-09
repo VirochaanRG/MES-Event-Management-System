@@ -1,9 +1,11 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { events } from "./schemas/events"; // adjust the import path if needed
+import { events } from "./schemas/events";
+import { users } from "./schemas/users"; // adjust the import path if needed
+// adjust the import path if needed
 import { Pool } from "pg";
 import dotenv from "dotenv";
 import path from "path";
-
+import bcrypt from 'bcrypt';
 // dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
 const pool = new Pool({
@@ -69,6 +71,21 @@ async function seed()
     },
   ]);
   console.log("5 test events inserted successfully!");
+  console.log("Seeding test accounts...");
+  const passwordHash = await bcrypt.hash("test1234", 10);
+  await db.insert(users).values([
+    {
+      email: "t1@test.com",
+      passwordHash: passwordHash,
+      roles: ["user"],
+    },
+    {
+      email: "ta1@test.com",
+      passwordHash: passwordHash,
+      roles: ["user", "admin", "all"],
+    },
+  ]);
+  console.log("Accounts inserted successfully!");
   await pool.end();
 }
 

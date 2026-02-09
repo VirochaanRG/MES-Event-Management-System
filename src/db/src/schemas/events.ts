@@ -1,5 +1,9 @@
-import { pgTable, serial, varchar, text, timestamp, integer, boolean,
-  unique, customType } from "drizzle-orm/pg-core";
+import
+{
+  pgTable, serial, varchar, text, timestamp, integer, boolean,
+  unique, customType,
+  json
+} from "drizzle-orm/pg-core";
 
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),
@@ -12,6 +16,7 @@ export const events = pgTable("events", {
   isPublic: boolean("is_public").default(true),
   status: varchar("status", { length: 50 }).default("scheduled"),
   cost: integer("cost").default(0),
+  registrationForm: json("registration_form"), // Stores the form schema/configuration
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
@@ -20,12 +25,13 @@ export const registeredUsers = pgTable("registered_users", {
   id: serial("id").primaryKey(),
   eventId: integer("event_id")
     .notNull()
-    .references(() => events.id, { onDelete: "cascade" }), // Or varchar if you use string IDs
+    .references(() => events.id, { onDelete: "cascade" }),
   userEmail: varchar("user_email", { length: 255 }).notNull(),
-  instance: integer("instance").default(0), // number of stuff
+  instance: integer("instance").default(0),
+  details: json("details"), // Stores the user's form responses
   registeredAt: timestamp("registered_at", { withTimezone: true }).defaultNow(),
-  status: varchar("status", { length: 50 }).default("confirmed"), // confirmed, cancelled, waitlist
-  paymentStatus: varchar("payment_status", { length: 50 }).default("pending"), // pending, paid, refunded
+  status: varchar("status", { length: 50 }).default("confirmed"),
+  paymentStatus: varchar("payment_status", { length: 50 }).default("pending"),
 },
   (t) => [
     unique("registration_natural_key").on(
@@ -37,13 +43,14 @@ export const registeredUsers = pgTable("registered_users", {
 );
 
 const bytea = customType<{ data: Buffer; notNull: true; }>({
-  dataType() {
+  dataType()
+  {
     return 'bytea';
   },
 });
 
 export const qrCodes = pgTable("qr_codes", {
-  id: serial("id").references(() => registeredUsers.id, {onDelete: "cascade" }),
+  id: serial("id").references(() => registeredUsers.id, { onDelete: "cascade" }),
   eventId: integer("event_id").notNull(),
   userEmail: varchar("user_email", { length: 255 }).notNull(),
   instance: integer("instance").notNull(),
