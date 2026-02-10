@@ -415,7 +415,7 @@ function AnalyticsDetailPageContent() {
                 style={{ height: "200px" }}
               >
                 <div
-                  className="w-full bg-red-600 rounded-t-lg transition-all flex items-end justify-center pb-2"
+                  className="w-full bg-red-900 rounded-t-lg transition-all flex items-end justify-center pb-2"
                   style={{ height: `${barHeight}px` }}
                 >
                   <span className="text-white font-bold text-sm">{count}</span>
@@ -460,7 +460,7 @@ function AnalyticsDetailPageContent() {
               >
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-red-600 font-semibold text-sm">
+                    <span className="text-red-900 font-semibold text-sm">
                       {startIndex + index + 1}
                     </span>
                   </div>
@@ -519,8 +519,47 @@ function AnalyticsDetailPageContent() {
   const renderPieChart = (questionId: number) => {
     const stats = getAnswerStats(questionId);
 
+    // If only one answer, show a full circle with legend
+    if (stats.answers.length === 1) {
+      const [answer, count] = stats.answers[0];
+      const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
+
+      return (
+        <div className="flex flex-col md:flex-row gap-6 items-center">
+          <svg
+            width="200"
+            height="200"
+            viewBox="0 0 200 200"
+            className="flex-shrink-0"
+          >
+            <circle
+              cx="100"
+              cy="100"
+              r="80"
+              fill="#82181a"
+              stroke="white"
+              strokeWidth="2"
+            />
+          </svg>
+
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center gap-3 text-sm">
+              <div
+                className="w-4 h-4 rounded flex-shrink-0"
+                style={{ backgroundColor: "#82181a" }}
+              />
+              <span className="text-gray-700 truncate flex-1">{answer}</span>
+              <span className="text-gray-600 font-medium whitespace-nowrap">
+                {count} ({percentage.toFixed(1)}%)
+              </span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     const colors = [
-      "#DC2626", // red-600
+      "#82181a", // red-900
       "#EA580C", // orange-600
       "#D97706", // amber-600
       "#CA8A04", // yellow-600
@@ -614,7 +653,7 @@ function AnalyticsDetailPageContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-900 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading analytics...</p>
         </div>
       </div>
@@ -697,7 +736,7 @@ function AnalyticsDetailPageContent() {
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-red-600" />
+                  <Users className="w-6 h-6 text-red-900" />
                 </div>
               </div>
             </div>
@@ -727,7 +766,7 @@ function AnalyticsDetailPageContent() {
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-red-600" />
+                  <TrendingUp className="w-6 h-6 text-red-900" />
                 </div>
               </div>
             </div>
@@ -757,7 +796,7 @@ function AnalyticsDetailPageContent() {
                   onClick={() => setViewMode("table")}
                   className={`flex items-center gap-2 px-4 py-2 font-semibold rounded-lg transition-colors ${
                     viewMode === "table"
-                      ? "bg-red-600 text-white"
+                      ? "bg-red-900 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
@@ -768,7 +807,7 @@ function AnalyticsDetailPageContent() {
                   onClick={() => setViewMode("graphs")}
                   className={`flex items-center gap-2 px-4 py-2 font-semibold rounded-lg transition-colors ${
                     viewMode === "graphs"
-                      ? "bg-red-600 text-white"
+                      ? "bg-red-900 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
@@ -846,7 +885,7 @@ function AnalyticsDetailPageContent() {
                               analyticsData.submissions.length
                           }
                           onChange={toggleAllRows}
-                          className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                          className="w-4 h-4 text-red-900 border-gray-300 rounded focus:ring-red-500"
                         />
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase sticky left-0 bg-gray-50">
@@ -877,7 +916,7 @@ function AnalyticsDetailPageContent() {
                             type="checkbox"
                             checked={selectedRows.has(index)}
                             onChange={() => toggleRowSelection(index)}
-                            className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                            className="w-4 h-4 text-red-900 border-gray-300 rounded focus:ring-red-500"
                           />
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900 font-medium sticky left-0 bg-white">
@@ -950,7 +989,7 @@ function AnalyticsDetailPageContent() {
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => toggleQuestionSelection(question.id)}
-                          className="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500 mt-1"
+                          className="w-5 h-5 text-red-900 border-gray-300 rounded focus:ring-red-500 mt-1"
                         />
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900 text-lg mb-1">

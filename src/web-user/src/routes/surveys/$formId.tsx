@@ -100,22 +100,22 @@ function RouteComponent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600">Loading form...</div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-lg text-red-900">Loading form...</div>
       </div>
     );
   }
 
   if (error || !form) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="text-lg text-red-600 mb-4">
+          <div className="text-lg text-red-900 mb-4">
             {error || "Survey not found"}
           </div>
           <button
             onClick={handleBack}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
           >
             Back to surveys
           </button>
@@ -130,7 +130,7 @@ function RouteComponent() {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="mb-6 flex items-center gap-2 text-red-900 hover:text-red-700 transition-colors"
         >
           <svg
             className="w-5 h-5"
@@ -149,10 +149,10 @@ function RouteComponent() {
         </button>
 
         {/* Survey Header */}
-        <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-8 mb-6">
+        <div className="bg-white rounded-lg shadow-sm border-2 border-red-900 p-8 mb-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <h1 className="text-4xl font-bold text-red-900 mb-2">
                 {form.name}
               </h1>
             </div>
@@ -166,10 +166,10 @@ function RouteComponent() {
         </div>
 
         {/* Action Buttons */}
-        <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
+        <div className="bg-white rounded-lg shadow-sm border-2 border-yellow-300 p-6">
           <div className="flex gap-4">
             <button
-              className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 px-6 py-3 bg-red-900 text-white font-semibold rounded-lg hover:bg-red-800 transition-colors"
               onClick={handleFillSurvey}
             >
               {surveyProgress === "unfilled"
@@ -181,7 +181,7 @@ function RouteComponent() {
             {(surveyProgress === "started" ||
               surveyProgress == "completed") && (
               <button
-                className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex-1 px-6 py-3 bg-yellow-300 text-red-900 font-semibold rounded-lg hover:bg-yellow-400 transition-colors"
                 onClick={handleDeleteSubmission}
               >
                 Delete Submission
