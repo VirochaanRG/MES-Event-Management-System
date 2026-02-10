@@ -63,14 +63,18 @@ export default async function formsRoutes(fastify: FastifyInstance)
           .from(form)
           .where(and(
             eq(form.isPublic, true),
-            notInArray(form.id, submittedIds)));
+            and(
+              notInArray(form.id, submittedIds),
+              isNull(form.moduleId))));
       } else
       {
         // If no submissions, return all forms
         allForms = await db
           .select()
           .from(form)
-          .where(eq(form.isPublic, true));
+          .where(and(
+            eq(form.isPublic, true),
+            isNull(form.moduleId)));
       }
 
       console.log('UNFILLED: ', allForms);
@@ -96,7 +100,14 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { uid } = request.params;
       const allForms = await db
-        .select()
+        .select({
+            id: form.id,
+            name: form.name,
+            description: form.description,
+            createdAt: form.createdAt,
+            isPublic: form.isPublic,
+            moduleId: form.moduleId
+          })
         .from(form)
         .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
         .where(and(
@@ -262,9 +273,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
             name: form.name,
             description: form.description,
             createdAt: form.createdAt,
-            isPublic: form.isPublic,
-            moduleId: form.moduleId
-            // add other fields you need
+            isPublic: form.isPublic
           })
         .from(modularForms)
         .innerJoin(form, eq(form.moduleId, modularForms.id))

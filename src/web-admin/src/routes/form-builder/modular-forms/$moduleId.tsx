@@ -171,6 +171,37 @@ function RouteComponent() {
     }
   };
 
+  const handleToggleVisibility = async (form) => {
+    try {
+      const id = form.id;
+      const isPublic = form.isPublic;
+      const response =  
+        await fetch(`${API_URL}/api/forms/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isPublic: !isPublic }),
+        });
+
+      if (!response.ok) {
+        throw new Error("Failed to update visibility");
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setSubForms((prev) =>
+          prev.map((f) => (f.id === id ? { ...f, isPublic: !isPublic } : f))
+        );
+      } else {
+        throw new Error(data.error || "Failed to update visibility");
+      }
+    } catch (err) {
+      console.error("Visibility toggle error:", err);
+      setError("Failed to update form visibility");
+    }
+  };
+
 
   if (loading) {
     return (
@@ -270,12 +301,43 @@ function RouteComponent() {
                                 transition-all cursor-pointer"
                     >
                       <div className="flex flex-col h-full">
-                        {/* Content */}
-                        <div className="flex-1">
+                        {/* Header */}
+                        <div className="flex items-start justify-between">
                           <h3 className="text-xl font-semibold text-gray-800 mb-1 group-hover:text-amber-700">
                             {form.name}
                           </h3>
+                          
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2"
+                          >
+                            <button
+                              onClick={() =>
+                                handleToggleVisibility(form)
+                              }
+                              className={`
+                                relative inline-flex h-6 w-11 items-center rounded-full
+                                transition-colors
+                                ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}
+                              `}
+                            >
+                              <span
+                                className={`
+                                  inline-block h-4 w-4 transform rounded-full bg-white
+                                  transition-transform
+                                  ${form.isPublic ? "translate-x-6" : "translate-x-1"}
+                                `}
+                              />
+                            </button>
 
+                            <span className="text-sm text-gray-700">
+                              {form.isPublic ? "Public" : "Private"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="flex-1 mt-2">
                           <p className="text-gray-600 mb-4 line-clamp-3">
                             {form.description || "No description"}
                           </p>
