@@ -242,7 +242,10 @@ function RouteComponent() {
               </p>
             )}
 
-            {loading ? (
+            {/* Sub-forms section*/}
+            
+            <div className="mt-12">
+              {loading ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">Loading forms...</p>
                 </div>
@@ -280,7 +283,7 @@ function RouteComponent() {
                         {/* Footer */}
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                           <p className="text-sm text-gray-500">
-                            {new Date(form.createdAt).toLocaleDateString()}
+                            Created {new Date(form.createdAt).toLocaleDateString()}
                           </p>
 
                           <button
@@ -298,6 +301,7 @@ function RouteComponent() {
                   ))}
                 </div>
               )}
+            </div>
 
             {/* Add Form Modal */}
             {showModal && (
