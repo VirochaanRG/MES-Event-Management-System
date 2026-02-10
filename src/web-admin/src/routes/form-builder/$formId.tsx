@@ -512,7 +512,27 @@ function RouteComponent() {
                 <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
                   {formData?.name || "Untitled Form"}
                 </h1>
+
+                {/* Make public checkbox */}
+                <div className="mt-3 flex items-center gap-3">
+                  <input
+                    id="makePublic"
+                    type="checkbox"
+                    checked={!!formData?.isPublic}
+                    disabled={savingVisibility}
+                    onChange={(e) => handleTogglePublic(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 disabled:opacity-50"
+                  />
+                  <label htmlFor="makePublic" className="text-sm font-medium text-gray-900">
+                    Make public
+                  </label>
+
+                  <span className="text-xs text-gray-500">
+                    {formData?.isPublic ? "Public" : "Private"}
+                  </span>
+                </div>
               </div>
+
               <div className="relative z-20" ref={dropdownRef}>
                 <button
                   onClick={handleAddComponent}
@@ -551,6 +571,7 @@ function RouteComponent() {
                 )}
               </div>
             </div>
+
             {formData?.description && (
               <p className="text-gray-600 text-lg mt-2">
                 {formData.description}
