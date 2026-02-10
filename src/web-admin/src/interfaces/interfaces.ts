@@ -4,7 +4,14 @@ export interface Form
   name: string;
   description: string | null;
   createdAt: string;
+  isPublic: boolean;
 }
+
+export interface SimpleForm extends Form {
+  moduleId: number;
+}
+
+export interface ModularForm extends Form {}
 
 export interface FormQuestion
 {
