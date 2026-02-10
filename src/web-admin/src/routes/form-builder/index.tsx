@@ -198,7 +198,7 @@ function RouteComponent() {
       const data = await response.json();
       if (data.success) {
         setForms((prev) =>
-          prev.map((f) => (f.id === id ? { ...f, isPublic: !isPublic } : f))
+          prev.map((f) => (f.id === id && checkFormIsModular(f) === checkFormIsModular(form) ? { ...f, isPublic: !isPublic } : f))
         );
       } else {
         throw new Error(data.error || "Failed to update visibility");
