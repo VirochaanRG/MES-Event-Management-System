@@ -5,11 +5,25 @@ import { and, eq, isNull, notInArray, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
 {
+
+  const assertPublicForm = async (fid: string, reply: any) => {
+  const f = await db.query.form.findFirst({
+    where: and(eq(form.id, parseInt(fid)), eq(form.isPublic, true)),
+  });
+  if (!f) {
+    reply.code(404).send({ success: false, error: "Survey not found" });
+    return null;
+  }
+  return f;
+  };
+
   fastify.get('/api/forms', async (request, reply) =>
   {
     try
     {
-      const allForms = await db.query.form.findMany();
+      const allForms = await db.query.form.findMany({
+        where: eq(form.isPublic, true)
+      });
 
       return reply.send({
         success: true,
@@ -52,7 +66,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
             createdAt: form.createdAt,
           })
           .from(form)
-          .where(notInArray(form.id, submittedIds));
+          .where(and(
+            eq(form.isPublic, true),
+            notInArray(form.id, submittedIds)));
       } else
       {
         // If no submissions, return all forms
@@ -63,7 +79,8 @@ export default async function formsRoutes(fastify: FastifyInstance)
             description: form.description,
             createdAt: form.createdAt,
           })
-          .from(form);
+          .from(form)
+          .where(eq(form.isPublic, true));
       }
 
       console.log('UNFILLED: ', allForms);
@@ -96,7 +113,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
         })
         .from(form)
         .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
-        .where(eq(formSubmissions.userId, uid));
+        .where(and(
+          eq(formSubmissions.userId, uid),
+          eq(form.isPublic, true)));
 
       console.log('FILLED: ', allForms);
 
@@ -120,22 +139,13 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { fid } = request.params;
-
-      const selectedForm = await db.query.form.findFirst({
-        where: eq(form.id, parseInt(fid)),
-      });
-
-      if (!selectedForm)
-      {
-        return reply.code(404).send({
-          success: false,
-          error: 'Survey not found',
-        });
-      }
+      
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
 
       return reply.send({
         success: true,
-        data: selectedForm,
+        data: publicForm,
       });
     } catch (error)
     {
@@ -155,6 +165,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
       try
       {
         const { fid, uid } = request.params;
+
+        const publicForm = await assertPublicForm(fid, reply);
+        if (!publicForm) return;
 
         console.log('Checking status for:', { fid, uid }); // Debug log
 
@@ -225,6 +238,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { fid } = request.params;
 
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
+
       const questions = await db
         .select()
         .from(formQuestions)
@@ -252,6 +268,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
       try
       {
         const { fid, uid } = request.params;
+        
+        const publicForm = await assertPublicForm(fid, reply);
+        if (!publicForm) return;
 
         var answers = await db
           .select()
@@ -291,6 +310,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { fid, uid } = request.params;
+
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
+
       const { qid, answer, questionType } = request.body;
 
       const selectedQuestion = await db.query.formQuestions.findFirst({
@@ -352,6 +375,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { fid, uid } = request.params;
+
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
 
       const existingSubmission = await db.query.formSubmissions.findFirst({
         where: and(eq(formSubmissions.formId, parseInt(fid)), eq(formSubmissions.userId, uid)),
@@ -419,6 +445,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { fid, uid } = request.params;
 
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
+
       await db
         .delete(formSubmissions)
         .where(and(eq(formSubmissions.userId, uid), eq(formSubmissions.formId, parseInt(fid))));
@@ -433,10 +462,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     } catch (error)
     {
-      fastify.log.error({ err: error }, 'Failed to post user answers');
+      fastify.log.error({ err: error }, 'Failed to delete user answers');
       return reply.code(500).send({
         success: false,
-        error: 'Failed to post user answers',
+        error: 'Failed to delete user answers',
       });
     }
   });

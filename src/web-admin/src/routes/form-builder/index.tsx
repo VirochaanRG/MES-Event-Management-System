@@ -170,6 +170,35 @@ function RouteComponent() {
       });
     }
   }
+  
+  const handleToggleVisibility = async (id: number, isPublic: boolean) => {
+    try {
+      const response = await fetch(`${API_URL}/api/forms/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isPublic }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update visibility");
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setForms((prev) =>
+          prev.map((f) => (f.id === id ? data.data : f))
+        );
+      } else {
+        throw new Error(data.error || "Failed to update visibility");
+      }
+    } catch (err) {
+      console.error("Visibility toggle error:", err);
+      setError("Failed to update form visibility");
+    }
+  };
+
 
   if (!user) {
     return null;
@@ -247,15 +276,46 @@ function RouteComponent() {
                             {new Date(form.createdAt).toLocaleDateString()}
                           </p>
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteForm(form.id);
-                          }}
-                          className="px-4 py-2 text-red-800 hover:bg-red-50 rounded transition-colors ml-2 font-semibold"
-                        >
-                          Delete
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2"
+                          >
+                            <button
+                              onClick={() =>
+                                handleToggleVisibility(form.id, !form.isPublic)
+                              }
+                              className={`
+                                relative inline-flex h-6 w-11 items-center rounded-full
+                                transition-colors
+                                ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}
+                              `}
+                            >
+                              <span
+                                className={`
+                                  inline-block h-4 w-4 transform rounded-full bg-white
+                                  transition-transform
+                                  ${form.isPublic ? "translate-x-6" : "translate-x-1"}
+                                `}
+                              />
+                            </button>
+
+                            <span className="text-sm text-gray-700">
+                              {form.isPublic ? "Public" : "Private"}
+                            </span>
+                          </div>
+
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteForm(form.id);
+                            }}
+                            className="px-4 py-2 text-red-800 hover:bg-red-50 rounded transition-colors ml-2 font-semibold"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

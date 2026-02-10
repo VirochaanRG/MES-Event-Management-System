@@ -13,7 +13,7 @@ export const form = pgTable("form", {
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   moduleId: integer("module_id").references(() => modularForms.id, { onDelete: "cascade" }),
-  isPublic: boolean("is_public").notNull().default(true)
+  isPublic: boolean("is_public").notNull().default(false)
 });
 
 export const formSubmissions = pgTable("form_submissions", {

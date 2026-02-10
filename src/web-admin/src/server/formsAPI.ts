@@ -10,6 +10,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
   {
     try
     {
+<<<<<<< HEAD
       const forms = await db.query.form.findMany({where : 
         isNull(form.moduleId)
       });
@@ -56,6 +57,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
       const forms = await db.query.form.findMany({
         where: eq(form.moduleId, moduleId)
       });
+=======
+      const forms = await db.query.form.findMany();
+
+>>>>>>> ac438b9f7ea877c4620d14c7dd7d637ce10e855f
       return reply.send({
         success: true,
         data: forms,
@@ -80,8 +85,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
         where: eq(form.id, parseInt(id)),
       });
 
-      if (!formData)
-      {
+      if (!formData) {
         return reply.code(404).send({
           success: false,
           error: 'Form not found',
@@ -136,12 +140,21 @@ export default async function formsRoutes(fastify: FastifyInstance)
 
   // CREATE a new form
   fastify.post<{
+<<<<<<< HEAD
     Body: { name: string; description?: string; eventId?: number ; isModular?: boolean; moduleId?: number};
   }>('/api/forms', async (request, reply) =>
   {
     try
     {
       const { name, description, eventId, isModular, moduleId} = request.body;
+=======
+  Body: { name: string; description?: string; moduleId?: number; isPublic?: boolean };
+}>('/api/forms', async (request, reply) =>
+  {
+    try
+    {
+      const { name, description, moduleId, isPublic } = request.body;
+>>>>>>> ac438b9f7ea877c4620d14c7dd7d637ce10e855f
 
       if (!name || name.trim() === '')
       {
@@ -163,8 +176,13 @@ export default async function formsRoutes(fastify: FastifyInstance)
         .values({
           name: name.trim(),
           description: description?.trim() || null,
+<<<<<<< HEAD
           eventId: eventId || null,
           moduleId: moduleId
+=======
+          moduleId: moduleId ?? null,
+          isPublic: isPublic ?? false,
+>>>>>>> ac438b9f7ea877c4620d14c7dd7d637ce10e855f
         })
         .returning();
 
@@ -186,13 +204,13 @@ export default async function formsRoutes(fastify: FastifyInstance)
   // UPDATE a form
   fastify.put<{
     Params: { id: string };
-    Body: { name?: string; description?: string; eventId?: number };
+    Body: { name?: string; description?: string; moduleId?: number; isPublic?: boolean };
   }>('/api/forms/:id', async (request, reply) =>
   {
     try
     {
       const { id } = request.params;
-      const { name, description, eventId } = request.body;
+      const { name, description, moduleId, isPublic } = request.body;
 
       const existingForm = await db.query.form.findFirst({
         where: eq(form.id, parseInt(id)),
@@ -215,9 +233,11 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         updateData.description = description.trim() || null;
       }
-      if (eventId !== undefined)
-      {
-        updateData.eventId = eventId || null;
+      if (moduleId !== undefined) {
+        updateData.moduleId = moduleId ?? null;
+      }
+      if (isPublic !== undefined) {
+        updateData.isPublic = isPublic;
       }
 
       if (Object.keys(updateData).length === 0)
@@ -459,4 +479,25 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
+
+  fastify.patch<{
+  Params: { id: string };
+  Body: { isPublic: boolean };
+  }>('/api/forms/:id/visibility', async (request, reply) => {
+    const { id } = request.params;
+    const { isPublic } = request.body;
+
+  const updated = await db
+    .update(form)
+    .set({ isPublic })
+    .where(eq(form.id, parseInt(id)))
+    .returning();
+
+  if (!updated[0]) {
+    return reply.code(404).send({ success: false, error: 'Form not found' });
+  }
+
+  return reply.send({ success: true, data: updated[0] });
+});
+
 }
