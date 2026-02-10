@@ -259,19 +259,34 @@ function RouteComponent() {
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <label 
+                          <div
                             onClick={(e) => e.stopPropagation()}
                             className="flex items-center gap-2"
                           >
-                            <input
-                              type="checkbox"
-                              checked={form.isPublic}
-                              onChange={(e) =>
-                                handleToggleVisibility(form.id, e.target.checked)
+                            <button
+                              onClick={() =>
+                                handleToggleVisibility(form.id, !form.isPublic)
                               }
-                            />
-                            Public
-                          </label>
+                              className={`
+                                relative inline-flex h-6 w-11 items-center rounded-full
+                                transition-colors
+                                ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}
+                              `}
+                            >
+                              <span
+                                className={`
+                                  inline-block h-4 w-4 transform rounded-full bg-white
+                                  transition-transform
+                                  ${form.isPublic ? "translate-x-6" : "translate-x-1"}
+                                `}
+                              />
+                            </button>
+
+                            <span className="text-sm text-gray-700">
+                              {form.isPublic ? "Public" : "Private"}
+                            </span>
+                          </div>
+
 
                           <button
                             onClick={(e) => {
