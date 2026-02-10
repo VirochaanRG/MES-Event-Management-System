@@ -152,12 +152,12 @@ function RouteComponent() {
     }
   };
 
-  const formIsModular = (form) => {
+  const checkFormIsModular = (form) => {
     return form.moduleId === undefined;
   };
 
   const handleClickForm = (form) => {
-    if(formIsModular(form)) {
+    if(checkFormIsModular(form)) {
       navigate({
         to: "/form-builder/modular-forms/$moduleId",
         params: { moduleId: form.id.toString() },
@@ -171,15 +171,25 @@ function RouteComponent() {
     }
   }
   
-  const handleToggleVisibility = async (id: number, isPublic: boolean) => {
+  const handleToggleVisibility = async (form) => {
     try {
-      const response = await fetch(`${API_URL}/api/forms/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ isPublic }),
-      });
+      const id = form.id;
+      const isPublic = form.isPublic;
+      const response = checkFormIsModular(form) ? 
+        await fetch(`${API_URL}/api/mod-forms/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isPublic: !isPublic }),
+        }) :
+        await fetch(`${API_URL}/api/forms/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isPublic: !isPublic }),
+        });
 
       if (!response.ok) {
         throw new Error("Failed to update visibility");
@@ -188,7 +198,7 @@ function RouteComponent() {
       const data = await response.json();
       if (data.success) {
         setForms((prev) =>
-          prev.map((f) => (f.id === id ? data.data : f))
+          prev.map((f) => (f.id === id ? { ...f, isPublic: !isPublic } : f))
         );
       } else {
         throw new Error(data.error || "Failed to update visibility");
@@ -283,7 +293,7 @@ function RouteComponent() {
                           >
                             <button
                               onClick={() =>
-                                handleToggleVisibility(form.id, !form.isPublic)
+                                handleToggleVisibility(form)
                               }
                               className={`
                                 relative inline-flex h-6 w-11 items-center rounded-full

@@ -4,7 +4,8 @@ export const modularForms = pgTable("modular_forms", {
   id: serial("id").primaryKey().notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  isPublic: boolean("is_public").notNull().default(false)
 });
 
 export const form = pgTable("form", {
