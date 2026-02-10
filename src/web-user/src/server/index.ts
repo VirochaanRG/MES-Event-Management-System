@@ -319,6 +319,8 @@ fastify.post<{
       });
     }
 
+    // Only single registrations for now
+    // TODO: Add functionality to allow for multiple users to register
     const existingRegistration = await db.query.registeredUsers.findFirst({
       where: and(
         eq(registeredUsers.eventId, parseInt(id)),
@@ -389,7 +391,8 @@ interface QRPayload
 
 function buildQRContentString(payload: QRPayload)
 {
-  return `registrationId:${payload.registrationId};eventId:${payload.eventId};userEmail:${payload.userEmail};instance:${payload.instance}`;
+  return `registrationId:${payload.registrationId};eventId:${payload.eventId};userEmail:${payload.userEmail};` +
+    `instance:${payload.instance};${Date.now()}`;
 }
 
 fastify.post<{
@@ -425,7 +428,8 @@ fastify.post<{
       instance,
     };
     const qrString = buildQRContentString(payload);
-    const qrBuffer = await QRCode.toBuffer(qrString);
+    const qrSalt = await bcrypt.hash(qrString, SALT_ROUNDS);
+    const qrBuffer = await QRCode.toBuffer(qrSalt);
     const [entry] = await db
       .insert(qrCodes)
       .values({
@@ -434,6 +438,7 @@ fastify.post<{
         userEmail,
         instance,
         image: qrBuffer,
+        content: qrSalt
       })
       .returning();
 
@@ -450,6 +455,7 @@ fastify.post<{
     });
   }
 });
+
 // GET available events (not started yet and not registered by user)
 fastify.get<{
   Querystring: { userEmail?: string };
