@@ -353,9 +353,7 @@ fastify.post<{
         });
       }
     }
-
-    // Transform the form answers to include labels
-    let formattedDetails = null;
+    let formattedDetails;
     if (details && event.registrationForm)
     {
       const registrationForm = event.registrationForm as any;
