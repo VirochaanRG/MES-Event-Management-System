@@ -17,6 +17,38 @@ function RouteComponent() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const { formId } = Route.useParams();
   const [formData, setFormData] = useState<Form | null>(null);
+  const [savingVisibility, setSavingVisibility] = useState(false);
+  const handleTogglePublic = async (nextValue: boolean) => {
+    if (!formData) return;
+
+    const prev = formData.isPublic;
+
+    // optimistic update
+    setFormData({ ...formData, isPublic: nextValue });
+    setSavingVisibility(true);
+
+    try {
+      const res = await fetch(`/api/forms/${formId}/visibility`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic: nextValue }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json?.error || "Failed to update visibility");
+      }
+
+      setFormData(json.data);
+    } catch (err: any) {
+      // revert if it fails
+      setFormData({ ...formData, isPublic: prev });
+      alert(err?.message || "Failed to update visibility");
+    } finally {
+      setSavingVisibility(false);
+    }
+  };
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

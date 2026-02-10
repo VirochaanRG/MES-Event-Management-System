@@ -277,12 +277,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
     }
   });
 
-  fastify.patch<{
-  Params: { id: string };
-  Body: { isPublic: boolean };
-}>('/api/forms/:id/visibility', async (request, reply) => {
-  const { id } = request.params;
-  const { isPublic } = request.body;
+  fastify.patch<{Params: { id: string }; Body: { isPublic: boolean };
+  }>('/api/forms/:id/visibility', async (request, reply) => {
+    const { id } = request.params;
+    const { isPublic } = request.body;
 
   const updated = await db
     .update(form)

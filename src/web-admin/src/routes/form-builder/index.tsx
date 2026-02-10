@@ -259,15 +259,20 @@ function RouteComponent() {
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleToggleVisibility(form.id, !form.isPublic);
-                            }}
-                            className="px-4 py-2 text-amber-800 hover:bg-amber-50 rounded transition-colors font-semibold"
+                          <label 
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2"
                           >
-                            {form.isPublic ? "Make Private" : "Make Public"}
-                          </button>
+                            <input
+                              type="checkbox"
+                              checked={form.isPublic}
+                              onChange={(e) =>
+                                handleToggleVisibility(form.id, e.target.checked)
+                              }
+                            />
+                            Public
+                          </label>
+
                           <button
                             onClick={(e) => {
                               e.stopPropagation();

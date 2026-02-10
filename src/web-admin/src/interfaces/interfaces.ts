@@ -4,6 +4,7 @@ export interface Form
   name: string;
   description: string | null;
   createdAt: string;
+  isPublic: boolean;
 }
 
 export interface FormQuestion
