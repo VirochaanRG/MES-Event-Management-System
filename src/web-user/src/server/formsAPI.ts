@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
-import { form, formAnswers, formQuestions, formSubmissions } from './../../../db/src/schemas/form';
+import { form, formAnswers, formQuestions, formSubmissions, modularForms } from './../../../db/src/schemas/form';
 import { and, eq, isNull, notInArray, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
@@ -59,12 +59,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       if (submittedIds.length > 0)
       {
         allForms = await db
-          .select({
-            id: form.id,
-            name: form.name,
-            description: form.description,
-            createdAt: form.createdAt,
-          })
+          .select()
           .from(form)
           .where(and(
             eq(form.isPublic, true),
@@ -73,12 +68,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         // If no submissions, return all forms
         allForms = await db
-          .select({
-            id: form.id,
-            name: form.name,
-            description: form.description,
-            createdAt: form.createdAt,
-          })
+          .select()
           .from(form)
           .where(eq(form.isPublic, true));
       }
@@ -98,6 +88,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
+
   //GET filled forms for user
   fastify.get<{ Params: { uid: string } }>('/api/forms/completed/:uid', async (request, reply) =>
   {
@@ -105,19 +96,42 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { uid } = request.params;
       const allForms = await db
-        .select({
-          id: form.id,
-          name: form.name,
-          description: form.description,
-          createdAt: form.createdAt,
-        })
+        .select()
         .from(form)
         .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
         .where(and(
           eq(formSubmissions.userId, uid),
-          eq(form.isPublic, true)));
+          and(
+            eq(form.isPublic, true),
+            isNull(form.moduleId))));
 
       console.log('FILLED: ', allForms);
+
+      return reply.send({
+        success: true,
+        data: allForms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
+      });
+    }
+  });
+
+  //GET available modular forms for user
+  fastify.get<{ Params: { uid: string } }>('/api/mod-forms/available/:uid', async (request, reply) =>
+  {
+    try
+    {
+      const { uid } = request.params;
+      const allForms = await db
+        .select()
+        .from(modularForms)
+        .where(
+          eq(modularForms.isPublic, true));
 
       return reply.send({
         success: true,
@@ -153,6 +167,127 @@ export default async function formsRoutes(fastify: FastifyInstance)
       return reply.code(500).send({
         success: false,
         error: 'Failed to fetch form',
+      });
+    }
+  });
+  
+  // GET single modular form by ID
+  fastify.get<{ Params: { fid: string } }>('/api/mod-forms/:fid', async (request, reply) =>
+  {
+    try
+    {
+      const { fid } = request.params;
+      const form = await db.query.modularForms.findFirst(
+        {where: and(
+          eq(modularForms.isPublic, true), 
+          eq(modularForms.id, parseInt(fid)))}
+      );
+      return reply.send({
+        success: true,
+        data: form,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch form');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch form',
+      });
+    }
+  });
+
+  //GET unfilled forms for user and modular form
+  fastify.get<{ Params: { mid: string, uid: string } }>('/api/mod-forms/:mid/available/:uid', async (request, reply) =>
+  {
+    try
+    {
+      const { mid, uid } = request.params;
+
+      // Get all form IDs that the user has submitted
+      const submittedFormIds = await db
+        .select({ formId: formSubmissions.formId })
+        .from(formSubmissions)
+        .where(eq(formSubmissions.userId, uid));
+
+      const submittedIds = submittedFormIds.map(s => s.formId);
+
+      // Get all forms NOT in the submitted list
+      let allForms;
+      if (submittedIds.length > 0)
+      {
+        allForms = await db
+          .select()
+          .from(form)
+          .where(and(
+            eq(form.isPublic, true),
+            and(
+              notInArray(form.id, submittedIds),
+              eq(form.moduleId, parseInt(mid)))));
+      } else
+      {
+        // If no submissions, return all forms
+        allForms = await db
+          .select()
+          .from(form)
+          .where(and(
+            eq(form.isPublic, true),
+            eq(form.moduleId, parseInt(mid))));
+      }
+
+      console.log('UNFILLED: ', allForms);
+
+      return reply.send({
+        success: true,
+        data: allForms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
+      });
+    }
+  });
+  
+  //GET filled forms for user and modular form
+  fastify.get<{ Params: { mid: string, uid: string } }>('/api/mod-forms/:mid/completed/:uid', async (request, reply) =>
+  {
+    try
+    {
+      const { mid, uid } = request.params;
+      const allForms = await db
+        .select({
+            id: form.id,
+            name: form.name,
+            description: form.description,
+            createdAt: form.createdAt,
+            isPublic: form.isPublic,
+            moduleId: form.moduleId
+            // add other fields you need
+          })
+        .from(modularForms)
+        .innerJoin(form, eq(form.moduleId, modularForms.id))
+        .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
+        .where(and(
+          eq(formSubmissions.userId, uid),
+          and(
+            eq(form.isPublic, true),
+            eq(modularForms.id, parseInt(mid))
+          )));
+
+      console.log('FILLED: ', allForms);
+
+      return reply.send({
+        success: true,
+        data: allForms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
       });
     }
   });

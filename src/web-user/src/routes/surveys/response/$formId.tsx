@@ -55,11 +55,6 @@ function RouteComponent() {
         if (Array.isArray(parentAnswer)) {
           return parentAnswer.some((a) => enablingAnswers.includes(a));
         }
-        console.log(
-          parentResponse.question.questionTitle,
-          enablingAnswers,
-          parentAnswer,
-        );
 
         const visible = enablingAnswers.includes(parentAnswer ?? "");
         if (!visible && r.answer) r.answer.answer = "";
@@ -78,6 +73,7 @@ function RouteComponent() {
           throw new Error(formResult.error || "Failed to fetch form");
         }
         setForm(formResult.data);
+        console.log(form);
 
         const questionsResponse = await fetch(`/api/forms/questions/${formId}`);
         const questionsResult = await questionsResponse.json();
@@ -115,7 +111,11 @@ function RouteComponent() {
   }, [formId]);
 
   const handleBack = () => {
-    navigate({ to: "/" });
+    if(form?.moduleId) {
+      navigate({ to: `/surveys/modular-form/${form.moduleId}` });
+    } else {
+      navigate({ to: "/" });
+    }
   };
 
   const handleResponseOnChange = (response: FormResponse, value: string) => {
@@ -247,7 +247,7 @@ function RouteComponent() {
             onClick={handleBack}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Back to surveys
+            {form?.moduleId ? "Back to modules" : "Back to surveys"}
           </button>
         </div>
       </div>
@@ -276,7 +276,7 @@ function RouteComponent() {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back to Surveys
+            {form?.moduleId ? "Back to modules" : "Back to surveys"}
           </button>
 
           {/* Survey Header */}
@@ -301,7 +301,7 @@ function RouteComponent() {
               onClick={handleBack}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Back to surveys
+            {form?.moduleId ? "Back to modules" : "Back to surveys"}
             </button>
           </div>
           {/* Metadata */}
@@ -334,7 +334,7 @@ function RouteComponent() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          Back to Surveys
+            {form?.moduleId ? "Back to modules" : "Back to surveys"}
         </button>
 
         {/* Survey Header */}

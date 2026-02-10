@@ -5,6 +5,8 @@ export interface Form
   name: string;
   description: string | null;
   createdAt: string;
+  isPublic: boolean;
+  moduleId: number;
 }
 
 export interface FormQuestion

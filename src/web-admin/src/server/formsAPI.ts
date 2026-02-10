@@ -293,7 +293,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       }
 
       const updatedForm = await db
-        .update(form)
+        .update(modularForms)
         .set(updateData)
         .where(eq(form.id, parseInt(id)))
         .returning();

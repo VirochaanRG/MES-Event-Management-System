@@ -113,7 +113,8 @@ function RouteComponent() {
           body: JSON.stringify({
             name: newFormName.trim(),
             description: newFormDescription.trim() || null,
-            moduleId: moduleId
+            moduleId: moduleId,
+            isPublic: true
           }),
         });
   

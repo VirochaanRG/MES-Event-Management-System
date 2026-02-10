@@ -57,7 +57,11 @@ function RouteComponent() {
   }, [formId]);
 
   const handleBack = () => {
-    navigate({ to: "/" });
+    if(form?.moduleId) {
+      navigate({ to: `/surveys/modular-form/${form.moduleId}` });
+    } else {
+      navigate({ to: "/" });
+    }
   };
 
   const handleFillSurvey = () => {
@@ -145,7 +149,7 @@ function RouteComponent() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          Back to Surveys
+          {form?.moduleId ? "Back to modules" : "Back to Surveys"}
         </button>
 
         {/* Survey Header */}
