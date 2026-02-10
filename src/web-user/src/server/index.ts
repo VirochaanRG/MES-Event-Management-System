@@ -702,6 +702,7 @@ fastify.delete<{
       });
     }
 
+    // TODO: Account for multiple registrations
     // Check if the event exists
     const event = await db.query.events.findFirst({
       where: eq(events.id, parseInt(id)),
