@@ -125,14 +125,18 @@ function RouteComponent() {
     }
   };
 
-  const handleDeleteForm = async (id: number) => {
+  const handleDeleteForm = async (form) => {
     if (!confirm("Are you sure you want to delete this form?")) {
       return;
     }
 
     try {
       setError(null);
-      const response = await fetch(`${API_URL}/api/forms/${id}`, {
+      const response = checkFormIsModular(form) ? 
+      await fetch(`${API_URL}/api/mod-forms/${form.id}`, {
+        method: "DELETE",
+      }) : 
+      await fetch(`${API_URL}/api/forms/${form.id}`, {
         method: "DELETE",
       });
 
@@ -142,7 +146,7 @@ function RouteComponent() {
 
       const data = await response.json();
       if (data.success) {
-        setForms(forms.filter((f) => f.id !== id));
+        setForms(forms.filter((f) => f.id !== form.id));
       } else {
         throw new Error(data.error || "Failed to delete form");
       }
@@ -319,7 +323,7 @@ function RouteComponent() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteForm(form.id);
+                              handleDeleteForm(form);
                             }}
                             className="px-4 py-2 text-red-800 hover:bg-red-50 rounded transition-colors ml-2 font-semibold"
                           >

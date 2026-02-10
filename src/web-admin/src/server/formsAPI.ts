@@ -354,8 +354,8 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { id } = request.params;
 
-      const existingForm = await db.query.form.findFirst({
-        where: eq(form.id, parseInt(id)),
+      const existingForm = await db.query.modularForms.findFirst({
+        where: eq(modularForms.id, parseInt(id)),
       });
 
       if (!existingForm)
@@ -366,7 +366,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
         });
       }
 
-      await db.delete(form).where(eq(form.id, parseInt(id)));
+      await db.delete(modularForms).where(eq(modularForms.id, parseInt(id)));
 
       return reply.send({
         success: true,
