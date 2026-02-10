@@ -291,13 +291,13 @@ fastify.get<{ Params: { id: string } }>('/api/events/:id', async (request, reply
 // POST - Register user for an event
 fastify.post<{
   Params: { id: string };
-  Body: { userEmail: string; instance?: number };
+  Body: { userEmail: string; instance?: number; details?: Record<string, any> };
 }>('/api/events/:id/register', async (request, reply) =>
 {
   try
   {
     const { id } = request.params;
-    const { userEmail, instance } = request.body;
+    const { userEmail, instance, details } = request.body;
 
     if (!userEmail || !userEmail.trim())
     {
@@ -352,6 +352,37 @@ fastify.post<{
       }
     }
 
+    // Transform the form answers to include labels
+    let formattedDetails = null;
+    if (details && event.registrationForm)
+    {
+      const registrationForm = event.registrationForm as any;
+      const questions = registrationForm.questions || [];
+
+      formattedDetails = Object.entries(details).map(([questionOrder, answer]) =>
+      {
+        const question = questions[parseInt(questionOrder) - 1];
+        if (!question) return null;
+
+        let formattedAnswer = answer;
+
+        // For multiple choice and multi-select, convert indices to actual choice text
+        if (question.question_type === 'multiple_choice' && typeof answer === 'number')
+        {
+          formattedAnswer = question.options?.[answer] || answer;
+        } else if (question.question_type === 'multi_select' && Array.isArray(answer))
+        {
+          formattedAnswer = answer.map((index: number) => question.options?.[index] || index);
+        }
+
+        return {
+          question: question.label,
+          answer: formattedAnswer,
+          questionType: question.question_type
+        };
+      }).filter(Boolean); // Remove null entries
+    }
+
     const eventCost = event.cost ?? 0;
     const registration = await db
       .insert(registeredUsers)
@@ -361,6 +392,7 @@ fastify.post<{
         instance: instance ?? 0,
         status: 'confirmed',
         paymentStatus: eventCost > 0 ? 'pending' : 'paid',
+        details: formattedDetails, // Store the formatted details
       })
       .returning();
 
