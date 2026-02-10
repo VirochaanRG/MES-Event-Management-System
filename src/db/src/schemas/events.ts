@@ -1,7 +1,7 @@
 import
 {
   pgTable, serial, varchar, text, timestamp, integer, boolean,
-  unique, customType,
+  unique, customType, uniqueIndex,
   json
 } from "drizzle-orm/pg-core";
 
@@ -55,6 +55,8 @@ export const qrCodes = pgTable("qr_codes", {
   userEmail: varchar("user_email", { length: 255 }).notNull(),
   instance: integer("instance").notNull(),
   image: bytea("image").notNull(),
-  // content: varchar("content", {length: 255}).notNull(),
+  content: varchar("content", {length: 255}).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-});
+}, (table) => [
+    uniqueIndex('qr_code_idx').on(table.content)
+  ]);

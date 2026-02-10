@@ -5,36 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1764257794735,
-      "tag": "0000_big_firestar",
+      "when": 1770682825661,
+      "tag": "0000_married_selene",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1769099034733,
-      "tag": "0001_chief_mongoose",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1770495880976,
-      "tag": "0002_black_shotgun",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1770647539734,
-      "tag": "0003_flowery_typhoid_mary",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1770667173762,
-      "tag": "0004_cultured_weapon_omega",
+      "when": 1770710059141,
+      "tag": "0001_black_meteorite",
       "breakpoints": true
     }
   ]
