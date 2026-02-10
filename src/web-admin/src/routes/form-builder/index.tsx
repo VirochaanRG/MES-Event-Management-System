@@ -1,5 +1,6 @@
 import AdminLayout from "@/components/AdminLayout";
 import RequireRole from "@/components/RequireRole";
+import { Form } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
@@ -7,13 +8,6 @@ import { useState, useEffect } from "react";
 export const Route = createFileRoute("/form-builder/")({
   component: RouteComponent,
 });
-
-interface Form {
-  id: number;
-  name: string;
-  description: string | null;
-  createdAt: string;
-}
 
 const API_URL = "http://localhost:3124";
 
@@ -25,6 +19,7 @@ function RouteComponent() {
   const [showModal, setShowModal] = useState(false);
   const [newFormName, setNewFormName] = useState("");
   const [newFormDescription, setNewFormDescription] = useState("");
+  const [isFormModular, setIsFormModular] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
 
@@ -56,18 +51,27 @@ function RouteComponent() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`${API_URL}/api/forms`);
+      const formsResponse = await fetch(`${API_URL}/api/forms`);
+      const modFormsResponse = await fetch(`${API_URL}/api/mod-forms`);
 
-      if (!response.ok) {
+      if (!formsResponse.ok || !modFormsResponse.ok) {
         throw new Error("Failed to fetch forms");
       }
 
-      const data = await response.json();
+      let allForms = [];
+      const data = await formsResponse.json();
       if (data.success) {
-        setForms(data.data);
+        allForms = allForms.concat(data.data);
       } else {
         throw new Error(data.error || "Failed to fetch forms");
       }
+      const modFormData = await modFormsResponse.json();
+      if (modFormData.success) {
+        allForms = allForms.concat(modFormData.data);
+      } else {
+        throw new Error(modFormData.error || "Failed to fetch forms");
+      }
+      setForms(allForms);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch forms");
       console.error("Fetch error:", err);
@@ -94,6 +98,7 @@ function RouteComponent() {
         body: JSON.stringify({
           name: newFormName.trim(),
           description: newFormDescription.trim() || null,
+          isModular: isFormModular
         }),
       });
 
@@ -146,6 +151,65 @@ function RouteComponent() {
       console.error("Delete error:", err);
     }
   };
+
+  const checkFormIsModular = (form) => {
+    return form.moduleId === undefined;
+  };
+
+  const handleClickForm = (form) => {
+    if(checkFormIsModular(form)) {
+      navigate({
+        to: "/form-builder/modular-forms/$moduleId",
+        params: { moduleId: form.id.toString() },
+      });
+    }
+    else {
+      navigate({
+        to: "/form-builder/$formId",
+        params: { formId: form.id.toString() },
+      });
+    }
+  }
+  
+  const handleToggleVisibility = async (form) => {
+    try {
+      const id = form.id;
+      const isPublic = form.isPublic;
+      const response = checkFormIsModular(form) ? 
+        await fetch(`${API_URL}/api/mod-forms/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isPublic: !isPublic }),
+        }) :
+        await fetch(`${API_URL}/api/forms/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isPublic: !isPublic }),
+        });
+
+      if (!response.ok) {
+        throw new Error("Failed to update visibility");
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setForms((prev) =>
+          prev.map((f) => (f.id === id && checkFormIsModular(f) === checkFormIsModular(form) ? { ...f, isPublic: !isPublic } : f))
+        );
+      } else {
+        throw new Error(data.error || "Failed to update visibility");
+      }
+    } catch (err) {
+      console.error("Visibility toggle error:", err);
+      setError("Failed to update form visibility");
+    }
+  };
+
+
   if (!user) {
     return null;
   }
@@ -206,12 +270,7 @@ function RouteComponent() {
                   {forms.map((form) => (
                     <div
                       key={form.id}
-                      onClick={() =>
-                        navigate({
-                          to: "/form-builder/$formId",
-                          params: { formId: form.id.toString() },
-                        })
-                      }
+                      onClick={() => handleClickForm(form)}
                       className="p-4 bg-white rounded-lg border border-gray-200 hover:border-amber-400 hover:bg-amber-50 transition-colors cursor-pointer"
                     >
                       <div className="flex justify-between items-start">
@@ -227,15 +286,46 @@ function RouteComponent() {
                             {new Date(form.createdAt).toLocaleDateString()}
                           </p>
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteForm(form.id);
-                          }}
-                          className="px-4 py-2 text-red-800 hover:bg-red-50 rounded transition-colors ml-2 font-semibold"
-                        >
-                          Delete
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center gap-2"
+                          >
+                            <button
+                              onClick={() =>
+                                handleToggleVisibility(form)
+                              }
+                              className={`
+                                relative inline-flex h-6 w-11 items-center rounded-full
+                                transition-colors
+                                ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}
+                              `}
+                            >
+                              <span
+                                className={`
+                                  inline-block h-4 w-4 transform rounded-full bg-white
+                                  transition-transform
+                                  ${form.isPublic ? "translate-x-6" : "translate-x-1"}
+                                `}
+                              />
+                            </button>
+
+                            <span className="text-sm text-gray-700">
+                              {form.isPublic ? "Public" : "Private"}
+                            </span>
+                          </div>
+
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteForm(form.id);
+                            }}
+                            className="px-4 py-2 text-red-800 hover:bg-red-50 rounded transition-colors ml-2 font-semibold"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -275,6 +365,21 @@ function RouteComponent() {
                         placeholder="Enter form description"
                         rows={3}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label
+                        htmlFor="modular"
+                        className="text-sm font-medium text-gray-900"
+                      >
+                        Make form modular
+                      </label>
+                      <input
+                        type="checkbox"
+                        id="modular"
+                        checked={isFormModular}
+                        onChange={(e) => setIsFormModular(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
                       />
                     </div>
                   </div>

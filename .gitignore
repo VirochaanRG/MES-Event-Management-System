@@ -289,3 +289,5 @@ src/db/drizzle/meta/0002_snapshot.json
 src/db/drizzle/meta/_journal.json
 src/db/drizzle/meta/0002_snapshot.json
 src/db/drizzle/meta/_journal.json
+pnpm-lock.yaml
+src/web-user/package.json

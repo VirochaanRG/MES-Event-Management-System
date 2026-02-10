@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
-import { form, formAnswers, formQuestions } from './../../../db/src/schemas/form';
-import { and, eq, sql } from 'drizzle-orm';
+import { form, formAnswers, formQuestions, modularForms } from './../../../db/src/schemas/form';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
 {
@@ -10,7 +10,52 @@ export default async function formsRoutes(fastify: FastifyInstance)
   {
     try
     {
-      const forms = await db.query.form.findMany();
+      const forms = await db.query.form.findMany({where : 
+        isNull(form.moduleId)
+      });
+      return reply.send({
+        success: true,
+        data: forms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
+      });
+    }
+  });
+
+  // GET all modular forms
+  fastify.get('/api/mod-forms', async (request, reply) =>
+  {
+    try
+    {
+      const forms = await db.query.modularForms.findMany();
+      return reply.send({
+        success: true,
+        data: forms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
+      });
+    }
+  });
+
+  // GET all sub-forms for a module
+  fastify.get<{ Params: { id: string } }>('/api/mod-forms/sub-forms/:id', async (request, reply) =>
+  {
+    try
+    {
+      const moduleId = parseInt(request.params.id);
+      const forms = await db.query.form.findMany({
+        where: eq(form.moduleId, moduleId)
+      });
       return reply.send({
         success: true,
         data: forms,
@@ -32,6 +77,37 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { id } = request.params;
       const formData = await db.query.form.findFirst({
+        where: eq(form.id, parseInt(id)),
+      });
+
+      if (!formData) {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      return reply.send({
+        success: true,
+        data: formData,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch form');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch form',
+      });
+    }
+  });
+
+  // GET single modular form by ID
+  fastify.get<{ Params: { id: string } }>('/api/mod-forms/:id', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+      const formData = await db.query.modularForms.findFirst({
         where: eq(form.id, parseInt(id)),
       });
 
@@ -59,12 +135,12 @@ export default async function formsRoutes(fastify: FastifyInstance)
 
   // CREATE a new form
   fastify.post<{
-    Body: { name: string; description?: string; eventId?: number };
+    Body: { name: string; description?: string; isModular?: boolean; moduleId?: number};
   }>('/api/forms', async (request, reply) =>
   {
     try
     {
-      const { name, description, eventId } = request.body;
+      const { name, description, isModular, moduleId} = request.body;
 
       if (!name || name.trim() === '')
       {
@@ -73,13 +149,20 @@ export default async function formsRoutes(fastify: FastifyInstance)
           error: 'Form name is required',
         });
       }
-
-      const newForm = await db
+      
+      const newForm = isModular ? 
+        await db
+        .insert(modularForms)
+        .values({
+          name: name.trim(),
+          description: description?.trim() || null,
+        }) 
+        : await db 
         .insert(form)
         .values({
           name: name.trim(),
           description: description?.trim() || null,
-          eventId: eventId || null,
+          moduleId: moduleId
         })
         .returning();
 
@@ -89,6 +172,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     } catch (error)
     {
+      console.log(error)
       fastify.log.error({ err: error }, 'Failed to create form');
       return reply.code(500).send({
         success: false,
@@ -100,13 +184,13 @@ export default async function formsRoutes(fastify: FastifyInstance)
   // UPDATE a form
   fastify.put<{
     Params: { id: string };
-    Body: { name?: string; description?: string; eventId?: number };
+    Body: { name?: string; description?: string; moduleId?: number; isPublic?: boolean};
   }>('/api/forms/:id', async (request, reply) =>
   {
     try
     {
       const { id } = request.params;
-      const { name, description, eventId } = request.body;
+      const { name, description, moduleId, isPublic } = request.body;
 
       const existingForm = await db.query.form.findFirst({
         where: eq(form.id, parseInt(id)),
@@ -129,9 +213,75 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         updateData.description = description.trim() || null;
       }
-      if (eventId !== undefined)
+      if (moduleId !== undefined) {
+        updateData.moduleId = moduleId ?? null;
+      }
+      if (isPublic !== undefined) {
+        updateData.isPublic = isPublic;
+      }
+
+      if (Object.keys(updateData).length === 0)
       {
-        updateData.eventId = eventId || null;
+        return reply.code(400).send({
+          success: false,
+          error: 'No fields to update',
+        });
+      }
+
+      const updatedForm = await db
+        .update(form)
+        .set(updateData)
+        .where(eq(form.id, parseInt(id)))
+        .returning();
+
+      return reply.send({
+        success: true,
+        data: updatedForm[0],
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to update form');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to update form',
+      });
+    }
+  });
+
+  // UPDATE a modular form
+  fastify.put<{
+    Params: { id: string };
+    Body: { name?: string; description?: string; isPublic?: boolean };
+  }>('/api/mod-forms/:id', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+      const { name, description, isPublic } = request.body;
+
+      const existingForm = await db.query.modularForms.findFirst({
+        where: eq(form.id, parseInt(id)),
+      });
+
+      if (!existingForm)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      const updateData: Record<string, any> = {};
+      if (name !== undefined)
+      {
+        updateData.name = name.trim();
+      }
+      if (description !== undefined)
+      {
+        updateData.description = description.trim() || null;
+      }
+      if (isPublic !== undefined) {
+        updateData.isPublic = isPublic;
       }
 
       if (Object.keys(updateData).length === 0)
@@ -164,6 +314,41 @@ export default async function formsRoutes(fastify: FastifyInstance)
 
   // DELETE a form
   fastify.delete<{ Params: { id: string } }>('/api/forms/:id', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+
+      const existingForm = await db.query.form.findFirst({
+        where: eq(form.id, parseInt(id)),
+      });
+
+      if (!existingForm)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      await db.delete(form).where(eq(form.id, parseInt(id)));
+
+      return reply.send({
+        success: true,
+        message: 'Form deleted successfully',
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to delete form');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to delete form',
+      });
+    }
+  });
+
+   // DELETE a modular form
+  fastify.delete<{ Params: { id: string } }>('/api/mod-forms/:id', async (request, reply) =>
   {
     try
     {
@@ -273,4 +458,47 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
+
+// UPDATE visibility of a form
+  fastify.patch<{
+  Params: { id: string };
+  Body: { isPublic: boolean };
+  }>('/api/forms/:id/visibility', async (request, reply) => {
+    const { id } = request.params;
+    const { isPublic } = request.body;
+
+    const updated = await db
+      .update(form)
+      .set({ isPublic })
+      .where(eq(form.id, parseInt(id)))
+      .returning();
+
+    if (!updated[0]) {
+      return reply.code(404).send({ success: false, error: 'Form not found' });
+    }
+
+    return reply.send({ success: true, data: updated[0] });
+  });
+
+  // UPDATE visibility of a modular form
+  fastify.patch<{
+  Params: { id: string };
+  Body: { isPublic: boolean };
+  }>('/api/mod-forms/:id/visibility', async (request, reply) => {
+    const { id } = request.params;
+    const { isPublic } = request.body;
+
+    const updated = await db
+      .update(modularForms)
+      .set({ isPublic })
+      .where(eq(form.id, parseInt(id)))
+      .returning();
+
+    if (!updated[0]) {
+      return reply.code(404).send({ success: false, error: 'Form not found' });
+    }
+
+    return reply.send({ success: true, data: updated[0] });
+  });
+
 }

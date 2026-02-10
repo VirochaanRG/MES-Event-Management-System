@@ -17,6 +17,38 @@ function RouteComponent() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const { formId } = Route.useParams();
   const [formData, setFormData] = useState<Form | null>(null);
+  const [savingVisibility, setSavingVisibility] = useState(false);
+  const handleTogglePublic = async (nextValue: boolean) => {
+    if (!formData) return;
+
+    const prev = formData.isPublic;
+
+    // optimistic update
+    setFormData({ ...formData, isPublic: nextValue });
+    setSavingVisibility(true);
+
+    try {
+      const res = await fetch(`/api/forms/${formId}/visibility`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic: nextValue }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json?.error || "Failed to update visibility");
+      }
+
+      setFormData(json.data);
+    } catch (err: any) {
+      // revert if it fails
+      setFormData({ ...formData, isPublic: prev });
+      alert(err?.message || "Failed to update visibility");
+    } finally {
+      setSavingVisibility(false);
+    }
+  };
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -480,7 +512,28 @@ function RouteComponent() {
                 <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
                   {formData?.name || "Untitled Form"}
                 </h1>
+
+                {/* Make public checkbox */}
+                {!formData?.moduleId  && 
+                <div className="mt-3 flex items-center gap-3">
+                  <input
+                    id="makePublic"
+                    type="checkbox"
+                    checked={!!formData?.isPublic}
+                    disabled={savingVisibility}
+                    onChange={(e) => handleTogglePublic(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 disabled:opacity-50"
+                  />
+                  <label htmlFor="makePublic" className="text-sm font-medium text-gray-900">
+                    Make public
+                  </label>
+
+                  <span className="text-xs text-gray-500">
+                    {formData?.isPublic ? "Public" : "Private"}
+                  </span>
+                </div>}
               </div>
+
               <div className="relative z-20" ref={dropdownRef}>
                 <button
                   onClick={handleAddComponent}
@@ -519,6 +572,7 @@ function RouteComponent() {
                 )}
               </div>
             </div>
+
             {formData?.description && (
               <p className="text-gray-600 text-lg mt-2">
                 {formData.description}
