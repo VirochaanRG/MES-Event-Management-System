@@ -21,6 +21,9 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    watch: {
+      ignored: ['**/.env', '**/.env.*']
+    }
   },
   preview: {
     port: 4173, // Preview port (can be anything)
@@ -33,7 +36,7 @@ export default defineConfig({
     },
     allowedHosts: [
       'mes-event-admin.up.railway.app'
-    ]
+    ],
   },
   build: {
     outDir: 'dist/client',
