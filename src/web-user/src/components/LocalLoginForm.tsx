@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { AuthUser } from "../lib/auth";
 import { motion, AnimatePresence } from "framer-motion";
+import { config } from "../../../config/config";
 
 interface LocalLoginFormProps {
   onLoginSuccess: (user: AuthUser, token: string) => void;

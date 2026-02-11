@@ -9,8 +9,6 @@ export const Route = createFileRoute("/form-builder/")({
   component: RouteComponent,
 });
 
-const API_URL = "http://localhost:3124";
-
 function RouteComponent() {
   const navigate = useNavigate();
   const [forms, setForms] = useState<Form[]>([]);
@@ -51,8 +49,8 @@ function RouteComponent() {
     try {
       setLoading(true);
       setError(null);
-      const formsResponse = await fetch(`${API_URL}/api/forms`);
-      const modFormsResponse = await fetch(`${API_URL}/api/mod-forms`);
+      const formsResponse = await fetch(`/api/forms`);
+      const modFormsResponse = await fetch(`/api/mod-forms`);
 
       if (!formsResponse.ok || !modFormsResponse.ok) {
         throw new Error("Failed to fetch forms");
@@ -90,7 +88,7 @@ function RouteComponent() {
       setSubmitting(true);
       setError(null);
 
-      const response = await fetch(`${API_URL}/api/forms`, {
+      const response = await fetch(`/api/forms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -98,7 +96,7 @@ function RouteComponent() {
         body: JSON.stringify({
           name: newFormName.trim(),
           description: newFormDescription.trim() || null,
-          isModular: isFormModular
+          isModular: isFormModular,
         }),
       });
 
@@ -132,13 +130,13 @@ function RouteComponent() {
 
     try {
       setError(null);
-      const response = checkFormIsModular(form) ? 
-      await fetch(`${API_URL}/api/mod-forms/${form.id}`, {
-        method: "DELETE",
-      }) : 
-      await fetch(`${API_URL}/api/forms/${form.id}`, {
-        method: "DELETE",
-      });
+      const response = checkFormIsModular(form)
+        ? await fetch(`/api/mod-forms/${form.id}`, {
+            method: "DELETE",
+          })
+        : await fetch(`/api/forms/${form.id}`, {
+            method: "DELETE",
+          });
 
       if (!response.ok) {
         throw new Error("Failed to delete form");
@@ -161,39 +159,38 @@ function RouteComponent() {
   };
 
   const handleClickForm = (form) => {
-    if(checkFormIsModular(form)) {
+    if (checkFormIsModular(form)) {
       navigate({
         to: "/form-builder/modular-forms/$moduleId",
         params: { moduleId: form.id.toString() },
       });
-    }
-    else {
+    } else {
       navigate({
         to: "/form-builder/$formId",
         params: { formId: form.id.toString() },
       });
     }
-  }
-  
+  };
+
   const handleToggleVisibility = async (form) => {
     try {
       const id = form.id;
       const isPublic = form.isPublic;
-      const response = checkFormIsModular(form) ? 
-        await fetch(`${API_URL}/api/mod-forms/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ isPublic: !isPublic }),
-        }) :
-        await fetch(`${API_URL}/api/forms/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ isPublic: !isPublic }),
-        });
+      const response = checkFormIsModular(form)
+        ? await fetch(`/api/mod-forms/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ isPublic: !isPublic }),
+          })
+        : await fetch(`/api/forms/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ isPublic: !isPublic }),
+          });
 
       if (!response.ok) {
         throw new Error("Failed to update visibility");
@@ -202,7 +199,11 @@ function RouteComponent() {
       const data = await response.json();
       if (data.success) {
         setForms((prev) =>
-          prev.map((f) => (f.id === id && checkFormIsModular(f) === checkFormIsModular(form) ? { ...f, isPublic: !isPublic } : f))
+          prev.map((f) =>
+            f.id === id && checkFormIsModular(f) === checkFormIsModular(form)
+              ? { ...f, isPublic: !isPublic }
+              : f,
+          ),
         );
       } else {
         throw new Error(data.error || "Failed to update visibility");
@@ -212,7 +213,6 @@ function RouteComponent() {
       setError("Failed to update form visibility");
     }
   };
-
 
   if (!user) {
     return null;
@@ -296,9 +296,7 @@ function RouteComponent() {
                             className="flex items-center gap-2"
                           >
                             <button
-                              onClick={() =>
-                                handleToggleVisibility(form)
-                              }
+                              onClick={() => handleToggleVisibility(form)}
                               className={`
                                 relative inline-flex h-6 w-11 items-center rounded-full
                                 transition-colors
@@ -318,7 +316,6 @@ function RouteComponent() {
                               {form.isPublic ? "Public" : "Private"}
                             </span>
                           </div>
-
 
                           <button
                             onClick={(e) => {

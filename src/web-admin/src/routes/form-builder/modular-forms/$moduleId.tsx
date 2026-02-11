@@ -1,5 +1,5 @@
 import AdminLayout from "@/components/AdminLayout";
-import { Form} from "@/interfaces/interfaces";
+import { Form } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
@@ -7,8 +7,6 @@ import { useState, useEffect, useRef } from "react";
 export const Route = createFileRoute("/form-builder/modular-forms/$moduleId")({
   component: RouteComponent,
 });
-
-const API_URL = "http://localhost:3124";
 
 function RouteComponent() {
   const navigate = useNavigate();
@@ -68,77 +66,77 @@ function RouteComponent() {
   }, [moduleId]);
 
   useEffect(() => {
-      fetchForms();
-    }, []);
-  
-    const fetchForms = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const formsResponse = await fetch(`${API_URL}/api/mod-forms/sub-forms/${moduleId}`);
-  
-        if (!formsResponse.ok) {
-          throw new Error("Failed to fetch forms");
-        }
+    fetchForms();
+  }, []);
 
-        const data = await formsResponse.json();
-        if (data.success) {
-          setSubForms(data.data);
-        } else {
-          throw new Error(data.error || "Failed to fetch forms");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch forms");
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
+  const fetchForms = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const formsResponse = await fetch(`/api/mod-forms/sub-forms/${moduleId}`);
+
+      if (!formsResponse.ok) {
+        throw new Error("Failed to fetch forms");
       }
-    };
-  
-    const handleAddForm = async () => {
-      if (!newFormName.trim()) {
-        setError("Form name is required");
-        return;
+
+      const data = await formsResponse.json();
+      if (data.success) {
+        setSubForms(data.data);
+      } else {
+        throw new Error(data.error || "Failed to fetch forms");
       }
-  
-      try {
-        setSubmitting(true);
-        setError(null);
-  
-        const response = await fetch(`${API_URL}/api/forms`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: newFormName.trim(),
-            description: newFormDescription.trim() || null,
-            moduleId: moduleId,
-            isPublic: true
-          }),
-        });
-  
-        if (!response.ok) {
-          throw new Error("Failed to create form");
-        }
-  
-        const data = await response.json();
-        if (data.success) {
-          setNewFormName("");
-          setNewFormDescription("");
-          setShowModal(false);
-          // Refresh forms to ensure we have the latest data from the server
-          await fetchForms();
-        } else {
-          throw new Error(data.error || "Failed to create form");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to create form");
-        console.error("Create error:", err);
-      } finally {
-        setSubmitting(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch forms");
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddForm = async () => {
+    if (!newFormName.trim()) {
+      setError("Form name is required");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError(null);
+
+      const response = await fetch(`/api/forms`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newFormName.trim(),
+          description: newFormDescription.trim() || null,
+          moduleId: moduleId,
+          isPublic: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create form");
       }
-    };
+
+      const data = await response.json();
+      if (data.success) {
+        setNewFormName("");
+        setNewFormDescription("");
+        setShowModal(false);
+        // Refresh forms to ensure we have the latest data from the server
+        await fetchForms();
+      } else {
+        throw new Error(data.error || "Failed to create form");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create form");
+      console.error("Create error:", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleBackToForms = () => {
     navigate({ to: "/form-builder" });
@@ -151,7 +149,7 @@ function RouteComponent() {
 
     try {
       setError(null);
-      const response = await fetch(`${API_URL}/api/forms/${id}`, {
+      const response = await fetch(`/api/forms/${id}`, {
         method: "DELETE",
       });
 
@@ -175,14 +173,13 @@ function RouteComponent() {
     try {
       const id = form.id;
       const isPublic = form.isPublic;
-      const response =  
-        await fetch(`${API_URL}/api/forms/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ isPublic: !isPublic }),
-        });
+      const response = await fetch(`/api/forms/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isPublic: !isPublic }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to update visibility");
@@ -191,7 +188,7 @@ function RouteComponent() {
       const data = await response.json();
       if (data.success) {
         setSubForms((prev) =>
-          prev.map((f) => (f.id === id ? { ...f, isPublic: !isPublic } : f))
+          prev.map((f) => (f.id === id ? { ...f, isPublic: !isPublic } : f)),
         );
       } else {
         throw new Error(data.error || "Failed to update visibility");
@@ -201,7 +198,6 @@ function RouteComponent() {
       setError("Failed to update form visibility");
     }
   };
-
 
   if (loading) {
     return (
@@ -275,7 +271,7 @@ function RouteComponent() {
             )}
 
             {/* Sub-forms section*/}
-            
+
             <div className="mt-12">
               {loading ? (
                 <div className="text-center py-12">
@@ -306,15 +302,13 @@ function RouteComponent() {
                           <h3 className="text-xl font-semibold text-gray-800 mb-1 group-hover:text-amber-700">
                             {form.name}
                           </h3>
-                          
+
                           <div
                             onClick={(e) => e.stopPropagation()}
                             className="flex items-center gap-2"
                           >
                             <button
-                              onClick={() =>
-                                handleToggleVisibility(form)
-                              }
+                              onClick={() => handleToggleVisibility(form)}
                               className={`
                                 relative inline-flex h-6 w-11 items-center rounded-full
                                 transition-colors
@@ -346,7 +340,8 @@ function RouteComponent() {
                         {/* Footer */}
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                           <p className="text-sm text-gray-500">
-                            Created {new Date(form.createdAt).toLocaleDateString()}
+                            Created{" "}
+                            {new Date(form.createdAt).toLocaleDateString()}
                           </p>
 
                           <button

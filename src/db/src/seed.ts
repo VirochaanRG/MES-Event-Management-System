@@ -6,11 +6,13 @@ import { Pool } from "pg";
 import dotenv from "dotenv";
 import path from "path";
 import bcrypt from 'bcrypt';
-// dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+dotenv.config();
 
 const pool = new Pool({
-  connectionString: "postgres://postgres:password@localhost:5432/db",
+  connectionString: process.env.DATABASE_URL,
 });
+
+
 
 const db = drizzle(pool);
 

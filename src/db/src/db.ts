@@ -9,7 +9,7 @@ dotenv.config();
 
 // Create a Postgres connection pool
 const pool = new Pool({
-  connectionString: "postgres://postgres:password@localhost:5432/db",
+  connectionString: process.env.DATABASE_URL,
 });
 pool.connect()
   .then((client) =>

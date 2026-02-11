@@ -6,8 +6,8 @@ import bcrypt from 'bcrypt';
 import { db } from '../../../db/src/db';
 import { events, registeredUsers } from '../../../db/src/schemas/events';
 import { users } from '../../../db/src/schemas/users';
-import { eq, and, sql, isNull, or, max } from 'drizzle-orm';
-import { form, formQuestions, formAnswers, formSubmissions, qrCodes } from '@db/schemas';
+import { eq, and, sql, max } from 'drizzle-orm';
+import { qrCodes } from '@db/schemas';
 import QRCode from 'qrcode';
 import formsRoutes from './formsAPI';
 import publicImageRoutes from './imagesAPI';
@@ -623,6 +623,7 @@ fastify.get<{
 
 fastify.get('/api/events/:id/latest-instance', async (request, reply) =>
 {
+  // TODO: Potentially remove in favour of local logic
   try
   {
     const { eventId, userEmail } = request.body as {

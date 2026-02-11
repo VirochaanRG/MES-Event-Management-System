@@ -70,7 +70,7 @@ function AnalyticsPageContent() {
 
   const fetchForms = async () => {
     try {
-      const response = await fetch("http://localhost:3124/api/forms");
+      const response = await fetch("/api/forms");
       const data = await response.json();
       if (data.success) {
         setForms(data.data);
@@ -86,18 +86,14 @@ function AnalyticsPageContent() {
 
   const fetchFormStats = async (formId: number) => {
     try {
-      const response = await fetch(
-        `http://localhost:3124/api/forms/${formId}/answers`,
-      );
+      const response = await fetch(`/api/forms/${formId}/answers`);
       const data = await response.json();
       if (data.success) {
         const submissions = data.data.submissions || [];
         const totalSubmissions = submissions.length;
 
         // Get questions count
-        const questionsResponse = await fetch(
-          `http://localhost:3124/api/forms/${formId}/questions`,
-        );
+        const questionsResponse = await fetch(`/api/forms/${formId}/questions`);
         const questionsData = await questionsResponse.json();
         const totalQuestions = questionsData.success
           ? questionsData.data.length

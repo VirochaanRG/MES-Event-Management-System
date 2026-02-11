@@ -73,7 +73,7 @@ function UsersPageContent() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://localhost:3124/api/users");
+      const response = await fetch("/api/users");
       const data = await response.json();
       if (data.success) {
         setUsers(data.data);
@@ -86,7 +86,7 @@ function UsersPageContent() {
 
   const fetchRoles = async () => {
     try {
-      const response = await fetch("http://localhost:3124/api/roles");
+      const response = await fetch("/api/roles");
       const data = await response.json();
       if (data.success) {
         setAvailableRoles(data.data);
@@ -116,7 +116,7 @@ function UsersPageContent() {
     if (!confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      const response = await fetch(`http://localhost:3124/api/users/${id}`, {
+      const response = await fetch(`/api/users/${id}`, {
         method: "DELETE",
       });
       const data = await response.json();
@@ -142,14 +142,11 @@ function UsersPageContent() {
     if (!selectedUser) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:3124/api/users/${selectedUser.id}/roles`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ roles: editRolesData }),
-        },
-      );
+      const response = await fetch(`/api/users/${selectedUser.id}/roles`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roles: editRolesData }),
+      });
       const data = await response.json();
       if (data.success) {
         fetchUsers();
