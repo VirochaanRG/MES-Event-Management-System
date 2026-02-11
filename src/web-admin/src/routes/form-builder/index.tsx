@@ -20,6 +20,7 @@ function RouteComponent() {
   const [isFormModular, setIsFormModular] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [newUnlockAt, setNewUnlockAt] = useState("");
 
   useEffect(() => {
     const initAuth = () => {
@@ -97,6 +98,7 @@ function RouteComponent() {
           name: newFormName.trim(),
           description: newFormDescription.trim() || null,
           isModular: isFormModular,
+          unlockAt: newUnlockAt ? new Date(newUnlockAt).toISOString() : null, // NEW
         }),
       });
 
@@ -110,6 +112,7 @@ function RouteComponent() {
         setNewFormName("");
         setNewFormDescription("");
         setShowModal(false);
+        setNewUnlockAt("");
         // Refresh forms to ensure we have the latest data from the server
         await fetchForms();
       } else {
@@ -379,6 +382,21 @@ function RouteComponent() {
                         className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
                       />
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Unlock date (optional)
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={newUnlockAt}
+                        onChange={(e) => setNewUnlockAt(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        If set, the form won’t be available to users until this date (when Public is enabled).
+                      </p>
+                    </div>
                   </div>
 
                   <div className="flex gap-3 mt-6">
@@ -387,6 +405,7 @@ function RouteComponent() {
                         setShowModal(false);
                         setNewFormName("");
                         setNewFormDescription("");
+                        setNewUnlockAt("");
                       }}
                       disabled={submitting}
                       className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors font-semibold disabled:opacity-50"

@@ -130,7 +130,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { id } = request.params;
       const formData = await db.query.modularForms.findFirst({
-        where: eq(form.id, parseInt(id)),
+        where: eq(modularForms.id, parseInt(id)),
       });
 
       if (!formData)
@@ -311,7 +311,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       const { name, description, isPublic } = request.body;
 
       const existingForm = await db.query.modularForms.findFirst({
-        where: eq(form.id, parseInt(id)),
+        where: eq(modularForms.id, parseInt(id)),
       });
 
       if (!existingForm)
@@ -542,7 +542,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
     const updated = await db
       .update(modularForms)
       .set({ isPublic })
-      .where(eq(form.id, parseInt(id)))
+      .where(eq(modularForms.id, parseInt(id)))
       .returning();
 
     if (!updated[0]) {

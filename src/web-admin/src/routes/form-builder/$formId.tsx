@@ -19,6 +19,8 @@ function RouteComponent() {
   const { formId } = Route.useParams();
   const [formData, setFormData] = useState<Form | null>(null);
   const [savingVisibility, setSavingVisibility] = useState(false);
+  const [unlockLocal, setUnlockLocal] = useState<string>(""); 
+  const [savingUnlock, setSavingUnlock] = useState(false);
   const handleTogglePublic = async (nextValue: boolean) => {
     if (!formData) return;
 
@@ -48,6 +50,36 @@ function RouteComponent() {
       alert(err?.message || "Failed to update visibility");
     } finally {
       setSavingVisibility(false);
+    }
+  };
+  const handleSaveUnlockAt = async (override?: string) => {
+    if (!formData) return;
+
+    setSavingUnlock(true);
+    try {
+      const value = override !== undefined ? override : unlockLocal;
+
+      const payload = {
+        unlockAt: value ? new Date(value).toISOString() : null,
+      };
+
+      const res = await fetch(`/api/forms/${formId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json?.error || "Failed to update unlock date");
+      }
+
+      setFormData(json.data);
+      alert("Unlock date saved");
+    } catch (err: any) {
+      alert(err?.message || "Failed to update unlock date");
+    } finally {
+      setSavingUnlock(false);
     }
   };
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
@@ -138,6 +170,8 @@ function RouteComponent() {
         }
 
         setFormData(result.data);
+        const u = result.data?.unlockAt ? new Date(result.data.unlockAt) : null;
+        setUnlockLocal(u ? new Date(u.getTime() - u.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "");
 
         // Fetch questions
         const questionsResponse = await fetch(`/api/forms/${formId}/questions`);
@@ -546,8 +580,42 @@ function RouteComponent() {
                     {formData?.isPublic ? "Public" : "Private"}
                   </span>
                 </div>
+                <div className="mt-4 flex items-end gap-3">
+                  <div className="flex flex-col">
+                    <label className="text-sm font-medium text-gray-900 mb-2">
+                      Unlock date (optional)
+                    </label>
+                    <input
+                      type="datetime-local"
+                      value={unlockLocal}
+                      onChange={(e) => setUnlockLocal(e.target.value)}
+                      className="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    />
+                    <span className="text-xs text-gray-500 mt-1">
+                      <span className="text-xs text-gray-500 mt-1">
+                        Current:{" "}
+                        {formData?.unlockAt
+                          ? new Date(formData.unlockAt).toLocaleString()
+                          : "No unlock date set"}
+                      </span>
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleSaveUnlockAt("")}
+                    disabled={savingUnlock}
+                    className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
+                  >
+                    {savingUnlock ? "Saving..." : "Save"}
+                  </button>
+                  <button
+                    onClick={() => handleSaveUnlockAt("")}
+                    disabled={savingUnlock}
+                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Clear
+                  </button>
+                </div>
               </div>
-
               <div className="relative z-20" ref={dropdownRef}>
                 <button
                   onClick={handleAddComponent}
