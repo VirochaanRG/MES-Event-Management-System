@@ -1,15 +1,29 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
-import { form, formAnswers, formQuestions, formSubmissions } from './../../../db/src/schemas/form';
+import { form, formAnswers, formQuestions, formSubmissions, modularForms } from './../../../db/src/schemas/form';
 import { and, eq, isNull, notInArray, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
 {
+
+  const assertPublicForm = async (fid: string, reply: any) => {
+  const f = await db.query.form.findFirst({
+    where: and(eq(form.id, parseInt(fid)), eq(form.isPublic, true)),
+  });
+  if (!f) {
+    reply.code(404).send({ success: false, error: "Survey not found" });
+    return null;
+  }
+  return f;
+  };
+
   fastify.get('/api/forms', async (request, reply) =>
   {
     try
     {
-      const allForms = await db.query.form.findMany();
+      const allForms = await db.query.form.findMany({
+        where: eq(form.isPublic, true)
+      });
 
       return reply.send({
         success: true,
@@ -45,25 +59,22 @@ export default async function formsRoutes(fastify: FastifyInstance)
       if (submittedIds.length > 0)
       {
         allForms = await db
-          .select({
-            id: form.id,
-            name: form.name,
-            description: form.description,
-            createdAt: form.createdAt,
-          })
+          .select()
           .from(form)
-          .where(notInArray(form.id, submittedIds));
+          .where(and(
+            eq(form.isPublic, true),
+            and(
+              notInArray(form.id, submittedIds),
+              isNull(form.moduleId))));
       } else
       {
         // If no submissions, return all forms
         allForms = await db
-          .select({
-            id: form.id,
-            name: form.name,
-            description: form.description,
-            createdAt: form.createdAt,
-          })
-          .from(form);
+          .select()
+          .from(form)
+          .where(and(
+            eq(form.isPublic, true),
+            isNull(form.moduleId)));
       }
 
       console.log('UNFILLED: ', allForms);
@@ -81,6 +92,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
+
   //GET filled forms for user
   fastify.get<{ Params: { uid: string } }>('/api/forms/completed/:uid', async (request, reply) =>
   {
@@ -89,16 +101,48 @@ export default async function formsRoutes(fastify: FastifyInstance)
       const { uid } = request.params;
       const allForms = await db
         .select({
-          id: form.id,
-          name: form.name,
-          description: form.description,
-          createdAt: form.createdAt,
-        })
+            id: form.id,
+            name: form.name,
+            description: form.description,
+            createdAt: form.createdAt,
+            isPublic: form.isPublic,
+            moduleId: form.moduleId
+          })
         .from(form)
         .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
-        .where(eq(formSubmissions.userId, uid));
+        .where(and(
+          eq(formSubmissions.userId, uid),
+          and(
+            eq(form.isPublic, true),
+            isNull(form.moduleId))));
 
       console.log('FILLED: ', allForms);
+
+      return reply.send({
+        success: true,
+        data: allForms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
+      });
+    }
+  });
+
+  //GET available modular forms for user
+  fastify.get<{ Params: { uid: string } }>('/api/mod-forms/available/:uid', async (request, reply) =>
+  {
+    try
+    {
+      const { uid } = request.params;
+      const allForms = await db
+        .select()
+        .from(modularForms)
+        .where(
+          eq(modularForms.isPublic, true));
 
       return reply.send({
         success: true,
@@ -120,22 +164,13 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { fid } = request.params;
-
-      const selectedForm = await db.query.form.findFirst({
-        where: eq(form.id, parseInt(fid)),
-      });
-
-      if (!selectedForm)
-      {
-        return reply.code(404).send({
-          success: false,
-          error: 'Survey not found',
-        });
-      }
+      
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
 
       return reply.send({
         success: true,
-        data: selectedForm,
+        data: publicForm,
       });
     } catch (error)
     {
@@ -143,6 +178,125 @@ export default async function formsRoutes(fastify: FastifyInstance)
       return reply.code(500).send({
         success: false,
         error: 'Failed to fetch form',
+      });
+    }
+  });
+  
+  // GET single modular form by ID
+  fastify.get<{ Params: { fid: string } }>('/api/mod-forms/:fid', async (request, reply) =>
+  {
+    try
+    {
+      const { fid } = request.params;
+      const form = await db.query.modularForms.findFirst(
+        {where: and(
+          eq(modularForms.isPublic, true), 
+          eq(modularForms.id, parseInt(fid)))}
+      );
+      return reply.send({
+        success: true,
+        data: form,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch form');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch form',
+      });
+    }
+  });
+
+  //GET unfilled forms for user and modular form
+  fastify.get<{ Params: { mid: string, uid: string } }>('/api/mod-forms/:mid/available/:uid', async (request, reply) =>
+  {
+    try
+    {
+      const { mid, uid } = request.params;
+
+      // Get all form IDs that the user has submitted
+      const submittedFormIds = await db
+        .select({ formId: formSubmissions.formId })
+        .from(formSubmissions)
+        .where(eq(formSubmissions.userId, uid));
+
+      const submittedIds = submittedFormIds.map(s => s.formId);
+
+      // Get all forms NOT in the submitted list
+      let allForms;
+      if (submittedIds.length > 0)
+      {
+        allForms = await db
+          .select()
+          .from(form)
+          .where(and(
+            eq(form.isPublic, true),
+            and(
+              notInArray(form.id, submittedIds),
+              eq(form.moduleId, parseInt(mid)))));
+      } else
+      {
+        // If no submissions, return all forms
+        allForms = await db
+          .select()
+          .from(form)
+          .where(and(
+            eq(form.isPublic, true),
+            eq(form.moduleId, parseInt(mid))));
+      }
+
+      console.log('UNFILLED: ', allForms);
+
+      return reply.send({
+        success: true,
+        data: allForms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
+      });
+    }
+  });
+  
+  //GET filled forms for user and modular form
+  fastify.get<{ Params: { mid: string, uid: string } }>('/api/mod-forms/:mid/completed/:uid', async (request, reply) =>
+  {
+    try
+    {
+      const { mid, uid } = request.params;
+      const allForms = await db
+        .select({
+            id: form.id,
+            name: form.name,
+            description: form.description,
+            createdAt: form.createdAt,
+            isPublic: form.isPublic
+          })
+        .from(modularForms)
+        .innerJoin(form, eq(form.moduleId, modularForms.id))
+        .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
+        .where(and(
+          eq(formSubmissions.userId, uid),
+          and(
+            eq(form.isPublic, true),
+            eq(modularForms.id, parseInt(mid))
+          )));
+
+      console.log('FILLED: ', allForms);
+
+      return reply.send({
+        success: true,
+        data: allForms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
       });
     }
   });
@@ -155,6 +309,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
       try
       {
         const { fid, uid } = request.params;
+
+        const publicForm = await assertPublicForm(fid, reply);
+        if (!publicForm) return;
 
         console.log('Checking status for:', { fid, uid }); // Debug log
 
@@ -225,6 +382,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { fid } = request.params;
 
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
+
       const questions = await db
         .select()
         .from(formQuestions)
@@ -252,6 +412,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
       try
       {
         const { fid, uid } = request.params;
+        
+        const publicForm = await assertPublicForm(fid, reply);
+        if (!publicForm) return;
 
         var answers = await db
           .select()
@@ -291,6 +454,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { fid, uid } = request.params;
+
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
+
       const { qid, answer, questionType } = request.body;
 
       const selectedQuestion = await db.query.formQuestions.findFirst({
@@ -352,6 +519,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { fid, uid } = request.params;
+
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
 
       const existingSubmission = await db.query.formSubmissions.findFirst({
         where: and(eq(formSubmissions.formId, parseInt(fid)), eq(formSubmissions.userId, uid)),
@@ -419,6 +589,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { fid, uid } = request.params;
 
+      const publicForm = await assertPublicForm(fid, reply);
+      if (!publicForm) return;
+
       await db
         .delete(formSubmissions)
         .where(and(eq(formSubmissions.userId, uid), eq(formSubmissions.formId, parseInt(fid))));
@@ -433,10 +606,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     } catch (error)
     {
-      fastify.log.error({ err: error }, 'Failed to post user answers');
+      fastify.log.error({ err: error }, 'Failed to delete user answers');
       return reply.code(500).send({
         success: false,
-        error: 'Failed to post user answers',
+        error: 'Failed to delete user answers',
       });
     }
   });

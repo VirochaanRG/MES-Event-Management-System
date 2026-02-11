@@ -1,32 +1,36 @@
 import AdminLayout from "@/components/AdminLayout";
-import RequireRole from "@/components/RequireRole";
 import { Form } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-export const Route = createFileRoute("/form-builder/")({
+export const Route = createFileRoute("/form-builder/modular-forms/$moduleId")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const navigate = useNavigate();
-  const [forms, setForms] = useState<Form[]>([]);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [subForms, setSubForms] = useState<Form[]>([]);
+  const { moduleId } = Route.useParams();
+  const [formData, setFormData] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [newFormName, setNewFormName] = useState("");
   const [newFormDescription, setNewFormDescription] = useState("");
-  const [isFormModular, setIsFormModular] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    console.log("subforms updated:", subForms);
+  }, [subForms]);
 
   useEffect(() => {
     const initAuth = () => {
       const sessionUser = getCurrentUser("admin");
       if (sessionUser) {
         if (sessionUser.roles && sessionUser.roles.includes("admin")) {
-          setUser(sessionUser);
+          setCurrentUser(sessionUser);
         } else {
           console.error("User does not have admin role");
           logout("admin");
@@ -35,12 +39,32 @@ function RouteComponent() {
       } else {
         navigate({ to: "/" });
       }
+      setLoading(false);
     };
 
     initAuth();
   }, [navigate]);
 
-  // Fetch forms on component mount
+  useEffect(() => {
+    const fetchFormData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/mod-forms/${moduleId}`);
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error || "Failed to fetch data");
+        }
+        setFormData(result.data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFormData();
+  }, [moduleId]);
+
   useEffect(() => {
     fetchForms();
   }, []);
@@ -49,27 +73,18 @@ function RouteComponent() {
     try {
       setLoading(true);
       setError(null);
-      const formsResponse = await fetch(`/api/forms`);
-      const modFormsResponse = await fetch(`/api/mod-forms`);
+      const formsResponse = await fetch(`/api/mod-forms/sub-forms/${moduleId}`);
 
-      if (!formsResponse.ok || !modFormsResponse.ok) {
+      if (!formsResponse.ok) {
         throw new Error("Failed to fetch forms");
       }
 
-      let allForms = [];
       const data = await formsResponse.json();
       if (data.success) {
-        allForms = allForms.concat(data.data);
+        setSubForms(data.data);
       } else {
         throw new Error(data.error || "Failed to fetch forms");
       }
-      const modFormData = await modFormsResponse.json();
-      if (modFormData.success) {
-        allForms = allForms.concat(modFormData.data);
-      } else {
-        throw new Error(modFormData.error || "Failed to fetch forms");
-      }
-      setForms(allForms);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch forms");
       console.error("Fetch error:", err);
@@ -96,7 +111,8 @@ function RouteComponent() {
         body: JSON.stringify({
           name: newFormName.trim(),
           description: newFormDescription.trim() || null,
-          isModular: isFormModular,
+          moduleId: moduleId,
+          isPublic: true,
         }),
       });
 
@@ -106,7 +122,6 @@ function RouteComponent() {
 
       const data = await response.json();
       if (data.success) {
-        setForms([...forms, data.data]);
         setNewFormName("");
         setNewFormDescription("");
         setShowModal(false);
@@ -123,20 +138,20 @@ function RouteComponent() {
     }
   };
 
-  const handleDeleteForm = async (form) => {
+  const handleBackToForms = () => {
+    navigate({ to: "/form-builder" });
+  };
+
+  const handleDeleteForm = async (id: number) => {
     if (!confirm("Are you sure you want to delete this form?")) {
       return;
     }
 
     try {
       setError(null);
-      const response = checkFormIsModular(form)
-        ? await fetch(`/api/mod-forms/${form.id}`, {
-            method: "DELETE",
-          })
-        : await fetch(`/api/forms/${form.id}`, {
-            method: "DELETE",
-          });
+      const response = await fetch(`/api/forms/${id}`, {
+        method: "DELETE",
+      });
 
       if (!response.ok) {
         throw new Error("Failed to delete form");
@@ -144,7 +159,7 @@ function RouteComponent() {
 
       const data = await response.json();
       if (data.success) {
-        setForms(forms.filter((f) => f.id !== form.id));
+        setSubForms(subForms.filter((f) => f.id !== id));
       } else {
         throw new Error(data.error || "Failed to delete form");
       }
@@ -154,43 +169,17 @@ function RouteComponent() {
     }
   };
 
-  const checkFormIsModular = (form) => {
-    return form.moduleId === undefined;
-  };
-
-  const handleClickForm = (form) => {
-    if (checkFormIsModular(form)) {
-      navigate({
-        to: "/form-builder/modular-forms/$moduleId",
-        params: { moduleId: form.id.toString() },
-      });
-    } else {
-      navigate({
-        to: "/form-builder/$formId",
-        params: { formId: form.id.toString() },
-      });
-    }
-  };
-
   const handleToggleVisibility = async (form) => {
     try {
       const id = form.id;
       const isPublic = form.isPublic;
-      const response = checkFormIsModular(form)
-        ? await fetch(`/api/mod-forms/${id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ isPublic: !isPublic }),
-          })
-        : await fetch(`/api/forms/${id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ isPublic: !isPublic }),
-          });
+      const response = await fetch(`/api/forms/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isPublic: !isPublic }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to update visibility");
@@ -198,12 +187,8 @@ function RouteComponent() {
 
       const data = await response.json();
       if (data.success) {
-        setForms((prev) =>
-          prev.map((f) =>
-            f.id === id && checkFormIsModular(f) === checkFormIsModular(form)
-              ? { ...f, isPublic: !isPublic }
-              : f,
-          ),
+        setSubForms((prev) =>
+          prev.map((f) => (f.id === id ? { ...f, isPublic: !isPublic } : f)),
         );
       } else {
         throw new Error(data.error || "Failed to update visibility");
@@ -214,45 +199,63 @@ function RouteComponent() {
     }
   };
 
-  if (!user) {
-    return null;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-gray-600">Loading...</div>
+      </div>
+    );
   }
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
+  if (!currentUser) {
+    return null;
+  }
   return (
-    <RequireRole
-      userRoles={user.roles}
-      requiredRole="forms"
-      redirectTo="/denied"
+    <AdminLayout
+      user={currentUser}
+      title="Form Builder"
+      subtitle="Create and edit forms"
     >
-      <AdminLayout
-        user={user}
-        title="Events Management"
-        subtitle="Manage and organize all your events"
-      >
-        <main>
-          <div className="px-5 py-10 bg-gray-50 rounded-lg mx-5 my-5">
-            <button
-              onClick={() => navigate({ to: "/" })}
-              className="mb-6 px-4 py-2 text-gray-700 bg-white hover:bg-gray-100 border border-gray-300 rounded transition-colors font-semibold"
-            >
-              ← Back to Home
-            </button>
-            <h1 className="text-4xl text-gray-800 mb-2">Form Builder</h1>
-            <p className="text-lg text-gray-600 mb-7">
-              Create and manage your forms
-            </p>
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Back Button */}
+        <button
+          onClick={handleBackToForms}
+          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Back to Forms
+        </button>
 
-            {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
-                {error}
+        {/* Outer Form Border */}
+        <div className="border-2 border-gray-300 rounded-lg bg-white p-8">
+          {/* Header Section */}
+          <div className="mb-12">
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <div className="flex-1">
+                <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+                  {formData?.name || "Untitled Form"}
+                </h1>
               </div>
-            )}
-
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">
-                  Current Forms
-                </h2>
+              <div className="relative z-20">
                 <button
                   onClick={() => setShowModal(true)}
                   className="px-6 py-2 font-semibold bg-amber-500 text-white rounded hover:bg-amber-600 transition-colors"
@@ -260,37 +263,46 @@ function RouteComponent() {
                   + Add New Form
                 </button>
               </div>
+            </div>
+            {formData?.description && (
+              <p className="text-gray-600 text-lg mt-2">
+                {formData.description}
+              </p>
+            )}
 
+            {/* Sub-forms section*/}
+
+            <div className="mt-12">
               {loading ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">Loading forms...</p>
                 </div>
-              ) : forms.length === 0 ? (
+              ) : subForms.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg mb-4">No forms</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {forms.map((form) => (
+                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                  {subForms.map((form) => (
                     <div
                       key={form.id}
-                      onClick={() => handleClickForm(form)}
-                      className="p-4 bg-white rounded-lg border border-gray-200 hover:border-amber-400 hover:bg-amber-50 transition-colors cursor-pointer"
+                      onClick={() =>
+                        navigate({
+                          to: "/form-builder/$formId",
+                          params: { formId: form.id.toString() },
+                        })
+                      }
+                      className="group p-6 bg-white rounded-xl border border-gray-200 
+                                hover:border-amber-400 hover:shadow-md 
+                                transition-all cursor-pointer"
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                      <div className="flex flex-col h-full">
+                        {/* Header */}
+                        <div className="flex items-start justify-between">
+                          <h3 className="text-xl font-semibold text-gray-800 mb-1 group-hover:text-amber-700">
                             {form.name}
                           </h3>
-                          <p className="text-gray-600 mb-2">
-                            {form.description || "No description"}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Created:{" "}
-                            {new Date(form.createdAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-3">
+
                           <div
                             onClick={(e) => e.stopPropagation()}
                             className="flex items-center gap-2"
@@ -316,13 +328,28 @@ function RouteComponent() {
                               {form.isPublic ? "Public" : "Private"}
                             </span>
                           </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="flex-1 mt-2">
+                          <p className="text-gray-600 mb-4 line-clamp-3">
+                            {form.description || "No description"}
+                          </p>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                          <p className="text-sm text-gray-500">
+                            Created{" "}
+                            {new Date(form.createdAt).toLocaleDateString()}
+                          </p>
 
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleDeleteForm(form);
+                              handleDeleteForm(form.id);
                             }}
-                            className="px-4 py-2 text-red-800 hover:bg-red-50 rounded transition-colors ml-2 font-semibold"
+                            className="text-sm font-semibold text-red-700 hover:text-red-800 hover:bg-red-50 px-3 py-1.5 rounded transition-colors"
                           >
                             Delete
                           </button>
@@ -368,21 +395,6 @@ function RouteComponent() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none"
                       />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <label
-                        htmlFor="modular"
-                        className="text-sm font-medium text-gray-900"
-                      >
-                        Make form modular
-                      </label>
-                      <input
-                        type="checkbox"
-                        id="modular"
-                        checked={isFormModular}
-                        onChange={(e) => setIsFormModular(e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
-                      />
-                    </div>
                   </div>
 
                   <div className="flex gap-3 mt-6">
@@ -409,8 +421,8 @@ function RouteComponent() {
               </div>
             )}
           </div>
-        </main>
-      </AdminLayout>
-    </RequireRole>
+        </div>
+      </div>
+    </AdminLayout>
   );
 }

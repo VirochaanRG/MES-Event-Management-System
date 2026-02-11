@@ -20,7 +20,6 @@
   "dependencies": {
     "@fastify/cookie": "^10.0.1",
     "@fastify/cors": "^10.0.1",
-    "@fastify/static": "^9.0.0",
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-router": "^1.58.3",
     "axios": "^1.12.2",
@@ -33,7 +32,7 @@
     "framer-motion": "^12.29.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.563.0",
-    "pg": "^8.16.3",
+    "pg": "^8.18.0",
     "qrcode": "^1.5.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

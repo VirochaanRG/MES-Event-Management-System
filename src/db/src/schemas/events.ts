@@ -1,7 +1,8 @@
 import
 {
   pgTable, serial, varchar, text, timestamp, integer, boolean,
-  unique, customType
+  unique, customType, uniqueIndex,
+  json
 } from "drizzle-orm/pg-core";
 
 export const events = pgTable("events", {
@@ -15,6 +16,7 @@ export const events = pgTable("events", {
   isPublic: boolean("is_public").default(true),
   status: varchar("status", { length: 50 }).default("scheduled"),
   cost: integer("cost").default(0),
+  registrationForm: json("registration_form"), // Stores the form schema/configuration
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
@@ -23,12 +25,13 @@ export const registeredUsers = pgTable("registered_users", {
   id: serial("id").primaryKey(),
   eventId: integer("event_id")
     .notNull()
-    .references(() => events.id, { onDelete: "cascade" }), // Or varchar if you use string IDs
+    .references(() => events.id, { onDelete: "cascade" }),
   userEmail: varchar("user_email", { length: 255 }).notNull(),
-  instance: integer("instance").default(0), // number of stuff
+  instance: integer("instance").default(0),
+  details: json("details"), // Stores the user's form responses
   registeredAt: timestamp("registered_at", { withTimezone: true }).defaultNow(),
-  status: varchar("status", { length: 50 }).default("confirmed"), // confirmed, cancelled, waitlist
-  paymentStatus: varchar("payment_status", { length: 50 }).default("pending"), // pending, paid, refunded
+  status: varchar("status", { length: 50 }).default("confirmed"),
+  paymentStatus: varchar("payment_status", { length: 50 }).default("pending"),
 },
   (t) => [
     unique("registration_natural_key").on(
@@ -52,10 +55,8 @@ export const qrCodes = pgTable("qr_codes", {
   userEmail: varchar("user_email", { length: 255 }).notNull(),
   instance: integer("instance").notNull(),
   image: bytea("image").notNull(),
-  // content: varchar("content", {length: 255}).notNull(),
+  content: varchar("content", {length: 255}).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-});
-
-
-
-
+}, (table) => [
+    uniqueIndex('qr_code_idx').on(table.content)
+  ]);

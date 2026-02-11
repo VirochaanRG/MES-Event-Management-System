@@ -3,6 +3,7 @@ import { LinearScaleQuestion } from "@/components/LinearScaleQuestion";
 import MultipleChoiceQuestion from "@/components/MultipleChoiceQuestion";
 import MultiSelectQuestion from "@/components/MultiSelectQuestion";
 import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
+import DropdownQuestion from "@/components/DropdownQuestion";
 import { Form, FormQuestion } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -17,6 +18,38 @@ function RouteComponent() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const { formId } = Route.useParams();
   const [formData, setFormData] = useState<Form | null>(null);
+  const [savingVisibility, setSavingVisibility] = useState(false);
+  const handleTogglePublic = async (nextValue: boolean) => {
+    if (!formData) return;
+
+    const prev = formData.isPublic;
+
+    // optimistic update
+    setFormData({ ...formData, isPublic: nextValue });
+    setSavingVisibility(true);
+
+    try {
+      const res = await fetch(`/api/forms/${formId}/visibility`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic: nextValue }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json?.error || "Failed to update visibility");
+      }
+
+      setFormData(json.data);
+    } catch (err: any) {
+      // revert if it fails
+      setFormData({ ...formData, isPublic: prev });
+      alert(err?.message || "Failed to update visibility");
+    } finally {
+      setSavingVisibility(false);
+    }
+  };
   const [questions, setQuestions] = useState<FormQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +73,11 @@ function RouteComponent() {
   const [scaleMaxLabel, setScaleMaxLabel] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const allowedTypesForFollowUp = ["multiple_choice", "linear_scale"];
+  const allowedTypesForFollowUp = [
+    "multiple_choice",
+    "linear_scale",
+    "dropdown",
+  ];
 
   useEffect(() => {
     const initAuth = () => {
@@ -129,11 +166,14 @@ function RouteComponent() {
     setSelectedTriggers([]);
     setSelectedQuestionType(questionType);
     setQuestionTitle("");
+    setRequired(false);
     setMcChoices(["", ""]);
     setScaleMin(1);
     setScaleMax(5);
     setScaleMinLabel("");
     setScaleMaxLabel("");
+    setSelectionsMin(0);
+    setSelectionsMax(null);
     setIsDropdownOpen(false);
     setIsModalOpen(true);
     setOpenFollowupFor(null);
@@ -156,7 +196,8 @@ function RouteComponent() {
     setRequired(question.required);
     // Parse options based on question type
     if (
-      question.questionType === "multiple_choice" &&
+      (question.questionType === "multiple_choice" ||
+        question.questionType === "dropdown") &&
       question.optionsCategory
     ) {
       const parsed = JSON.parse(question.optionsCategory);
@@ -308,7 +349,10 @@ function RouteComponent() {
 
       let optionsCategory = "";
 
-      if (selectedQuestionType === "multiple_choice") {
+      if (
+        selectedQuestionType === "multiple_choice" ||
+        selectedQuestionType === "dropdown"
+      ) {
         const validChoices = mcChoices.filter((c) => c.trim() !== "");
         if (validChoices.length < 2) {
           alert("Please provide at least 2 choices");
@@ -480,7 +524,30 @@ function RouteComponent() {
                 <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
                   {formData?.name || "Untitled Form"}
                 </h1>
+
+                {/* Make public checkbox */}
+                <div className="mt-3 flex items-center gap-3">
+                  <input
+                    id="makePublic"
+                    type="checkbox"
+                    checked={!!formData?.isPublic}
+                    disabled={savingVisibility}
+                    onChange={(e) => handleTogglePublic(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 disabled:opacity-50"
+                  />
+                  <label
+                    htmlFor="makePublic"
+                    className="text-sm font-medium text-gray-900"
+                  >
+                    Make public
+                  </label>
+
+                  <span className="text-xs text-gray-500">
+                    {formData?.isPublic ? "Public" : "Private"}
+                  </span>
+                </div>
               </div>
+
               <div className="relative z-20" ref={dropdownRef}>
                 <button
                   onClick={handleAddComponent}
@@ -496,6 +563,12 @@ function RouteComponent() {
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       Multiple Choice
+                    </button>
+                    <button
+                      onClick={() => openModal("dropdown")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Dropdown
                     </button>
                     <button
                       onClick={() => openModal("text_answer")}
@@ -519,6 +592,7 @@ function RouteComponent() {
                 )}
               </div>
             </div>
+
             {formData?.description && (
               <p className="text-gray-600 text-lg mt-2">
                 {formData.description}
@@ -530,21 +604,6 @@ function RouteComponent() {
           <div className="space-y-6">
             {questions.length === 0 ? (
               <div className="bg-gray-50 rounded-lg border-2 border-gray-300 p-12 text-center">
-                {/* <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                  <svg
-                    className="w-8 h-8 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
-                </div> */}
                 <h3 className="text-lg font-medium text-gray-900 mb-1">
                   No questions
                 </h3>
@@ -659,6 +718,14 @@ function RouteComponent() {
                               </button>
                               <button
                                 onClick={() =>
+                                  openFollowUpModal("dropdown", question.id)
+                                }
+                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              >
+                                Dropdown
+                              </button>
+                              <button
+                                onClick={() =>
                                   openFollowUpModal("text_answer", question.id)
                                 }
                                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
@@ -721,6 +788,12 @@ function RouteComponent() {
                     {/* Question Component */}
                     {question.questionType === "multiple_choice" && (
                       <MultipleChoiceQuestion
+                        question={question}
+                        questionsList={questions}
+                      />
+                    )}
+                    {question.questionType === "dropdown" && (
+                      <DropdownQuestion
                         question={question}
                         questionsList={questions}
                       />
@@ -811,25 +884,23 @@ function RouteComponent() {
                       </label>
 
                       <div className="space-y-2">
-                        {answers?.map((answer, index) => (
+                        {answers?.map((answer: string, index: number) => (
                           <label
                             key={index}
                             className="flex items-center gap-3 text-sm text-gray-700"
                           >
                             <input
                               type="checkbox"
-                              value={index} // store the index
+                              value={index}
                               checked={
                                 selectedTriggers?.includes(index) || false
-                              } // check against index
+                              }
                               onChange={(e) => {
                                 const checked = e.target.checked;
                                 setSelectedTriggers((prev) => {
                                   if (checked) {
-                                    // add index if not already in array
                                     return prev ? [...prev, index] : [index];
                                   } else {
-                                    // remove index
                                     return (prev || []).filter(
                                       (i) => i !== index,
                                     );
@@ -860,8 +931,9 @@ function RouteComponent() {
                 />
               </div>
 
-              {/* Multiple Choice Options */}
-              {selectedQuestionType === "multiple_choice" && (
+              {/* Multiple Choice/Dropdown Options */}
+              {(selectedQuestionType === "multiple_choice" ||
+                selectedQuestionType === "dropdown") && (
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Answer Choices

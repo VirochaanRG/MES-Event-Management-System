@@ -4,6 +4,8 @@ export interface Form
   name: string;
   description: string | null;
   createdAt: string;
+  isPublic: boolean;
+  moduleId: number;
 }
 
 export interface FormQuestion
@@ -40,4 +42,13 @@ interface AuthUser
   email: string;
   id: number;
   roles: string[];
+}
+
+export interface FormCondition
+{
+  id: number;
+  formId : number;
+  conditionType: string;
+  questionId: number;
+  requiredOptions: number[];
 }

@@ -1,10 +1,20 @@
 import { pgTable, serial, varchar, text, timestamp, integer, json, boolean } from "drizzle-orm/pg-core";
 
+export const modularForms = pgTable("modular_forms", {
+  id: serial("id").primaryKey().notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  isPublic: boolean("is_public").notNull().default(false)
+});
+
 export const form = pgTable("form", {
   id: serial("id").primaryKey().notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow()
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  moduleId: integer("module_id").references(() => modularForms.id, { onDelete: "cascade" }),
+  isPublic: boolean("is_public").notNull().default(false)
 });
 
 export const formSubmissions = pgTable("form_submissions", {
@@ -47,3 +57,17 @@ export const formAnswers = pgTable("form_answers", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   submissionId: integer("submission_id").references(() => formSubmissions.id, { onDelete: "cascade" })
 });
+
+export const formConditions = pgTable("form_conditions", {
+  id: serial("id").primaryKey().notNull(),
+  formId: integer("form_id")
+    .notNull()
+    .references(() => form.id, { onDelete: "cascade" }),
+  conditionType: text("condition_type").notNull(),
+  questionId: integer("question_id")
+    .notNull()
+    .references(() => formQuestions.id, { onDelete: "cascade" }),
+  requiredOptions: json("required_options").$type<number[]>()
+});
+
+

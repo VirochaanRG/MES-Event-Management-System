@@ -15,10 +15,14 @@ export default function AvailableSurveys() {
   } = useQuery({
     queryKey: ["availableSurveys", userId],
     queryFn: async () => {
-      const response = await fetch(`/api/forms/available/${userId}`);
-      if (!response.ok) throw new Error("Failed to fetch surveys");
-      const json = await response.json();
-      return json.data;
+      const formsResponse = await fetch(`/api/forms/available/${userId}`);
+      if (!formsResponse.ok) throw new Error("Failed to fetch surveys");
+      const formsJson = await formsResponse.json();
+      const modFormsResponse = await fetch(`/api/mod-forms/available/${userId}`);
+      if (!modFormsResponse.ok) throw new Error("Failed to fetch surveys");
+      const modFormsJson = await modFormsResponse.json();
+      console.log(modFormsJson);
+      return formsJson.data.concat(modFormsJson.data);
     },
   });
 
@@ -32,8 +36,18 @@ export default function AvailableSurveys() {
     });
   };
 
-  const handleSurveyClick = (formId: number) => {
-    navigate({ to: `/surveys/${formId}` });
+  const checkFormIsModular = (form) => {
+    return form.moduleId === undefined;
+  };
+  
+  const handleSurveyClick = (form) => {
+    const formId = form.id;
+    console.log(form);
+    if(checkFormIsModular(form)) {
+      navigate({ to: `/surveys/modular-form/${formId}` });
+    } else {
+      navigate({ to: `/surveys/${formId}` });
+    }
   };
 
   if (isLoading) {
@@ -52,12 +66,13 @@ export default function AvailableSurveys() {
     );
   }
 
+  console.log(formData);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {(formData as Form[]).map((form) => (
         <div
           key={form.id}
-          onClick={() => handleSurveyClick(form.id)}
+          onClick={() => handleSurveyClick(form)}
           className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 cursor-pointer hover:border-yellow-500"
         >
           {/* Event Image */}

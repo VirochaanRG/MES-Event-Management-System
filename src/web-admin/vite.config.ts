@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
 import path from 'path';
-import { config } from '../config/config'
 
 
 
@@ -24,6 +23,9 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    watch: {
+      ignored: ['**/.env', '**/.env.*']
+    }
   },
   preview: {
     port: 4173, // Preview port (can be anything)
@@ -36,7 +38,7 @@ export default defineConfig({
     },
     allowedHosts: [
       'mes-event-admin.up.railway.app'
-    ]
+    ],
   },
   build: {
     outDir: 'dist/client',

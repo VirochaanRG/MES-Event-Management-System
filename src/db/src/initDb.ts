@@ -1,7 +1,8 @@
 import { Client } from 'pg';
-import { config } from "../../config/config";
+import * as dotenv from 'dotenv';
 
-const dbUrl = config.DATABASE_URL;
+dotenv.config();
+const dbUrl = process.env.DATABASE_URL;
 if (!dbUrl) throw new Error('DATABASE_URL not found in .env');
 
 // Extract database name and build a connection to the default "postgres" DB

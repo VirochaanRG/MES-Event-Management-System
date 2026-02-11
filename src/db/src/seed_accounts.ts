@@ -6,9 +6,8 @@ import path from "path";
 import bcrypt from 'bcrypt';
 // dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
 
-import { config } from "../../config/config";
 const pool = new Pool({
-  connectionString: config.DATABASE_URL,
+  connectionString: "postgres://postgres:password@localhost:5432/db",
 });
 
 const db = drizzle(pool);

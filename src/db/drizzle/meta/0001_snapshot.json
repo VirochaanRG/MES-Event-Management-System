@@ -1,6 +1,6 @@
 {
-  "id": "d9becdaa-6de9-4a54-ba26-9335d535cb40",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "8cf4ebe5-d3f0-40a2-aff7-97948d94d794",
+  "prevId": "d9becdaa-6de9-4a54-ba26-9335d535cb40",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -135,6 +135,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "content": {
+          "name": "content",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -143,7 +149,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "qr_code_idx": {
+          "name": "qr_code_idx",
+          "columns": [
+            {
+              "expression": "content",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "qr_codes_id_registered_users_id_fk": {
           "name": "qr_codes_id_registered_users_id_fk",

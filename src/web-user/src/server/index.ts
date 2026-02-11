@@ -1,4 +1,3 @@
-import { fastifyStatic } from '@fastify/static';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
@@ -12,8 +11,6 @@ import { form, formQuestions, formAnswers, formSubmissions, qrCodes } from '@db/
 import QRCode from 'qrcode';
 import formsRoutes from './formsAPI';
 import publicImageRoutes from './imagesAPI';
-import { config } from '../../../config/config';
-import path from 'path';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -294,13 +291,13 @@ fastify.get<{ Params: { id: string } }>('/api/events/:id', async (request, reply
 // POST - Register user for an event
 fastify.post<{
   Params: { id: string };
-  Body: { userEmail: string; instance?: number };
+  Body: { userEmail: string; instance?: number; details?: Record<string, any> };
 }>('/api/events/:id/register', async (request, reply) =>
 {
   try
   {
     const { id } = request.params;
-    const { userEmail, instance } = request.body;
+    const { userEmail, instance, details } = request.body;
 
     if (!userEmail || !userEmail.trim())
     {
@@ -322,6 +319,8 @@ fastify.post<{
       });
     }
 
+    // Only single registrations for now
+    // TODO: Add functionality to allow for multiple users to register
     const existingRegistration = await db.query.registeredUsers.findFirst({
       where: and(
         eq(registeredUsers.eventId, parseInt(id)),
@@ -354,6 +353,35 @@ fastify.post<{
         });
       }
     }
+    let formattedDetails;
+    if (details && event.registrationForm)
+    {
+      const registrationForm = event.registrationForm as any;
+      const questions = registrationForm.questions || [];
+
+      formattedDetails = Object.entries(details).map(([questionOrder, answer]) =>
+      {
+        const question = questions[parseInt(questionOrder) - 1];
+        if (!question) return null;
+
+        let formattedAnswer = answer;
+
+        // For multiple choice and multi-select, convert indices to actual choice text
+        if (question.question_type === 'multiple_choice' && typeof answer === 'number')
+        {
+          formattedAnswer = question.options?.[answer] || answer;
+        } else if (question.question_type === 'multi_select' && Array.isArray(answer))
+        {
+          formattedAnswer = answer.map((index: number) => question.options?.[index] || index);
+        }
+
+        return {
+          question: question.label,
+          answer: formattedAnswer,
+          questionType: question.question_type
+        };
+      }).filter(Boolean); // Remove null entries
+    }
 
     const eventCost = event.cost ?? 0;
     const registration = await db
@@ -364,6 +392,7 @@ fastify.post<{
         instance: instance ?? 0,
         status: 'confirmed',
         paymentStatus: eventCost > 0 ? 'pending' : 'paid',
+        details: formattedDetails, // Store the formatted details
       })
       .returning();
 
@@ -392,7 +421,8 @@ interface QRPayload
 
 function buildQRContentString(payload: QRPayload)
 {
-  return `registrationId:${payload.registrationId};eventId:${payload.eventId};userEmail:${payload.userEmail};instance:${payload.instance}`;
+  return `registrationId:${payload.registrationId};eventId:${payload.eventId};userEmail:${payload.userEmail};` +
+    `instance:${payload.instance};${Date.now()}`;
 }
 
 fastify.post<{
@@ -428,7 +458,8 @@ fastify.post<{
       instance,
     };
     const qrString = buildQRContentString(payload);
-    const qrBuffer = await QRCode.toBuffer(qrString);
+    const qrSalt = await bcrypt.hash(qrString, SALT_ROUNDS);
+    const qrBuffer = await QRCode.toBuffer(qrSalt);
     const [entry] = await db
       .insert(qrCodes)
       .values({
@@ -437,6 +468,7 @@ fastify.post<{
         userEmail,
         instance,
         image: qrBuffer,
+        content: qrSalt
       })
       .returning();
 
@@ -454,6 +486,58 @@ fastify.post<{
   }
 });
 
+// GET available events (not started yet and not registered by user)
+fastify.get<{
+  Querystring: { userEmail?: string };
+}>('/api/events/available', async (request, reply) =>
+{
+  try
+  {
+    const { userEmail } = request.query;
+    const now = new Date();
+
+    // Get all events that haven't started yet
+    const upcomingEvents = await db.query.events.findMany({
+      where: sql`${events.startTime} > ${now}`,
+    });
+
+    // If no userEmail provided, return all upcoming events
+    if (!userEmail || !userEmail.trim())
+    {
+      return reply.send({
+        success: true,
+        data: upcomingEvents,
+      });
+    }
+
+    // Get all registrations for this user
+    const userRegistrations = await db.query.registeredUsers.findMany({
+      where: eq(registeredUsers.userEmail, userEmail.toLowerCase().trim()),
+    });
+
+    // Create a set of event IDs the user is already registered for
+    const registeredEventIds = new Set(
+      userRegistrations.map((reg) => reg.eventId)
+    );
+
+    // Filter out events the user is already registered for
+    const availableEvents = upcomingEvents.filter(
+      (event) => !registeredEventIds.has(event.id)
+    );
+
+    return reply.send({
+      success: true,
+      data: availableEvents,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch available events');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch available events',
+    });
+  }
+});
 // GET - Check if a user is registered for an event
 fastify.get<{
   Params: { id: string };
@@ -567,8 +651,148 @@ fastify.get('/api/events/:id/latest-instance', async (request, reply) =>
   }
 });
 
-await fastify.register(formsRoutes)
+// GET event registration form
+fastify.get<{ Params: { id: string } }>('/api/events/:id/registration-form', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
 
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, parseInt(id))
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    const registrationForm = event.registrationForm as any;
+
+    if (!registrationForm || !registrationForm.questions)
+    {
+      return reply.send({
+        success: true,
+        questions: [],
+      });
+    }
+
+    // Transform questions to match FormQuestion interface
+    const transformedQuestions = registrationForm.questions.map((q: any, index: number) => ({
+      id: q.id,
+      formId: parseInt(id),
+      questionType: q.question_type,
+      questionTitle: q.label,
+      optionsCategory: q.options?.length > 0 ? JSON.stringify({
+        choices: q.options,
+        min: q.min,
+        max: q.max
+      }) : null,
+      qorder: index + 1,
+      parentQuestionId: null,
+      enablingAnswers: [],
+      required: q.required || false,
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt,
+    }));
+
+    return reply.send({
+      success: true,
+      questions: transformedQuestions,
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to fetch event registration form');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to fetch event registration form',
+    });
+  }
+});
+
+// DELETE - Deregister user from an event
+fastify.delete<{
+  Params: { id: string };
+  Querystring: { userEmail: string };
+}>('/api/events/:id/register', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { userEmail } = request.query;
+
+    if (!userEmail || !userEmail.trim())
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'userEmail query parameter is required',
+      });
+    }
+
+    // TODO: Account for multiple registrations
+    // Check if the event exists
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, parseInt(id)),
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    // Check if the registration exists
+    const registration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.eventId, parseInt(id)),
+        eq(registeredUsers.userEmail, userEmail.toLowerCase().trim())
+      ),
+    });
+
+    if (!registration)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Registration not found',
+      });
+    }
+
+    // Delete the QR code (cascade will handle this automatically due to foreign key)
+    // But we'll explicitly delete it to be sure
+    await db
+      .delete(qrCodes)
+      .where(eq(qrCodes.id, registration.id));
+
+    // Delete the registration
+    await db
+      .delete(registeredUsers)
+      .where(
+        and(
+          eq(registeredUsers.eventId, parseInt(id)),
+          eq(registeredUsers.userEmail, userEmail.toLowerCase().trim())
+        )
+      );
+
+    return reply.send({
+      success: true,
+      message: 'Successfully deregistered from event',
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to deregister from event');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to deregister from event',
+    });
+  }
+});
+
+await fastify.register(formsRoutes)
 await fastify.register(publicImageRoutes)
 
 
