@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
 import { and, eq, sql } from 'drizzle-orm';
-import { events, registeredUsers } from '../../../db/src/schemas/events';
+import { events, qrCodes, registeredUsers } from '../../../db/src/schemas/events';
 
 // Default registration form template
 const DEFAULT_REGISTRATION_FORM = {
@@ -226,11 +226,102 @@ export default async function eventsRoutes(fastify: FastifyInstance)
     }
   );
 
+  fastify.get<{Params: { id: string }; Querystring: { registrationHash: string} }>(
+    '/api/events/:id/qr-registration',
+    async (request, reply) =>
+    {
+      try {
+        const { id } = request.params;
+        const { registrationHash } = request.query;
+
+        const event = await db.query.events.findFirst({
+          where: eq(events.id, parseInt(id)),
+        });
+
+        if (!event)
+        {
+          return reply.code(404).send({
+            success: false,
+            error: 'Event not found',
+          });
+        }
+
+        if (!registrationHash)
+        {
+          return reply.code(400).send({ success: false, error: 'registrationHash query parameter is required' });
+        }
+
+        const registration = await db.query.qrCodes.findFirst({
+          where: eq(qrCodes.content, registrationHash.trim() )
+        });
+
+        return reply.send({ success: true, isRegistered: !!registration, data: registration || null });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Failed to check registration');
+        return reply.code(500).send({ success: false, error: 'Failed to check registration' });
+      }
+    })
+
+  //
+  fastify.patch<{ Params: {id: string }; Body: { userId: number } }>(
+    '/api/events/:id/check-in',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { id } = request.params;
+        const { userId } = request.body;
+
+        const event = await db.query.events.findFirst({
+          where: eq(events.id, parseInt(id)),
+        });
+
+        if (!event)
+        {
+          return reply.code(404).send({
+            success: false,
+            error: 'Event not found',
+          });
+        }
+
+        const [entry] = await db
+          .update(registeredUsers)
+          .set({ status: 'attended' })
+          .where(
+            and(
+              eq(registeredUsers.id, userId),
+              eq(registeredUsers.status, 'confirmed')
+            )
+          ).returning();
+
+        if (!entry)
+        {
+          const exists = await db.query.registeredUsers.findFirst({ where: eq(registeredUsers.id, userId) });
+          if (!exists)
+          {
+            return reply.code(404).send({ error: 'Invalid user registration provided. This user did not register' +
+                'for the event.' });
+          } else
+          {
+            return reply.code(400).send({ error: 'User already checked-in to this event'});
+          }
+        }
+
+        return reply.send({ success: true, isAttending: !!entry, data: entry || null });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Failed to check registration');
+        return reply.code(500).send({ success: false, error: 'Failed to check registration' });
+      }
+    })
+
   // Check registration
   fastify.get<{ Params: { id: string }; Querystring: { userEmail: string } }>(
     '/api/events/:id/registration',
     async (request, reply) =>
     {
+      // TODO: Allow multiple instances (probably change params)
       try
       {
         const { id } = request.params;
