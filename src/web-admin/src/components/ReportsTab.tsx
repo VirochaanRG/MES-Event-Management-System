@@ -15,7 +15,7 @@ export default function ReportsTab() {
   const fetchForms = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3124/api/forms", {
+      const response = await fetch("/api/forms", {
         credentials: "include",
       });
 

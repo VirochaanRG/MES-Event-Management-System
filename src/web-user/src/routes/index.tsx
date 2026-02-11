@@ -41,7 +41,7 @@ function HomePage() {
   // Fetch featured events
   useEffect(() => {
     if (activeTab === "overview") {
-      fetch("http://localhost:3114/api/events", { credentials: "include" })
+      fetch("/api/events", { credentials: "include" })
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {
@@ -259,7 +259,7 @@ function HomePage() {
                       >
                         <div className="relative h-44 bg-red-900 overflow-hidden">
                           <img
-                            src={`http://localhost:3114/api/images/event/${event.id}`}
+                            src={`api/images/event/${event.id}`}
                             alt={event.name}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                             onError={(e) => {

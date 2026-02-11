@@ -22,6 +22,19 @@ export default defineConfig({
       },
     },
   },
+  preview: {
+    port: 4173, // Preview port (can be anything)
+    host: '0.0.0.0', // IMPORTANT: Allows Railway to access it
+    proxy: {
+      '/api': {
+        target: 'https://web-admin-production-2b44.up.railway.app',
+        changeOrigin: true,
+      },
+    },
+    allowedHosts: [
+      'mes-event-admin.up.railway.app'
+    ]
+  },
   build: {
     outDir: 'dist/client',
     sourcemap: true,

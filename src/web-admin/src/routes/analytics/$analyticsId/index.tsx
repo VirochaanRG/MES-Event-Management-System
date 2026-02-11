@@ -105,9 +105,7 @@ function AnalyticsDetailPageContent() {
 
   const fetchAnalyticsData = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3124/api/forms/${analyticsId}/answers`,
-      );
+      const response = await fetch(`/api/forms/${analyticsId}/answers`);
       const data = await response.json();
       if (data.success) {
         setAnalyticsData(data.data);
@@ -119,9 +117,7 @@ function AnalyticsDetailPageContent() {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3124/api/forms/${analyticsId}/questions`,
-      );
+      const response = await fetch(`/api/forms/${analyticsId}/questions`);
       const data = await response.json();
       if (data.success) {
         setQuestions(data.data);

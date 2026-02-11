@@ -35,7 +35,7 @@ function AdvancedAnalyticsContent() {
     const sessionUser = getCurrentUser("admin");
     if (sessionUser) setCurrentUser(sessionUser);
 
-    fetch(`http://localhost:3124/api/forms/${analyticsId}/answers`)
+    fetch(`/api/forms/${analyticsId}/answers`)
       .then((res) => res.json())
       .then((json) => {
         if (json.success) setSubmissions(json.data.submissions);
@@ -66,7 +66,7 @@ function AdvancedAnalyticsContent() {
 
   useEffect(() => {
     // Fetch master list of questions for the form
-    fetch(`http://localhost:3124/api/forms/${analyticsId}/questions`)
+    fetch(`/api/forms/${analyticsId}/questions`)
       .then((res) => res.json())
       .then((json) => {
         if (json.success) {

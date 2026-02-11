@@ -3,7 +3,8 @@ import react from '@vitejs/plugin-react';
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
 import path from 'path';
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode }) =>
+{
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
@@ -24,6 +25,19 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
         },
       },
+    },
+    preview: {
+      port: 4173, // Preview port (can be anything)
+      host: '0.0.0.0', // IMPORTANT: Allows Railway to access it
+      proxy: {
+        '/api': {
+          target: 'https://web-user-production-f2a0.up.railway.app',
+          changeOrigin: true,
+        },
+      },
+      allowedHosts: [
+        'mes-event-user.up.railway.app',
+      ]
     },
     build: {
       outDir: 'dist/client',
