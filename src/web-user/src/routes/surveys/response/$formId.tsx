@@ -12,6 +12,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import MultipleSelectAnswerQuestion from "@/components/MultipleSelectAnswerQuestion";
+import DropdownAnswerQuestion from "@/components/DropdownAnswerQuestion";
 
 export const Route = createFileRoute("/surveys/response/$formId")({
   component: RouteComponent,
@@ -21,7 +22,9 @@ function RouteComponent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { formId } = Route.useParams();
-  const userId = JSON.parse(sessionStorage.getItem("teamd-auth-user") ?? "{\"email\" : \"\"}").email;
+  const userId = JSON.parse(
+    sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
+  ).email;
   const [form, setForm] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -191,7 +194,16 @@ function RouteComponent() {
     };
     try {
       setSubmitting(true);
-      if (visibleResponses.filter(r => r.question.required).some((r) => !r.answer || !r.answer.answer || (Array.isArray(r.answer.answer) && r.answer.answer.length === 0))) {
+      if (
+        visibleResponses
+          .filter((r) => r.question.required)
+          .some(
+            (r) =>
+              !r.answer ||
+              !r.answer.answer ||
+              (Array.isArray(r.answer.answer) && r.answer.answer.length === 0),
+          )
+      ) {
         toast.error("Please fill in all required fields");
       } else {
         const confirmation = confirm("Are you sure you want to submit?");
@@ -230,22 +242,22 @@ function RouteComponent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-gray-600">Loading form...</div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-lg text-red-900">Loading form...</div>
       </div>
     );
   }
 
   if (error || !form) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
-          <div className="text-lg text-red-600 mb-4">
+          <div className="text-lg text-red-900 mb-4">
             {error || "Survey not found"}
           </div>
           <button
             onClick={handleBack}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
           >
             {form?.moduleId ? "Back to modules" : "Back to surveys"}
           </button>
@@ -261,7 +273,7 @@ function RouteComponent() {
           {/* Back Button */}
           <button
             onClick={handleBack}
-            className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            className="mb-6 flex items-center gap-2 text-red-900 hover:text-red-700 transition-colors"
           >
             <svg
               className="w-5 h-5"
@@ -280,10 +292,10 @@ function RouteComponent() {
           </button>
 
           {/* Survey Header */}
-          <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-8 mb-6">
+          <div className="bg-white rounded-lg shadow-sm border-2 border-red-900 p-8 mb-6">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                <h1 className="text-4xl font-bold text-red-900 mb-2">
                   {form.name}
                 </h1>
               </div>
@@ -293,13 +305,13 @@ function RouteComponent() {
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-8 mb-6">
+          <div className="bg-white rounded-lg shadow-sm border-2 border-yellow-300 p-8 mb-6">
             <p className="text-gray-700 text-lg leading-relaxed py-5">
               Thank you for your submission. Your response has been recorded.
             </p>
             <button
               onClick={handleBack}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
             >
             {form?.moduleId ? "Back to modules" : "Back to surveys"}
             </button>
@@ -319,7 +331,7 @@ function RouteComponent() {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="mb-6 flex items-center gap-2 text-red-900 hover:text-red-700 transition-colors"
         >
           <svg
             className="w-5 h-5"
@@ -338,10 +350,10 @@ function RouteComponent() {
         </button>
 
         {/* Survey Header */}
-        <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-8 mb-6">
+        <div className="bg-white rounded-lg shadow-sm border-2 border-red-900 p-8 mb-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <h1 className="text-4xl font-bold text-red-900 mb-2">
                 {form.name}
               </h1>
             </div>
@@ -370,6 +382,13 @@ function RouteComponent() {
               answer={response.answer?.answer}
               onChange={(e) => handleResponseOnChange(response, e)}
             />
+          ) : response.question.questionType === "dropdown" ? (
+            <DropdownAnswerQuestion
+              key={response.question.id}
+              question={response.question}
+              answer={response.answer?.answer}
+              onChange={(e) => handleResponseOnChange(response, e)}
+            />
           ) : response.question.questionType === "linear_scale" ? (
             <LinearScaleAnswerQuestion
               key={response.question.id}
@@ -390,16 +409,16 @@ function RouteComponent() {
         )}
 
         {/* Action Buttons */}
-        <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
+        <div className="bg-white rounded-lg shadow-sm border-2 border-yellow-300 p-6">
           <div className="flex gap-4">
             <button
-              className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 px-6 py-3 bg-yellow-300 text-red-900 font-semibold rounded-lg hover:bg-yellow-400 transition-colors"
               onClick={handleSave}
             >
               Save
             </button>
             <button
-              className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex-1 px-6 py-3 bg-red-900 text-white font-semibold rounded-lg hover:bg-red-800 transition-colors"
               onClick={handleSubmit}
               disabled={submitting}
             >

@@ -94,7 +94,7 @@ function HomePage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-rose-50 flex flex-col">
         {/* Header */}
-        <header className="bg-pink-950 text-white shadow-2xl sticky top-0 z-40">
+        <header className="bg-red-900 text-white shadow-2xl sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div>
@@ -111,7 +111,7 @@ function HomePage() {
                 onClick={() => setShowMenu(!showMenu)}
                 className="bg-yellow-400 hover:bg-yellow-300 text-rose-900 font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                <div className="w-8 h-8 bg-pink-950 rounded-full flex items-center justify-center text-yellow-400 text-sm font-bold">
+                <div className="w-8 h-8 bg-red-900 rounded-full flex items-center justify-center text-yellow-400 text-sm font-bold">
                   {user?.email?.[0]?.toUpperCase() || "U"}
                 </div>
                 <span className="truncate max-w-[150px]">{user?.email}</span>
@@ -257,7 +257,7 @@ function HomePage() {
                         key={event.id}
                         className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group cursor-pointer transform hover:-translate-y-1 border border-gray-100"
                       >
-                        <div className="relative h-44 bg-pink-950 overflow-hidden">
+                        <div className="relative h-44 bg-red-900 overflow-hidden">
                           <img
                             src={`http://localhost:3114/api/images/event/${event.id}`}
                             alt={event.name}
@@ -321,7 +321,7 @@ function HomePage() {
                               setActiveTab("events");
                               setEventsSubTab("available");
                             }}
-                            className="mt-4 w-full bg-pink-950 hover:bg-rose-800 text-white font-semibold py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                            className="mt-4 w-full bg-red-900 hover:bg-rose-800 text-white font-semibold py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
                           >
                             View Details →
                           </button>
@@ -462,7 +462,7 @@ function HomePage() {
         </main>
 
         {/* Footer */}
-        <footer className="bg-pink-950 text-amber-300 mt-12 py-8 shadow-2xl">
+        <footer className="bg-red-900 text-amber-300 mt-12 py-8 shadow-2xl">
           <div className="max-w-7xl mx-auto px-6 text-center">
             <p className="text-sm font-medium">
               © 2025 McMaster Engineering Society.{" "}
