@@ -64,10 +64,11 @@ export const formConditions = pgTable("form_conditions", {
     .notNull()
     .references(() => form.id, { onDelete: "cascade" }),
   conditionType: text("condition_type").notNull(),
-  questionId: integer("question_id")
-    .notNull()
+  dependentFormId: integer("dependent_form_id").notNull()
+    .references(() => form.id, { onDelete: "cascade" }),
+  dependentQuestionId: integer("dependent_question_id")
     .references(() => formQuestions.id, { onDelete: "cascade" }),
-  requiredOptions: json("required_options").$type<number[]>()
+  dependentAnswerIdx: integer("dependent_answer_idx")
 });
 
 
