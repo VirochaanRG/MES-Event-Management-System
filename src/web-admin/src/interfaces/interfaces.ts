@@ -48,7 +48,8 @@ export interface FormCondition
 {
   id: number;
   formId : number;
+  dependentFormId : number;
   conditionType: string;
-  questionId: number;
-  requiredOptions: number[];
+  dependentQuestionId : number;
+  dependentAnswerIdx : number;
 }
