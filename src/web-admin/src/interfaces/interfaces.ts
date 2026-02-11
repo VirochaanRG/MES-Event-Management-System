@@ -43,3 +43,12 @@ interface AuthUser
   id: number;
   roles: string[];
 }
+
+export interface FormCondition
+{
+  id: number;
+  formId : number;
+  conditionType: string;
+  questionId: number;
+  requiredOptions: number[];
+}

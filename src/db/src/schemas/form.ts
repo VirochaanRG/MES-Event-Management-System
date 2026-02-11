@@ -57,3 +57,17 @@ export const formAnswers = pgTable("form_answers", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   submissionId: integer("submission_id").references(() => formSubmissions.id, { onDelete: "cascade" })
 });
+
+export const formConditions = pgTable("form_conditions", {
+  id: serial("id").primaryKey().notNull(),
+  formId: integer("form_id")
+    .notNull()
+    .references(() => form.id, { onDelete: "cascade" }),
+  conditionType: text("condition_type").notNull(),
+  questionId: integer("question_id")
+    .notNull()
+    .references(() => formQuestions.id, { onDelete: "cascade" }),
+  requiredOptions: json("required_options").$type<number[]>()
+});
+
+
