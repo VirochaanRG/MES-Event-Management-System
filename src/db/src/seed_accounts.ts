@@ -18,12 +18,22 @@ async function seed()
   const passwordHash = await bcrypt.hash("test1234", 10);
   await db.insert(users).values([
     {
-      email: "t1@test.com",
+      email: "test1@test.com",
       passwordHash: passwordHash,
       roles: ["user"],
     },
     {
-      email: "ta1@test.com",
+      email: "testa1@test.com",
+      passwordHash: passwordHash,
+      roles: ["user", "admin", "all"],
+    },
+    {
+      email: "test2@test.com",
+      passwordHash: passwordHash,
+      roles: ["user"],
+    },
+    {
+      email: "testa2@test.com",
       passwordHash: passwordHash,
       roles: ["user", "admin", "all"],
     },

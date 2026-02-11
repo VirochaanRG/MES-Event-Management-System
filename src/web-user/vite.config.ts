@@ -36,6 +36,7 @@ export default defineConfig(({ mode }) =>
         '/api': {
           target: 'https://web-user-production-f2a0.up.railway.app',
           changeOrigin: true,
+
         },
       },
       allowedHosts: [
