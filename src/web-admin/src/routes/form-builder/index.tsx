@@ -5,6 +5,33 @@ import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 
+type FormStatus = "Private" | "Public" | "Live" | "Scheduled";
+
+const getFormStatus = (f: Form): FormStatus => {
+  const unlockAt = f.unlockAt ? new Date(f.unlockAt) : null;
+  if (unlockAt) {
+    return unlockAt > new Date() ? "Scheduled" : "Live";
+  }
+  return f.isPublic ? "Public" : "Private";
+};
+
+
+
+function StatusPill({ status }: { status: FormStatus }) {
+  const base =
+    "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border";
+
+  const styles: Record<FormStatus, string> = {
+    Private: "bg-gray-50 text-gray-700 border-gray-200",
+    Public: "bg-green-50 text-green-700 border-green-200",
+    Live: "bg-green-50 text-green-700 border-green-200",
+    Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
+  };
+
+  return <span className={`${base} ${styles[status]}`}>{status}</span>;
+}
+
+
 export const Route = createFileRoute("/form-builder/")({
   component: RouteComponent,
 });
@@ -21,7 +48,6 @@ function RouteComponent() {
   const [submitting, setSubmitting] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [newUnlockAt, setNewUnlockAt] = useState("");
-
   useEffect(() => {
     const initAuth = () => {
       const sessionUser = getCurrentUser("admin");
@@ -284,38 +310,50 @@ function RouteComponent() {
                           <p className="text-gray-600 mb-2">
                             {form.description || "No description"}
                           </p>
-                          <p className="text-sm text-gray-500">
-                            Created:{" "}
-                            {new Date(form.createdAt).toLocaleDateString()}
-                          </p>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <p className="text-sm text-gray-500">
+                              Created: {new Date(form.createdAt).toLocaleDateString()}
+                            </p>
+
+                            <StatusPill status={getFormStatus(form)} />
+
+                            {form.unlockAt && (
+                              <p className="text-sm text-gray-500">
+                                Unlocks: {new Date(form.unlockAt).toLocaleString()}
+                              </p>
+                            )}
+                          </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <div
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-3"
                           >
-                            <button
-                              onClick={() => handleToggleVisibility(form)}
-                              className={`
-                                relative inline-flex h-6 w-11 items-center rounded-full
-                                transition-colors
-                                ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}
-                              `}
-                            >
-                              <span
-                                className={`
-                                  inline-block h-4 w-4 transform rounded-full bg-white
-                                  transition-transform
-                                  ${form.isPublic ? "translate-x-6" : "translate-x-1"}
-                                `}
-                              />
-                            </button>
+                            {!form.unlockAt && (
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleToggleVisibility(form)}
+                                  className={`
+                                    relative inline-flex h-6 w-11 items-center rounded-full
+                                    transition-colors
+                                    ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}
+                                  `}
+                                >
+                                  <span
+                                    className={`
+                                      inline-block h-4 w-4 transform rounded-full bg-white
+                                      transition-transform
+                                      ${form.isPublic ? "translate-x-6" : "translate-x-1"}
+                                    `}
+                                  />
+                                </button>
 
-                            <span className="text-sm text-gray-700">
-                              {form.isPublic ? "Public" : "Private"}
-                            </span>
+                                <span className="text-sm text-gray-700">
+                                  {form.isPublic ? "Public" : "Private"}
+                                </span>
+                              </div>
+                            )}
                           </div>
-
                           <button
                             onClick={(e) => {
                               e.stopPropagation();

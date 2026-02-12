@@ -9,6 +9,34 @@ import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 
+type FormStatus = "Private" | "Live" | "Scheduled" | "Locked";
+
+function getFormStatus(form?: Form | null): FormStatus {
+  if (!form?.isPublic) return "Private";
+
+  if (!form.unlockAt) return "Live";
+
+  const unlock = new Date(form.unlockAt).getTime();
+  const now = Date.now();
+
+  return unlock > now ? "Scheduled" : "Live";
+}
+
+function StatusPill({ status }: { status: FormStatus }) {
+  const base =
+    "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border";
+
+  const styles: Record<FormStatus, string> = {
+    Private: "bg-gray-50 text-gray-700 border-gray-200",
+    Live: "bg-green-50 text-green-700 border-green-200",
+    Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
+    Locked: "bg-red-50 text-red-700 border-red-200",
+  };
+
+  return <span className={`${base} ${styles[status]}`}>{status}</span>;
+}
+
+
 export const Route = createFileRoute("/form-builder/$formId")({
   component: RouteComponent,
 });
@@ -21,12 +49,14 @@ function RouteComponent() {
   const [savingVisibility, setSavingVisibility] = useState(false);
   const [unlockLocal, setUnlockLocal] = useState<string>(""); 
   const [savingUnlock, setSavingUnlock] = useState(false);
+  const [isEditingUnlock, setIsEditingUnlock] = useState(false);
+  const [unlockDraft, setUnlockDraft] = useState<string>("");
+  const status = getFormStatus(formData);
   const handleTogglePublic = async (nextValue: boolean) => {
     if (!formData) return;
 
     const prev = formData.isPublic;
 
-    // optimistic update
     setFormData({ ...formData, isPublic: nextValue });
     setSavingVisibility(true);
 
@@ -58,24 +88,24 @@ function RouteComponent() {
     setSavingUnlock(true);
     try {
       const value = override !== undefined ? override : unlockLocal;
-
-      const payload = {
-        unlockAt: value ? new Date(value).toISOString() : null,
-      };
-
+      const nextUnlockAt = value ? new Date(value).toISOString() : null;
       const res = await fetch(`/api/forms/${formId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          unlockAt: nextUnlockAt,
+          isPublic: false, 
+        }),
       });
 
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json?.error || "Failed to update unlock date");
       }
-
       setFormData(json.data);
-      alert("Unlock date saved");
+      setUnlockLocal(value || "");
+      setUnlockDraft(value || "");
+
     } catch (err: any) {
       alert(err?.message || "Failed to update unlock date");
     } finally {
@@ -171,7 +201,14 @@ function RouteComponent() {
 
         setFormData(result.data);
         const u = result.data?.unlockAt ? new Date(result.data.unlockAt) : null;
-        setUnlockLocal(u ? new Date(u.getTime() - u.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "");
+        const local = u
+          ? new Date(u.getTime() - u.getTimezoneOffset() * 60000)
+              .toISOString()
+              .slice(0, 16)
+          : "";
+        setUnlockLocal(local);
+        setUnlockDraft(local);
+        setIsEditingUnlock(false);
 
         // Fetch questions
         const questionsResponse = await fetch(`/api/forms/${formId}/questions`);
@@ -558,62 +595,101 @@ function RouteComponent() {
                 <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
                   {formData?.name || "Untitled Form"}
                 </h1>
-
-                {/* Make public checkbox */}
+                {/* Publish controls + status */}
                 <div className="mt-3 flex items-center gap-3">
-                  <input
-                    id="makePublic"
-                    type="checkbox"
-                    checked={!!formData?.isPublic}
+                  <button
+                    onClick={() => handleTogglePublic(!formData?.isPublic)}
                     disabled={savingVisibility}
-                    onChange={(e) => handleTogglePublic(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900 disabled:opacity-50"
-                  />
-                  <label
-                    htmlFor="makePublic"
-                    className="text-sm font-medium text-gray-900"
+                    className={`px-4 py-2 text-sm font-medium rounded-md border disabled:opacity-50 ${
+                      formData?.isPublic
+                        ? "bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
+                        : "bg-gray-900 text-white border-gray-900 hover:bg-gray-800"
+                    }`}
                   >
-                    Make public
-                  </label>
+                    {formData?.isPublic ? "Unpublish" : "Publish"}
+                  </button>
 
-                  <span className="text-xs text-gray-500">
-                    {formData?.isPublic ? "Public" : "Private"}
-                  </span>
+                  <StatusPill status={status} />
                 </div>
-                <div className="mt-4 flex items-end gap-3">
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-900 mb-2">
-                      Unlock date (optional)
-                    </label>
-                    <input
-                      type="datetime-local"
-                      value={unlockLocal}
-                      onChange={(e) => setUnlockLocal(e.target.value)}
-                      className="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    />
-                    <span className="text-xs text-gray-500 mt-1">
-                      <span className="text-xs text-gray-500 mt-1">
-                        Current:{" "}
-                        {formData?.unlockAt
-                          ? new Date(formData.unlockAt).toLocaleString()
-                          : "No unlock date set"}
-                      </span>
-                    </span>
+                <div className="mt-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-900">Unlock date</span>
+
+                      {!isEditingUnlock ? (
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
+                          <span className="text-sm text-gray-700">
+                            {formData?.unlockAt
+                              ? `Unlocks: ${new Date(formData.unlockAt).toLocaleString()}`
+                              : "No unlock date set"}
+                          </span>
+                          {formData?.unlockAt ? (
+                            <StatusPill status={"Scheduled"} />
+                          ) : (
+                            <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-700 border-gray-200">
+                              None
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="mt-2 flex flex-wrap items-end gap-3">
+                          <input
+                            type="datetime-local"
+                            value={unlockDraft}
+                            onChange={(e) => setUnlockDraft(e.target.value)}
+                            className="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                          />
+                          <button
+                            onClick={async () => {
+                              await handleSaveUnlockAt(unlockDraft);
+                              setIsEditingUnlock(false);
+                            }}
+                            disabled={savingUnlock}
+                            className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
+                          >
+                            {savingUnlock ? "Saving..." : "Save"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setUnlockDraft(unlockLocal);
+                              setIsEditingUnlock(false);
+                            }}
+                            disabled={savingUnlock}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                          >
+                            Cancel
+                          </button>
+                          {formData?.unlockAt && (
+                            <button
+                              onClick={async () => {
+                                await handleSaveUnlockAt("");
+                                setUnlockDraft("");
+                                setUnlockLocal("");
+                                setIsEditingUnlock(false);
+                              }}
+                              disabled={savingUnlock}
+                              className="px-4 py-2 text-sm font-medium text-red-700 bg-white border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      <p className="mt-1 text-xs text-gray-500">
+                      </p>
+                    </div>
+                    {!isEditingUnlock && (
+                      <button
+                        onClick={() => {
+                          setUnlockDraft(unlockLocal); // preload current value
+                          setIsEditingUnlock(true);
+                        }}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                      >
+                        {formData?.unlockAt ? "Edit" : "Set date"}
+                      </button>
+                    )}
                   </div>
-                  <button
-                    onClick={() => handleSaveUnlockAt("")}
-                    disabled={savingUnlock}
-                    className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
-                  >
-                    {savingUnlock ? "Saving..." : "Save"}
-                  </button>
-                  <button
-                    onClick={() => handleSaveUnlockAt("")}
-                    disabled={savingUnlock}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    Clear
-                  </button>
                 </div>
               </div>
               <div className="relative z-20" ref={dropdownRef}>
@@ -623,7 +699,6 @@ function RouteComponent() {
                 >
                   Add Question
                 </button>
-
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30">
                     <button
