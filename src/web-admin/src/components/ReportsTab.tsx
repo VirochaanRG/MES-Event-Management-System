@@ -54,10 +54,10 @@ export default function ReportsTab() {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">Error: {error}</p>
+        <p className="text-red-900">Error: {error}</p>
         <button
           onClick={fetchForms}
-          className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          className="mt-2 px-4 py-2 bg-red-900 text-white rounded hover:bg-red-950"
         >
           Retry
         </button>
@@ -78,7 +78,7 @@ export default function ReportsTab() {
 
   return (
     <div>
-      <h4 className="text-2xl font-bold text-stone-900 mb-3 border-b-2 border-red-900 pb-2 inline-block">
+      <h4 className="text-2xl font-bold text-red-900 mb-3 border-b-2 border-red-900 pb-2 inline-block">
         Form Reports
       </h4>
       <p className="text-gray-600 mb-6">
@@ -92,7 +92,7 @@ export default function ReportsTab() {
             onClick={() => handleFormClick(form.id)}
             className="bg-white border border-gray-300 rounded-lg p-5 hover:shadow-lg hover:border-red-900 transition-all cursor-pointer"
           >
-            <h5 className="text-lg font-semibold text-gray-800 mb-2">
+            <h5 className="text-lg font-semibold text-red-900 mb-2">
               {form.name}
             </h5>
             {form.description && (

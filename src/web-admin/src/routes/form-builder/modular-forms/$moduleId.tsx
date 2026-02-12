@@ -217,7 +217,7 @@ function RouteComponent() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-red-600">Error: {error}</div>
+        <div className="text-lg text-red-900">Error: {error}</div>
       </div>
     );
   }
@@ -406,7 +406,7 @@ function RouteComponent() {
 
                                 <button
                                   onClick={() => handleDeleteForm(form.id)}
-                                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                  className="w-full text-left px-4 py-2 text-sm text-red-900 hover:bg-red-50"
                                 >
                                   Delete
                                 </button>

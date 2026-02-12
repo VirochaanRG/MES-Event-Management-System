@@ -98,7 +98,7 @@ function HomePage() {
           <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div>
-                <h1 className="text-3xl font-bold text-yellow-400 underline decoration-2 tracking-tight">
+                <h1 className="text-3xl font-extrabold italic text-yellow-400 underline decoration-2 tracking-tight">
                   EvENGage
                 </h1>
                 <p className="text-amber-300 text-xs mt-0.5 font-medium">
@@ -209,7 +209,7 @@ function HomePage() {
               <div className="text-center bg-white rounded-2xl shadow-lg p-8 border-t-4 border-yellow-400">
                 <h2 className="text-4xl font-bold text-rose-900 mb-3">
                   Welcome to{" "}
-                  <span className="text-yellow-500 underline decoration-4">
+                  <span className="text-yellow-500 font-extrabold italic underline decoration-4">
                     EvENGage
                   </span>
                 </h2>
@@ -468,9 +468,6 @@ function HomePage() {
               © 2025 McMaster Engineering Society.{" "}
               <span className="font-bold underline decoration-2">EvENGage</span>{" "}
               Platform.
-            </p>
-            <p className="text-xs text-yellow-200 mt-1">
-              Building community, one event at a time.
             </p>
           </div>
         </footer>

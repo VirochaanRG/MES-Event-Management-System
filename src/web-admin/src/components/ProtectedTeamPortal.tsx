@@ -12,19 +12,7 @@ function UnauthorizedAccess({
   onLocalLogin: (user: AuthUser, token: string) => void;
 }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        padding: "20px",
-        backgroundColor: "#f8f9fa",
-        textAlign: "center",
-        gap: "20px",
-      }}
-    >
+    <div>
       <LocalLoginForm onLoginSuccess={onLocalLogin} />
     </div>
   );
