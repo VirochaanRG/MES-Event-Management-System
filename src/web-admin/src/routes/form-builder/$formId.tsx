@@ -464,9 +464,9 @@ function RouteComponent() {
       alert("Failed to save question: " + err.message);
     }
   };
-  
+
   const handleBack = () => {
-    if(formData?.moduleId) {
+    if (formData?.moduleId) {
       navigate({ to: `/form-builder/modular-forms/${formData.moduleId}` });
     } else {
       navigate({ to: "/form-builder" });
@@ -492,11 +492,7 @@ function RouteComponent() {
     return null;
   }
   return (
-    <AdminLayout
-      user={currentUser}
-      title="Form Builder"
-      subtitle="Create and edit forms"
-    >
+    <AdminLayout user={currentUser} title="Form Builder">
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button

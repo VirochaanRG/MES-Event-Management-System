@@ -22,7 +22,6 @@ function RouteComponent() {
   const [submitting, setSubmitting] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
-
   useEffect(() => {
     console.log("subforms updated:", subForms);
   }, [subForms]);
@@ -32,7 +31,6 @@ function RouteComponent() {
     window.addEventListener("click", close);
     return () => window.removeEventListener("click", close);
   }, []);
-
 
   useEffect(() => {
     const initAuth = () => {
@@ -227,11 +225,7 @@ function RouteComponent() {
     return null;
   }
   return (
-    <AdminLayout
-      user={currentUser}
-      title="Form Builder"
-      subtitle="Create and edit forms"
-    >
+    <AdminLayout user={currentUser} title="Form Builder">
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button
@@ -354,66 +348,71 @@ function RouteComponent() {
                           </p>
 
                           {/* Dropdown */}
-                        <div
-                          className="relative"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <button
-                            onClick={() =>
-                              setOpenMenuId(openMenuId === form.id ? null : form.id)
-                            }
-                            className="p-2 rounded-full hover:bg-gray-100 transition"
+                          <div
+                            className="relative"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <svg
-                              className="w-5 h-5 text-gray-500"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
+                            <button
+                              onClick={() =>
+                                setOpenMenuId(
+                                  openMenuId === form.id ? null : form.id,
+                                )
+                              }
+                              className="p-2 rounded-full hover:bg-gray-100 transition"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 6h.01M12 12h.01M12 18h.01"
-                              />
-                            </svg>
-                          </button>
-
-                          {openMenuId === form.id && (
-                            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                              <button
-                                onClick={() =>
-                                  navigate({
-                                    to: "/form-builder/$formId",
-                                    params: { formId: form.id.toString() },
-                                  })
-                                }
-                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                              <svg
+                                className="w-5 h-5 text-gray-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
                               >
-                                Edit
-                              </button>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 6h.01M12 12h.01M12 18h.01"
+                                />
+                              </svg>
+                            </button>
 
-                              <button
-                                onClick={() =>
-                                  navigate({
-                                    to: "/form-builder/modular-forms/$mId/conditions/$formId",
-                                    params: { mId: moduleId, formId: form.id.toString()},
-                                  })
-                                }
-                                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                              >
-                                Conditions
-                              </button>
+                            {openMenuId === form.id && (
+                              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                                <button
+                                  onClick={() =>
+                                    navigate({
+                                      to: "/form-builder/$formId",
+                                      params: { formId: form.id.toString() },
+                                    })
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                                >
+                                  Edit
+                                </button>
 
-                              <button
-                                onClick={() => handleDeleteForm(form.id)}
-                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          )}
-                        </div>
+                                <button
+                                  onClick={() =>
+                                    navigate({
+                                      to: "/form-builder/modular-forms/$mId/conditions/$formId",
+                                      params: {
+                                        mId: moduleId,
+                                        formId: form.id.toString(),
+                                      },
+                                    })
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                                >
+                                  Conditions
+                                </button>
+
+                                <button
+                                  onClick={() => handleDeleteForm(form.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

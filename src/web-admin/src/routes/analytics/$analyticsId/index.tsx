@@ -665,7 +665,7 @@ function AnalyticsDetailPageContent() {
       <RequireRole
         userRoles={currentUser.roles}
         requiredRole="analytics"
-        redirectTo="/"
+        redirectTo="/denied"
       >
         <AdminLayout user={currentUser} title="Form Analytics">
           <div className="p-6">
@@ -688,13 +688,9 @@ function AnalyticsDetailPageContent() {
     <RequireRole
       userRoles={currentUser.roles}
       requiredRole="analytics"
-      redirectTo="/"
+      redirectTo="/denied"
     >
-      <AdminLayout
-        user={currentUser}
-        title={analyticsData.form.name}
-        subtitle="Detailed form analytics and responses"
-      >
+      <AdminLayout user={currentUser} title={analyticsData.form.name}>
         <div className="p-6">
           {/* Back Button */}
           <div className="flex items-center justify-between mb-6">

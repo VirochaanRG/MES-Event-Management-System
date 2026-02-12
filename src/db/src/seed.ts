@@ -49,8 +49,8 @@ async function seed()
       title: "Test Event 1",
       description: "This is a sample event for testing purposes.",
       location: "Test Location A",
-      startTime: new Date("2026-01-10T10:00:00Z"),
-      endTime: new Date("2026-01-10T12:00:00Z"),
+      startTime: new Date("2026-02-13T10:00:00Z"),
+      endTime: new Date("2026-02-13T12:00:00Z"),
       capacity: 50,
       isPublic: true,
       status: "scheduled",
@@ -107,6 +107,21 @@ async function seed()
   await db.insert(users).values([
     {
       email: "t1@test.com",
+      passwordHash: passwordHash,
+      roles: ["user"],
+    },
+    {
+      email: "t2@test.com",
+      passwordHash: passwordHash,
+      roles: ["user"],
+    },
+    {
+      email: "t4@test.com",
+      passwordHash: passwordHash,
+      roles: ["user"],
+    },
+    {
+      email: "t3@test.com",
       passwordHash: passwordHash,
       roles: ["user"],
     },

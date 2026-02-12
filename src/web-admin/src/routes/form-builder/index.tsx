@@ -224,11 +224,7 @@ function RouteComponent() {
       requiredRole="forms"
       redirectTo="/denied"
     >
-      <AdminLayout
-        user={user}
-        title="Events Management"
-        subtitle="Manage and organize all your events"
-      >
+      <AdminLayout user={user} title="Events Management">
         <main>
           <div className="px-5 py-10 bg-gray-50 rounded-lg mx-5 my-5">
             <button

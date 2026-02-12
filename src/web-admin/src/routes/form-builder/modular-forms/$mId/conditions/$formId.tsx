@@ -1,30 +1,37 @@
 import AdminLayout from "@/components/AdminLayout";
-import { Form, FormCondition, FormQuestion} from "@/interfaces/interfaces";
+import { Form, FormCondition, FormQuestion } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef, use } from "react";
-export const Route = createFileRoute("/form-builder/modular-forms/$mId/conditions/$formId")({
-   component: () => {
+export const Route = createFileRoute(
+  "/form-builder/modular-forms/$mId/conditions/$formId",
+)({
+  component: () => {
     const { formId } = Route.useParams();
     return <RouteComponent key={formId} />;
   },
 });
 
 function RouteComponent() {
-
   const navigate = useNavigate();
-  const { mId, formId} = Route.useParams();
+  const { mId, formId } = Route.useParams();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [form, setForm] = useState<Form | null>(null);
   const [allForms, setAllForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [conditions, setConditions] = useState<FormCondition[]>([]);
-  const [selectedConditionType, setSelectedConditionType] = useState<string>("");
-  const [selectedParentForm, setSelectedParentForm] = useState<Form | null>(null);
-  const [selectedQuestion, setSelectedQuestion] = useState<FormQuestion | null>(null);
+  const [selectedConditionType, setSelectedConditionType] =
+    useState<string>("");
+  const [selectedParentForm, setSelectedParentForm] = useState<Form | null>(
+    null,
+  );
+  const [selectedQuestion, setSelectedQuestion] = useState<FormQuestion | null>(
+    null,
+  );
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [editingCondition, setEditingCondition] = useState<FormCondition | null>(null);
+  const [editingCondition, setEditingCondition] =
+    useState<FormCondition | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -40,12 +47,15 @@ function RouteComponent() {
         const allFormsRes = await fetch(`/api/mod-forms/sub-forms/${mId}`);
         const allFormsData = await allFormsRes.json();
 
-        if (!formData.success) throw new Error(formData.error || 'Failed to fetch form');
-        if (!conditionsData.success) throw new Error(formData.error || 'Failed to fetch conditions');
-        if (!allFormsData.success) throw new Error(allFormsData.error || 'Failed to fetch form')
+        if (!formData.success)
+          throw new Error(formData.error || "Failed to fetch form");
+        if (!conditionsData.success)
+          throw new Error(formData.error || "Failed to fetch conditions");
+        if (!allFormsData.success)
+          throw new Error(allFormsData.error || "Failed to fetch form");
 
         setForm(formData.data);
-        setAllForms(allFormsData.data.filter(f => f.id !== parseInt(formId)));
+        setAllForms(allFormsData.data.filter((f) => f.id !== parseInt(formId)));
         setConditions(conditionsData.data);
       } catch (err: any) {
         setError(err.message);
@@ -76,15 +86,15 @@ function RouteComponent() {
 
     initAuth();
   }, [navigate]);
-  
+
   const handleBack = () => {
-    if(form?.moduleId) {
+    if (form?.moduleId) {
       navigate({ to: `/form-builder/modular-forms/${form.moduleId}` });
     } else {
       navigate({ to: "/form-builder" });
     }
   };
-  
+
   const openModal = (conditionType) => {
     setSelectedConditionType(conditionType);
     setSelectedParentForm(null);
@@ -96,35 +106,31 @@ function RouteComponent() {
 
   const openEditModal = (condition) => {
     setSelectedConditionType(condition.conditionType);
-    const parentForm = allForms.find(
-      f => f.id === condition.dependentFormId
-    ) ?? null;
+    const parentForm =
+      allForms.find((f) => f.id === condition.dependentFormId) ?? null;
     setSelectedParentForm(parentForm);
     setSelectedQuestion(condition.dependentQuestionId);
     setSelectedAnswer(condition.dependentAnswerIdx);
-    setEditingCondition(condition)
+    setEditingCondition(condition);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-  }
+  };
 
   const handleAddCondition = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-  
+
   const handleDeleteCondition = async (id) => {
     if (!confirm("Are you sure you want to delete this condition?")) {
       return;
     }
     try {
-      const response = await fetch(
-        `/api/forms/${formId}/conditions/${id}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const response = await fetch(`/api/forms/${formId}/conditions/${id}`, {
+        method: "DELETE",
+      });
 
       const result = await response.json();
 
@@ -141,8 +147,9 @@ function RouteComponent() {
 
   const handleSaveCondition = async () => {
     try {
-      if(!selectedParentForm) {
-        alert("Must select a form"); return;
+      if (!selectedParentForm) {
+        alert("Must select a form");
+        return;
       }
       let body;
       if (selectedConditionType === "complete_form") {
@@ -151,25 +158,28 @@ function RouteComponent() {
           dependentFormId: selectedParentForm.id,
         });
       } else if (selectedConditionType === "answer_question") {
-        if(!selectedQuestion) {
-          alert("Must select a question"); return;
+        if (!selectedQuestion) {
+          alert("Must select a question");
+          return;
         }
         body = JSON.stringify({
           conditionType: selectedConditionType,
           dependentFormId: selectedParentForm.id,
-          dependentQuestionId : selectedQuestion.id,
+          dependentQuestionId: selectedQuestion.id,
         });
       } else if (selectedConditionType === "specific_answer") {
-        if(!selectedQuestion) {
-          alert("Must select a question"); return;
-        } else if(!selectedAnswer) {
-          alert("Must select an answer"); return;
+        if (!selectedQuestion) {
+          alert("Must select a question");
+          return;
+        } else if (!selectedAnswer) {
+          alert("Must select an answer");
+          return;
         }
         body = JSON.stringify({
           conditionType: selectedConditionType,
           dependentFormId: selectedParentForm.id,
-          dependentQuestionId : selectedQuestion.id,
-          dependentAnswerIdx : selectedAnswer,
+          dependentQuestionId: selectedQuestion.id,
+          dependentAnswerIdx: selectedAnswer,
         });
       }
       console.log(selectedConditionType);
@@ -184,7 +194,7 @@ function RouteComponent() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: body
+            body: body,
           },
         );
 
@@ -194,7 +204,9 @@ function RouteComponent() {
         }
 
         setConditions(
-          conditions.map((c) => (c.id === editingCondition.id ? result.data : c)),
+          conditions.map((c) =>
+            c.id === editingCondition.id ? result.data : c,
+          ),
         );
       } else {
         console.log(form);
@@ -204,7 +216,7 @@ function RouteComponent() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: body
+          body: body,
         });
 
         result = await response.json();
@@ -221,33 +233,37 @@ function RouteComponent() {
       console.error("Failed to save condition:", err.message);
       alert("Failed to save condition: " + err.message);
     }
-  }
+  };
 
-  if (loading) return <div className="text-center py-12">Loading conditions...</div>;
-  if (error || !form) return <div className="text-center py-12 text-red-600">{error || "Form not found"}</div>;
-  if(!currentUser) return null;
+  if (loading)
+    return <div className="text-center py-12">Loading conditions...</div>;
+  if (error || !form)
+    return (
+      <div className="text-center py-12 text-red-600">
+        {error || "Form not found"}
+      </div>
+    );
+  if (!currentUser) return null;
 
   const getConditionText = (condition) => {
-    const dependentForm = allForms.find(f => f.id === condition.dependentFormId);
-    if(!dependentForm) return "";
-    if(condition.conditionType === 'complete_form') {
+    const dependentForm = allForms.find(
+      (f) => f.id === condition.dependentFormId,
+    );
+    if (!dependentForm) return "";
+    if (condition.conditionType === "complete_form") {
       return "Must complete " + dependentForm.name + " to unlock";
-    } else if (condition.conditionType === 'answer_question') {
+    } else if (condition.conditionType === "answer_question") {
       //TODO
-      return "TODO"
-    } else if (condition.conditionType === 'specific_answer') {
+      return "TODO";
+    } else if (condition.conditionType === "specific_answer") {
       //TODO
-      return "TODO"
+      return "TODO";
     }
-  }
+  };
 
   return (
-    <AdminLayout
-        user={currentUser}
-        title="Form Builder"
-        subtitle="Create and edit forms"
-    >
-    <div className="min-h-screen p-6 bg-gray-50">
+    <AdminLayout user={currentUser} title="Form Builder">
+      <div className="min-h-screen p-6 bg-gray-50">
         {/* Back Button */}
         <button
           onClick={handleBack}
@@ -274,8 +290,12 @@ function RouteComponent() {
           <div className="mb-12">
             <div className="flex items-start justify-between gap-4 mb-3">
               <div className="flex-1">
-                <h1 className="text-3xl font-bold mb-4">Conditions for: {form.name}</h1>
-                <p className="text-gray-700 mb-6">{form.description || "No description"}</p>
+                <h1 className="text-3xl font-bold mb-4">
+                  Conditions for: {form.name}
+                </h1>
+                <p className="text-gray-700 mb-6">
+                  {form.description || "No description"}
+                </p>
               </div>
               <div className="relative z-20" ref={dropdownRef}>
                 <button
@@ -309,78 +329,82 @@ function RouteComponent() {
                 )}
               </div>
             </div>
-            
+
             {/* Conditions list */}
             <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-              {conditions?.length > 0 ?
-                (conditions.map((condition) => (
-                    <div key={condition.id} className="relative group">
-                      {/* Question Border */}
-                        {/* Action Buttons */}
-                        <div className="absolute top-4 right-4 flex gap-2">
-                          {/* Edit Button */}
-                          <button
-                            onClick={() => openEditModal(condition)}
-                            className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
-                            title="Edit"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                              />
-                            </svg>
-                          </button>
-                          
-                          {/* Delete Button */}
-                          <button
-                            onClick={() => handleDeleteCondition(condition.id)}
-                            className="p-1.5 bg-white border border-gray-300 text-red-600 rounded hover:bg-red-50"
-                            title="Delete"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                        <div className="p-6 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors bg-white">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex-1">
-                              <div className="text-sm text-teal-600 font-medium mb-2">
-                                {condition.conditionType === "complete_form" ? "COMPLETE A FORM" : 
-                                 condition.conditionType === "answer_question" ? "ANSWER A QUESTION" : 
-                                condition.conditionType === "specific_answer" ? "GIVE A SPECIFIC ANSWER" : 
-                                "INVALID CONDITION"}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="mt-4">
-                            <p className="text-black">
-                              {getConditionText(condition)}
-                            </p>
+              {conditions?.length > 0 ? (
+                conditions.map((condition) => (
+                  <div key={condition.id} className="relative group">
+                    {/* Question Border */}
+                    {/* Action Buttons */}
+                    <div className="absolute top-4 right-4 flex gap-2">
+                      {/* Edit Button */}
+                      <button
+                        onClick={() => openEditModal(condition)}
+                        className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                        title="Edit"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </button>
+
+                      {/* Delete Button */}
+                      <button
+                        onClick={() => handleDeleteCondition(condition.id)}
+                        className="p-1.5 bg-white border border-gray-300 text-red-600 rounded hover:bg-red-50"
+                        title="Delete"
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="p-6 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors bg-white">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="text-sm text-teal-600 font-medium mb-2">
+                            {condition.conditionType === "complete_form"
+                              ? "COMPLETE A FORM"
+                              : condition.conditionType === "answer_question"
+                                ? "ANSWER A QUESTION"
+                                : condition.conditionType === "specific_answer"
+                                  ? "GIVE A SPECIFIC ANSWER"
+                                  : "INVALID CONDITION"}
                           </div>
                         </div>
                       </div>
-                  ))
-                )
-               : <p className="text-gray-500">No conditions found</p>}
+                      <div className="mt-4">
+                        <p className="text-black">
+                          {getConditionText(condition)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500">No conditions found</p>
+              )}
             </div>
 
             {/* Modal */}
@@ -392,7 +416,9 @@ function RouteComponent() {
                 >
                   <div className="p-6 border-b border-gray-200">
                     <h3 className="text-xl font-semibold text-gray-900">
-                      {editingCondition ? "Editing condition" : "Add a condition"}
+                      {editingCondition
+                        ? "Editing condition"
+                        : "Add a condition"}
                     </h3>
                     <p className="text-sm text-gray-500 mt-1">
                       {selectedConditionType.replace("_", " ")}
@@ -413,71 +439,76 @@ function RouteComponent() {
                         id="form"
                         value={selectedParentForm?.id ?? ""}
                         onChange={(e) => {
-                          const parentForm = allForms.find(f => parseInt(e.target.value) === f.id);
-                          if(parentForm) setSelectedParentForm(parentForm);
+                          const parentForm = allForms.find(
+                            (f) => parseInt(e.target.value) === f.id,
+                          );
+                          if (parentForm) setSelectedParentForm(parentForm);
                         }}
                         className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                                   focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500
                                   text-gray-700 bg-white"
                       >
-                      <option value="" disabled>
-                        Select a form
-                      </option>
-                        { allForms.length > 0 ? 
-                          (allForms.map(f => {
-                            return (
-                            <option 
-                              value={f.id}>
-                              {f.name}
-                            </option>);
-                          }))
-                        : (<option value="no_forms_found" disabled>
-                          No applicable forms found
-                        </option>)}
+                        <option value="" disabled>
+                          Select a form
+                        </option>
+                        {allForms.length > 0 ? (
+                          allForms.map((f) => {
+                            return <option value={f.id}>{f.name}</option>;
+                          })
+                        ) : (
+                          <option value="no_forms_found" disabled>
+                            No applicable forms found
+                          </option>
+                        )}
                       </select>
                     </div>
 
                     {/* Dependent Question */}
-                    {(selectedConditionType === "answer_question"  || selectedConditionType === "specific_answer") && (<div className="flex flex-col mb-4">
-                      <label
-                        htmlFor="question"
-                        className="mb-1 text-sm font-medium text-gray-900"
-                      >
-                        Question
-                      </label>
-                      <select
-                        name="question"
-                        id="question"
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                    {(selectedConditionType === "answer_question" ||
+                      selectedConditionType === "specific_answer") && (
+                      <div className="flex flex-col mb-4">
+                        <label
+                          htmlFor="question"
+                          className="mb-1 text-sm font-medium text-gray-900"
+                        >
+                          Question
+                        </label>
+                        <select
+                          name="question"
+                          id="question"
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                                   focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500
                                   text-gray-700 bg-white"
-                      >
-                        <option value="no_questions_found" disabled>
-                          No applicable questions found
-                        </option>
-                      </select>
-                    </div>)}
+                        >
+                          <option value="no_questions_found" disabled>
+                            No applicable questions found
+                          </option>
+                        </select>
+                      </div>
+                    )}
 
                     {/* Dependent Answer */}
-                    {selectedConditionType === "specific_answer" && (<div className="flex flex-col mb-4">
-                      <label
-                        htmlFor="answer"
-                        className="mb-1 text-sm font-medium text-gray-900"
-                      >
-                        Answer
-                      </label>
-                      <select
-                        name="answer"
-                        id="answer"
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+                    {selectedConditionType === "specific_answer" && (
+                      <div className="flex flex-col mb-4">
+                        <label
+                          htmlFor="answer"
+                          className="mb-1 text-sm font-medium text-gray-900"
+                        >
+                          Answer
+                        </label>
+                        <select
+                          name="answer"
+                          id="answer"
+                          className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                                   focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500
                                   text-gray-700 bg-white"
-                      >
-                        <option value="no_answers_found" disabled>
-                          No applicable answers found
-                        </option>
-                      </select>
-                    </div>)}
+                        >
+                          <option value="no_answers_found" disabled>
+                            No applicable answers found
+                          </option>
+                        </select>
+                      </div>
+                    )}
                   </div>
                   <div className="p-6 border-t border-gray-200 flex justify-end gap-3 bg-gray-50">
                     <button
