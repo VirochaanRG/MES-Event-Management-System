@@ -5,7 +5,7 @@ import { and, eq, isNull, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
 {
-  // GET all forms
+  // GET all standard forms
   fastify.get('/api/forms', async (request, reply) =>
   {
     try
@@ -13,6 +13,26 @@ export default async function formsRoutes(fastify: FastifyInstance)
       const forms = await db.query.form.findMany({where : 
         isNull(form.moduleId)
       });
+      return reply.send({
+        success: true,
+        data: forms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
+      });
+    }
+  });
+
+  // GET all forms including sub-forms
+  fastify.get('/api/forms/all', async (request, reply) =>
+  {
+    try
+    {
+      const forms = await db.query.form.findMany();
       return reply.send({
         success: true,
         data: forms,
@@ -295,7 +315,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       const updatedForm = await db
         .update(modularForms)
         .set(updateData)
-        .where(eq(modularForms.id, parseInt(id)))
+        .where(eq(form.id, parseInt(id)))
         .returning();
 
       return reply.send({
@@ -366,7 +386,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
         });
       }
 
-      await db.delete(modularForms).where(eq(modularForms.id, parseInt(id)));
+      await db.delete(modularForms).where(eq(form.id, parseInt(id)));
 
       return reply.send({
         success: true,

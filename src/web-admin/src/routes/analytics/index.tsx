@@ -70,7 +70,7 @@ function AnalyticsPageContent() {
 
   const fetchForms = async () => {
     try {
-      const response = await fetch("/api/forms");
+      const response = await fetch("/api/forms/all");
       const data = await response.json();
       if (data.success) {
         setForms(data.data);
