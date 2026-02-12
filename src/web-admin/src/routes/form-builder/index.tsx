@@ -5,6 +5,33 @@ import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 
+type FormStatus = "Private" | "Live" | "Scheduled";
+
+const getFormStatus = (f: Form): FormStatus => {
+  if (!f.isPublic) return "Private";
+
+  const unlockAt = f.unlockAt ? new Date(f.unlockAt) : null;
+  if (unlockAt) {
+    return unlockAt > new Date() ? "Scheduled" : "Live";
+  }
+
+  return "Live";
+};
+
+function StatusPill({ status }: { status: FormStatus }) {
+  const base =
+    "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border";
+
+  const styles: Record<FormStatus, string> = {
+    Private: "bg-gray-50 text-gray-700 border-gray-200",
+    Live: "bg-green-50 text-green-700 border-green-200",
+    Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
+  };
+
+  return <span className={`${base} ${styles[status]}`}>{status}</span>;
+}
+
+
 export const Route = createFileRoute("/form-builder/")({
   component: RouteComponent,
 });
@@ -20,7 +47,7 @@ function RouteComponent() {
   const [isFormModular, setIsFormModular] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
-
+  const [newUnlockAt, setNewUnlockAt] = useState("");
   useEffect(() => {
     const initAuth = () => {
       const sessionUser = getCurrentUser("admin");
@@ -97,6 +124,7 @@ function RouteComponent() {
           name: newFormName.trim(),
           description: newFormDescription.trim() || null,
           isModular: isFormModular,
+          unlockAt: newUnlockAt ? new Date(newUnlockAt).toISOString() : null, // NEW
         }),
       });
 
@@ -110,6 +138,7 @@ function RouteComponent() {
         setNewFormName("");
         setNewFormDescription("");
         setShowModal(false);
+        setNewUnlockAt("");
         // Refresh forms to ensure we have the latest data from the server
         await fetchForms();
       } else {
@@ -224,7 +253,11 @@ function RouteComponent() {
       requiredRole="forms"
       redirectTo="/denied"
     >
-      <AdminLayout user={user} title="Events Management">
+      <AdminLayout
+        user={user}
+        title="Events Management"
+        subtitle="Manage and organize all your events"
+      >
         <main>
           <div className="px-5 py-10 bg-gray-50 rounded-lg mx-5 my-5">
             <button
@@ -281,38 +314,50 @@ function RouteComponent() {
                           <p className="text-gray-600 mb-2">
                             {form.description || "No description"}
                           </p>
-                          <p className="text-sm text-gray-500">
-                            Created:{" "}
-                            {new Date(form.createdAt).toLocaleDateString()}
-                          </p>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <p className="text-sm text-gray-500">
+                              Created: {new Date(form.createdAt).toLocaleDateString()}
+                            </p>
+
+                            <StatusPill status={getFormStatus(form)} />
+
+                            {form.unlockAt && (
+                              <p className="text-sm text-gray-500">
+                                Unlocks: {new Date(form.unlockAt).toLocaleString()}
+                              </p>
+                            )}
+                          </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <div
                             onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-3"
                           >
-                            <button
-                              onClick={() => handleToggleVisibility(form)}
-                              className={`
-                                relative inline-flex h-6 w-11 items-center rounded-full
-                                transition-colors
-                                ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}
-                              `}
-                            >
-                              <span
-                                className={`
-                                  inline-block h-4 w-4 transform rounded-full bg-white
-                                  transition-transform
-                                  ${form.isPublic ? "translate-x-6" : "translate-x-1"}
-                                `}
-                              />
-                            </button>
+                            {!form.unlockAt && (
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleToggleVisibility(form)}
+                                  className={`
+                                    relative inline-flex h-6 w-11 items-center rounded-full
+                                    transition-colors
+                                    ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}
+                                  `}
+                                >
+                                  <span
+                                    className={`
+                                      inline-block h-4 w-4 transform rounded-full bg-white
+                                      transition-transform
+                                      ${form.isPublic ? "translate-x-6" : "translate-x-1"}
+                                    `}
+                                  />
+                                </button>
 
-                            <span className="text-sm text-gray-700">
-                              {form.isPublic ? "Public" : "Private"}
-                            </span>
+                                <span className="text-sm text-gray-700">
+                                  {form.isPublic ? "Public" : "Private"}
+                                </span>
+                              </div>
+                            )}
                           </div>
-
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -379,6 +424,21 @@ function RouteComponent() {
                         className="h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
                       />
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Unlock date (optional)
+                      </label>
+                      <input
+                        type="datetime-local"
+                        value={newUnlockAt}
+                        onChange={(e) => setNewUnlockAt(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        If set, the form won’t be available to users until this date (when Public is enabled).
+                      </p>
+                    </div>
                   </div>
 
                   <div className="flex gap-3 mt-6">
@@ -387,6 +447,7 @@ function RouteComponent() {
                         setShowModal(false);
                         setNewFormName("");
                         setNewFormDescription("");
+                        setNewUnlockAt("");
                       }}
                       disabled={submitting}
                       className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors font-semibold disabled:opacity-50"

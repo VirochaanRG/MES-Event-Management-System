@@ -231,7 +231,9 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       {
         updateData.enablingAnswers = enablingAnswers;
       }
-      updateData.required = required;
+      if (required !== undefined) {
+        updateData.required = required;
+      }
 
       if (Object.keys(updateData).length === 0)
       {
