@@ -6,36 +6,45 @@ import { and, eq, isNull, notInArray, sql } from 'drizzle-orm';
 export default async function formsRoutes(fastify: FastifyInstance)
 {
 
-  const assertPublicForm = async (fid: string, reply: any) => {
+  const assertPublicForm = async (fid: string, reply: any) =>
+  {
     const f = await db.query.form.findFirst({
-      where: and(eq(form.id, parseInt(fid)), eq(form.isPublic, true)),
+      where: and(
+        eq(form.id, parseInt(fid)),
+        eq(form.isPublic, true),
+        sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
+      ),
     });
-    if (!f) {
+    if (!f)
+    {
       reply.code(404).send({ success: false, error: "Survey not found" });
       return null;
     }
     return f;
   };
 
-  const checkConditionsMet = async (uid, fid) => {
+  const checkConditionsMet = async (uid, fid) =>
+  {
     const conditions = await db.query.formConditions.findMany({
       where: eq(formConditions.formId, parseInt(fid)),
     });
     if (conditions.length === 0) return true;
 
     const results = await Promise.all(
-      conditions.map(async (c) => {
-        if (c.conditionType === 'complete_form') {
+      conditions.map(async (c) =>
+      {
+        if (c.conditionType === 'complete_form')
+        {
           const submission = await db.query.formSubmissions.findFirst({
             where: and(
               eq(formSubmissions.userId, uid),
               eq(formSubmissions.formId, c.dependentFormId)
             ),
           });
-          return !!submission; 
+          return !!submission;
         }
         // TODO: handle other condition types
-        return true; 
+        return true;
       })
     );
     return results.every(Boolean);
@@ -46,7 +55,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const allForms = await db.query.form.findMany({
-        where: eq(form.isPublic, true)
+        where: and(
+          eq(form.isPublic, true),
+          sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
+        )
       });
 
       return reply.send({
@@ -87,6 +99,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
           .from(form)
           .where(and(
             eq(form.isPublic, true),
+            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
             and(
               notInArray(form.id, submittedIds),
               isNull(form.moduleId))));
@@ -98,6 +111,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
           .from(form)
           .where(and(
             eq(form.isPublic, true),
+            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
             isNull(form.moduleId)));
       }
 
@@ -125,19 +139,20 @@ export default async function formsRoutes(fastify: FastifyInstance)
       const { uid } = request.params;
       const allForms = await db
         .select({
-            id: form.id,
-            name: form.name,
-            description: form.description,
-            createdAt: form.createdAt,
-            isPublic: form.isPublic,
-            moduleId: form.moduleId
-          })
+          id: form.id,
+          name: form.name,
+          description: form.description,
+          createdAt: form.createdAt,
+          isPublic: form.isPublic,
+          moduleId: form.moduleId
+        })
         .from(form)
         .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
         .where(and(
           eq(formSubmissions.userId, uid),
           and(
             eq(form.isPublic, true),
+            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
             isNull(form.moduleId))));
 
       console.log('FILLED: ', allForms);
@@ -188,7 +203,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { fid } = request.params;
-      
+
       const publicForm = await assertPublicForm(fid, reply);
       if (!publicForm) return;
 
@@ -205,7 +220,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
-  
+
   // GET single modular form by ID
   fastify.get<{ Params: { fid: string } }>('/api/mod-forms/:fid', async (request, reply) =>
   {
@@ -213,9 +228,11 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { fid } = request.params;
       const form = await db.query.modularForms.findFirst(
-        {where: and(
-          eq(modularForms.isPublic, true), 
-          eq(modularForms.id, parseInt(fid)))}
+        {
+          where: and(
+            eq(modularForms.isPublic, true),
+            eq(modularForms.id, parseInt(fid)))
+        }
       );
       return reply.send({
         success: true,
@@ -255,11 +272,11 @@ export default async function formsRoutes(fastify: FastifyInstance)
           .from(form)
           .where(and(
             eq(form.isPublic, true),
+            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
             and(
               notInArray(form.id, submittedIds),
-              and(
-                eq(form.moduleId, parseInt(mid),
-          )))));
+              eq(form.moduleId, parseInt(mid))
+            )));
       } else
       {
         // If no submissions, return all forms
@@ -268,11 +285,13 @@ export default async function formsRoutes(fastify: FastifyInstance)
           .from(form)
           .where(and(
             eq(form.isPublic, true),
+            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
             eq(form.moduleId, parseInt(mid))));
       }
 
       const formsToReturn = await Promise.all(
-        allForms.map(async (f) => {
+        allForms.map(async (f) =>
+        {
           const met = await checkConditionsMet(uid, f.id);
           return met ? f : null;
         })
@@ -291,7 +310,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
-  
+
   //GET filled forms for user and modular form
   fastify.get<{ Params: { mid: string, uid: string } }>('/api/mod-forms/:mid/completed/:uid', async (request, reply) =>
   {
@@ -300,12 +319,12 @@ export default async function formsRoutes(fastify: FastifyInstance)
       const { mid, uid } = request.params;
       const allForms = await db
         .select({
-            id: form.id,
-            name: form.name,
-            description: form.description,
-            createdAt: form.createdAt,
-            isPublic: form.isPublic
-          })
+          id: form.id,
+          name: form.name,
+          description: form.description,
+          createdAt: form.createdAt,
+          isPublic: form.isPublic
+        })
         .from(modularForms)
         .innerJoin(form, eq(form.moduleId, modularForms.id))
         .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
@@ -313,6 +332,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
           eq(formSubmissions.userId, uid),
           and(
             eq(form.isPublic, true),
+            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
             eq(modularForms.id, parseInt(mid))
           )));
 
@@ -443,7 +463,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       try
       {
         const { fid, uid } = request.params;
-        
+
         const publicForm = await assertPublicForm(fid, reply);
         if (!publicForm) return;
 
