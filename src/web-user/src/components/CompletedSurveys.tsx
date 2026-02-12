@@ -15,10 +15,17 @@ export default function CompletedSurveys() {
   } = useQuery({
     queryKey: ["completedSurveys", userId],
     queryFn: async () => {
-      const response = await fetch(`/api/forms/completed/${userId}`);
-      if (!response.ok) throw new Error("Failed to fetch surveys");
-      const json = await response.json();
-      return json.data;
+      const formsResponse = await fetch(`/api/forms/completed/${userId}`);
+      const modFormsResponse = await fetch(`/api/mod-forms/completed/${userId}`);
+      
+      if (!formsResponse.ok || !modFormsResponse.ok) {
+        throw new Error("Failed to fetch surveys");
+      }
+      
+      const formsJson = await formsResponse.json();
+      const modFormsJson = await modFormsResponse.json();
+      
+      return formsJson.data.concat(modFormsJson.data || []);
     },
   });
 
@@ -32,8 +39,16 @@ export default function CompletedSurveys() {
     });
   };
 
-  const handleSurveyClick = (formId: number) => {
-    navigate({ to: `/surveys/${formId}` });
+  const checkFormIsModular = (form: Form) => {
+    return form.moduleId === undefined;
+  };
+
+  const handleSurveyClick = (form: Form) => {
+    if (checkFormIsModular(form)) {
+      navigate({ to: `/surveys/modular-form/${form.id}` });
+    } else {
+      navigate({ to: `/surveys/${form.id}` });
+    }
   };
 
   if (isLoading) {
@@ -57,7 +72,7 @@ export default function CompletedSurveys() {
       {(formData as Form[]).map((form) => (
         <div
           key={form.id}
-          onClick={() => handleSurveyClick(form.id)}
+          onClick={() => handleSurveyClick(form)}
           className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 cursor-pointer hover:border-yellow-500"
         >
           {/* Event Image */}
