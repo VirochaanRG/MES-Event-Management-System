@@ -5,17 +5,18 @@ import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 
-type FormStatus = "Private" | "Public" | "Live" | "Scheduled";
+type FormStatus = "Private" | "Live" | "Scheduled";
 
 const getFormStatus = (f: Form): FormStatus => {
+  if (!f.isPublic) return "Private";
+
   const unlockAt = f.unlockAt ? new Date(f.unlockAt) : null;
   if (unlockAt) {
     return unlockAt > new Date() ? "Scheduled" : "Live";
   }
-  return f.isPublic ? "Public" : "Private";
+
+  return "Live";
 };
-
-
 
 function StatusPill({ status }: { status: FormStatus }) {
   const base =
@@ -23,7 +24,6 @@ function StatusPill({ status }: { status: FormStatus }) {
 
   const styles: Record<FormStatus, string> = {
     Private: "bg-gray-50 text-gray-700 border-gray-200",
-    Public: "bg-green-50 text-green-700 border-green-200",
     Live: "bg-green-50 text-green-700 border-green-200",
     Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
   };
@@ -253,7 +253,11 @@ function RouteComponent() {
       requiredRole="forms"
       redirectTo="/denied"
     >
-      <AdminLayout user={user} title="Events Management">
+      <AdminLayout
+        user={user}
+        title="Events Management"
+        subtitle="Manage and organize all your events"
+      >
         <main>
           <div className="px-5 py-10 bg-gray-50 rounded-lg mx-5 my-5">
             <button
