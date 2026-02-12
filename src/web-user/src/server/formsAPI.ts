@@ -1,21 +1,45 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
-import { form, formAnswers, formQuestions, formSubmissions, modularForms } from './../../../db/src/schemas/form';
+import { form, formAnswers, formConditions, formQuestions, formSubmissions, modularForms } from './../../../db/src/schemas/form';
 import { and, eq, isNull, notInArray, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
 {
 
   const assertPublicForm = async (fid: string, reply: any) => {
-  const f = await db.query.form.findFirst({
-    where: and(eq(form.id, parseInt(fid)), eq(form.isPublic, true)),
-  });
-  if (!f) {
-    reply.code(404).send({ success: false, error: "Survey not found" });
-    return null;
-  }
-  return f;
+    const f = await db.query.form.findFirst({
+      where: and(eq(form.id, parseInt(fid)), eq(form.isPublic, true)),
+    });
+    if (!f) {
+      reply.code(404).send({ success: false, error: "Survey not found" });
+      return null;
+    }
+    return f;
   };
+
+  const checkConditionsMet = async (uid, fid) => {
+    const conditions = await db.query.formConditions.findMany({
+      where: eq(formConditions.formId, parseInt(fid)),
+    });
+    if (conditions.length === 0) return true;
+
+    const results = await Promise.all(
+      conditions.map(async (c) => {
+        if (c.conditionType === 'complete_form') {
+          const submission = await db.query.formSubmissions.findFirst({
+            where: and(
+              eq(formSubmissions.userId, uid),
+              eq(formSubmissions.formId, c.dependentFormId)
+            ),
+          });
+          return !!submission; 
+        }
+        // TODO: handle other condition types
+        return true; 
+      })
+    );
+    return results.every(Boolean);
+  }
 
   fastify.get('/api/forms', async (request, reply) =>
   {
@@ -233,7 +257,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
             eq(form.isPublic, true),
             and(
               notInArray(form.id, submittedIds),
-              eq(form.moduleId, parseInt(mid)))));
+              and(
+                eq(form.moduleId, parseInt(mid),
+          )))));
       } else
       {
         // If no submissions, return all forms
@@ -245,11 +271,16 @@ export default async function formsRoutes(fastify: FastifyInstance)
             eq(form.moduleId, parseInt(mid))));
       }
 
-      console.log('UNFILLED: ', allForms);
+      const formsToReturn = await Promise.all(
+        allForms.map(async (f) => {
+          const met = await checkConditionsMet(uid, f.id);
+          return met ? f : null;
+        })
+      );
 
       return reply.send({
         success: true,
-        data: allForms,
+        data: formsToReturn.filter(Boolean)
       });
     } catch (error)
     {
