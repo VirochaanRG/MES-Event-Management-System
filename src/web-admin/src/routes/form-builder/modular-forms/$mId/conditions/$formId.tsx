@@ -392,7 +392,7 @@ function RouteComponent() {
                 >
                   <div className="p-6 border-b border-gray-200">
                     <h3 className="text-xl font-semibold text-gray-900">
-                      TODO: TITLE OF MODAL
+                      {editingCondition ? "Editing condition" : "Add a condition"}
                     </h3>
                     <p className="text-sm text-gray-500 mt-1">
                       {selectedConditionType.replace("_", " ")}
