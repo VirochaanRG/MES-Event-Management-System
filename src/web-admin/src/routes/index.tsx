@@ -118,11 +118,7 @@ function TeamBDashboard() {
   };
 
   return (
-    <AdminLayout
-      user={user}
-      title="Dashboard"
-      subtitle={`Welcome back, ${user.email?.split("@")[0]}`}
-    >
+    <AdminLayout user={user} title="Dashboard">
       <div className="p-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

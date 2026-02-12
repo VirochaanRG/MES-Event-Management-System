@@ -216,11 +216,7 @@ function UsersPageContent() {
       requiredRole="users"
       redirectTo="/denied"
     >
-      <AdminLayout
-        user={currentUser}
-        title="Users Management"
-        subtitle="Manage users and their roles"
-      >
+      <AdminLayout user={currentUser} title="Users Management">
         <div className="p-6">
           {/* Actions Bar */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">

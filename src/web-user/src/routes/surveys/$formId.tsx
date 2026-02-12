@@ -121,7 +121,7 @@ function RouteComponent() {
             onClick={handleBack}
             className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
           >
-            Back to surveys
+          {form?.moduleId ? "Back to modules" : "Back to Surveys"}
           </button>
         </div>
       </div>

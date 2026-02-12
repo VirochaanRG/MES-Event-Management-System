@@ -7,6 +7,7 @@ export interface Form
   createdAt: string;
   isPublic: boolean;
   moduleId: number;
+  unlockAt: string;
 }
 
 export interface FormQuestion

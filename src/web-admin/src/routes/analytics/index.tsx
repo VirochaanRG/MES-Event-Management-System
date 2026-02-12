@@ -70,7 +70,7 @@ function AnalyticsPageContent() {
 
   const fetchForms = async () => {
     try {
-      const response = await fetch("/api/forms");
+      const response = await fetch("/api/forms/all");
       const data = await response.json();
       if (data.success) {
         setForms(data.data);
@@ -178,13 +178,9 @@ function AnalyticsPageContent() {
     <RequireRole
       userRoles={currentUser.roles}
       requiredRole="analytics"
-      redirectTo="/"
+      redirectTo="/denied"
     >
-      <AdminLayout
-        user={currentUser}
-        title="Form Analytics"
-        subtitle="View and analyze form submissions and responses"
-      >
+      <AdminLayout user={currentUser} title="Form Analytics">
         <div className="p-6">
           {/* Overview Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

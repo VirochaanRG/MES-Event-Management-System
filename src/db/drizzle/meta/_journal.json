@@ -15,6 +15,13 @@
       "when": 1770710059141,
       "tag": "0001_black_meteorite",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770779139202,
+      "tag": "0002_jittery_newton_destine",
+      "breakpoints": true
     }
   ]
 }
