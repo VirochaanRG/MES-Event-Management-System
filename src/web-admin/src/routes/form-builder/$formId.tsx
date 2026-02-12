@@ -464,9 +464,13 @@ function RouteComponent() {
       alert("Failed to save question: " + err.message);
     }
   };
-
-  const handleBackToForms = () => {
-    navigate({ to: "/form-builder" });
+  
+  const handleBack = () => {
+    if(formData?.moduleId) {
+      navigate({ to: `/form-builder/modular-forms/${formData.moduleId}` });
+    } else {
+      navigate({ to: "/form-builder" });
+    }
   };
 
   if (loading) {
@@ -496,7 +500,7 @@ function RouteComponent() {
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back Button */}
         <button
-          onClick={handleBackToForms}
+          onClick={handleBack}
           className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
         >
           <svg
@@ -512,7 +516,7 @@ function RouteComponent() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          Back to Forms
+          {formData?.moduleId ? "Back to modules" : "Back to Forms"}
         </button>
 
         {/* Outer Form Border */}

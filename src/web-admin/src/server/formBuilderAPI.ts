@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
-import { form, formAnswers, formQuestions } from './../../../db/src/schemas/form';
+import { form, formAnswers, formConditions, formQuestions } from './../../../db/src/schemas/form';
 import { and, eq, sql } from 'drizzle-orm';
 
 
@@ -446,4 +446,276 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       }
     }
   );
+
+  // CREATE a form condition
+  fastify.post<{
+    Params: { id: string };
+    Body: { conditionType: string; dependentFormId: string; dependentQuestionId?: string; dependentAnswerIdx?: number};
+  }>('/api/forms/:id/conditions', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+      const { conditionType, dependentFormId, dependentQuestionId, dependentAnswerIdx} = request.body;
+
+      if (!conditionType || conditionType.trim() === '')
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Condition type is required',
+        });
+      }
+
+      if (!dependentFormId)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Dependant form is required',
+        });
+      }
+
+      const existingForm = await db.query.form.findFirst({
+        where: eq(form.id, parseInt(id)),
+      });
+
+      const dependentForm = await db.query.form.findFirst({
+        where: eq(form.id, parseInt(dependentFormId)),
+      });
+
+      console.log(existingForm);
+      console.log(dependentForm);
+
+      if (!existingForm)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      if (!dependentForm)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Dependent form not found',
+        });
+      }
+
+      const conditionTypes = ['complete_form', 'answer_question', 'specific_answer'];
+
+      if(!conditionTypes.includes(conditionType))
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Invalid condition type',
+        });
+      }
+
+      const newCondition = await db
+        .insert(formConditions)
+        .values({
+          formId: parseInt(id),
+          dependentFormId: parseInt(dependentFormId),
+          conditionType: conditionType,
+          dependentQuestionId : dependentQuestionId ? parseInt(dependentQuestionId) : null,
+          dependentAnswerIdx : dependentAnswerIdx ?? null
+        })
+        .returning();
+
+      return reply.code(201).send({
+        success: true,
+        data: newCondition[0],
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to create form condition');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to create form condition',
+      });
+    }
+  });
+
+  
+
+  // UPDATE a form condition
+  fastify.put<{
+    Params: { fid: string , cid: string};
+    Body: { dependentFormId: string; dependentQuestionId?: string; dependentAnswerIdx?: number};
+  }>('/api/forms/:fid/conditions/:cid', async (request, reply) =>
+  {
+    try
+    {
+      const { fid, cid } = request.params;
+      const {dependentFormId, dependentQuestionId, dependentAnswerIdx} = request.body;
+
+      if (!dependentFormId)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Dependant form is required',
+        });
+      }
+
+      const existingForm = await db.query.form.findFirst({
+        where: eq(form.id, parseInt(fid)),
+      });
+
+      const dependentForm = await db.query.form.findFirst({
+        where: eq(form.id, parseInt(dependentFormId)),
+      });
+
+      if (!existingForm || !dependentForm)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      const existingCondition = await db.query.formConditions.findFirst({
+        where: eq(formConditions.id, parseInt(cid)),
+      }); 
+
+      if (!existingCondition)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form condition not found',
+        });
+      }
+
+      const updateData: Record<string, any> = {};
+
+      if (dependentFormId)
+      {
+        updateData.dependentFormId = parseInt(dependentFormId);
+      }
+      if (dependentQuestionId)
+      {
+        updateData.dependentQuestionId = parseInt(dependentQuestionId);
+      }
+      if (dependentAnswerIdx)
+      {
+        updateData.dependentAnswerIdx = dependentAnswerIdx;
+      }
+
+      if (Object.keys(updateData).length === 0)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'No fields to update',
+        });
+      }
+
+      const updatedCondition = await db
+        .update(formConditions)
+        .set(updateData)
+        .where(eq(formConditions.id, parseInt(cid)))
+        .returning();
+
+      return reply.send({
+        success: true,
+        data: updatedCondition[0],
+        message: 'Question updated successfully',
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to edit form condition');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to edit form condition',
+      });
+    }
+  });
+
+  // DELETE a form condition
+  fastify.delete<{ Params: { fid: string; cid: string } }>(
+    '/api/forms/:fid/conditions/:cid',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { fid, cid } = request.params;
+
+        const existingForm = await db.query.form.findFirst({
+          where: eq(form.id, parseInt(fid)),
+        });
+
+        if (!existingForm)
+        {
+          return reply.code(404).send({
+            success: false,
+            error: 'Form not found',
+          });
+        }
+
+        const existingCondition = await db.query.formConditions.findFirst({
+          where: and(
+            eq(formConditions.id, parseInt(cid)),
+            eq(formConditions.formId, parseInt(fid))
+          ),
+        });
+
+        if (!existingCondition)
+        {
+          return reply.code(404).send({
+            success: false,
+            error: 'Condition not found',
+          });
+        }
+
+        await db.delete(formConditions).where(eq(formConditions.id, parseInt(cid)));
+
+        return reply.send({
+          success: true,
+          message: 'Condition deleted successfully',
+        });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Failed to delete condition');
+        return reply.code(500).send({
+          success: false,
+          error: 'Failed to delete condition',
+        });
+      }
+    }
+  );
+
+  // GET all conditions for a form
+  fastify.get<{ Params: { id: string } }>('/api/forms/:id/conditions', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+
+      const existingForm = await db.query.form.findFirst({
+        where: eq(form.id, parseInt(id)),
+      });
+
+      if (!existingForm)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      const conditions = await db.query.formConditions.findMany({
+        where: eq(formConditions.formId, parseInt(id))
+      });
+
+      return reply.send({
+        success: true,
+        data: conditions,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch questions');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch questions',
+      });
+    }
+  });
 }
