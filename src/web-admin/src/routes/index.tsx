@@ -74,7 +74,7 @@ function TeamBDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-900 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading admin dashboard...</p>
         </div>
       </div>
@@ -126,27 +126,27 @@ function TeamBDashboard() {
             title="Total Events"
             value={stats?.totalEvents ?? 0}
             icon={Calendar}
-            bgColor="bg-red-600"
+            bgColor="bg-red-900"
           />
 
           <StatCard
             title="Total Users"
             value={stats?.totalUsers ?? 0}
             icon={Users}
-            bgColor="bg-yellow-600"
+            bgColor="bg-yellow-500"
           />
 
           <StatCard
             title="Form Responses"
             value={stats?.totalFormResponses ?? 0}
             icon={FileText}
-            bgColor="bg-red-600"
+            bgColor="bg-red-900"
           />
         </div>
 
         {/* Home Page Management Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-red-600">
+          <h2 className="text-xl font-bold text-red-900 mb-4 pb-3 border-b-2 border-red-900">
             Home Page Management
           </h2>
           <HomePageManagement />
@@ -154,7 +154,7 @@ function TeamBDashboard() {
 
         {/* Recent Activity Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-red-600">
+          <h2 className="text-xl font-bold text-red-900 mb-4 pb-3 border-b-2 border-red-900">
             Recent Activity
           </h2>
           <EventsTab />
@@ -162,7 +162,7 @@ function TeamBDashboard() {
 
         {/* Analytics Overview Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 pb-3 border-b-2 border-yellow-500">
+          <h2 className="text-xl font-bold text-red-900 mb-4 pb-3 border-b-2 border-yellow-500">
             Analytics Overview
           </h2>
           <ReportsTab />

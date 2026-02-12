@@ -164,7 +164,7 @@ export default function HomePageManagement() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-red-900">
             Component Images
           </h3>
           <p className="text-sm text-gray-600 mt-1">
@@ -174,13 +174,13 @@ export default function HomePageManagement() {
 
         {/* Component Selector */}
         <div className="flex items-center gap-3">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-red-900">
             Component:
           </label>
           <select
             value={selectedComponent}
             onChange={(e) => setSelectedComponent(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
           >
             {COMPONENTS.map((component) => (
               <option key={component.value} value={component.value}>
@@ -198,7 +198,7 @@ export default function HomePageManagement() {
           <div className="mt-4">
             <label
               htmlFor="file-upload"
-              className="relative cursor-pointer bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors inline-block"
+              className="relative cursor-pointer bg-red-900 text-white px-6 py-2 rounded-lg hover:bg-red-950 transition-colors inline-block"
             >
               <span>{uploading ? "Uploading..." : "Upload Image"}</span>
               <input
@@ -217,13 +217,13 @@ export default function HomePageManagement() {
 
       {/* Images Grid */}
       <div>
-        <h4 className="text-md font-semibold text-gray-900 mb-4">
+        <h4 className="text-md font-semibold text-red-900 mb-4">
           Existing Images ({images.length})
         </h4>
 
         {loading ? (
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-900 mx-auto"></div>
             <p className="text-gray-600 mt-2">Loading images...</p>
           </div>
         ) : images.length === 0 ? (
@@ -273,7 +273,7 @@ export default function HomePageManagement() {
                     </button>
                     <button
                       onClick={() => handleDeleteImage(image.id)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-sm"
+                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-900 rounded hover:bg-red-100 transition-colors text-sm"
                     >
                       <Trash2 className="w-4 h-4" />
                       Delete
@@ -297,7 +297,7 @@ export default function HomePageManagement() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-red-900">
                 {previewFileName}
               </h3>
               <button

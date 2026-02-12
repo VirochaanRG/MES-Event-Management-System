@@ -228,7 +228,7 @@ function UsersPageContent() {
                   placeholder="Search users by email or role..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
                 />
               </div>
 
@@ -265,7 +265,7 @@ function UsersPageContent() {
             </div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
               <p className="text-sm text-gray-600">Admin Users</p>
-              <p className="text-2xl font-bold text-red-600">
+              <p className="text-2xl font-bold text-red-900">
                 {users.filter((u) => u.roles.includes("admin")).length}
               </p>
             </div>
@@ -418,7 +418,7 @@ function UsersPageContent() {
                         onClick={() => toggleRole(role, false)}
                         className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
                           editRolesData.includes(role)
-                            ? "bg-red-600 text-white"
+                            ? "bg-red-900 text-white"
                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                         }`}
                       >
@@ -431,7 +431,7 @@ function UsersPageContent() {
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={handleUpdateRoles}
-                    className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors"
+                    className="flex-1 px-4 py-2 bg-red-900 hover:bg-red-950 text-white font-semibold rounded-lg transition-colors"
                   >
                     Update Roles
                   </button>

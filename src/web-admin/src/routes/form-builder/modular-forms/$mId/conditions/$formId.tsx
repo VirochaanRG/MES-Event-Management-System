@@ -239,7 +239,7 @@ function RouteComponent() {
     return <div className="text-center py-12">Loading conditions...</div>;
   if (error || !form)
     return (
-      <div className="text-center py-12 text-red-600">
+      <div className="text-center py-12 text-red-900">
         {error || "Form not found"}
       </div>
     );
@@ -362,7 +362,7 @@ function RouteComponent() {
                       {/* Delete Button */}
                       <button
                         onClick={() => handleDeleteCondition(condition.id)}
-                        className="p-1.5 bg-white border border-gray-300 text-red-600 rounded hover:bg-red-50"
+                        className="p-1.5 bg-white border border-gray-300 text-red-900 rounded hover:bg-red-50"
                         title="Delete"
                       >
                         <svg

@@ -27,6 +27,13 @@ export default function LocalLoginForm({
     setIsLoading(true);
     setError("");
 
+    // Validate McMaster email for registration
+    if (!isLogin && !email.trim().endsWith("@mcmaster.ca")) {
+      setError("Please use a McMaster University email address (@mcmaster.ca) to register.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
       const response = await fetch(endpoint, {
@@ -79,10 +86,10 @@ export default function LocalLoginForm({
 
           <div className="relative z-10">
             <h2 className="text-3xl font-bold leading-tight">
-              {isLogin ? "MES Events" : "Join the MES Community."}
+              {isLogin ? "MES Events" : "Join the McMaster Engineering Community."}
             </h2>
             <p className="mt-4 text-yellow-300/70 font-medium">
-              Access the latest MES events, mixers, and technical seminars.
+              Access the latest MES events and find out what we're up to!
             </p>
           </div>
         </div>
@@ -120,6 +127,15 @@ export default function LocalLoginForm({
                       className="w-full px-6 py-4 bg-gray-50 rounded-xl border-2 border-transparent focus:border-red-900 focus:bg-white outline-none transition-all text-gray-900 font-bold"
                       required
                     />
+                    {!isLogin && (
+                      <p className="text-[10px] text-gray-500 mt-2 ml-1">
+                        {email && !email.endsWith("@mcmaster.ca")
+                          ? "❌ Must use a @mcmaster.ca email"
+                          : email
+                            ? "✓ Valid McMaster email"
+                            : "Only McMaster University emails allowed"}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2 ml-1">

@@ -555,7 +555,7 @@ function RouteComponent() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg text-red-600">Error: {error}</div>
+        <div className="text-lg text-red-900">Error: {error}</div>
       </div>
     );
   }
@@ -909,7 +909,7 @@ function RouteComponent() {
                       </button>
                       <button
                         onClick={() => handleDeleteQuestion(question.id)}
-                        className="p-1.5 bg-white border border-gray-300 text-red-600 rounded hover:bg-red-50"
+                        className="p-1.5 bg-white border border-gray-300 text-red-900 rounded hover:bg-red-50"
                         title="Delete"
                       >
                         <svg
@@ -1096,7 +1096,7 @@ function RouteComponent() {
                         {mcChoices.length > 2 && (
                           <button
                             onClick={() => removeMcChoice(index)}
-                            className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+                            className="px-3 py-2 text-sm text-red-900 hover:bg-red-50 rounded-md"
                           >
                             Remove
                           </button>
@@ -1220,7 +1220,7 @@ function RouteComponent() {
                         {mcChoices.length > 2 && (
                           <button
                             onClick={() => removeMcChoice(index)}
-                            className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+                            className="px-3 py-2 text-sm text-red-900 hover:bg-red-50 rounded-md"
                           >
                             Remove
                           </button>

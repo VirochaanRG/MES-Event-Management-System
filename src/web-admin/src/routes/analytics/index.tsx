@@ -194,8 +194,8 @@ function AnalyticsPageContent() {
                     {forms.length}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-red-600" />
+                <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-red-900" />
                 </div>
               </div>
             </div>
@@ -228,8 +228,8 @@ function AnalyticsPageContent() {
                       : 0}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-red-600" />
+                <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-red-900" />
                 </div>
               </div>
             </div>
@@ -244,7 +244,7 @@ function AnalyticsPageContent() {
                 placeholder="Search forms by name or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
               />
             </div>
           </div>
@@ -262,7 +262,7 @@ function AnalyticsPageContent() {
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors mb-1">
+                        <h3 className="text-lg font-bold text-gray-900 group-hover:text-red-900 transition-colors mb-1">
                           {form.name}
                         </h3>
                         {form.description && (
@@ -272,7 +272,7 @@ function AnalyticsPageContent() {
                         )}
                       </div>
                       <div className="ml-4">
-                        <Eye className="w-5 h-5 text-gray-400 group-hover:text-red-600 transition-colors" />
+                        <Eye className="w-5 h-5 text-gray-400 group-hover:text-red-900 transition-colors" />
                       </div>
                     </div>
 
@@ -312,7 +312,7 @@ function AnalyticsPageContent() {
                   <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">View Analytics</span>
-                      <BarChart3 className="w-4 h-4 text-red-600" />
+                      <BarChart3 className="w-4 h-4 text-red-900" />
                     </div>
                   </div>
                 </Link>
@@ -334,7 +334,7 @@ function AnalyticsPageContent() {
               {!searchTerm && (
                 <Link
                   to="/form-builder"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-red-900 hover:bg-red-950 text-white font-semibold rounded-lg transition-colors"
                 >
                   <FileText className="w-4 h-4" />
                   Create Form

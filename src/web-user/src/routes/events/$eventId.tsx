@@ -179,6 +179,17 @@ function RouteComponent() {
         }
       }
 
+      // Validate email fields
+      const isEmailField = question.questionTitle?.toLowerCase().includes("email");
+      if (isEmailField && formAnswers[question.qorder.toString()]) {
+        const emailValue = formAnswers[question.qorder.toString()];
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailValue)) {
+          toast.error(`${question.questionTitle}: Please enter a valid email address`);
+          return false;
+        }
+      }
+
       // Validate multi-select min/max
       if (
         question.questionType === "multi_select" &&
@@ -264,6 +275,7 @@ function RouteComponent() {
 
     switch (question.questionType) {
       case "text_answer":
+        const isEmailField = question.questionTitle?.toLowerCase().includes("email");
         return (
           <div key={questionKey} className="mb-6">
             <label className="block text-sm font-semibold text-gray-800 mb-2">
@@ -275,10 +287,19 @@ function RouteComponent() {
             <textarea
               value={formAnswers[questionKey] || ""}
               onChange={(e) => handleInputChange(questionKey, e.target.value)}
-              placeholder="Enter your answer..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none transition-all"
-              rows={3}
+              placeholder={isEmailField ? "Enter your email address..." : "Enter your answer..."}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none transition-all"
+              rows={1}
             />
+            {isEmailField && formAnswers[questionKey] && (
+              <div className="text-xs mt-1">
+                {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formAnswers[questionKey]) ? (
+                  <span className="text-green-600 font-medium">✓ Valid email</span>
+                ) : (
+                  <span className="text-red-600 font-medium">❌ Invalid email format</span>
+                )}
+              </div>
+            )}
           </div>
         );
 
@@ -450,13 +471,13 @@ function RouteComponent() {
                 {event.title}
               </h1>
               <div className="flex items-center gap-3 flex-wrap">
-                <span
+                {/* <span
                   className={`px-4 py-1.5 rounded-full text-sm font-semibold ${getStatusColor(
                     event.status,
                   )}`}
                 >
                   {event.status.toUpperCase()}
-                </span>
+                </span> */}
                 {event.isPublic ? (
                   <span className="px-4 py-1.5 rounded-full text-sm font-semibold bg-green-50 text-green-700 border border-green-200">
                     PUBLIC EVENT

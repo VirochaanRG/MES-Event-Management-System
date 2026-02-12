@@ -55,102 +55,90 @@ export default function LocalLoginForm({
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#800020]/10 to-[#D4AF37]/10 p-6">
-      <div className="gap-8 w-3/4 max-w-5xl">
-        {/* Login Panel */}
-        <div className="md:col-span-2 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
-          <h2 className="text-[#800020] mb-5 text-3xl text-center font-bold tracking-tight">
-            Admin Portal - Login
-          </h2>
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-0">
+      <div className="w-full max-w-md">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Admin Portal
+          </h1>
+          <p className="text-gray-400 text-sm">
+            Sign in to manage events and users
+          </p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Login Card */}
+        <div className="bg-gray-800/50 backdrop-blur-sm border-0 rounded-2xl p-8 shadow-2xl">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Field */}
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-semibold text-gray-300 mb-3"
               >
                 Email Address
               </label>
               <input
                 id="email"
                 type="email"
-                placeholder="Enter your admin email"
+                placeholder="admin@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               />
             </div>
 
+            {/* Password Field */}
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-semibold text-gray-300 mb-3"
               >
                 Password
               </label>
               <input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-[#800020] text-white rounded-lg text-sm font-semibold hover:bg-[#660018] disabled:cursor-not-allowed disabled:opacity-50 transition-colors shadow-md"
-            >
-              {loading ? "Logging in..." : "Login to Admin Portal"}
-            </button>
-
+            {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm font-medium">
                 {error}
               </div>
             )}
+
+            {/* Sign In Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-[#800020] to-[#600018] text-white rounded-lg text-sm font-semibold hover:from-[#900024] hover:to-[#700020] disabled:cursor-not-allowed disabled:opacity-50 disabled:from-[#800020] disabled:to-[#600018] transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <span className="inline-block animate-spin mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                  Signing in...
+                </span>
+              ) : (
+                "Sign In"
+              )}
+            </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center">
-              <strong>Note:</strong> Only users with admin role can access this
-              portal.
+          {/* Footer Info */}
+          <div className="mt-8 pt-6 border-t border-gray-700">
+            <p className="text-xs text-gray-400 text-center">
+              Only users with admin privileges can access this portal.
             </p>
           </div>
         </div>
-
-        {/* Quick Login Panel
-        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 h-fit">
-          <h3 className="text-gray-700 font-semibold text-md mb-4 text-center">
-            Test Admin Accounts
-          </h3>
-
-          <div className="flex flex-col gap-3">
-            {TEST_ACCOUNTS.map((account) => (
-              <button
-                key={account.email}
-                onClick={() => quickLogin(account)}
-                className="w-full px-4 py-3 bg-[#D4AF37]/20 border border-[#D4AF37] rounded-lg cursor-pointer text-[#800020] hover:bg-[#D4AF37]/30 transition-colors text-sm shadow-sm text-left"
-              >
-                <div className="font-semibold mb-1">{account.email}</div>
-                <div className="text-xs text-gray-600">
-                  Password: {account.password}
-                </div>
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <p className="text-xs text-gray-500">
-              Click any account to auto-fill credentials. These accounts must
-              have the 'admin' role in the database.
-            </p>
-          </div>
-        </div> */}
       </div>
     </div>
   );

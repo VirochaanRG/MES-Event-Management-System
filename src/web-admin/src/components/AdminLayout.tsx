@@ -16,7 +16,7 @@ export default function AdminLayout({
   subtitle,
 }: AdminLayoutProps) {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-white flex">
       <AdminSidebar user={user} />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -24,21 +24,21 @@ export default function AdminLayout({
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm">
           <div>
             {title && (
-              <h1 className="text-4xl font-bold text-gray-900">{title}</h1>
+              <h1 className="text-4xl font-bold text-red-900">{title}</h1>
             )}
             {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
           </div>
           <div className="flex items-center gap-4">
-            <div className="px-3 py-1 bg-gradient-to-r from-red-50 to-yellow-50 border border-red-200 rounded-full">
-              <span className="text-xs font-semibold text-red-700">
-                Admin Access
+            <div className="px-3 py-1 bg-red-900 border border-yellow-300 rounded-full">
+              <span className="text-xs font-semibold text-yellow-300">
+                {user.email} - admin
               </span>
             </div>
           </div>
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
       </div>
     </div>
   );

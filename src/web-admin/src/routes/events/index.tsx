@@ -396,7 +396,7 @@ function EventsPageContent() {
                     placeholder="Search events..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
                   />
                 </div>
 
@@ -406,7 +406,7 @@ function EventsPageContent() {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent appearance-none bg-white"
+                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent appearance-none bg-white"
                   >
                     <option value="all">All Status</option>
                     <option value="scheduled">Scheduled</option>
@@ -419,7 +419,7 @@ function EventsPageContent() {
 
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-red-900 hover:bg-red-950 text-white font-semibold rounded-lg transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 Create Event
@@ -497,7 +497,7 @@ function EventsPageContent() {
                           triggerFileInput(event.id);
                         }}
                         disabled={uploadingImageFor === event.id}
-                        className="flex items-center gap-2 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-3 py-2 bg-red-900 hover:bg-red-950 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
                       >
                         {uploadingImageFor === event.id ? (
                           <>
@@ -583,7 +583,7 @@ function EventsPageContent() {
                         e.stopPropagation();
                         handleDeleteEvent(event.id);
                       }}
-                      className="flex items-center justify-center gap-2 px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-medium rounded transition-colors"
+                      className="flex items-center justify-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-900 font-medium rounded transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -639,7 +639,7 @@ function EventsPageContent() {
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
                   />
                 </div>
 
@@ -653,7 +653,7 @@ function EventsPageContent() {
                       setFormData({ ...formData, description: e.target.value })
                     }
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
                   />
                 </div>
 
@@ -667,7 +667,7 @@ function EventsPageContent() {
                     onChange={(e) =>
                       setFormData({ ...formData, location: e.target.value })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
                   />
                 </div>
 
@@ -683,7 +683,7 @@ function EventsPageContent() {
                       onChange={(e) =>
                         setFormData({ ...formData, startTime: e.target.value })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
                     />
                   </div>
 
@@ -698,7 +698,7 @@ function EventsPageContent() {
                       onChange={(e) =>
                         setFormData({ ...formData, endTime: e.target.value })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -718,7 +718,7 @@ function EventsPageContent() {
                           capacity: parseInt(e.target.value) || 0,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
                     />
                   </div>
 
@@ -736,7 +736,7 @@ function EventsPageContent() {
                           cost: parseInt(e.target.value) || 0,
                         })
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -767,7 +767,7 @@ function EventsPageContent() {
                     onChange={(e) =>
                       setFormData({ ...formData, isPublic: e.target.checked })
                     }
-                    className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                    className="w-4 h-4 text-red-900 border-gray-300 rounded focus:ring-red-900"
                   />
                   <label
                     htmlFor="isPublic"
@@ -780,7 +780,7 @@ function EventsPageContent() {
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={handleCreateEvent}
-                    className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors"
+                    className="flex-1 px-4 py-2 bg-red-900 hover:bg-red-950 text-white font-semibold rounded-lg transition-colors"
                   >
                     Create Event
                   </button>
