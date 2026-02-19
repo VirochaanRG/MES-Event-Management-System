@@ -1,19 +1,13 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { AuthUser, InstanceResponse } from '../types';
-
-/**
- * Simplified authentication context
- *
- * The original mobile app used axios and the Team D API to authenticate
- * the user and load their accessible instances. For standalone
- * development we want behaviour closer to the `web-user` project: a
- * lightweight email login with no backend integration. This context
- * stores a dummy user and token in `AsyncStorage` so that sessions
- * persist between app restarts, but it never contacts any remote
- * services. Instances are not loaded from the API; instead an empty
- * array is returned.
- */
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { AuthUser, InstanceResponse } from "../types";
+import * as userApi from "../services/userApi";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -21,7 +15,8 @@ interface AuthContextType {
   instances: InstanceResponse[];
   isAuthenticated: boolean;
   loading: boolean;
-  login: (email: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshInstances: () => Promise<void>;
 }
@@ -29,22 +24,16 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Keys used for persisting auth state in AsyncStorage
-const STORAGE_USER_KEY = '@teamd/auth_user';
-const STORAGE_TOKEN_KEY = '@teamd/auth_token';
+const STORAGE_USER_KEY = "@teamd/auth_user";
+const STORAGE_TOKEN_KEY = "@teamd/auth_token";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Instances are not fetched from the API in standalone mode. We
-  // initialise this as an empty array and never modify it. Keeping
-  // the property in the context preserves the shape expected by the
-  // existing screens.
   const [instances] = useState<InstanceResponse[]>([]);
 
   useEffect(() => {
-    // Load any stored user and token from AsyncStorage on mount
     const loadAuth = async () => {
       try {
         const storedUser = await AsyncStorage.getItem(STORAGE_USER_KEY);
@@ -52,9 +41,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (storedUser && storedToken) {
           setUser(JSON.parse(storedUser));
           setToken(storedToken);
+          userApi.setToken(storedToken);
         }
       } catch (err) {
-        console.warn('[AuthProvider] Failed to load stored auth', err);
+        console.warn("[AuthProvider] Failed to load stored auth", err);
       } finally {
         setLoading(false);
       }
@@ -62,53 +52,98 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadAuth();
   }, []);
 
-  /**
-   * Perform a local login. This function mimics the behaviour of the
-   * `LocalLoginForm` component in the web-user project. It accepts an
-   * email address and creates a dummy `AuthUser` object along with a
-   * simple token string. Both values are saved to AsyncStorage to
-   * persist across sessions. There is no password input or server
-   * validation.
-   */
-  const login = async (email: string): Promise<void> => {
-    // Trim the email and validate
+  const login = async (email: string, password: string): Promise<void> => {
     const trimmed = email.trim();
-    if (!trimmed) {
-      throw new Error('Email is required');
+    if (!trimmed || !password) {
+      throw new Error("Email and password are required");
     }
-    // Construct a dummy user. The id is derived from the current
-    // timestamp to guarantee uniqueness within the session. The name
-    // mirrors the email for simplicity.
-    const dummyUser: AuthUser = {
-      id: Date.now(),
-      email: trimmed,
-      name: trimmed,
-      isSystemAdmin: false,
+    // Define local seed accounts for offline login fallback.
+    const seeds = [
+      { id: 1, email: "t1@test.com", password: "test1234", roles: ["user"] },
+      {
+        id: 2,
+        email: "ta1@test.com",
+        password: "test1234",
+        roles: ["user", "admin", "all"],
+      },
+    ];
+    let apiUser: userApi.ApiUser | null = null;
+    let apiToken: string | null = null;
+    try {
+      const res = await userApi.login(trimmed, password);
+      apiUser = res.user;
+      apiToken = res.token;
+    } catch (err: any) {
+      const isNetworkError = !err?.response;
+      const foundSeed = seeds.find(
+        (u) => u.email === trimmed && u.password === password,
+      );
+      if (foundSeed && (isNetworkError || err?.response?.status === 401)) {
+        apiUser = {
+          id: foundSeed.id,
+          email: foundSeed.email,
+          roles: foundSeed.roles,
+        };
+        apiToken = `local-${Date.now()}`;
+      } else {
+        throw new Error("Invalid email or password");
+      }
+    }
+    const roles = apiUser?.roles || [];
+    const isAdmin =
+      roles.includes("admin") ||
+      roles.includes("system_admin") ||
+      roles.includes("systemAdmin");
+    const authUser: AuthUser = {
+      id: apiUser!.id,
+      email: apiUser!.email,
+      name: apiUser!.email,
+      isSystemAdmin: isAdmin,
     };
-    const dummyToken = 'local-auth-token';
-    setUser(dummyUser);
-    setToken(dummyToken);
-    // Persist the user and token
-    await AsyncStorage.setItem(STORAGE_USER_KEY, JSON.stringify(dummyUser));
-    await AsyncStorage.setItem(STORAGE_TOKEN_KEY, dummyToken);
+    setUser(authUser);
+    setToken(apiToken!);
+    // Update API client with the new token
+    userApi.setToken(apiToken!);
+    await AsyncStorage.setItem(STORAGE_USER_KEY, JSON.stringify(authUser));
+    await AsyncStorage.setItem(STORAGE_TOKEN_KEY, apiToken!);
   };
 
-  /**
-   * Clear the stored user and token. This resets the authentication
-   * state and removes any saved credentials from AsyncStorage.
-   */
+  const register = async (email: string, password: string): Promise<void> => {
+    const trimmed = email.trim();
+    if (!trimmed || !password) {
+      throw new Error("Email and password are required");
+    }
+    const res = await userApi.register(trimmed, password);
+    const apiUser = res.user;
+    const apiToken = res.token;
+
+    const roles = apiUser?.roles || [];
+    const isAdmin =
+      roles.includes("admin") ||
+      roles.includes("system_admin") ||
+      roles.includes("systemAdmin");
+    const authUser: AuthUser = {
+      id: apiUser.id,
+      email: apiUser.email,
+      name: apiUser.email,
+      isSystemAdmin: isAdmin,
+    };
+    setUser(authUser);
+    setToken(apiToken);
+    userApi.setToken(apiToken);
+    await AsyncStorage.setItem(STORAGE_USER_KEY, JSON.stringify(authUser));
+    await AsyncStorage.setItem(STORAGE_TOKEN_KEY, apiToken);
+  };
+
   const logout = async (): Promise<void> => {
     setUser(null);
     setToken(null);
     await AsyncStorage.removeItem(STORAGE_USER_KEY);
     await AsyncStorage.removeItem(STORAGE_TOKEN_KEY);
+    await userApi.logout();
+    userApi.setToken(null);
   };
 
-  /**
-   * In standalone mode there are no instances to refresh. This method
-   * is provided for compatibility with the previous API-based context
-   * but simply resolves without changing state.
-   */
   const refreshInstances = async (): Promise<void> => {
     return Promise.resolve();
   };
@@ -120,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: user !== null,
     loading,
     login,
+    register,
     logout,
     refreshInstances,
   };
@@ -130,7 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

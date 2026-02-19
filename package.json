@@ -7,7 +7,6 @@
     "src/web-admin",
     "src/web-user",
     "src/api",
-    "src/mobile",
     "src/shared",
     "src/db"
   ],
@@ -17,12 +16,15 @@
     "dev": "concurrently \"pnpm --filter @teamb/web-admin dev\" \"pnpm --filter @teamb/web-user dev\"",
     "dev:admin": "pnpm --filter @teamb/web-admin dev",
     "dev:user": "pnpm --filter @teamb/web-user dev",
+    "dev:server": "concurrently \"pnpm --filter @teamb/web-user dev:server\" \"pnpm --filter @teamb/web-admin dev:server\"",
     "build": "pnpm -r build",
     "build:full": "concurrently \"pnpm --filter @teamb/web-admin build\" \"pnpm --filter @teamb/web-user build\"",
     "start": "concurrently \"pnpm --filter @teamb/web-admin start\" \"pnpm --filter @teamb/web-user start\"",
     "preview": "concurrently \"pnpm --filter @teamb/web-admin preview\" \"pnpm --filter @teamb/web-user preview\"",
     "lint": "pnpm -r lint",
-    "clean": "pnpm -r clean"
+    "clean": "pnpm -r clean",
+    "install:mobile": "cd src/mobile && npm install",
+    "install:all": "pnpm install && cd src/mobile && npm install"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

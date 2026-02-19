@@ -291,3 +291,13 @@ src/db/drizzle/meta/0002_snapshot.json
 src/db/drizzle/meta/_journal.json
 pnpm-lock.yaml
 src/web-user/package.json
+
+# Environment files
+.env
+.env.*
+.ENV
+.ENV.*
+**/.env
+**/.env.*
+**/.ENV
+**/.ENV.*

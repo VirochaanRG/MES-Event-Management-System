@@ -43,7 +43,7 @@ function verifyToken(token: string): { user: AuthUser } | null
 
 // Register plugins
 await fastify.register(cors, {
-  origin: 'http://localhost:3014',
+  origin: true,
   credentials: true,
 });
 

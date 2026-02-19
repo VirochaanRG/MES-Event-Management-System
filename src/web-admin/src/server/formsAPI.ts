@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
-import { form, formAnswers, formQuestions, modularForms } from './../../../db/src/schemas/form';
+import { form, formAnswers, formQuestions, formSubmissions, modularForms } from './../../../db/src/schemas/form';
+import { users } from '../../../db/src/schemas/users';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
@@ -529,6 +530,115 @@ export default async function formsRoutes(fastify: FastifyInstance)
     }
 
     return reply.send({ success: true, data: updated[0] });
+  });
+
+  // GET form analytics – all forms with submission counts
+  fastify.get('/api/forms/analytics', async (request, reply) =>
+  {
+    try
+    {
+      const forms = await db.query.form.findMany({
+        where: isNull(form.moduleId),
+      });
+
+      const submissionCounts = await db
+        .select({
+          formId: formSubmissions.formId,
+          count: sql<number>`count(*)`,
+        })
+        .from(formSubmissions)
+        .groupBy(formSubmissions.formId);
+
+      const questionCounts = await db
+        .select({
+          formId: formQuestions.formId,
+          count: sql<number>`count(*)`,
+        })
+        .from(formQuestions)
+        .groupBy(formQuestions.formId);
+
+      const subMap = new Map(submissionCounts.map((s) => [s.formId, Number(s.count)]));
+      const qMap = new Map(questionCounts.map((q) => [q.formId, Number(q.count)]));
+
+      const data = forms.map((f) => ({
+        id: f.id,
+        name: f.name,
+        description: f.description,
+        createdAt: f.createdAt,
+        isPublic: f.isPublic,
+        totalSubmissions: subMap.get(f.id) ?? 0,
+        totalQuestions: qMap.get(f.id) ?? 0,
+      }));
+
+      const totalForms = data.length;
+      const totalSubmissions = data.reduce((sum, f) => sum + f.totalSubmissions, 0);
+
+      return reply.send({
+        success: true,
+        data: { forms: data, totalForms, totalSubmissions },
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch form analytics');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch form analytics',
+      });
+    }
+  });
+
+  // GET users who completed a specific form
+  fastify.get<{ Params: { id: string } }>('/api/forms/:id/completions', async (request, reply) =>
+  {
+    try
+    {
+      const formId = parseInt(request.params.id);
+
+      const existingForm = await db.query.form.findFirst({
+        where: eq(form.id, formId),
+      });
+
+      if (!existingForm)
+      {
+        return reply.code(404).send({ success: false, error: 'Form not found' });
+      }
+
+      const submissions = await db
+        .select({
+          userId: formSubmissions.userId,
+          submittedAt: formSubmissions.createdAt,
+        })
+        .from(formSubmissions)
+        .where(eq(formSubmissions.formId, formId))
+        .orderBy(formSubmissions.createdAt);
+
+      // Resolve user emails
+      const userIds = [...new Set(submissions.map((s) => s.userId))];
+      const userRows = userIds.length
+        ? await db.query.users.findMany({
+            columns: { id: true, email: true },
+          })
+        : [];
+      const userMap = new Map(userRows.map((u) => [String(u.id), u.email]));
+
+      const completions = submissions.map((s) => ({
+        userId: s.userId,
+        email: userMap.get(s.userId) ?? s.userId,
+        submittedAt: s.submittedAt,
+      }));
+
+      return reply.send({
+        success: true,
+        data: { form: existingForm, completions, totalCompletions: completions.length },
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch form completions');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch form completions',
+      });
+    }
   });
 
   // UPDATE visibility of a modular form

@@ -7,10 +7,18 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.largeevent.teamd"
+      "bundleIdentifier": "com.largeevent.teamd",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera access is required to scan event tickets."
+      }
     },
     "android": {
-      "package": "com.largeevent.teamd"
-    }
+      "package": "com.largeevent.teamd",
+      "permissions": ["CAMERA"],
+      "usesCleartextTraffic": true
+    },
+    "plugins": [
+      "expo-camera"
+    ]
   }
 }
