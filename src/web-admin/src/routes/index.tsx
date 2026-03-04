@@ -1,106 +1,174 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { getCurrentUser, AuthUser } from "../lib/auth";
+import { getCurrentUser, AuthUser, logout } from "../lib/auth";
 import ProtectedTeamPortal from "../components/ProtectedTeamPortal";
 import EventsTab from "@/components/EventsTab";
 import ReportsTab from "@/components/ReportsTab";
-import Navbar from "@/components/Navbar";
+import AdminLayout from "@/components/AdminLayout";
+import HomePageManagement from "@/components/HomePageManagement";
+import { Calendar, Users, FileText } from "lucide-react";
+
+interface DashboardStats {
+  totalEvents: number;
+  totalUsers: number;
+  totalFormResponses: number;
+}
 
 function TeamBDashboard() {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [activeTab, setActiveTab] = useState<"events" | "users" | "reports">(
-    "events"
-  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const authUser = getCurrentUser();
-    setUser(authUser);
-  }, []);
+    const initAuth = () => {
+      const sessionUser = getCurrentUser("admin");
+      if (sessionUser) {
+        if (sessionUser.roles && sessionUser.roles.includes("admin")) {
+          setUser(sessionUser);
+        } else {
+          console.error("User does not have admin role");
+          logout("admin");
+          if (window.location.pathname === "/") {
+            window.location.reload();
+          } else {
+            navigate({ to: "/" });
+          }
+        }
+      } else {
+        if (window.location.pathname === "/") {
+          window.location.reload();
+        } else {
+          navigate({ to: "/" });
+        }
+      }
+      setIsLoading(false);
+    };
 
-  const handleFormBuilder = () => {
-    navigate({ to: "/form-builder" });
-  };
+    initAuth();
+  }, [navigate]);
 
-  return (
-    <>
-      <Navbar />
-      <div className="min-h-screen bg-stone-50">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="bg-white border-l-4 border-red-900 p-6 mb-6">
-            <h1 className="text-3xl font-bold text-stone-900">
-              Admin Dashboard
-            </h1>
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("/api/dashboard/stats");
+        const data = await response.json();
+
+        if (data.success) {
+          setStats(data.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats:", error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    if (user) {
+      fetchStats();
+    }
+  }, [user]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading admin dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const StatCard = ({
+    title,
+    value,
+    icon: Icon,
+    bgColor,
+  }: {
+    title: string;
+    value: number;
+    icon: any;
+    bgColor: string;
+  }) => {
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-600">{title}</p>
+            {statsLoading ? (
+              <div className="h-10 w-20 bg-gray-200 animate-pulse rounded mt-2"></div>
+            ) : (
+              <p className="text-4xl font-bold text-gray-900 mt-2">{value}</p>
+            )}
           </div>
-
-          <div className="bg-white border border-stone-300">
-            <div className="border-b-2 border-stone-300 bg-stone-100 px-6 py-4 flex justify-between items-center">
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setActiveTab("events")}
-                  className={`px-6 py-2 font-semibold transition-colors ${
-                    activeTab === "events"
-                      ? "bg-red-900 text-white"
-                      : "bg-stone-200 text-stone-700 hover:bg-stone-300"
-                  }`}
-                >
-                  Events
-                </button>
-                <button
-                  onClick={() => setActiveTab("users")}
-                  className={`px-6 py-2 font-semibold transition-colors ${
-                    activeTab === "users"
-                      ? "bg-red-900 text-white"
-                      : "bg-stone-200 text-stone-700 hover:bg-stone-300"
-                  }`}
-                >
-                  Users
-                </button>
-                <button
-                  onClick={() => setActiveTab("reports")}
-                  className={`px-6 py-2 font-semibold transition-colors ${
-                    activeTab === "reports"
-                      ? "bg-red-900 text-white"
-                      : "bg-stone-200 text-stone-700 hover:bg-stone-300"
-                  }`}
-                >
-                  Form Analytics
-                </button>
-              </div>
-              <button
-                onClick={handleFormBuilder}
-                className="px-6 py-2 font-semibold bg-red-900 text-white hover:bg-red-950 transition-colors"
-              >
-                Form Builder
-              </button>
-            </div>
-
-            <div className="p-6">
-              {activeTab === "events" && (
-                <div>
-                  <EventsTab />
-                </div>
-              )}
-              {activeTab === "users" && (
-                <div>
-                  <h2 className="text-2xl font-bold text-stone-900 mb-3 border-b-2 border-red-900 pb-2 inline-block">
-                    Users
-                  </h2>
-                  <p className="text-stone-600 mt-4">
-                    //TODO
-                  </p>
-                </div>
-              )}
-              {activeTab === "reports" && (
-                <div>
-                  <ReportsTab />
-                </div>
-              )}
-            </div>
+          <div
+            className={`w-14 h-14 ${bgColor} rounded-lg flex items-center justify-center`}
+          >
+            <Icon className="w-7 h-7 text-white" />
           </div>
         </div>
       </div>
-    </>
+    );
+  };
+
+  return (
+    <AdminLayout user={user} title="Dashboard">
+      <div className="p-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <StatCard
+            title="Total Events"
+            value={stats?.totalEvents ?? 0}
+            icon={Calendar}
+            bgColor="bg-red-900"
+          />
+
+          <StatCard
+            title="Total Users"
+            value={stats?.totalUsers ?? 0}
+            icon={Users}
+            bgColor="bg-yellow-500"
+          />
+
+          <StatCard
+            title="Form Responses"
+            value={stats?.totalFormResponses ?? 0}
+            icon={FileText}
+            bgColor="bg-red-900"
+          />
+        </div>
+
+        {/* Home Page Management Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h2 className="text-xl font-bold text-red-900 mb-4 pb-3 border-b-2 border-red-900">
+            Home Page Management
+          </h2>
+          <HomePageManagement />
+        </div>
+
+        {/* Recent Activity Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-red-900 mb-4 pb-3 border-b-2 border-red-900">
+            Recent Activity
+          </h2>
+          <EventsTab />
+        </div>
+
+        {/* Analytics Overview Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
+          <h2 className="text-xl font-bold text-red-900 mb-4 pb-3 border-b-2 border-yellow-500">
+            Analytics Overview
+          </h2>
+          <ReportsTab />
+        </div>
+      </div>
+    </AdminLayout>
   );
 }
 

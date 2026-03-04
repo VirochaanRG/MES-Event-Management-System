@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Event {
   id: number;
@@ -17,20 +19,65 @@ interface Event {
 
 export default function AvailableEvents() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [eventImages, setEventImages] = useState<Map<number, string>>(
+    new Map(),
+  );
 
   const {
     data: eventsData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["availableEvents"],
+    queryKey: ["availableEvents", user?.email],
     queryFn: async () => {
-      const response = await fetch("/api/events");
+      const url = user?.email
+        ? `/api/events/available?userEmail=${encodeURIComponent(user.email)}`
+        : "/api/events/available";
+
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch events");
       const json = await response.json();
       return json.data;
     },
   });
+
+  const fetchEventImage = async (eventId: number) => {
+    try {
+      // Adding a timestamp (?t=...) forces the browser to bypass the cache
+      const response = await fetch(
+        `/api/images/event/${eventId}?t=${Date.now()}`,
+      );
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const newImageUrl = URL.createObjectURL(blob);
+
+        setEventImages((prev) => {
+          // CLEANUP: Revoke the old URL to prevent memory leaks
+          const oldUrl = prev.get(eventId);
+          if (oldUrl) URL.revokeObjectURL(oldUrl);
+
+          return new Map(prev).set(eventId, newImageUrl);
+        });
+      }
+    } catch (error) {
+      console.error(`Failed to fetch image for event ${eventId}:`, error);
+    }
+  };
+
+  useEffect(() => {
+    if (eventsData) {
+      eventsData.forEach((event: Event) => {
+        fetchEventImage(event.id);
+      });
+    }
+
+    // Cleanup blob URLs on unmount
+    return () => {
+      eventImages.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [eventsData]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -71,9 +118,19 @@ export default function AvailableEvents() {
           className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 cursor-pointer hover:border-yellow-500"
         >
           {/* Event Image */}
-          <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
-            <span className="text-4xl">📅</span>
-          </div>
+          {eventImages.has(event.id) ? (
+            <div className="w-full h-48 overflow-hidden">
+              <img
+                src={eventImages.get(event.id)}
+                alt={event.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
+              <span className="text-4xl">📅</span>
+            </div>
+          )}
 
           {/* Event Content */}
           <div className="p-6">

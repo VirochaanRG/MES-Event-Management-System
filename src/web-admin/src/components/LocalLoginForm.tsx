@@ -1,119 +1,144 @@
-import { useState } from 'react';
-import { AuthUser } from '../lib/auth';
+import { useState } from "react";
+import { AuthUser } from "../lib/auth";
 
 interface LocalLoginFormProps {
   onLoginSuccess: (user: AuthUser, token: string) => void;
 }
 
-const TEST_ACCOUNTS = [
-  { email: 'userViro@test.com', id: 1 },
-  { email: 'userM@test.com', id: 2 },
-  { email: 'userI@test.com', id: 3 },
-  { email: 'userO@test.com', id: 4 },
-  { email: 'userR@test.com', id: 5 },
-];
-
-export default function LocalLoginForm({ onLoginSuccess }: LocalLoginFormProps) {
-  const [email, setEmail] = useState('');
+export default function LocalLoginForm({
+  onLoginSuccess,
+}: LocalLoginFormProps) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
-    if (!email) {
-      setError('Email is required');
+    if (!email || !password) {
+      setError("Email and password are required");
       setLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('/api/auth/local-login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        sessionStorage.setItem('teamd-auth-user', JSON.stringify(data.user));
-        sessionStorage.setItem('teamd-auth-token', data.token);
-        sessionStorage.setItem('teamd-auth-source', 'local');
+        sessionStorage.setItem(
+          "teamd-admin-auth-user",
+          JSON.stringify(data.user),
+        );
+        sessionStorage.setItem("teamd-admin-auth-token", data.token);
+        sessionStorage.setItem("teamd-admin-auth-source", "local");
 
         onLoginSuccess(data.user, data.token);
       } else {
-        setError(data.error || 'Login failed');
+        setError(data.error || "Login failed");
       }
     } catch (error) {
-      setError('Login failed. Please try again.');
-      console.error('Local login error:', error);
+      setError("Login failed. Please try again.");
+      console.error("Admin login error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const quickLogin = (userEmail: string) => {
-    setEmail(userEmail);
-  };
-
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#800020]/10 to-[#D4AF37]/10 p-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 p-0">
+      <div className="w-full max-w-md">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Admin Portal
+          </h1>
+          <p className="text-gray-400 text-sm">
+            Sign in to manage events and users
+          </p>
+        </div>
 
-        {/* Login Panel */}
-        <div className="md:col-span-2 bg-white p-10 rounded-2xl shadow-xl border border-gray-100">
-          <h2 className="text-[#800020] mb-5 text-3xl text-center font-bold tracking-tight">
-            Admin Portal - Login
-          </h2>
+        {/* Login Card */}
+        <div className="bg-gray-800/50 backdrop-blur-sm border-0 rounded-2xl p-8 shadow-2xl">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Field */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-semibold text-gray-300 mb-3"
+              >
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              />
+            </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <input
-              type="email"
-              placeholder="Enter your TeamD email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#800020] focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
-            />
+            {/* Password Field */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-semibold text-gray-300 mb-3"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              />
+            </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-[#800020] text-white rounded-lg text-sm font-semibold hover:bg-[#660018] disabled:cursor-not-allowed disabled:opacity-50 transition-colors shadow-md"
-            >
-              {loading ? 'Logging in...' : 'Login to TeamD'}
-            </button>
-
+            {/* Error Message */}
             {error && (
-              <div className="text-red-600 text-sm text-center font-medium">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm font-medium">
                 {error}
               </div>
             )}
+
+            {/* Sign In Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-[#800020] to-[#600018] text-white rounded-lg text-sm font-semibold hover:from-[#900024] hover:to-[#700020] disabled:cursor-not-allowed disabled:opacity-50 disabled:from-[#800020] disabled:to-[#600018] transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <span className="inline-block animate-spin mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full"></span>
+                  Signing in...
+                </span>
+              ) : (
+                "Sign In"
+              )}
+            </button>
           </form>
-        </div>
 
-        {/* Quick Login Panel */}
-        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 h-fit">
-          <h3 className="text-gray-700 font-semibold text-md mb-4 text-center">
-            Quick Login Accounts
-          </h3>
-
-          <div className="flex flex-col gap-3">
-            {TEST_ACCOUNTS.map(account => (
-              <button
-                key={account.email}
-                onClick={() => quickLogin(account.email)}
-                className="w-full px-4 py-3 bg-[#D4AF37]/20 border border-[#D4AF37] rounded-lg cursor-pointer text-[#800020] hover:bg-[#D4AF37]/30 transition-colors text-sm shadow-sm text-left"
-              >
-                <div className="font-semibold">{account.email}</div>
-              </button>
-            ))}
+          {/* Footer Info */}
+          <div className="mt-8 pt-6 border-t border-gray-700">
+            <p className="text-xs text-gray-400 text-center">
+              Only users with admin privileges can access this portal.
+            </p>
           </div>
         </div>
-
       </div>
     </div>
   );

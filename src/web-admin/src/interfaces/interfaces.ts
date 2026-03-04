@@ -4,6 +4,9 @@ export interface Form
   name: string;
   description: string | null;
   createdAt: string;
+  isPublic: boolean;
+  moduleId: number;
+  unlockAt: string | null;
 }
 
 export interface FormQuestion
@@ -15,6 +18,9 @@ export interface FormQuestion
   optionsCategory: string | null;
   qorder: number;
   createdAt: string;
+  parentQuestionId: number | null;
+  enablingAnswers: number[];
+  required : boolean
 }
 
 export interface Event
@@ -30,4 +36,21 @@ export interface Event
   status: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface AuthUser
+{
+  email: string;
+  id: number;
+  roles: string[];
+}
+
+export interface FormCondition
+{
+  id: number;
+  formId : number;
+  dependentFormId : number;
+  conditionType: string;
+  dependentQuestionId : number;
+  dependentAnswerIdx : number;
 }

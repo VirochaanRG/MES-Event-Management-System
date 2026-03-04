@@ -5,6 +5,9 @@ export interface Form
   name: string;
   description: string | null;
   createdAt: string;
+  isPublic: boolean;
+  moduleId: number;
+  unlockAt: string;
 }
 
 export interface FormQuestion
@@ -14,8 +17,11 @@ export interface FormQuestion
   questionType: string;
   questionTitle: string | null;
   optionsCategory: string | null;
-  qOrder: number;
+  qorder: number;
   createdAt: string;
+  parentQuestionId: number | null;
+  enablingAnswers: number[];
+  required: boolean;
 }
 
 export interface FormAnswer
@@ -25,7 +31,7 @@ export interface FormAnswer
   formId: number;
   questionId: number;
   questionType: string;
-  answer: string;
+  answer: string | string[];
   createdAt: string;
 }
 

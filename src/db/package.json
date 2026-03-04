@@ -18,14 +18,17 @@
     "studio": "drizzle-kit studio",
     "promote": "node src/scripts/promote-schema.js",
     "seed": "tsx src/seed.ts",
+    "seed:accounts": "tsx src/seed_accounts.ts",
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.7",
     "pg": "^8.11.5"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^20.19.19",
     "@types/pg": "^8.11.5",
     "drizzle-kit": "^0.31.6",
