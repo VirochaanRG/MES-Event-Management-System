@@ -65,13 +65,9 @@ Date 2 & 1.1 & Notes\\
 This document ...
 
 \section{Functional Requirements Evaluation}
-\subsection{Area of Testing 1 – Admin Portal}
-
+\subsection{Area of Testing 1: Admin Portal}
 \subsubsection{Test-FR-AP-1: Create Form}
-
-\textbf{Type:} Manual \\
-\textbf{Initial State:} Administrator is logged into the admin portal with permission to create forms. \\
-\textbf{Test Procedure:}
+\textbf{Type:} Manual \\ \textbf{Initial State:} Administrator is logged into the admin portal with permission to create forms. \\ \textbf{Test Procedure:}
 \begin{verbatim}
 Input:
 - Navigate to the form creation page
@@ -81,82 +77,61 @@ Input:
 - Add field: Rating field labelled "Overall Experience"
 - Click "Create Form"
 \end{verbatim}
-
 \textbf{Expected Result:}
-
 \begin{verbatim}
 Output:
 - System confirms successful form creation
 - Newly created form appears in the admin dashboard
 - Form fields are stored correctly in the database
 \end{verbatim}
-
-\textbf{Result:} Pass // \textbf{Discussion:} The administrator successfully created a new form with multiple fields and the form appeared correctly in the dashboard with all fields stored in the system database. //
-
+\textbf{Result:} Pass \\ \textbf{Discussion:} The administrator successfully created a new form with multiple fields and the form appeared correctly in the dashboard with all fields stored in the system database. \\
 \subsubsection{Test-FR-AP-2: View and Analyze Form Data}
-
-\textbf{Type:} Manual // \textbf{Initial State:} At least two forms exist with previously collected responses. // \textbf{Test Procedure:}
-
+\textbf{Type:} Manual \\ \textbf{Initial State:} At least two forms exist with previously collected responses. \\ \textbf{Test Procedure:}
 \begin{verbatim}
 Input:
 - Navigate to the analytics dashboard
 - Select multiple forms with collected responses
 - Click "View Analytics"
 \end{verbatim}
-
 \textbf{Expected Result:}
-
 \begin{verbatim}
 Output:
 - Aggregated analytics are displayed
 - Charts and response summaries appear
 - Displayed analytics match stored backend data
 \end{verbatim}
-
-\textbf{Result:} Pass // \textbf{Discussion:} The analytics dashboard correctly aggregated the responses from multiple forms and displayed charts and summary statistics consistent with the stored backend data. //
-
+\textbf{Result:} Pass \\ \textbf{Discussion:} The analytics dashboard correctly aggregated the responses from multiple forms and displayed charts and summary statistics consistent with the stored backend data. \\
 \subsubsection{Test-FR-AP-3: Manage Events via Dashboard}
-
-\textbf{Type:} Manual // \textbf{Initial State:} Multiple events exist in the system with various payment statuses. // \textbf{Test Procedure:}
-
+\textbf{Type:} Manual \\ \textbf{Initial State:} Multiple events exist in the system with various payment statuses. \\ \textbf{Test Procedure:}
 \begin{verbatim}
 Input:
 - Navigate to the admin dashboard
 - Select the filter option
 - Apply filter "Pending Payment"
 \end{verbatim}
-
 \textbf{Expected Result:}
-
 \begin{verbatim}
 Output:
 - Dashboard displays only events with pending payment status
 - Displayed events match stored system records
 \end{verbatim}
-
-\textbf{Result:} Pass // \textbf{Discussion:} The dashboard filtering functionality worked correctly and displayed only the events matching the selected payment status filter. //
-
+\textbf{Result:} Pass \\ \textbf{Discussion:} The dashboard filtering functionality worked correctly and displayed only the events matching the selected payment status filter. \\
 \subsubsection{Test-FR-AP-4: View and Export Event Analytics}
-
-\textbf{Type:} Manual // \textbf{Initial State:} Events exist with collected survey responses. // \textbf{Test Procedure:}
-
+\textbf{Type:} Manual \\ \textbf{Initial State:} Events exist with collected survey responses. \\ \textbf{Test Procedure:}
 \begin{verbatim}
 Input:
 - Navigate to the event analytics dashboard
 - Select an event with stored responses
 - Click "Export Analytics"
 \end{verbatim}
-
 \textbf{Expected Result:}
-
 \begin{verbatim}
 Output:
 - Event analytics are displayed in the dashboard
 - System generates a downloadable report file
 - Exported data matches the analytics displayed
 \end{verbatim}
-
-\textbf{Result:} Pass // \textbf{Discussion:} The export functionality successfully generated a downloadable analytics report containing the correct event statistics and survey response summaries. //
+\textbf{Result:} Pass \\ \textbf{Discussion:} The export functionality successfully generated a downloadable analytics report containing the correct event statistics and survey response summaries. \\
 
 
 \section{Nonfunctional Requirements Evaluation}
