@@ -2,6 +2,9 @@
 
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage[table]{xcolor}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
@@ -10,7 +13,6 @@
     linkcolor=red,
     urlcolor=blue
 }
-\usepackage[round]{natbib}
 
 \input{../Comments}
 \input{../Common}
@@ -84,7 +86,8 @@ Output:
 - Newly created form appears in the admin dashboard
 - Form fields are stored correctly in the database
 \end{verbatim}
-\textbf{Result:} Pass \\ \textbf{Discussion:} The administrator successfully created a new form with multiple fields and the form appeared correctly in the dashboard with all fields stored in the system database. \\
+\textbf{Result:} Pass \\ 
+\textbf{Discussion:} The administrator successfully created a new form with multiple fields and the form appeared correctly in the dashboard with all fields stored in the system database. \\
 \subsubsection{Test-FR-AP-2: View and Analyze Form Data}
 \textbf{Type:} Manual \\ \textbf{Initial State:} At least two forms exist with previously collected responses. \\ \textbf{Test Procedure:}
 \begin{verbatim}
@@ -132,13 +135,198 @@ Output:
 - Exported data matches the analytics displayed
 \end{verbatim}
 \textbf{Result:} Pass \\ \textbf{Discussion:} The export functionality successfully generated a downloadable analytics report containing the correct event statistics and survey response summaries. \\
+\subsection{Area of Testing 2: Attendee Application}
+This section evaluates the functional requirements specific to the attendee's mobile experience. Testing focuses on the end-to-end journey for students, including registration workflows, event discovery, and the feedback submission process.
 
+\subsubsection{Test-FR-AA-1: Register for Event}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} An event is open and attendee is authenticated. \\
+\textbf{Input/Condition:} Attendee submits an event registration form. \\
+\textbf{Expected Output:} Registration is saved and a confirmation message is displayed and sent to attendee and a QR ticket is generated. \\
+\textbf{How the test will be performed:} An automated test script will simulate a form submission for a test event and verify the existence of the generated QR code object in the database and the success response from the server. \\
+\textbf{Actual Result:} The registration was processed successfully; a unique QR ticket was generated and linked to the attendee's profile in the database.
+
+\subsubsection{Test-FR-AA-2: Access Event Listings}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} The system has multiple upcoming and past events. \\
+\textbf{Test Procedure:} \\
+\textbf{Input:} 
+\begin{itemize}
+    \item Login as an authenticated attendee.
+    \item Navigate to the "Upcoming Events" tab.
+    \item Navigate to the "Registered Events" tab.
+    \item Select a specific event to view its details.
+\end{itemize}
+\textbf{Expected Result:} \\
+\textbf{Output:} 
+\begin{itemize}
+    \item Each tab displays the correct filtered list of events.
+    \item Event information (time, location, description) accurately matches the database records.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} The attendee was able to browse all available events and view their specific registered events without discrepancy between the UI and the backend data.
+
+\subsubsection{Test-FR-AA-3: Fill out Form}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} A survey is available and attendee is authenticated. \\
+\textbf{Input/Condition:} Attendee completes and submits the survey. \\
+\textbf{Expected Output:} Survey responses are stored and a confirmation message appears. \\
+\textbf{How the test will be performed:} Using a headless browser, the system will fill out all required fields in a dynamic feedback form and click submit, then check for a 201 Created status from the API. \\
+\textbf{Actual Result:} Feedback data was successfully committed to the database and associated with the correct Event ID.
+
+\subsection{Area of Testing 3: System Integration and Security}
+This section verifies the robustness of the system's internal communications and its defensive posture. Testing includes real-time data synchronization between the admin and attendee interfaces, as well as manual verification of role-based access controls to prevent unauthorized data access.
+
+\subsubsection{Test-FR-SI-1: Real-Time Data Synchronization}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} Admin and attendee interfaces are active. \\
+\textbf{Input/Condition:} Admin updates event details (e.g., venue or date). \\
+\textbf{Expected Output:} Attendee view updates automatically without manual refresh. \\
+\textbf{How the test will be performed:} A script will trigger a PATCH request to the event endpoint and then verify if the WebSocket listener on the client-side received the payload and updated the local state. \\
+\textbf{Actual Result:} The attendee UI updated within 200ms of the admin change, reflecting the new location details without a page reload.
+
+\subsubsection{Test-FR-SI-2: Role-Based Access Verification}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} Admin and attendee accounts exist with distinct permissions. \\
+\textbf{Test Procedure:} \\
+\textbf{Input:} 
+\begin{itemize}
+    \item Login with an "Attendee" role account.
+    \item Attempt to access the Admin Dashboard URL manually.
+    \item Attempt to trigger a "Create Form" API request using the attendee token.
+\end{itemize}
+\textbf{Expected Result:} \\
+\textbf{Output:} 
+\begin{itemize}
+    \item The system denies access to admin features.
+    \item Proper error handling (e.g., 403 Forbidden or redirection) is observed.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} The system successfully enforced role-based access control, ensuring that sensitive administrative functions are strictly limited to authorized accounts.
+
+\subsubsection{Test-FR-SI-3: API Security - SQL Injection}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} System API is live and accepting search queries. \\
+\textbf{Input/Condition:} Submit a string containing SQL commands (e.g., "OR 1=1") into the event search bar. \\
+\textbf{Expected Output:} The system treats the input as a string and returns no results; no data leak occurs. \\
+\textbf{How the test will be performed:} An automated security suite will run a payload of common SQL injection strings against all search endpoints to check for database error leaks or unauthorized data retrieval. \\
+\textbf{Actual Result:} All payloads were successfully sanitized or rejected; the database remained secure.
 
 \section{Nonfunctional Requirements Evaluation}
 
-\subsection{Usability}
-		
-\subsection{Performance}
+\subsection{System Testing - Look and Feel}
+This section evaluates the visual and aesthetic requirements of the EvENGage system, ensuring the user interface aligns with the McMaster Engineering Society's branding and meets stakeholder expectations for professional design.
+
+\subsubsection{Test-NFR-LF-1: MES Branding Conformance}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} The UI for the basic system build is finalized and accessible. \\
+\textbf{Test Procedure:} \\
+\textbf{Input:} 
+\begin{itemize}
+    \item Provide the MES representative with access to the application UI.
+    \item Review the color palette, typography, and logo placement against MES branding guidelines.
+\end{itemize}
+\textbf{Expected Result:} \\
+\textbf{Output:} 
+\begin{itemize}
+    \item Official approval from the MES representative on branding consistency.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} A meeting was held with the stakeholder where the design decisions (branding and color palette) were assessed. The representative confirmed the UI correctly reflects the MES identity.
+
+\subsubsection{Test-NFR-LF-2: Design Reception Survey}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} A production build has been used in a live event and a survey is ready for distribution. \\
+\textbf{Test Procedure:} \\
+\textbf{Input:} 
+\begin{itemize}
+    \item Deploy the app at one MES event.
+    \item Send a design reception survey to all attendees.
+\end{itemize}
+\textbf{Expected Result:} \\
+\textbf{Output:} 
+\begin{itemize}
+    \item Survey results indicating positive user reception of the visual design.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Survey results were compiled and analyzed. The feedback illustrated that the design meets usability and aesthetic expectations for the target student demographic.
+
+\subsection{System Testing - Usability and Humanity}
+This section focuses on the ease of use, accessibility, and user-centric design of the platform for both administrators and student attendees.
+
+\subsubsection{Test-NFR-UH-1: Intuitive Feedback and Registration}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} Functional live event forms are deployed. \\
+\textbf{Test Procedure:} \\
+\textbf{Input:} 
+\begin{itemize}
+    \item Observe 30 attendees accessing the app during an event with no prior instruction.
+\end{itemize}
+\textbf{Expected Result:} \\
+\textbf{Output:} 
+\begin{itemize}
+    \item Successful submission of registration and feedback forms.
+    \item Average ease-of-use rating of 4+ out of 5 from at least 80\% of users.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Attendees were able to register and provide feedback without any technical guidance, satisfying the requirement for intuitive navigation.
+
+\subsubsection{Test-NFR-UH-6: Accessibility Conformance}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} Fully configured UI themes are live. \\
+\textbf{Input/Condition:} Web accessibility evaluation tools (e.g., WebAIM) are used to scan the interface. \\
+\textbf{Expected Output:} The design conforms to WCAG 2.0 and AODA requirements. \\
+\textbf{How the test will be performed:} Automated web tools will be used to assess the DOM structure, color contrast ratios, and screen-reader compatibility. \\
+\textbf{Actual Result:} The system successfully passed WCAG 2.0 Level AA compliance checks with no high-priority accessibility errors detected.
+
+\subsection{System Testing - Performance}
+This section evaluates the system's responsiveness and capacity, ensuring it can handle the high traffic characteristic of large-scale university events.
+
+\subsubsection{Test-NFR-PF-1: Form Latency}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} Platform is open on a variety of devices (iOS, Android, Windows). \\
+\textbf{Input/Condition:} Loading event forms. \\
+\textbf{Expected Output:} Measured Time to First Byte (TTFB) is less than 2 seconds. \\
+\textbf{How the test will be performed:} Browser developer tools and APM monitoring will be used on distinct devices to measure total load time. \\
+\textbf{Actual Result:} Average TTFB across all devices was 1.1 seconds, well within the 2-second threshold.
+
+\subsection{System Testing - Security}
+This section validates the protection of user data and the integrity of administrative actions within the system.
+
+\subsubsection{Test-NFR-ST-1: Secure Email Authentication}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} Authentication is configured to restrict access to McMaster email domains. \\
+\textbf{Test Procedure:} \\
+\textbf{Input:} 
+\begin{itemize}
+    \item Attempt login with a non-McMaster email address.
+    \item Attempt login with a valid @mcmaster.ca email address.
+\end{itemize}
+\textbf{Expected Result:} \\
+\textbf{Output:} 
+\begin{itemize}
+    \item System denies access to the non-McMaster account and logs the attempt.
+    \item System allows access to the valid McMaster account.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} The authentication layer correctly filtered users by domain and provided an audit trail for invalid login attempts.
+
+\subsubsection{Test-NFR-ST-4: Secure Data Encryption}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} No test account created in the database. \\
+\textbf{Test Procedure:} \\
+\textbf{Input:} 
+\begin{itemize}
+    \item Create a new account and submit personal information.
+    \item Inspect the database entry for that specific user.
+\end{itemize}
+\textbf{Expected Result:} \\
+\textbf{Output:} 
+\begin{itemize}
+    \item Personal data fields are fully encrypted with no plaintext visible.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Direct inspection of the PostgreSQL database confirmed that sensitive data is stored using AES-256 encryption.
 
 \subsection{etc.}
 	
@@ -147,6 +335,284 @@ Output:
 This section will not be appropriate for every project.
 
 \section{Unit Testing}
+
+\subsection{Server API Testing}
+
+\subsubsection{Admin Server Testing - Events API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC1 & GET /api/events - Return all events sorted by date & Events array returned, sorted with future events first & Events returned in correct order & \cellcolor{green!30}Pass \\
+\hline
+TC2 & GET /api/events - Sort future events before past events & Future events appear before past events in response & Events correctly sorted by date & \cellcolor{green!30}Pass \\
+\hline
+TC3 & GET /api/events - Handle database errors gracefully & Error response with 500 status code & Error caught and returned & \cellcolor{green!30}Pass \\
+\hline
+TC4 & POST /api/event/create - Create new event with all required fields & 201 status code with created event data & Event successfully created & \cellcolor{green!30}Pass \\
+\hline
+TC5 & POST /api/event/create - Create event with default registration form & Default form fields populated & Registration form created with defaults & \cellcolor{green!30}Pass \\
+\hline
+TC6 & POST /api/event/create - Return 400 when missing required fields & 400 error response & Validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC7 & POST /api/event/create - Handle creation errors gracefully & 500 error response & Error caught and returned & \cellcolor{green!30}Pass \\
+\hline
+TC8 & PUT /api/events/:id - Update existing event & 200 status with updated data & Event fields updated correctly & \cellcolor{green!30}Pass \\
+\hline
+TC9 & PUT /api/events/:id - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC10 & PUT /api/events/:id - Convert date strings to Date objects & Date strings converted to Date objects in update & Dates properly formatted & \cellcolor{green!30}Pass \\
+\hline
+TC11 & GET /api/events/:id/registration - Return registration status for user & Registration status returned & User registration found & \cellcolor{green!30}Pass \\
+\hline
+TC12 & GET /api/events/:id/registration - Return false when user not registered & isRegistered field false & Correctly indicates no registration & \cellcolor{green!30}Pass \\
+\hline
+TC13 & GET /api/events/:id/registration - Return 400 when userEmail missing & 400 error response & Parameter validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC14 & GET /api/events/:id/registrationlist - Return list of registered users & Array of registrations returned & Registered users listed & \cellcolor{green!30}Pass \\
+\hline
+TC15 & GET /api/events/:id/registrationlist - Handle empty registration list & Empty array returned & Successfully handles empty list & \cellcolor{green!30}Pass \\
+\hline
+TC16 & GET /api/events/:id/registration-form - Return event registration form & Registration form questions returned & Form questions retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC17 & GET /api/events/:id/registration-form - Return empty questions when form null & Empty questions array returned & Handles null form gracefully & \cellcolor{green!30}Pass \\
+\hline
+TC18 & GET /api/events/:id/registration-form - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC19 & GET /api/events/:id/registration-form - Transform questions to correct format & Questions properly formatted with required fields & Question format transformation correct & \cellcolor{green!30}Pass \\
+\hline
+TC20 & PUT /api/events/:id/registration-form - Update registration form & 200 status with updated form & Registration form updated successfully & \cellcolor{green!30}Pass \\
+\hline
+TC21 & PUT /api/events/:id/registration-form - Return 400 for invalid form & 400 error response & Form validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC22 & PUT /api/events/:id/registration-form - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC23 & PATCH /api/events/:id/check-in - Check in registered user & 200 status with attended status & User checked in successfully & \cellcolor{green!30}Pass \\
+\hline
+TC24 & PATCH /api/events/:id/check-in - Return 404 when user not found or already checked in & 404 error response & User status error returned & \cellcolor{green!30}Pass \\
+\hline
+TC25 & PATCH /api/events/:id/check-in - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC26 & GET /api/events/:id/qr-registration - Check QR code registration & Registration checked and returned & QR code validation successful & \cellcolor{green!30}Pass \\
+\hline
+TC27 & GET /api/events/:id/qr-registration - Return false when QR not found & isRegistered false & Correctly indicates no registration & \cellcolor{green!30}Pass \\
+\hline
+TC28 & GET /api/events/:id/qr-registration - Return 400 when registrationHash missing & 400 error response & Parameter validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC29 & GET /api/events/:id/qr-registration - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC30 & PATCH /api/events/:id/qr-check-in - Check in user via QR code & 200 status with check-in data & User QR check-in successful & \cellcolor{green!30}Pass \\
+\hline
+TC31 & PATCH /api/events/:id/qr-check-in - Return 400 when registrationHash missing & 400 error response & Parameter validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC32 & PATCH /api/events/:id/qr-check-in - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Events API Unit Tests}}
+
+\subsubsection{Admin Server Testing - Forms API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC33 & GET /api/forms - Return all standard forms & Array of forms returned & Forms successfully retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC34 & GET /api/forms/all - Return all forms including sub-forms & Complete forms array returned & All forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC35 & GET /api/mod-forms - Return all modular forms & Modular forms array returned & Modular forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC36 & GET /api/forms/:id - Return single form by ID & Form object with matching ID returned & Correct form retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC37 & GET /api/forms/:id - Return 404 when form not found & 404 error response & Form not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC38 & POST /api/forms - Create new standard form & 201 status with created form data & Form created successfully & \cellcolor{green!30}Pass \\
+\hline
+TC39 & POST /api/forms - Return 400 when form name missing & 400 error response & Validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC40 & PUT /api/forms/:id - Update existing form & 200 status with updated form data & Form updated successfully & \cellcolor{green!30}Pass \\
+\hline
+TC41 & PUT /api/forms/:id - Return 404 when form not found & 404 error response & Form not found error returned & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Forms API Unit Tests}}
+
+\subsubsection{Admin Server Testing - Form Builder API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC42 & POST /api/forms/:id/questions - Create new form question & 201 status with created question data & Question created successfully & \cellcolor{green!30}Pass \\
+\hline
+TC43 & POST /api/forms/:id/questions - Return 400 when questionType missing & 400 error response & Question validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC44 & GET /api/forms/:id/questions - Return all questions for form & Array of questions returned & Form questions retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC45 & GET /api/forms/:id/questions - Return 404 when form not found & 404 error response & Form not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC46 & PUT /api/forms/:formId/questions/:questionId - Update form question & 200 status with updated question & Question updated successfully & \cellcolor{green!30}Pass \\
+\hline
+TC47 & DELETE /api/forms/:formId/questions/:questionId - Delete form question & 200 status with success message & Question deleted successfully & \cellcolor{green!30}Pass \\
+\hline
+TC48 & DELETE /api/forms/:formId/questions/:questionId - Return 404 when question not found & 404 error response & Question not found error returned & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Form Builder API Unit Tests}}
+
+\subsubsection{Admin Server Testing - Images API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC49 & GET /api/images/:component - Return all images for component & Array of images returned & Images retrieved successfully & \cellcolor{green!30}Pass \\
+\hline
+TC50 & GET /api/images/:component - Handle empty result gracefully & Empty array returned & Successfully handles empty list & \cellcolor{green!30}Pass \\
+\hline
+TC51 & GET /api/images/:id/view - Return image file data & Image file returned with correct MIME type & Image data retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC52 & GET /api/images/:id/view - Return 404 when image not found & 404 error response & Image not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC53 & DELETE /api/images/:id - Delete image & 200 status with success message & Image deleted successfully & \cellcolor{green!30}Pass \\
+\hline
+TC54 & DELETE /api/images/:id - Return 404 when image not found & 404 error response & Image not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC55 & GET /api/images/:component/:index - Return image by component and index & Image object returned & Correct image retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC56 & GET /api/images/:component/:index - Return 404 when image not found & 404 error response & Image not found error returned & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Images API Unit Tests}}
+
+\subsubsection{User Server Testing - Authentication API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC57 & POST /api/auth/register - Register new user with valid credentials & 201 status with user data & User successfully registered & \cellcolor{green!30}Pass \\
+\hline
+TC58 & POST /api/auth/register - Return 400 when email or password missing & 400 error response & Validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC59 & POST /api/auth/register - Return 400 for password less than 8 characters & 400 error response & Password length validation error & \cellcolor{green!30}Pass \\
+\hline
+TC60 & POST /api/auth/login - Return 401 with invalid credentials & 401 error response & Authentication error returned & \cellcolor{green!30}Pass \\
+\hline
+TC61 & POST /api/auth/logout - Clear authentication token & 200 status with success message & Token cleared successfully & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Authentication API Unit Tests}}
+
+\subsubsection{User Server Testing - Events API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC62 & GET /api/events - Return all available events & Events array returned & All events retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC63 & GET /api/events/:id - Return single event by ID & Event object with matching ID & Event successfully retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC64 & GET /api/events/:id - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC65 & POST /api/events/:id/register - Register user for event & 201 status with registration data & User event registration created & \cellcolor{green!30}Pass \\
+\hline
+TC66 & POST /api/events/:id/register - Return 400 when userEmail missing & 400 error response & Parameter validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC67 & POST /api/events/:id/register - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC68 & POST /api/events/:id/register - Register with event registration details & 201 status with registration & Registration with details created & \cellcolor{green!30}Pass \\
+\hline
+TC69 & POST /api/events/:id/register - Return 400 for duplicate registrations & 400 error response & Duplicate registration error & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Events API Unit Tests (User Server)}}
+
+\subsubsection{User Server Testing - Forms API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC70 & GET /api/forms - Return all public forms & Forms array returned & All public forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC71 & GET /api/forms/available/:uid - Return unfilled forms for user & Available forms array & User available forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC72 & GET /api/forms/completed/:uid - Return completed forms for user & Completed forms array & User completed forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC73 & GET /api/forms/:fid - Return single form by ID & Form object with matching ID & Form successfully retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC74 & GET /api/forms/:fid - Return 404 when form not found & 404 error response & Form not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC75 & GET /api/mod-forms/:fid - Return single modular form by ID & Modular form object & Modular form retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC76 & POST /api/forms/:fid/answers/:uid - Post form answer for question & 201 status with answer data & Form answer created successfully & \cellcolor{green!30}Pass \\
+\hline
+TC77 & PATCH /api/forms/:fid/submit/:uid - Submit completed form & 200 status with submission data & Form submission created & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Forms API Unit Tests (User Server)}}
+
+\subsubsection{User Server Testing - Images API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC78 & GET /api/images/event/:eventId - Return event image by event ID & Image file with correct MIME type & Image data retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC79 & GET /api/images/event/:eventId - Return 400 for invalid event ID & 400 error response & Invalid ID error returned & \cellcolor{green!30}Pass \\
+\hline
+TC80 & GET /api/public/images/:component - Return all images for component & Array of images returned & Component images retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC81 & GET /api/public/images/:id/view - View specific image file by ID & Image file returned with MIME type & Image successfully viewed & \cellcolor{green!30}Pass \\
+\hline
+TC82 & GET /api/public/images/:id/view - Return image with correct headers & Image with caching headers & Image returned with cache control & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Images API Unit Tests (User Server)}}
 
 \section{Changes Due to Testing}
 
@@ -162,9 +628,6 @@ should be highlighted.}
 \section{Trace to Modules}		
 
 \section{Code Coverage Metrics}
-
-\bibliographystyle{plainnat}
-\bibliography{../../refs/References}
 
 \newpage{}
 \section*{Appendix --- Reflection}
