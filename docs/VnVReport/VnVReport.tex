@@ -616,10 +616,123 @@ TC82 & GET /api/public/images/:id/view - Return image with correct headers & Ima
 
 \section{Changes Due to Testing}
 
-\wss{This section should highlight how feedback from the users and from 
-the supervisor (when one exists) shaped the final product.  In particular 
-the feedback from the Rev 0 demo to the supervisor (or to potential users) 
-should be highlighted.}
+Reviews from peers and our supervisor revealed many issues with the first revision of the software, including usability issues and bugs that are difficult to catch with regular unit testing or were simply overlooked during manual testing by developers.
+
+\subsection{Server Robustness Improvements}
+
+Based on the results from unit testing, some changes can be made to improve server robustness. For example, TC69 verifies duplicate registration prevention, but enforcing uniqueness constraints at the database level on (userId, eventId) would provide stronger protection. Additionally, TC3 demonstrates graceful error handling, however, implementing centralized logging and monitoring would improve debugging and system reliability during unexpected failures.
+
+\subsection{Rendering Bug Fixes}
+
+During the reviews, a couple minor bugs were found mostly related to the initial rendering of pages and transfer of parameters between pages of the web application. The following are bugs noted by our supervisor.
+
+\subsubsection{User Portal}
+\begin{itemize}
+    \item 
+    \textbf{Bug:} Clicking the "Back to Surveys" buttons within the form filling interface brings the user back to the dashboard page, but on the "Overview" tab, not the "Surveys" tab.
+    \\
+    \textbf{Fix:} Each tab (Overview, Events, Surveys) can be attached to a URL route (e.g. /overview, /events, /surveys).
+    \item 
+    \textbf{Bug:} Clicking "Save" under the form filling interface, then reloading the page does not retain the user's current answers. 
+    \\
+    \textbf{Fix:} Ensure the database is queried for any saved responses to the selected form, and the reponses are loaded before the page is rendered.
+    \item 
+    \textbf{Bug:} The modular form filling interface does not render the "Completed Sections" interface until all modules are completed.
+    \\
+    \textbf{Fix:} Change the rendering conditions for the "Completed Sections" UI element to render if there are 1 or more completed sections.
+    \item 
+    \textbf{Bug:} Clicking "View Details" on an event card under the "Featured Events" section loads the overall "Events" tab, instead of bringing the user to the details page for the selected event. 
+    \\
+    \textbf{Fix:} Update the click handler for the "View Details" button to route to the event details page.
+\end{itemize}
+    
+\subsubsection{Admin Portal}
+\begin{itemize}
+    \item 
+    \textbf{Bug:} Setting the unlock date on a form to an invalid date will set no date instead of prompting the user to correct the invalid entry.
+    \\
+    \textbf{Fix:} Add error handling for the selected unlock date, with validity checks that trigger a correction prompt on invalid entries.
+    \item 
+    \textbf{Bug:} Empty sections (e.g. form with no description) are not rendered, causing inconsistencies in UI elements and visual bugs
+    \\
+    \textbf{Fix:} Add placeholder text for missing information (e.g. No description, no deadline) or render the element without any text.
+\end{itemize}
+
+\subsection{Missing Features}
+
+The following are important features or functionality of the software that was noted to be missing by reviewers due to oversights during development.
+
+\subsubsection{User Portal}
+\begin{itemize}
+    \item 
+    \textbf{Issue:} No option to view a completed submission, only to edit or delete.
+    \\
+    \textbf{Fix:} Render a "View Submission" button if the form is completed. When clicked it should open the form filling interface but disable all input fields to prevent edits.
+    \item 
+    \textbf{Issue:} The form details interface displays the time the form was created, which is irrelevant to the user. Should display the last edit or submission instead.
+    \\
+    \textbf{Fix:} Populate this field with the last submission time, queried from the form submissions database table.
+    \item 
+    \textbf{Issue:} Instead of prompting the user for their personal information (e.g. name, email), this information should be pulled from the user's profile.
+    \\
+    \textbf{Fix:} Create a user profile page, allowing the user to edit this information. This page can be rendered and required for completion upon creation of a new account.
+\end{itemize}
+
+\subsubsection{Admin Portal}
+\begin{itemize}
+    \item 
+    \textbf{Issue:} No option to edit the name and description of a form
+    \\
+    \textbf{Fix:} Similar to the events dashboard, add an edit button for each form which prompts the admin to edit the name and description of the form.
+    \item 
+    \textbf{Issue:} The status of an event ("Scheduled", "Ongoing", or "Completed") should be an automatically assigned state instead of manually selected.
+    \\
+    \textbf{Fix:} Add functionality in the backend to do this automatically at the indicated timestamps (e.g. set to "Ongoing" when the event date and time is reached).
+    \item 
+    \textbf{Issue:} Cannot set the status of an attendee from "Registed" to "Attended"
+    \\
+    \textbf{Fix:} This can be done by scanning the user's QR code, but should add an interface to set this manually 
+    \item 
+    \textbf{Issue:} The dropdown question type in the form builder should have the option to populate the dropdown with options by pasting multiple options seperated by newlines, instead of having to manually enter each choice for larger dropdowns.
+    \\
+    \textbf{Fix:} Add a seperate field to enter multiple options at once, or detect new line characters in the existing interface. 
+    \item 
+    \textbf{Issue:} Pressing the Enter key while adding options to a multiple selection question should create a new option, instead of having to use the UI buttons.
+    \\
+    \textbf{Fix:} Add detection for new lines in the option field, or an event handler for the enter key.
+\end{itemize}
+
+\subsection{Understandability Improvements}
+
+The following are parts of the system that reviewers found confusing or abiguous that can be updated for additional clarity. It can be noted that more issues were found on the admin side of the application due to assumptions that the admin users are more knowledgable of the system. This should be kept in mind for further changes to the admin portal.
+
+\subsubsection{User Portal}
+\begin{itemize}
+    \item In the "Available Events" tab, there is no indication or status pill on an event if the user has already registered.
+\end{itemize}
+
+\subsubsection{Admin Portal}
+\begin{itemize}
+    \item Confusion around what the "Instance" column represents in the attendee overview table
+    \item No column for name in the attendee overview table
+    \item A form that is set to auto unlock and has already been unlocked is displayed as being set to unlock at a past date.
+    \item The status text next to the visibility slider is confusing, as it appears as if "Private" is turned off when toggled.
+    \item Two different interfaces, indicating a form is "Public" and "Live" is unnecessary and confusing.
+    \item The "Set Date" button is too far from the "Unlock date" header, making it look unrelated.
+    \item Unclear whether a form that is private and scheduled to unlock will remain private after unlocking.
+    \item Unclear whether a form that is public and scheduled to unlock will be visible to users before the unlock date.
+    \item "Maximum required selections" for multiple selection questions is confusing wording, should be called "Maximum allowed selections".
+\end{itemize}
+
+\subsection{Look and Feel Improvements}
+
+The following are minor visual changes which can be made to improve the user experience and overall feel of the application.
+
+\begin{itemize}
+    \item Usage of UI modals instead of browser default alerts and confirmations.
+    \item Custom UI for dropdown menus to match the look of the interface, instead of the browser default.
+    \item Change the blue form selection UI to match wider UI theming (McMaster red and gold).
+\end{itemize}
 
 \section{Automated Testing}
 		
