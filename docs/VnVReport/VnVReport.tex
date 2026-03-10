@@ -20,10 +20,10 @@
 
 \begin{document}
 
-\title{Verification and Validation Report: \progname} 
+\title{Verification and Validation Report: \progname}
 \author{\authname}
 \date{\today}
-	
+
 \maketitle
 
 \pagenumbering{roman}
@@ -43,10 +43,10 @@ Date 2 & 1.1 & Notes\\
 \section{Symbols, Abbreviations and Acronyms}
 
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{l l} 
-  \toprule		
+\begin{tabular}{l l}
+  \toprule
   \textbf{symbol} & \textbf{description}\\
-  \midrule 
+  \midrule
   T & Test\\
   \bottomrule
 \end{tabular}\\
@@ -87,7 +87,7 @@ Output:
 - Newly created form appears in the admin dashboard
 - Form fields are stored correctly in the database
 \end{verbatim}
-\textbf{Result:} Pass \\ 
+\textbf{Result:} Pass \\
 \textbf{Discussion:} The administrator successfully created a new form with multiple fields and the form appeared correctly in the dashboard with all fields stored in the system database. \\
 \subsubsection{Test-FR-AP-2: View and Analyze Form Data}
 \textbf{Type:} Manual \\ \textbf{Initial State:} At least two forms exist with previously collected responses. \\ \textbf{Test Procedure:}
@@ -151,7 +151,7 @@ This section evaluates the functional requirements specific to the attendee's mo
 \textbf{Type:} Manual \\
 \textbf{Initial State:} The system has multiple upcoming and past events. \\
 \textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Input:}
 \begin{itemize}
     \item Login as an authenticated attendee.
     \item Navigate to the "Upcoming Events" tab.
@@ -159,7 +159,7 @@ This section evaluates the functional requirements specific to the attendee's mo
     \item Select a specific event to view its details.
 \end{itemize}
 \textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
     \item Each tab displays the correct filtered list of events.
     \item Event information (time, location, description) accurately matches the database records.
@@ -190,14 +190,14 @@ This section verifies the robustness of the system's internal communications and
 \textbf{Type:} Manual \\
 \textbf{Initial State:} Admin and attendee accounts exist with distinct permissions. \\
 \textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Input:}
 \begin{itemize}
     \item Login with an "Attendee" role account.
     \item Attempt to access the Admin Dashboard URL manually.
     \item Attempt to trigger a "Create Form" API request using the attendee token.
 \end{itemize}
 \textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
     \item The system denies access to admin features.
     \item Proper error handling (e.g., 403 Forbidden or redirection) is observed.
@@ -255,7 +255,7 @@ This section focuses on the ease of use, accessibility, and user-centric design 
 
 \subsubsection{Test-NFR-UH-1: Intuitive Feedback and Registration}
 \textbf{Type:} Manual \\
-\textbf{Initial State:} A deployed build is available and a test event has been scheduled. \\
+\textbf{Initial State:} A deployed build is available and there are functional live events and forms. \\
 \textbf{Input:}
 \begin{itemize}
     \item Instruct a small group of students (5-8 participants) to register to an event.
@@ -309,7 +309,7 @@ This section validates the protection of user data and the integrity of administ
 
 \subsubsection{Test-NFR-ST-1: Secure Email Authentication}
 \textbf{Type:} Manual \\
-\textbf{Initial State:} A deployed build is available and connected to database. \\
+\textbf{Initial State:} A deployed build is available and authentication is configured to McMaster email domains. \\
 \textbf{Input:}
 \begin{itemize}
     \item Attempt account creation/log-in with a non-authorized email address.
@@ -336,17 +336,17 @@ This section validates the protection of user data and the integrity of administ
     \item Sensitive authentication fields such as passwords are encrypted.
 \end{itemize}
 \textbf{Result:} Pass \\
-\textbf{Discussion:} Inspection of the development database confirmed that authentication credentials are successfully hashed.
-	
-\section{Comparison to Existing Implementation}	
+\textbf{Discussion:} Direct inspection of the PostgreSQL database confirmed that sensitive data is stored using AES-256 encryption.
+
+\subsection{etc.}
+
+\section{Comparison to Existing Implementation}
 
 This section will not be appropriate for every project.
 
 \section{Unit Testing}
 
-\subsection{Server API Testing}
-
-\subsubsection{Admin Server Testing - Events API}
+\subsection{Admin Server Testing - Events API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -424,7 +424,7 @@ TC32 & PATCH /api/events/:id/qr-check-in - Return 404 when event not found & 404
 
 {\small \textit{Table: Events API Unit Tests}}
 
-\subsubsection{Admin Server Testing - Forms API}
+\subsection{Admin Server Testing - Forms API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -456,7 +456,7 @@ TC41 & PUT /api/forms/:id - Return 404 when form not found & 404 error response 
 
 {\small \textit{Table: Forms API Unit Tests}}
 
-\subsubsection{Admin Server Testing - Form Builder API}
+\subsection{Admin Server Testing - Form Builder API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -484,7 +484,7 @@ TC48 & DELETE /api/forms/:formId/questions/:questionId - Return 404 when questio
 
 {\small \textit{Table: Form Builder API Unit Tests}}
 
-\subsubsection{Admin Server Testing - Images API}
+\subsection{Admin Server Testing - Images API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -632,35 +632,35 @@ Based on the results from unit testing, some changes can be made to improve serv
 
 \subsection{Rendering Bug Fixes}
 
-During the reviews, a couple minor bugs were found mostly related to the initial rendering of pages and transfer of parameters between pages of the web application. 
+During the reviews, a couple minor bugs were found mostly related to the initial rendering of pages and transfer of parameters between pages of the web application.
 
 \subsubsection{User Portal}
 \begin{itemize}
-    \item 
+    \item
     \textbf{Bug:} Clicking the "Back to Surveys" buttons within the form filling interface brings the user back to the dashboard page, but on the "Overview" tab, not the "Surveys" tab.
     \\
     \textbf{Fix:} Each tab (Overview, Events, Surveys) can be attached to a URL route (e.g. /overview, /events, /surveys).
-    \item 
-    \textbf{Bug:} Clicking "Save" under the form filling interface, then reloading the page does not retain the user's current answers. 
+    \item
+    \textbf{Bug:} Clicking "Save" under the form filling interface, then reloading the page does not retain the user's current answers.
     \\
     \textbf{Fix:} Ensure the database is queried for any saved responses to the selected form, and the reponses are loaded before the page is rendered.
-    \item 
+    \item
     \textbf{Bug:} The modular form filling interface does not render the "Completed Sections" interface until all modules are completed.
     \\
     \textbf{Fix:} Change the rendering conditions for the "Completed Sections" UI element to render if there are 1 or more completed sections.
-    \item 
-    \textbf{Bug:} Clicking "View Details" on an event card under the "Featured Events" section loads the overall "Events" tab, instead of bringing the user to the details page for the selected event. 
+    \item
+    \textbf{Bug:} Clicking "View Details" on an event card under the "Featured Events" section loads the overall "Events" tab, instead of bringing the user to the details page for the selected event.
     \\
     \textbf{Fix:} Update the click handler for the "View Details" button to route to the event details page.
 \end{itemize}
-    
+
 \subsubsection{Admin Portal}
 \begin{itemize}
-    \item 
+    \item
     \textbf{Bug:} Setting the unlock date on a form to an invalid date will set no date instead of prompting the user to correct the invalid entry.
     \\
     \textbf{Fix:} Add error handling for the selected unlock date, with validity checks that trigger a correction prompt on invalid entries.
-    \item 
+    \item
     \textbf{Bug:} Empty sections (e.g. form with no description) are not rendered, causing inconsistencies in UI elements and visual bugs
     \\
     \textbf{Fix:} Add placeholder text for missing information (e.g. No description, no deadline) or render the element without any text.
@@ -672,15 +672,15 @@ The following are important features or functionality of the software that was n
 
 \subsubsection{User Portal}
 \begin{itemize}
-    \item 
+    \item
     \textbf{Issue:} No option to view a completed submission, only to edit or delete.
     \\
     \textbf{Fix:} Render a "View Submission" button if the form is completed. When clicked it should open the form filling interface but disable all input fields to prevent edits.
-    \item 
+    \item
     \textbf{Issue:} The form details interface displays the time the form was created, which is irrelevant to the user. Should display the last edit or submission instead.
     \\
     \textbf{Fix:} Populate this field with the last submission time, queried from the form submissions database table.
-    \item 
+    \item
     \textbf{Issue:} Instead of prompting the user for their personal information (e.g. name, email), this information should be pulled from the user's profile.
     \\
     \textbf{Fix:} Create a user profile page, allowing the user to edit this information. This page can be rendered and required for completion upon creation of a new account.
@@ -688,23 +688,23 @@ The following are important features or functionality of the software that was n
 
 \subsubsection{Admin Portal}
 \begin{itemize}
-    \item 
+    \item
     \textbf{Issue:} No option to edit the name and description of a form
     \\
     \textbf{Fix:} Similar to the events dashboard, add an edit button for each form which prompts the admin to edit the name and description of the form.
-    \item 
+    \item
     \textbf{Issue:} The status of an event ("Scheduled", "Ongoing", or "Completed") should be an automatically assigned state instead of manually selected.
     \\
     \textbf{Fix:} Add functionality in the backend to do this automatically at the indicated timestamps (e.g. set to "Ongoing" when the event date and time is reached).
-    \item 
+    \item
     \textbf{Issue:} Cannot set the status of an attendee from "Registed" to "Attended"
     \\
-    \textbf{Fix:} This can be done by scanning the user's QR code, but should add an interface to set this manually 
-    \item 
+    \textbf{Fix:} This can be done by scanning the user's QR code, but should add an interface to set this manually
+    \item
     \textbf{Issue:} The dropdown question type in the form builder should have the option to populate the dropdown with options by pasting multiple options seperated by newlines, instead of having to manually enter each choice for larger dropdowns.
     \\
-    \textbf{Fix:} Add a seperate field to enter multiple options at once, or detect new line characters in the existing interface. 
-    \item 
+    \textbf{Fix:} Add a seperate field to enter multiple options at once, or detect new line characters in the existing interface.
+    \item
     \textbf{Issue:} Pressing the Enter key while adding options to a multiple selection question should create a new option, instead of having to use the UI buttons.
     \\
     \textbf{Fix:} Add detection for new lines in the option field, or an event handler for the enter key.
@@ -743,35 +743,221 @@ The following are minor visual changes which reviewers noted can be made to impr
 \end{itemize}
 
 \section{Automated Testing}
-		
+Our unit tests are automated by running the `pnpm test` command within the respective directories based on the unit tests that we want run. We used Vitest to do the unit testing and integrated the Postman type API testing with these Vitest unit tests. This allowed us to both create mocks and snapshots of the database while testing to easily complete the tests and not having to create a seperate profile and testing database doing it all in memory.\\
+\\
+For integration testing we utilized github actions which ran the our test workflow on pushes and merges into the dev branch to ensure that our new changes worked with our previous ones with out causing any problems.
 \section{Trace to Requirements}
-		
-\section{Trace to Modules}		
+\begin{longtable}{p{0.25\linewidth} p{0.65\linewidth}}
+\toprule
+\textbf{Requirement} & \textbf{Unit Tests} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Requirement} & \textbf{Unit Tests} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
 
+% Section 9 – Functional Requirements
+\textbf{FR-1}  & TC38, TC39, TC42, TC43, TC44, TC45, TC46, TC47, TC48 \\[4mm]
+\textbf{FR-2}  & TC33, TC34, TC35, TC36, TC37, TC40, TC41, TC70, TC71, TC72, TC73, TC74, TC75 \\[4mm]
+\textbf{FR-3}  & TC11, TC12, TC13, TC14, TC15, TC62, TC63, TC64, TC65, TC66, TC67, TC68, TC69 \\[4mm]
+\textbf{FR-4}  & TC26, TC27, TC28, TC29, TC30, TC31, TC32, TC65 \\[4mm]
+\textbf{FR-5}  & TC1, TC2, TC3, TC14, TC15 \\[4mm]
+\textbf{FR-6}  & TC4, TC5, TC6, TC7, TC8, TC9, TC10, TC62, TC63, TC64, TC65, TC66, TC67, TC68, TC69 \\[4mm]
+\textbf{FR-7}  & TC33, TC34, TC35, TC38, TC39, TC40, TC41, TC70, TC71, TC72, TC73, TC74, TC75, TC76, TC77 \\[4mm]
+\textbf{FR-9}  & TC70, TC71, TC72, TC73, TC74, TC75, TC76, TC77 \\[4mm]
+\textbf{FR-10} & TC33, TC34, TC35, TC36, TC37, TC40, TC41 \\[4mm]
+\textbf{FR-11} & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+
+\textbf{ER-2}  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{PI-1}  & TC38, TC42, TC43, TC44, TC46, TC47 \\[4mm]
+\textbf{PI-2}  & TC1, TC2 \\[4mm]
+\textbf{LR-2}  & TC38, TC42, TC43, TC44, TC45, TC46, TC47, TC48 \\[4mm]
+\textbf{UR-2}  & TC6, TC7, TC9, TC13, TC18, TC21, TC22, TC24, TC25, TC28, TC29, TC31, TC32,
+                  TC37, TC39, TC41, TC43, TC45, TC47, TC48, TC52, TC54, TC56, TC58, TC59,
+                  TC60, TC64, TC66, TC67, TC69, TC74, TC79 \\[4mm]
+\textbf{UR-3}  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{SC-1}  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{PA-1}  & TC1, TC2 \\[4mm]
+\textbf{FT-1}  & TC76, TC77 \\[4mm]
+\textbf{FT-2}  & TC76, TC77 \\[4mm]
+\textbf{FT-3}  & TC38, TC42, TC44 \\[4mm]
+\textbf{FT-4}  & TC8, TC9, TC10, TC20, TC21, TC22 \\[4mm]
+\textbf{SE-1}  & TC14, TC15, TC65, TC69 \\[4mm]
+
+% Section 15 – Security Requirements
+\textbf{SAR-1} & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{SAR-2} & TC57, TC60, TC61 \\[4mm]
+\textbf{SIR-1} & TC6, TC7, TC9, TC13, TC18, TC21, TC22, TC24, TC25, TC28, TC29, TC31,
+                  TC32, TC37, TC39, TC41, TC43, TC45, TC47, TC48, TC52, TC54, TC56,
+                  TC58, TC59, TC64, TC66, TC67, TC69, TC74, TC79 \\[4mm]
+
+\end{longtable}
+\section{Trace to Modules}
+\begin{longtable}{p{0.30\linewidth} p{0.60\linewidth}}
+\toprule
+\textbf{Module} & \textbf{Unit Tests} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Module} & \textbf{Unit Tests} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\textbf{M1: Main System Module}
+  & TC1, TC2, TC3, TC4, TC5, TC6, TC7, TC8, TC9, TC10,
+    TC11, TC12, TC13, TC14, TC15, TC16, TC17, TC18, TC19,
+    TC20, TC21, TC22, TC23, TC24, TC25, TC26, TC27, TC28,
+    TC29, TC30, TC31, TC32, TC33, TC34, TC35, TC36, TC37,
+    TC38, TC39, TC40, TC41, TC42, TC43, TC44, TC45, TC46,
+    TC47, TC48, TC49, TC50, TC51, TC52, TC53, TC54, TC55,
+    TC56, TC57, TC58, TC59, TC60, TC61, TC62, TC63, TC64,
+    TC65, TC66, TC67, TC68, TC69, TC70, TC71, TC72, TC73,
+    TC74, TC75, TC76, TC77, TC78, TC79, TC80, TC81, TC82 \\[4mm]
+
+\textbf{M2: User Authentication Module}
+  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+
+\textbf{M3: User Authorization Module}
+  & TC57, TC60, TC61 \\[4mm]
+
+\textbf{M4: Form Template Module}
+  & TC33, TC34, TC35, TC36, TC37, TC38, TC39, TC40, TC41,
+    TC42, TC43, TC44, TC45, TC46, TC47, TC48,
+    TC70, TC71, TC72, TC73, TC74, TC75 \\[4mm]
+
+\textbf{M5: Form Submission Module}
+  & TC76, TC77 \\[4mm]
+
+\textbf{M6: Event Management Module}
+  & TC1, TC2, TC3, TC4, TC5, TC6, TC7, TC8, TC9, TC10,
+    TC49, TC50, TC51, TC52, TC53, TC54, TC55, TC56,
+    TC62, TC63, TC64,
+    TC78, TC79, TC80, TC81, TC82 \\[4mm]
+
+
+\textbf{M8: Registration Module}
+  & TC11, TC12, TC13, TC14, TC15,
+    TC65, TC66, TC67, TC68, TC69 \\[4mm]
+
+\textbf{M9: Attendance Tracking Module}
+  & TC23, TC24, TC25, TC26, TC27, TC28, TC29,
+    TC30, TC31, TC32 \\[4mm]
+
+\textbf{M12: Database Access Module}
+  & TC3, TC7, TC9, TC15, TC17, TC22, TC25, TC29,
+    TC32, TC37, TC41, TC45, TC48, TC52, TC54, TC56,
+    TC64, TC67, TC69, TC74 \\[4mm]
+
+
+\end{longtable}
 \section{Code Coverage Metrics}
 
 \newpage{}
 \section*{Appendix --- Reflection}
 
-The information in this section will be used to evaluate the team members on the
-graduate attribute of Reflection.
+\subsubsection*{Rayyan Suhail Reflection}
 
-\input{../Reflection.tex}
+\textbf{1. What went well while writing this deliverable?}
 
-\begin{enumerate}
-  \item What went well while writing this deliverable? 
-  \item What pain points did you experience during this deliverable, and how
-    did you resolve them?
-  \item Which parts of this document stemmed from speaking to your client(s) or
-  a proxy (e.g. your peers)? Which ones were not, and why?
-  \item In what ways was the Verification and Validation (VnV) Plan different
-  from the activities that were actually conducted for VnV?  If there were
-  differences, what changes required the modification in the plan?  Why did
-  these changes occur?  Would you be able to anticipate these changes in future
-  projects?  If there weren't any differences, how was your team able to clearly
-  predict a feasible amount of effort and the right tasks needed to build the
-  evidence that demonstrates the required quality?  (It is expected that most
-  teams will have had to deviate from their original VnV Plan.)
-\end{enumerate}
+During this deliverable was that our team already
+had a strong understanding of the system from previous documents such as
+the SRS and design deliverables. Because of this, it was easier to connect
+the verification and validation activities to the actual components of the
+platform like event registration, the form builder, and the admin dashboard.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+
+Making sure that the testing approaches we described were realistic and would actually match the features that were implemented in the system.
+To resolve this, I reviewed the project requirements and thought about
+how those features would realistically be tested during development.
+Discussing these ideas with my teammates also helped clarify which
+verification activities made the most sense for our platform.
+
+\subsubsection*{Mohammad Mahdi Mahboob Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+
+One aspect of this deliverable that went well was the integration of AI
+into our testing workflow. With the rapid advancement of AI, we were able
+to quickly generate a test suite which helped us get the figures we needed
+for this deliverable without having to spend too much time thinking about,
+setting up, and deploying tests and testing technologies. We only needed to
+verify the testing methodology was consistent with our goals. I think this is
+a prime example of how AI can be used productively in our field, and is
+definitely going to become a staple of my workflow as I transition to the
+professional market.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+
+The biggest pain point I encountered was attempting to quantify, evaluate, and
+represent our NFR evaluations. This type of evaluation was completely new to me
+and I had difficulty figuring out how to conduct it, as well as identifying and
+accounting for any directive changes that had occurred since our Rev0 SRS plan.
+I was able to ask my fellow teammates for assistance in this aspect and
+referenced previous years' examples to get a better visualization of what the
+NFR evaluation looked like. My team also noted changes we need to make to our
+SRS, and we will regroup to determine what changes we will revert or commit to
+for Rev1. I am extremely grateful to my teammates for their continued support.
+
+\subsubsection*{Virochaan Ravichandran Gowri Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+Our VNV plan was quite thorough in what and how we would be testing and the tools and/or methodology we planned on using within our tests. We also were quite proactive in understanding that we were gonna do usability testing so we got extra feedback on how to improve our project. Also I think we figured out how to use the tools and like vitest quite easily so this was not a large barrier to our progress for this deliverable.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+Setting up the testing did cause some problems because there were some dependencies in the setup that we needed to figure out. Also we felt that front-end testing was a bit redundant as it really only just confirmed what could be seen in the validation and acceptance tests so we needed to ensure that there was no redundancy in code coverage. Also we needed to ensure that the testing methodology for the NFR's was actually effective in showing that the NFR was achieved as well. So this caused us to tweak our process to evaluating the NFR's multiple times to actually ensure we achieved our goals. Finally, there were some problems in getting good code coverage metrics specifically for the tests relating to the NFR because they are harder to measure.
+
+\subsubsection*{Omar Al-Asfar Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+We were very meticulous when writing our VnV Plan, which laid the foundation for this deliverable. We already had a detailed understanding of the testing approaches we wanted to use and how they would be applied to our system. Our VnV Plan also had good traceability, so we were able to efficiently reference the pertinent requirements and show the traceability in this report. As a result, the evaluation process was relatively simple, involving following the plan aside from some adjustments we made to the NFR evaluation process.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+The NFR Evaluation was the biggest pain point we had to deal with for this deliverable. While the FR Evaluation was in-line with the plan, there were a few adjustments required for the NFR's. The tests from the plan were occasionally too ambitious to perform, or not effective enough in demonstrating completion. Ultimately, the NFR evaluation was a pain point relative to the rest of the deliverable since it required more consideration and review.
+
+\subsubsection*{Team Reflection}
+
+\textbf{3. Which parts of this document stemmed from speaking to your
+client(s) or a proxy (e.g. your peers)? Which ones were not, and why?}
+
+Some parts of the document were influenced by conversations with our
+project supervisor and internal team discussions about how the platform
+would actually be used by MES organizers and students. In particular, the
+validation activities related to usability, event registration workflows,
+and the overall user experience were shaped by our understanding of the
+client’s needs and how the system would be used in practice.
+
+Other parts of the document, such as the structure of the verification
+process and the different testing strategies, were based more on standard
+software engineering practices rather than direct client input. These
+sections were included to ensure the system could be tested thoroughly
+and maintain a good level of reliability.
+
+\textbf{4. In what ways was the Verification and Validation (VnV) Plan
+different from the activities that were actually conducted for VnV?}
+
+Although the VnV plan outlined a structured set of verification and
+validation activities, the testing that actually took place during
+development was more iterative than originally planned.
+
+Many tests happened while features were being implemented rather than
+only after development was finished. For example, the team regularly
+tested components such as form creation, event registration, and data
+handling while building them to ensure they worked before integration.
+
+This difference mainly occurred because development progressed in small
+increments, and it made more sense to validate features as they were
+built. In future projects, we would anticipate this by planning for more
+continuous testing throughout development rather than assuming testing
+would happen mostly at the end.
 
 \end{document}
