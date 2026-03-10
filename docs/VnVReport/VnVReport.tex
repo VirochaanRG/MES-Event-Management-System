@@ -19,10 +19,10 @@
 
 \begin{document}
 
-\title{Verification and Validation Report: \progname} 
+\title{Verification and Validation Report: \progname}
 \author{\authname}
 \date{\today}
-	
+
 \maketitle
 
 \pagenumbering{roman}
@@ -42,10 +42,10 @@ Date 2 & 1.1 & Notes\\
 \section{Symbols, Abbreviations and Acronyms}
 
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{l l} 
-  \toprule		
+\begin{tabular}{l l}
+  \toprule
   \textbf{symbol} & \textbf{description}\\
-  \midrule 
+  \midrule
   T & Test\\
   \bottomrule
 \end{tabular}\\
@@ -86,7 +86,7 @@ Output:
 - Newly created form appears in the admin dashboard
 - Form fields are stored correctly in the database
 \end{verbatim}
-\textbf{Result:} Pass \\ 
+\textbf{Result:} Pass \\
 \textbf{Discussion:} The administrator successfully created a new form with multiple fields and the form appeared correctly in the dashboard with all fields stored in the system database. \\
 \subsubsection{Test-FR-AP-2: View and Analyze Form Data}
 \textbf{Type:} Manual \\ \textbf{Initial State:} At least two forms exist with previously collected responses. \\ \textbf{Test Procedure:}
@@ -150,7 +150,7 @@ This section evaluates the functional requirements specific to the attendee's mo
 \textbf{Type:} Manual \\
 \textbf{Initial State:} The system has multiple upcoming and past events. \\
 \textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Input:}
 \begin{itemize}
     \item Login as an authenticated attendee.
     \item Navigate to the "Upcoming Events" tab.
@@ -158,7 +158,7 @@ This section evaluates the functional requirements specific to the attendee's mo
     \item Select a specific event to view its details.
 \end{itemize}
 \textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
     \item Each tab displays the correct filtered list of events.
     \item Event information (time, location, description) accurately matches the database records.
@@ -189,14 +189,14 @@ This section verifies the robustness of the system's internal communications and
 \textbf{Type:} Manual \\
 \textbf{Initial State:} Admin and attendee accounts exist with distinct permissions. \\
 \textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Input:}
 \begin{itemize}
     \item Login with an "Attendee" role account.
     \item Attempt to access the Admin Dashboard URL manually.
     \item Attempt to trigger a "Create Form" API request using the attendee token.
 \end{itemize}
 \textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
     \item The system denies access to admin features.
     \item Proper error handling (e.g., 403 Forbidden or redirection) is observed.
@@ -221,13 +221,13 @@ This section evaluates the visual and aesthetic requirements of the EvENGage sys
 \textbf{Type:} Manual \\
 \textbf{Initial State:} The UI for the basic system build is finalized and accessible. \\
 \textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Input:}
 \begin{itemize}
     \item Provide the MES representative with access to the application UI.
     \item Review the color palette, typography, and logo placement against MES branding guidelines.
 \end{itemize}
 \textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
     \item Official approval from the MES representative on branding consistency.
 \end{itemize}
@@ -238,13 +238,13 @@ This section evaluates the visual and aesthetic requirements of the EvENGage sys
 \textbf{Type:} Manual \\
 \textbf{Initial State:} A production build has been used in a live event and a survey is ready for distribution. \\
 \textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Input:}
 \begin{itemize}
     \item Deploy the app at one MES event.
     \item Send a design reception survey to all attendees.
 \end{itemize}
 \textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
     \item Survey results indicating positive user reception of the visual design.
 \end{itemize}
@@ -258,12 +258,12 @@ This section focuses on the ease of use, accessibility, and user-centric design 
 \textbf{Type:} Manual \\
 \textbf{Initial State:} Functional live event forms are deployed. \\
 \textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Input:}
 \begin{itemize}
     \item Observe 30 attendees accessing the app during an event with no prior instruction.
 \end{itemize}
 \textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
     \item Successful submission of registration and feedback forms.
     \item Average ease-of-use rating of 4+ out of 5 from at least 80\% of users.
@@ -297,13 +297,13 @@ This section validates the protection of user data and the integrity of administ
 \textbf{Type:} Manual \\
 \textbf{Initial State:} Authentication is configured to restrict access to McMaster email domains. \\
 \textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Input:}
 \begin{itemize}
     \item Attempt login with a non-McMaster email address.
     \item Attempt login with a valid @mcmaster.ca email address.
 \end{itemize}
 \textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
     \item System denies access to the non-McMaster account and logs the attempt.
     \item System allows access to the valid McMaster account.
@@ -315,13 +315,13 @@ This section validates the protection of user data and the integrity of administ
 \textbf{Type:} Manual \\
 \textbf{Initial State:} No test account created in the database. \\
 \textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Input:}
 \begin{itemize}
     \item Create a new account and submit personal information.
     \item Inspect the database entry for that specific user.
 \end{itemize}
 \textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
     \item Personal data fields are fully encrypted with no plaintext visible.
 \end{itemize}
@@ -329,8 +329,8 @@ This section validates the protection of user data and the integrity of administ
 \textbf{Discussion:} Direct inspection of the PostgreSQL database confirmed that sensitive data is stored using AES-256 encryption.
 
 \subsection{etc.}
-	
-\section{Comparison to Existing Implementation}	
+
+\section{Comparison to Existing Implementation}
 
 This section will not be appropriate for every project.
 
@@ -622,35 +622,35 @@ Based on the results from unit testing, some changes can be made to improve serv
 
 \subsection{Rendering Bug Fixes}
 
-During the reviews, a couple minor bugs were found mostly related to the initial rendering of pages and transfer of parameters between pages of the web application. 
+During the reviews, a couple minor bugs were found mostly related to the initial rendering of pages and transfer of parameters between pages of the web application.
 
 \subsubsection{User Portal}
 \begin{itemize}
-    \item 
+    \item
     \textbf{Bug:} Clicking the "Back to Surveys" buttons within the form filling interface brings the user back to the dashboard page, but on the "Overview" tab, not the "Surveys" tab.
     \\
     \textbf{Fix:} Each tab (Overview, Events, Surveys) can be attached to a URL route (e.g. /overview, /events, /surveys).
-    \item 
-    \textbf{Bug:} Clicking "Save" under the form filling interface, then reloading the page does not retain the user's current answers. 
+    \item
+    \textbf{Bug:} Clicking "Save" under the form filling interface, then reloading the page does not retain the user's current answers.
     \\
     \textbf{Fix:} Ensure the database is queried for any saved responses to the selected form, and the reponses are loaded before the page is rendered.
-    \item 
+    \item
     \textbf{Bug:} The modular form filling interface does not render the "Completed Sections" interface until all modules are completed.
     \\
     \textbf{Fix:} Change the rendering conditions for the "Completed Sections" UI element to render if there are 1 or more completed sections.
-    \item 
-    \textbf{Bug:} Clicking "View Details" on an event card under the "Featured Events" section loads the overall "Events" tab, instead of bringing the user to the details page for the selected event. 
+    \item
+    \textbf{Bug:} Clicking "View Details" on an event card under the "Featured Events" section loads the overall "Events" tab, instead of bringing the user to the details page for the selected event.
     \\
     \textbf{Fix:} Update the click handler for the "View Details" button to route to the event details page.
 \end{itemize}
-    
+
 \subsubsection{Admin Portal}
 \begin{itemize}
-    \item 
+    \item
     \textbf{Bug:} Setting the unlock date on a form to an invalid date will set no date instead of prompting the user to correct the invalid entry.
     \\
     \textbf{Fix:} Add error handling for the selected unlock date, with validity checks that trigger a correction prompt on invalid entries.
-    \item 
+    \item
     \textbf{Bug:} Empty sections (e.g. form with no description) are not rendered, causing inconsistencies in UI elements and visual bugs
     \\
     \textbf{Fix:} Add placeholder text for missing information (e.g. No description, no deadline) or render the element without any text.
@@ -662,15 +662,15 @@ The following are important features or functionality of the software that was n
 
 \subsubsection{User Portal}
 \begin{itemize}
-    \item 
+    \item
     \textbf{Issue:} No option to view a completed submission, only to edit or delete.
     \\
     \textbf{Fix:} Render a "View Submission" button if the form is completed. When clicked it should open the form filling interface but disable all input fields to prevent edits.
-    \item 
+    \item
     \textbf{Issue:} The form details interface displays the time the form was created, which is irrelevant to the user. Should display the last edit or submission instead.
     \\
     \textbf{Fix:} Populate this field with the last submission time, queried from the form submissions database table.
-    \item 
+    \item
     \textbf{Issue:} Instead of prompting the user for their personal information (e.g. name, email), this information should be pulled from the user's profile.
     \\
     \textbf{Fix:} Create a user profile page, allowing the user to edit this information. This page can be rendered and required for completion upon creation of a new account.
@@ -678,23 +678,23 @@ The following are important features or functionality of the software that was n
 
 \subsubsection{Admin Portal}
 \begin{itemize}
-    \item 
+    \item
     \textbf{Issue:} No option to edit the name and description of a form
     \\
     \textbf{Fix:} Similar to the events dashboard, add an edit button for each form which prompts the admin to edit the name and description of the form.
-    \item 
+    \item
     \textbf{Issue:} The status of an event ("Scheduled", "Ongoing", or "Completed") should be an automatically assigned state instead of manually selected.
     \\
     \textbf{Fix:} Add functionality in the backend to do this automatically at the indicated timestamps (e.g. set to "Ongoing" when the event date and time is reached).
-    \item 
+    \item
     \textbf{Issue:} Cannot set the status of an attendee from "Registed" to "Attended"
     \\
-    \textbf{Fix:} This can be done by scanning the user's QR code, but should add an interface to set this manually 
-    \item 
+    \textbf{Fix:} This can be done by scanning the user's QR code, but should add an interface to set this manually
+    \item
     \textbf{Issue:} The dropdown question type in the form builder should have the option to populate the dropdown with options by pasting multiple options seperated by newlines, instead of having to manually enter each choice for larger dropdowns.
     \\
-    \textbf{Fix:} Add a seperate field to enter multiple options at once, or detect new line characters in the existing interface. 
-    \item 
+    \textbf{Fix:} Add a seperate field to enter multiple options at once, or detect new line characters in the existing interface.
+    \item
     \textbf{Issue:} Pressing the Enter key while adding options to a multiple selection question should create a new option, instead of having to use the UI buttons.
     \\
     \textbf{Fix:} Add detection for new lines in the option field, or an event handler for the enter key.
@@ -735,7 +735,7 @@ The following are minor visual changes which reviewers noted can be made to impr
 \section{Automated Testing}
 Our unit tests are automated by running the `pnpm test` command within the respective directories based on the unit tests that we want run. We used Vitest to do the unit testing and integrated the Postman type API testing with these Vitest unit tests. This allowed us to both create mocks and snapshots of the database while testing to easily complete the tests and not having to create a seperate profile and testing database doing it all in memory.\\
 \\
-For integration testing we utilized github actions which ran the our test workflow on pushes and merges into the dev branch to ensure that our new changes worked with our previous ones with out causing any problems. 
+For integration testing we utilized github actions which ran the our test workflow on pushes and merges into the dev branch to ensure that our new changes worked with our previous ones with out causing any problems.
 \section{Trace to Requirements}
 \begin{longtable}{p{0.25\linewidth} p{0.65\linewidth}}
 \toprule
@@ -784,8 +784,8 @@ For integration testing we utilized github actions which ran the our test workfl
                   TC32, TC37, TC39, TC41, TC43, TC45, TC47, TC48, TC52, TC54, TC56,
                   TC58, TC59, TC64, TC66, TC67, TC69, TC74, TC79 \\[4mm]
 
-\end{longtable}		
-\section{Trace to Modules}		
+\end{longtable}
+\section{Trace to Modules}
 \begin{longtable}{p{0.30\linewidth} p{0.60\linewidth}}
 \toprule
 \textbf{Module} & \textbf{Unit Tests} \\
@@ -869,6 +869,33 @@ how those features would realistically be tested during development.
 Discussing these ideas with my teammates also helped clarify which
 verification activities made the most sense for our platform.
 
+\subsubsection*{Mohammad Mahdi Mahboob Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+
+One aspect of this deliverable that went well was the integration of AI
+into our testing workflow. With the rapid advancement of AI, we were able
+to quickly generate a test suite which helped us get the figures we needed
+for this deliverable without having to spend too much time thinking about,
+setting up, and deploying tests and testing technologies. We only needed to
+verify the testing methodology was consistent with our goals. I think this is
+a prime example of how AI can be used productively in our field, and is
+definitely going to become a staple of my workflow as I transition to the
+professional market.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+
+The biggest pain point I encountered was attempting to quantify, evaluate, and
+represent our NFR evaluations. This type of evaluation was completely new to me
+and I had difficulty figuring out how to conduct it, as well as identifying and
+accounting for any directive changes that had occurred since our Rev0 SRS plan.
+I was able to ask my fellow teammates for assistance in this aspect and
+referenced previous years' examples to get a better visualization of what the
+NFR evaluation looked like. My team also noted changes we need to make to our
+SRS, and we will regroup to determine what changes we will revert or commit to
+for Rev1. I am extremely grateful to my teammates for their continued support.
+
 \subsubsection*{Virochaan Ravichandran Gowri Reflection}
 
 \textbf{1. What went well while writing this deliverable?}
@@ -876,8 +903,7 @@ Our VNV plan was quite thorough in what and how we would be testing and the tool
 
 \textbf{2. What pain points did you experience during this deliverable,
 and how did you resolve them?}
-Setting up the testing did cause some problems because there was some dependencies in the setup that we needed to figure out. Also we felt that front-end testing was a bit redundant as it really only just confirmed what could be seen in the validation and acceptance tests so we needed to ensure that there was no redundancy in code coverage. Also we needed to ensure that the testing methodology for the NFR's was actually effective in showing that the NFR was achieved as well. So this caused us to tweak our process to eavluating the NFR's multiple times to actually ensure we achieved our goals. Finally there was some problems in getting good code coverage metrics specifically for the tests relating to the NFR because they are harder to measure. 
-
+Setting up the testing did cause some problems because there were some dependencies in the setup that we needed to figure out. Also we felt that front-end testing was a bit redundant as it really only just confirmed what could be seen in the validation and acceptance tests so we needed to ensure that there was no redundancy in code coverage. Also we needed to ensure that the testing methodology for the NFR's was actually effective in showing that the NFR was achieved as well. So this caused us to tweak our process to evaluating the NFR's multiple times to actually ensure we achieved our goals. Finally, there were some problems in getting good code coverage metrics specifically for the tests relating to the NFR because they are harder to measure.
 
 \subsubsection*{Team Reflection}
 
@@ -886,9 +912,9 @@ client(s) or a proxy (e.g. your peers)? Which ones were not, and why?}
 
 Some parts of the document were influenced by conversations with our
 project supervisor and internal team discussions about how the platform
-would actually be used by MES organizers and students. In particular, the 
-validation activities related to usability, event registration workflows, 
-and the overall user experience were shaped by our understanding of the 
+would actually be used by MES organizers and students. In particular, the
+validation activities related to usability, event registration workflows,
+and the overall user experience were shaped by our understanding of the
 client’s needs and how the system would be used in practice.
 
 Other parts of the document, such as the structure of the verification
