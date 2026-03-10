@@ -1,6 +1,7 @@
 \documentclass[12pt, titlepage]{article}
 
 \usepackage{booktabs}
+\usepackage{fvextra}
 \usepackage{tabularx}
 \usepackage{array}
 \usepackage{longtable}
@@ -219,116 +220,123 @@ This section evaluates the visual and aesthetic requirements of the EvENGage sys
 
 \subsubsection{Test-NFR-LF-1: MES Branding Conformance}
 \textbf{Type:} Manual \\
-\textbf{Initial State:} The UI for the basic system build is finalized and accessible. \\
-\textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Initial State:} The UI for the latest web and mobile builds are finalized and accessible. \\
+\textbf{Input:}
 \begin{itemize}
-    \item Provide the MES representative with access to the application UI.
-    \item Review the color palette, typography, and logo placement against MES branding guidelines.
+    \item Present the latest build to an MES representative or project stakeholder.
+    \item Review key visual elements including color palette, typography, and logo placement.
+    \item Compare the interface against intended MES branding guidelines and prior design discussions.
 \end{itemize}
-\textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
-    \item Official approval from the MES representative on branding consistency.
+    \item Representative confirms whether the interface aligns with MES branding.
 \end{itemize}
 \textbf{Result:} Pass \\
-\textbf{Discussion:} A meeting was held with the stakeholder where the design decisions (branding and color palette) were assessed. The representative confirmed the UI correctly reflects the MES identity.
+\textbf{Discussion:} A meeting was held with the stakeholder where the design decisions were assessed. The representative confirmed that the UI adheres to the requirements. Minor visual suggestions were noted for future iterations, but the overall direction was approved.
 
 \subsubsection{Test-NFR-LF-2: Design Reception Survey}
 \textbf{Type:} Manual \\
-\textbf{Initial State:} A production build has been used in a live event and a survey is ready for distribution. \\
-\textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Initial State:} A deployed build is available and a short feedback survey has been prepared \href{https://forms.gle/GEDjaME9pe6QebEx6}{here}. \\
+\textbf{Input:}
 \begin{itemize}
-    \item Deploy the app at one MES event.
-    \item Send a design reception survey to all attendees.
+    \item Share the build with a small group of students (5-8 participants).
+    \item Ask participants to explore interface and interact with main functions.
+    \item Request participants complete the survey.
 \end{itemize}
-\textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
-    \item Survey results indicating positive user reception of the visual design.
+    \item Survey responses provide ratings on a scale of 1-5.
 \end{itemize}
 \textbf{Result:} Pass \\
-\textbf{Discussion:} Survey results were compiled and analyzed. The feedback illustrated that the design meets usability and aesthetic expectations for the target student demographic.
+\textbf{Discussion:} Survey responses were collected and analyzed. Average responses were positive and suggested that userse enjoyed the design.
 
 \subsection{System Testing - Usability and Humanity}
 This section focuses on the ease of use, accessibility, and user-centric design of the platform for both administrators and student attendees.
 
 \subsubsection{Test-NFR-UH-1: Intuitive Feedback and Registration}
 \textbf{Type:} Manual \\
-\textbf{Initial State:} Functional live event forms are deployed. \\
-\textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Initial State:} A deployed build is available and a test event has been scheduled. \\
+\textbf{Input:}
 \begin{itemize}
-    \item Observe 30 attendees accessing the app during an event with no prior instruction.
+    \item Instruct a small group of students (5-8 participants) to register to an event.
+    \item Instruct them to complete a feedback form.
+    \item Collect a short usability rating (1-5 scale) for ease of use.
 \end{itemize}
-\textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
-    \item Successful submission of registration and feedback forms.
-    \item Average ease-of-use rating of 4+ out of 5 from at least 80\% of users.
+    \item Successful event registration and survey submission.
+    \item Average usability rating of 4 or higher.
 \end{itemize}
 \textbf{Result:} Pass \\
-\textbf{Discussion:} Attendees were able to register and provide feedback without any technical guidance, satisfying the requirement for intuitive navigation.
+\textbf{Discussion:} All participants were able to navigate the registration and feedback workflows without any guidance. While a few users took more time than others, all participants successfully completed the task, suggesting it is intuitive.
 
 \subsubsection{Test-NFR-UH-6: Accessibility Conformance}
-\textbf{Type:} Automatic \\
-\textbf{Initial State:} Fully configured UI themes are live. \\
-\textbf{Input/Condition:} Web accessibility evaluation tools (e.g., WebAIM) are used to scan the interface. \\
-\textbf{Expected Output:} The design conforms to WCAG 2.0 and AODA requirements. \\
-\textbf{How the test will be performed:} Automated web tools will be used to assess the DOM structure, color contrast ratios, and screen-reader compatibility. \\
-\textbf{Actual Result:} The system successfully passed WCAG 2.0 Level AA compliance checks with no high-priority accessibility errors detected.
+\textbf{Type:} Manual \\
+\textbf{Initial State:} Fully configured UI themes. \\
+\textbf{Input:}
+\begin{itemize}
+    \item All members manually inspect color contrast, button labeling, and page structure for readability based on WCAG 2.0 guidelines.
+\end{itemize}
+\textbf{Output:}
+\begin{itemize}
+    \item No major accessibility violations are discovered.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Accessibility checks were performed manually. No significant accessibility issues were detected during testing. In the future, we plan to use an established web tool, such as WebAIM to ensure the interface meets basic accessibility expectations.
 
 \subsection{System Testing - Performance}
-This section evaluates the system's responsiveness and capacity, ensuring it can handle the high traffic characteristic of large-scale university events.
+This section evaluates the system's responsiveness and capacity, ensuring it can handle typical usage scenarios.
 
 \subsubsection{Test-NFR-PF-1: Form Latency}
 \textbf{Type:} Automatic \\
-\textbf{Initial State:} Platform is open on a variety of devices (iOS, Android, Windows). \\
-\textbf{Input/Condition:} Loading event forms. \\
-\textbf{Expected Output:} Measured Time to First Byte (TTFB) is less than 2 seconds. \\
-\textbf{How the test will be performed:} Browser developer tools and APM monitoring will be used on distinct devices to measure total load time. \\
-\textbf{Actual Result:} Average TTFB across all devices was 1.1 seconds, well within the 2-second threshold.
+\textbf{Initial State:} Platform is running locally on desktop browser. \\
+\textbf{Input:}
+\begin{itemize}
+    \item Open event registration and survey forms on different devices on chrome.
+    \item Use browser developer tools (F12) to measure page load times and request latency.
+    \item Repeat test multiple times.
+\end{itemize}
+\textbf{Output:}
+\begin{itemize}
+    \item Form pages load within 2 seconds.
+    \item No severe delays or loading failures.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Performance measurements were taken using chrome developer tools in a limited development environment. Forms consistently loaded within the acceptable threshold during testing. Next step is to test the deployed build on different browsers, as well as the mobile app.
 
 \subsection{System Testing - Security}
 This section validates the protection of user data and the integrity of administrative actions within the system.
 
 \subsubsection{Test-NFR-ST-1: Secure Email Authentication}
 \textbf{Type:} Manual \\
-\textbf{Initial State:} Authentication is configured to restrict access to McMaster email domains. \\
-\textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Initial State:} A deployed build is available and connected to database. \\
+\textbf{Input:}
 \begin{itemize}
-    \item Attempt login with a non-McMaster email address.
-    \item Attempt login with a valid @mcmaster.ca email address.
+    \item Attempt account creation/log-in with a non-authorized email address.
+    \item Attempt account creation/log-in with a valid McMaster email.
 \end{itemize}
-\textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
-    \item System denies access to the non-McMaster account and logs the attempt.
-    \item System allows access to the valid McMaster account.
+    \item Unauthorized email addresses are rejected by the authentication system.
+    \item Authorized accounts are successfully authenticated.
 \end{itemize}
 \textbf{Result:} Pass \\
-\textbf{Discussion:} The authentication layer correctly filtered users by domain and provided an audit trail for invalid login attempts.
+\textbf{Discussion:} Controlled login attempts were performed using both valid and invalid email domains. The system correctly restricted access to unauthorized accounts, and allowed valid users to log-in.
 
 \subsubsection{Test-NFR-ST-4: Secure Data Encryption}
 \textbf{Type:} Manual \\
-\textbf{Initial State:} No test account created in the database. \\
-\textbf{Test Procedure:} \\
-\textbf{Input:} 
+\textbf{Initial State:} No test account exists in the database. \\
+\textbf{Input:}
 \begin{itemize}
-    \item Create a new account and submit personal information.
-    \item Inspect the database entry for that specific user.
+    \item Create a new user account and submit registration information.
+    \item Inspect the corresponding database entry for stored data.
 \end{itemize}
-\textbf{Expected Result:} \\
-\textbf{Output:} 
+\textbf{Output:}
 \begin{itemize}
-    \item Personal data fields are fully encrypted with no plaintext visible.
+    \item Sensitive authentication fields such as passwords are encrypted.
 \end{itemize}
 \textbf{Result:} Pass \\
-\textbf{Discussion:} Direct inspection of the PostgreSQL database confirmed that sensitive data is stored using AES-256 encryption.
-
-\subsection{etc.}
+\textbf{Discussion:} Inspection of the development database confirmed that authentication credentials are successfully hashed.
 	
 \section{Comparison to Existing Implementation}	
 
