@@ -336,9 +336,7 @@ This section will not be appropriate for every project.
 
 \section{Unit Testing}
 
-\subsection{Server API Testing}
-
-\subsubsection{Admin Server Testing - Events API}
+\subsection{Admin Server Testing - Events API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -416,7 +414,7 @@ TC32 & PATCH /api/events/:id/qr-check-in - Return 404 when event not found & 404
 
 {\small \textit{Table: Events API Unit Tests}}
 
-\subsubsection{Admin Server Testing - Forms API}
+\subsection{Admin Server Testing - Forms API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -448,7 +446,7 @@ TC41 & PUT /api/forms/:id - Return 404 when form not found & 404 error response 
 
 {\small \textit{Table: Forms API Unit Tests}}
 
-\subsubsection{Admin Server Testing - Form Builder API}
+\subsection{Admin Server Testing - Form Builder API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -476,7 +474,7 @@ TC48 & DELETE /api/forms/:formId/questions/:questionId - Return 404 when questio
 
 {\small \textit{Table: Form Builder API Unit Tests}}
 
-\subsubsection{Admin Server Testing - Images API}
+\subsection{Admin Server Testing - Images API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -735,11 +733,118 @@ The following are minor visual changes which reviewers noted can be made to impr
 \end{itemize}
 
 \section{Automated Testing}
-
+Our unit tests are automated by running the `pnpm test` command within the respective directories based on the unit tests that we want run. We used Vitest to do the unit testing and integrated the Postman type API testing with these Vitest unit tests. This allowed us to both create mocks and snapshots of the database while testing to easily complete the tests and not having to create a seperate profile and testing database doing it all in memory.\\
+\\
+For integration testing we utilized github actions which ran the our test workflow on pushes and merges into the dev branch to ensure that our new changes worked with our previous ones with out causing any problems.
 \section{Trace to Requirements}
+\begin{longtable}{p{0.25\linewidth} p{0.65\linewidth}}
+\toprule
+\textbf{Requirement} & \textbf{Unit Tests} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Requirement} & \textbf{Unit Tests} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
 
+% Section 9 – Functional Requirements
+\textbf{FR-1}  & TC38, TC39, TC42, TC43, TC44, TC45, TC46, TC47, TC48 \\[4mm]
+\textbf{FR-2}  & TC33, TC34, TC35, TC36, TC37, TC40, TC41, TC70, TC71, TC72, TC73, TC74, TC75 \\[4mm]
+\textbf{FR-3}  & TC11, TC12, TC13, TC14, TC15, TC62, TC63, TC64, TC65, TC66, TC67, TC68, TC69 \\[4mm]
+\textbf{FR-4}  & TC26, TC27, TC28, TC29, TC30, TC31, TC32, TC65 \\[4mm]
+\textbf{FR-5}  & TC1, TC2, TC3, TC14, TC15 \\[4mm]
+\textbf{FR-6}  & TC4, TC5, TC6, TC7, TC8, TC9, TC10, TC62, TC63, TC64, TC65, TC66, TC67, TC68, TC69 \\[4mm]
+\textbf{FR-7}  & TC33, TC34, TC35, TC38, TC39, TC40, TC41, TC70, TC71, TC72, TC73, TC74, TC75, TC76, TC77 \\[4mm]
+\textbf{FR-9}  & TC70, TC71, TC72, TC73, TC74, TC75, TC76, TC77 \\[4mm]
+\textbf{FR-10} & TC33, TC34, TC35, TC36, TC37, TC40, TC41 \\[4mm]
+\textbf{FR-11} & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+
+\textbf{ER-2}  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{PI-1}  & TC38, TC42, TC43, TC44, TC46, TC47 \\[4mm]
+\textbf{PI-2}  & TC1, TC2 \\[4mm]
+\textbf{LR-2}  & TC38, TC42, TC43, TC44, TC45, TC46, TC47, TC48 \\[4mm]
+\textbf{UR-2}  & TC6, TC7, TC9, TC13, TC18, TC21, TC22, TC24, TC25, TC28, TC29, TC31, TC32,
+                  TC37, TC39, TC41, TC43, TC45, TC47, TC48, TC52, TC54, TC56, TC58, TC59,
+                  TC60, TC64, TC66, TC67, TC69, TC74, TC79 \\[4mm]
+\textbf{UR-3}  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{SC-1}  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{PA-1}  & TC1, TC2 \\[4mm]
+\textbf{FT-1}  & TC76, TC77 \\[4mm]
+\textbf{FT-2}  & TC76, TC77 \\[4mm]
+\textbf{FT-3}  & TC38, TC42, TC44 \\[4mm]
+\textbf{FT-4}  & TC8, TC9, TC10, TC20, TC21, TC22 \\[4mm]
+\textbf{SE-1}  & TC14, TC15, TC65, TC69 \\[4mm]
+
+% Section 15 – Security Requirements
+\textbf{SAR-1} & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{SAR-2} & TC57, TC60, TC61 \\[4mm]
+\textbf{SIR-1} & TC6, TC7, TC9, TC13, TC18, TC21, TC22, TC24, TC25, TC28, TC29, TC31,
+                  TC32, TC37, TC39, TC41, TC43, TC45, TC47, TC48, TC52, TC54, TC56,
+                  TC58, TC59, TC64, TC66, TC67, TC69, TC74, TC79 \\[4mm]
+
+\end{longtable}
 \section{Trace to Modules}
+\begin{longtable}{p{0.30\linewidth} p{0.60\linewidth}}
+\toprule
+\textbf{Module} & \textbf{Unit Tests} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Module} & \textbf{Unit Tests} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
 
+\textbf{M1: Main System Module}
+  & TC1, TC2, TC3, TC4, TC5, TC6, TC7, TC8, TC9, TC10,
+    TC11, TC12, TC13, TC14, TC15, TC16, TC17, TC18, TC19,
+    TC20, TC21, TC22, TC23, TC24, TC25, TC26, TC27, TC28,
+    TC29, TC30, TC31, TC32, TC33, TC34, TC35, TC36, TC37,
+    TC38, TC39, TC40, TC41, TC42, TC43, TC44, TC45, TC46,
+    TC47, TC48, TC49, TC50, TC51, TC52, TC53, TC54, TC55,
+    TC56, TC57, TC58, TC59, TC60, TC61, TC62, TC63, TC64,
+    TC65, TC66, TC67, TC68, TC69, TC70, TC71, TC72, TC73,
+    TC74, TC75, TC76, TC77, TC78, TC79, TC80, TC81, TC82 \\[4mm]
+
+\textbf{M2: User Authentication Module}
+  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+
+\textbf{M3: User Authorization Module}
+  & TC57, TC60, TC61 \\[4mm]
+
+\textbf{M4: Form Template Module}
+  & TC33, TC34, TC35, TC36, TC37, TC38, TC39, TC40, TC41,
+    TC42, TC43, TC44, TC45, TC46, TC47, TC48,
+    TC70, TC71, TC72, TC73, TC74, TC75 \\[4mm]
+
+\textbf{M5: Form Submission Module}
+  & TC76, TC77 \\[4mm]
+
+\textbf{M6: Event Management Module}
+  & TC1, TC2, TC3, TC4, TC5, TC6, TC7, TC8, TC9, TC10,
+    TC49, TC50, TC51, TC52, TC53, TC54, TC55, TC56,
+    TC62, TC63, TC64,
+    TC78, TC79, TC80, TC81, TC82 \\[4mm]
+
+
+\textbf{M8: Registration Module}
+  & TC11, TC12, TC13, TC14, TC15,
+    TC65, TC66, TC67, TC68, TC69 \\[4mm]
+
+\textbf{M9: Attendance Tracking Module}
+  & TC23, TC24, TC25, TC26, TC27, TC28, TC29,
+    TC30, TC31, TC32 \\[4mm]
+
+\textbf{M12: Database Access Module}
+  & TC3, TC7, TC9, TC15, TC17, TC22, TC25, TC29,
+    TC32, TC37, TC41, TC45, TC48, TC52, TC54, TC56,
+    TC64, TC67, TC69, TC74 \\[4mm]
+
+
+\end{longtable}
 \section{Code Coverage Metrics}
 
 \newpage{}
@@ -758,8 +863,7 @@ platform like event registration, the form builder, and the admin dashboard.
 \textbf{2. What pain points did you experience during this deliverable,
 and how did you resolve them?}
 
-Making sure that the testing approaches we described were realistic and would
-actually match the features that were implemented in the system.
+Making sure that the testing approaches we described were realistic and would actually match the features that were implemented in the system.
 To resolve this, I reviewed the project requirements and thought about
 how those features would realistically be tested during development.
 Discussing these ideas with my teammates also helped clarify which
@@ -791,6 +895,15 @@ referenced previous years' examples to get a better visualization of what the
 NFR evaluation looked like. My team also noted changes we need to make to our
 SRS, and we will regroup to determine what changes we will revert or commit to
 for Rev1. I am extremely grateful to my teammates for their continued support.
+
+\subsubsection*{Virochaan Ravichandran Gowri Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+Our VNV plan was quite thorough in what and how we would be testing and the tools and/or methodology we planned on using within our tests. We also were quite proactive in understanding that we were gonna do usability testing so we got extra feedback on how to improve our project. Also I think we figured out how to use the tools and like vitest quite easily so this was not a large barrier to our progress for this deliverable.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+Setting up the testing did cause some problems because there were some dependencies in the setup that we needed to figure out. Also we felt that front-end testing was a bit redundant as it really only just confirmed what could be seen in the validation and acceptance tests so we needed to ensure that there was no redundancy in code coverage. Also we needed to ensure that the testing methodology for the NFR's was actually effective in showing that the NFR was achieved as well. So this caused us to tweak our process to evaluating the NFR's multiple times to actually ensure we achieved our goals. Finally, there were some problems in getting good code coverage metrics specifically for the tests relating to the NFR because they are harder to measure.
 
 \subsubsection*{Team Reflection}
 
