@@ -1,11 +1,18 @@
 \documentclass[12pt, titlepage]{article}
 
-\usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{array}
 \usepackage{longtable}
 \usepackage[table]{xcolor}
 \usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{float}
+
 \hypersetup{
     colorlinks,
     citecolor=black,
@@ -38,21 +45,6 @@ Date 2 & 1.1 & Notes\\
 \end{tabularx}
 
 ~\newpage
-
-\section{Symbols, Abbreviations and Acronyms}
-
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{l l}
-  \toprule
-  \textbf{symbol} & \textbf{description}\\
-  \midrule
-  T & Test\\
-  \bottomrule
-\end{tabular}\\
-
-\wss{symbols, abbreviations or acronyms -- you can reference the SRS tables if needed}
-
-\newpage
 
 \tableofcontents
 
@@ -845,10 +837,34 @@ For integration testing we utilized github actions which ran the our test workfl
 
 
 \end{longtable}
+
 \section{Code Coverage Metrics}
+
+The code coverage reports for the backend APIs and database schemas were generated using Vitest. Overall, the coverage of the system was about 50\% for statement coverage,  48\5 branch coverage, 56\% function coverage and 51\% line coverage. Main areas for improvement include the events and forms schemas, which both have a considerably low function coverage, as well as the form builder and form fetching API. 
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/report.png}
+    \caption{Code coverage report}\label{fig:workcontextuser}
+\end{figure}
+\end{center}
+
+A coverage report was not generated for the frontend code. This is due to the high difficultly and intricacy of testing interactive and state driven nature of modern UI frameworks such as React. Traditional code coverage reports and unit testing were replaced with peer reviews and user accceptance testing. 
 
 \newpage{}
 \section*{Appendix --- Reflection}
+
+\subsubsection*{Ibrahim Quraishi Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+
+Due to the highly detailed reports left by our supervisor from his review of the system, it was very simple to understand changes that needed to be made to the system to maintain consistency as well as general improvements. Analyzing the user's interactions with the application also helped guide us with designing unit tests based around what the system expects and does not expect from the user.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+
+Finding ways to imrpove our code coverage was difficult, due to the large scale and distributed nature of our system. It was especially difficult figuring out how the test the frontend components of our system as it is not something that can be tested with traditional unit testing. We did our best to resolve these issues by asking advice from our supervisor and our TA, and using code coverage reports to find where coverage was missing.   
 
 \subsubsection*{Rayyan Suhail Reflection}
 
