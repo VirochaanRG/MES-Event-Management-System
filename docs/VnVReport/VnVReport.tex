@@ -745,25 +745,60 @@ The following are minor visual changes which reviewers noted can be made to impr
 \newpage{}
 \section*{Appendix --- Reflection}
 
-The information in this section will be used to evaluate the team members on the
-graduate attribute of Reflection.
+\subsubsection*{Rayyan Suhail Reflection}
 
-\input{../Reflection.tex}
+\textbf{1. What went well while writing this deliverable?}
 
-\begin{enumerate}
-  \item What went well while writing this deliverable? 
-  \item What pain points did you experience during this deliverable, and how
-    did you resolve them?
-  \item Which parts of this document stemmed from speaking to your client(s) or
-  a proxy (e.g. your peers)? Which ones were not, and why?
-  \item In what ways was the Verification and Validation (VnV) Plan different
-  from the activities that were actually conducted for VnV?  If there were
-  differences, what changes required the modification in the plan?  Why did
-  these changes occur?  Would you be able to anticipate these changes in future
-  projects?  If there weren't any differences, how was your team able to clearly
-  predict a feasible amount of effort and the right tasks needed to build the
-  evidence that demonstrates the required quality?  (It is expected that most
-  teams will have had to deviate from their original VnV Plan.)
-\end{enumerate}
+During this deliverable was that our team already
+had a strong understanding of the system from previous documents such as
+the SRS and design deliverables. Because of this, it was easier to connect
+the verification and validation activities to the actual components of the
+platform like event registration, the form builder, and the admin dashboard.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+
+Making sure that the testing approaches we described were realistic and would
+actually match the features that were implemented in the system.
+To resolve this, I reviewed the project requirements and thought about
+how those features would realistically be tested during development.
+Discussing these ideas with my teammates also helped clarify which
+verification activities made the most sense for our platform.
+
+\subsubsection*{Team Reflection}
+
+\textbf{3. Which parts of this document stemmed from speaking to your
+client(s) or a proxy (e.g. your peers)? Which ones were not, and why?}
+
+Some parts of the document were influenced by conversations with our
+project supervisor and internal team discussions about how the platform
+would actually be used by MES organizers and students. In particular, the 
+validation activities related to usability, event registration workflows, 
+and the overall user experience were shaped by our understanding of the 
+client’s needs and how the system would be used in practice.
+
+Other parts of the document, such as the structure of the verification
+process and the different testing strategies, were based more on standard
+software engineering practices rather than direct client input. These
+sections were included to ensure the system could be tested thoroughly
+and maintain a good level of reliability.
+
+\textbf{4. In what ways was the Verification and Validation (VnV) Plan
+different from the activities that were actually conducted for VnV?}
+
+Although the VnV plan outlined a structured set of verification and
+validation activities, the testing that actually took place during
+development was more iterative than originally planned.
+
+Many tests happened while features were being implemented rather than
+only after development was finished. For example, the team regularly
+tested components such as form creation, event registration, and data
+handling while building them to ensure they worked before integration.
+
+This difference mainly occurred because development progressed in small
+increments, and it made more sense to validate features as they were
+built. In future projects, we would anticipate this by planning for more
+continuous testing throughout development rather than assuming testing
+would happen mostly at the end.
 
 \end{document}
