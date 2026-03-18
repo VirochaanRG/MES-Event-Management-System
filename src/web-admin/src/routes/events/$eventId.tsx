@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { FormQuestion } from "@/interfaces/interfaces";
 import RequireRole from "@/components/RequireRole";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
+import { useCustomAlert } from "@/components/CustomAlert";
 
 export const Route = createFileRoute("/events/$eventId")({
   component: EventDetail,
@@ -42,6 +43,7 @@ function EventDetail() {
   const { eventId } = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { showAlert } = useCustomAlert();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [selectedRegistration, setSelectedRegistration] =
@@ -164,7 +166,7 @@ function EventDetail() {
 
   const addQuestion = () => {
     if (!currentQuestion.label.trim()) {
-      alert("Please enter a question title");
+      showAlert("Please enter a question title");
       return;
     }
 
@@ -173,7 +175,7 @@ function EventDetail() {
         currentQuestion.question_type === "multi_select") &&
       (!currentQuestion.options || currentQuestion.options.length === 0)
     ) {
-      alert("Please add at least one option");
+      showAlert("Please add at least one option");
       return;
     }
 
@@ -215,7 +217,7 @@ function EventDetail() {
 
   const saveForm = () => {
     if (questions.length === 0) {
-      alert("Please add at least one question");
+      showAlert("Please add at least one question");
       return;
     }
 

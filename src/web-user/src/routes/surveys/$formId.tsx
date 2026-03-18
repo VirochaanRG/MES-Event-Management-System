@@ -1,12 +1,9 @@
-import {
-  createFileRoute,
-  useLocation,
-  useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Form } from "@/interfaces/interfaces";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useCustomConfirm } from "@/components/CustomAlert";
 
 export const Route = createFileRoute("/surveys/$formId")({
   component: RouteComponent,
@@ -15,6 +12,7 @@ export const Route = createFileRoute("/surveys/$formId")({
 function RouteComponent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const showConfirm = useCustomConfirm();
   const { formId } = Route.useParams();
   const userId = JSON.parse(
     sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
@@ -57,7 +55,7 @@ function RouteComponent() {
   }, [formId]);
 
   const handleBack = () => {
-    if(form?.moduleId) {
+    if (form?.moduleId) {
       navigate({ to: `/surveys/modular-form/${form.moduleId}` });
     } else {
       navigate({ to: "/" });
@@ -68,27 +66,27 @@ function RouteComponent() {
     navigate({ to: `/surveys/response/${formId}` });
   };
 
-  const handleDeleteSubmission = () => {
-    const deleteSubmission = async () => {
-      const confirmation = confirm(
-        "Are you sure you want to delete your submission?",
-      );
-      if (!confirmation) return;
-      const deleteResponse = await fetch(
-        `/api/forms/${formId}/delete/${userId}`,
-        { method: "DELETE" },
-      );
-      const deleteResult = await deleteResponse.json();
-      if (!deleteResult.success) {
-        toast.error("Unable to delete submission");
-      } else {
-        toast.success("Submission deleted");
-      }
+  const handleDeleteSubmission = async () => {
+    const confirmation = await showConfirm(
+      "Are you sure you want to delete your submission?",
+    );
+    if (!confirmation) return;
 
-      queryClient.invalidateQueries({ queryKey: ["availableSurveys"] });
-      queryClient.invalidateQueries({ queryKey: ["completedSurveys"] });
-    };
-    deleteSubmission();
+    const deleteResponse = await fetch(
+      `/api/forms/${formId}/delete/${userId}`,
+      {
+        method: "DELETE",
+      },
+    );
+    const deleteResult = await deleteResponse.json();
+    if (!deleteResult.success) {
+      toast.error("Unable to delete submission");
+      return;
+    }
+
+    toast.success("Submission deleted");
+    queryClient.invalidateQueries({ queryKey: ["availableSurveys"] });
+    queryClient.invalidateQueries({ queryKey: ["completedSurveys"] });
     setSurveyProgress("unfilled");
   };
 
@@ -121,7 +119,7 @@ function RouteComponent() {
             onClick={handleBack}
             className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
           >
-          {form?.moduleId ? "Back to modules" : "Back to Surveys"}
+            {form?.moduleId ? "Back to modules" : "Back to Surveys"}
           </button>
         </div>
       </div>

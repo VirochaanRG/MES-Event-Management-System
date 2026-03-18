@@ -16,6 +16,7 @@ import {
   Tag,
 } from "lucide-react";
 import RequireRole from "@/components/RequireRole";
+import { useCustomAlert, useCustomConfirm } from "@/components/CustomAlert";
 
 interface User {
   id: number;
@@ -26,6 +27,8 @@ interface User {
 }
 
 function UsersPageContent() {
+  const { showAlert } = useCustomAlert();
+  const showConfirm = useCustomConfirm();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
@@ -113,7 +116,10 @@ function UsersPageContent() {
   };
 
   const handleDeleteUser = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this user?",
+    );
+    if (!confirmed) return;
 
     try {
       const response = await fetch(`/api/users/${id}`, {
@@ -124,11 +130,11 @@ function UsersPageContent() {
         fetchUsers();
         fetchRoles();
       } else {
-        alert(data.error || "Failed to delete user");
+        showAlert(data.error || "Failed to delete user");
       }
     } catch (error) {
       console.error("Failed to delete user:", error);
-      alert("Failed to delete user");
+      showAlert("Failed to delete user");
     }
   };
 
@@ -154,11 +160,11 @@ function UsersPageContent() {
         setShowEditRolesModal(false);
         setSelectedUser(null);
       } else {
-        alert(data.error || "Failed to update roles");
+        showAlert(data.error || "Failed to update roles");
       }
     } catch (error) {
       console.error("Failed to update roles:", error);
-      alert("Failed to update roles");
+      showAlert("Failed to update roles");
     }
   };
 
@@ -167,7 +173,7 @@ function UsersPageContent() {
 
     const roleName = newRoleName.trim().toLowerCase();
     if (availableRoles.includes(roleName)) {
-      alert("This role already exists!");
+      showAlert("This role already exists!");
       return;
     }
 

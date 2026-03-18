@@ -6,6 +6,7 @@ import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
 import DropdownQuestion from "@/components/DropdownQuestion";
 import { Form, FormQuestion } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
+import { useCustomAlert, useCustomConfirm } from "@/components/CustomAlert";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 
@@ -36,18 +37,19 @@ function StatusPill({ status }: { status: FormStatus }) {
   return <span className={`${base} ${styles[status]}`}>{status}</span>;
 }
 
-
 export const Route = createFileRoute("/form-builder/$formId")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const { showAlert } = useCustomAlert();
+  const showConfirm = useCustomConfirm();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const { formId } = Route.useParams();
   const [formData, setFormData] = useState<Form | null>(null);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [unlockLocal, setUnlockLocal] = useState<string>(""); 
+  const [unlockLocal, setUnlockLocal] = useState<string>("");
   const [savingUnlock, setSavingUnlock] = useState(false);
   const [isEditingUnlock, setIsEditingUnlock] = useState(false);
   const [unlockDraft, setUnlockDraft] = useState<string>("");
@@ -77,7 +79,7 @@ function RouteComponent() {
     } catch (err: any) {
       // revert if it fails
       setFormData({ ...formData, isPublic: prev });
-      alert(err?.message || "Failed to update visibility");
+      showAlert(err?.message || "Failed to update visibility");
     } finally {
       setSavingVisibility(false);
     }
@@ -94,7 +96,7 @@ function RouteComponent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           unlockAt: nextUnlockAt,
-          isPublic: false, 
+          isPublic: false,
         }),
       });
 
@@ -105,9 +107,8 @@ function RouteComponent() {
       setFormData(json.data);
       setUnlockLocal(value || "");
       setUnlockDraft(value || "");
-
     } catch (err: any) {
-      alert(err?.message || "Failed to update unlock date");
+      showAlert(err?.message || "Failed to update unlock date");
     } finally {
       setSavingUnlock(false);
     }
@@ -325,7 +326,10 @@ function RouteComponent() {
   };
 
   const handleDeleteQuestion = async (questionId: number) => {
-    if (!confirm("Are you sure you want to delete this question?")) {
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this question?",
+    );
+    if (!confirmed) {
       return;
     }
 
@@ -346,7 +350,7 @@ function RouteComponent() {
       setQuestions(questions.filter((q) => q.id !== questionId));
     } catch (err: any) {
       console.error("Failed to delete question:", err.message);
-      alert("Failed to delete question: " + err.message);
+      showAlert("Failed to delete question: " + err.message);
     }
   };
 
@@ -374,7 +378,7 @@ function RouteComponent() {
       }
     } catch (err: any) {
       console.error("Failed to move question up:", err.message);
-      alert("Failed to move question up: " + err.message);
+      showAlert("Failed to move question up: " + err.message);
     }
   };
 
@@ -402,19 +406,19 @@ function RouteComponent() {
       }
     } catch (err: any) {
       console.error("Failed to move question down:", err.message);
-      alert("Failed to move question down: " + err.message);
+      showAlert("Failed to move question down: " + err.message);
     }
   };
 
   const handleSaveQuestion = async () => {
     try {
       if (!questionTitle.trim()) {
-        alert("Please enter a question title");
+        showAlert("Please enter a question title");
         return;
       }
 
       if (followupParentId && selectedTriggers.length == 0) {
-        alert("Please select atleast one answer to follow up to");
+        showAlert("Please select atleast one answer to follow up to");
         return;
       }
 
@@ -426,11 +430,11 @@ function RouteComponent() {
       ) {
         const validChoices = mcChoices.filter((c) => c.trim() !== "");
         if (validChoices.length < 2) {
-          alert("Please provide at least 2 choices");
+          showAlert("Please provide at least 2 choices");
           return;
         }
         if (new Set(validChoices).size !== validChoices.length) {
-          alert("Duplicate choices are not allowed");
+          showAlert("Duplicate choices are not allowed");
           return;
         }
         optionsCategory = JSON.stringify({ choices: validChoices });
@@ -448,11 +452,11 @@ function RouteComponent() {
       } else if (selectedQuestionType === "multi_select") {
         const validChoices = mcChoices.filter((c) => c.trim() !== "");
         if (validChoices.length < 2) {
-          alert("Please provide at least 2 choices");
+          showAlert("Please provide at least 2 choices");
           return;
         }
         if (new Set(validChoices).size !== validChoices.length) {
-          alert("Duplicate choices are not allowed");
+          showAlert("Duplicate choices are not allowed");
           return;
         }
         optionsCategory = JSON.stringify({
@@ -532,7 +536,7 @@ function RouteComponent() {
       setOpenFollowupFor(null); // ADD THIS LINE - Reset follow-up dropdown state after saving
     } catch (err: any) {
       console.error("Failed to save question:", err.message);
-      alert("Failed to save question: " + err.message);
+      showAlert("Failed to save question: " + err.message);
     }
   };
 
@@ -614,7 +618,9 @@ function RouteComponent() {
                 <div className="mt-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-900">Unlock date</span>
+                      <span className="text-sm font-medium text-gray-900">
+                        Unlock date
+                      </span>
 
                       {!isEditingUnlock ? (
                         <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -675,8 +681,7 @@ function RouteComponent() {
                           )}
                         </div>
                       )}
-                      <p className="mt-1 text-xs text-gray-500">
-                      </p>
+                      <p className="mt-1 text-xs text-gray-500"></p>
                     </div>
                     {!isEditingUnlock && (
                       <button

@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/AdminLayout";
+import { useCustomConfirm } from "@/components/CustomAlert";
 import RequireRole from "@/components/RequireRole";
 import { Form } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
@@ -31,13 +32,13 @@ function StatusPill({ status }: { status: FormStatus }) {
   return <span className={`${base} ${styles[status]}`}>{status}</span>;
 }
 
-
 export const Route = createFileRoute("/form-builder/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const showConfirm = useCustomConfirm();
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -153,7 +154,10 @@ function RouteComponent() {
   };
 
   const handleDeleteForm = async (form) => {
-    if (!confirm("Are you sure you want to delete this form?")) {
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this form?",
+    );
+    if (!confirmed) {
       return;
     }
 
@@ -316,14 +320,16 @@ function RouteComponent() {
                           </p>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <p className="text-sm text-gray-500">
-                              Created: {new Date(form.createdAt).toLocaleDateString()}
+                              Created:{" "}
+                              {new Date(form.createdAt).toLocaleDateString()}
                             </p>
 
                             <StatusPill status={getFormStatus(form)} />
 
                             {form.unlockAt && (
                               <p className="text-sm text-gray-500">
-                                Unlocks: {new Date(form.unlockAt).toLocaleString()}
+                                Unlocks:{" "}
+                                {new Date(form.unlockAt).toLocaleString()}
                               </p>
                             )}
                           </div>
@@ -436,7 +442,8 @@ function RouteComponent() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                       />
                       <p className="mt-1 text-xs text-gray-500">
-                        If set, the form won’t be available to users until this date (when Public is enabled).
+                        If set, the form won’t be available to users until this
+                        date (when Public is enabled).
                       </p>
                     </div>
                   </div>

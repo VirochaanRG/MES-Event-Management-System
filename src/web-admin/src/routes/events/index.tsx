@@ -19,6 +19,7 @@ import {
   Edit,
 } from "lucide-react";
 import RequireRole from "@/components/RequireRole";
+import { useCustomAlert, useCustomConfirm } from "@/components/CustomAlert";
 
 interface Event {
   id: number;
@@ -45,6 +46,8 @@ interface RegisteredUser {
 }
 
 function EventsPageContent() {
+  const { showAlert } = useCustomAlert();
+  const showConfirm = useCustomConfirm();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState<Event[]>([]);
@@ -155,13 +158,13 @@ function EventsPageContent() {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+      showAlert("Please select an image file");
       return;
     }
 
     // Validate file size (e.g., max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image size should be less than 5MB");
+      showAlert("Image size should be less than 5MB");
       return;
     }
 
@@ -183,13 +186,13 @@ function EventsPageContent() {
       if (data.success) {
         // Refresh the image for this event
         fetchEventImage(eventId);
-        alert("Image uploaded successfully!");
+        showAlert("Image uploaded successfully!");
       } else {
-        alert("Failed to upload image: " + (data.error || "Unknown error"));
+        showAlert("Failed to upload image: " + (data.error || "Unknown error"));
       }
     } catch (error) {
       console.error("Failed to upload image:", error);
-      alert("Failed to upload image");
+      showAlert("Failed to upload image");
     } finally {
       setUploadingImageFor(null);
     }
@@ -259,7 +262,10 @@ function EventsPageContent() {
   };
 
   const handleDeleteEvent = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this event?")) return;
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this event?",
+    );
+    if (!confirmed) return;
 
     try {
       const response = await fetch(`/api/events/${id}`, {
@@ -286,7 +292,7 @@ function EventsPageContent() {
         fetchEvents();
         setIsEditing(false);
         setShowDetailModal(false);
-        alert("Event updated successfully!");
+        showAlert("Event updated successfully!");
       }
     } catch (error) {
       console.error("Failed to update event:", error);

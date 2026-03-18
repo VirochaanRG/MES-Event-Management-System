@@ -13,6 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import MultipleSelectAnswerQuestion from "@/components/MultipleSelectAnswerQuestion";
 import DropdownAnswerQuestion from "@/components/DropdownAnswerQuestion";
+import { useCustomConfirm } from "@/components/CustomAlert";
 
 export const Route = createFileRoute("/surveys/response/$formId")({
   component: RouteComponent,
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/surveys/response/$formId")({
 function RouteComponent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const showConfirm = useCustomConfirm();
   const { formId } = Route.useParams();
   const userId = JSON.parse(
     sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
@@ -84,18 +86,18 @@ function RouteComponent() {
         if (!questionsResult.success) {
           throw new Error(questionsResult.error || "Failed to fetch form");
         }
-        var questions: FormQuestion[] = questionsResult.data;
+        const questions: FormQuestion[] = questionsResult.data;
 
         const answersResponse = await fetch(
           `/api/forms/${formId}/answers/${userId}`,
         );
         const answersResult = await answersResponse.json();
-        var answers: FormAnswer[] = answersResult.success
+        const answers: FormAnswer[] = answersResult.success
           ? answersResult.data
           : [];
         setResponses(
           questions.map((q) => {
-            var response: FormResponse = {
+            const response: FormResponse = {
               question: q,
               answer: answers.find((a) => a.questionId == q.id),
             };
@@ -103,8 +105,8 @@ function RouteComponent() {
             return response;
           }),
         );
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to fetch form");
       } finally {
         setLoading(false);
       }
@@ -114,7 +116,7 @@ function RouteComponent() {
   }, [formId]);
 
   const handleBack = () => {
-    if(form?.moduleId) {
+    if (form?.moduleId) {
       navigate({ to: `/surveys/modular-form/${form.moduleId}` });
     } else {
       navigate({ to: "/" });
@@ -179,7 +181,7 @@ function RouteComponent() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const postSubmission = async () => {
       const submitReponse = await fetch(
         `/api/forms/${formId}/submit/${userId}`,
@@ -206,27 +208,29 @@ function RouteComponent() {
       ) {
         toast.error("Please fill in all required fields");
       } else {
-        const confirmation = confirm("Are you sure you want to submit?");
+        const confirmation = await showConfirm(
+          "Are you sure you want to submit?",
+        );
         if (!confirmation) return;
-        saveForm();
-        postSubmission();
+        await saveForm();
+        await postSubmission();
         setSubmitted(true);
         queryClient.invalidateQueries({ queryKey: ["availableSurveys"] });
         queryClient.invalidateQueries({ queryKey: ["completedSurveys"] });
       }
-    } catch (err: any) {
+    } catch {
       toast.error("Unable to submit form");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     try {
-      saveForm();
+      await saveForm();
       toast.success("Your response has been saved.");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to save response");
     }
   };
 
@@ -313,7 +317,7 @@ function RouteComponent() {
               onClick={handleBack}
               className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
             >
-            {form?.moduleId ? "Back to modules" : "Back to surveys"}
+              {form?.moduleId ? "Back to modules" : "Back to surveys"}
             </button>
           </div>
           {/* Metadata */}
@@ -346,7 +350,7 @@ function RouteComponent() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-            {form?.moduleId ? "Back to modules" : "Back to surveys"}
+          {form?.moduleId ? "Back to modules" : "Back to surveys"}
         </button>
 
         {/* Survey Header */}

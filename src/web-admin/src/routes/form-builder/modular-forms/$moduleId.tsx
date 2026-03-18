@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/AdminLayout";
+import { useCustomConfirm } from "@/components/CustomAlert";
 import { Form } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/form-builder/modular-forms/$moduleId")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const showConfirm = useCustomConfirm();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [subForms, setSubForms] = useState<Form[]>([]);
   const { moduleId } = Route.useParams();
@@ -150,7 +152,10 @@ function RouteComponent() {
   };
 
   const handleDeleteForm = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this form?")) {
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this form?",
+    );
+    if (!confirmed) {
       return;
     }
 

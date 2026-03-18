@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/AdminLayout";
+import { useCustomAlert, useCustomConfirm } from "@/components/CustomAlert";
 import { Form, FormCondition, FormQuestion } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -14,6 +15,8 @@ export const Route = createFileRoute(
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const { showAlert } = useCustomAlert();
+  const showConfirm = useCustomConfirm();
   const { mId, formId } = Route.useParams();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [form, setForm] = useState<Form | null>(null);
@@ -124,7 +127,10 @@ function RouteComponent() {
   };
 
   const handleDeleteCondition = async (id) => {
-    if (!confirm("Are you sure you want to delete this condition?")) {
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this condition?",
+    );
+    if (!confirmed) {
       return;
     }
     try {
@@ -141,14 +147,14 @@ function RouteComponent() {
       setConditions(conditions.filter((c) => c.id !== id));
     } catch (err: any) {
       console.error("Failed to delete condition:", err.message);
-      alert("Failed to delete condition: " + err.message);
+      showAlert("Failed to delete condition: " + err.message);
     }
   };
 
   const handleSaveCondition = async () => {
     try {
       if (!selectedParentForm) {
-        alert("Must select a form");
+        showAlert("Must select a form");
         return;
       }
       let body;
@@ -159,7 +165,7 @@ function RouteComponent() {
         });
       } else if (selectedConditionType === "answer_question") {
         if (!selectedQuestion) {
-          alert("Must select a question");
+          showAlert("Must select a question");
           return;
         }
         body = JSON.stringify({
@@ -169,10 +175,10 @@ function RouteComponent() {
         });
       } else if (selectedConditionType === "specific_answer") {
         if (!selectedQuestion) {
-          alert("Must select a question");
+          showAlert("Must select a question");
           return;
         } else if (!selectedAnswer) {
-          alert("Must select an answer");
+          showAlert("Must select an answer");
           return;
         }
         body = JSON.stringify({
@@ -231,7 +237,7 @@ function RouteComponent() {
       closeModal();
     } catch (err: any) {
       console.error("Failed to save condition:", err.message);
-      alert("Failed to save condition: " + err.message);
+      showAlert("Failed to save condition: " + err.message);
     }
   };
 
