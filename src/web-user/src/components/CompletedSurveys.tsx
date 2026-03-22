@@ -2,6 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Form } from "@/interfaces/interfaces";
 
+interface ModularForm {
+  id: number;
+  name: string;
+  description: string;
+  createdAt: string;
+  isPublic: boolean;
+  isModular?: boolean;
+}
+
 export default function CompletedSurveys() {
   const navigate = useNavigate();
   const userId = JSON.parse(
@@ -15,10 +24,27 @@ export default function CompletedSurveys() {
   } = useQuery({
     queryKey: ["completedSurveys", userId],
     queryFn: async () => {
-      const response = await fetch(`/api/forms/completed/${userId}`);
-      if (!response.ok) throw new Error("Failed to fetch surveys");
-      const json = await response.json();
-      return json.data;
+      const [regularRes, modularRes] = await Promise.all([
+        fetch(`/api/forms/completed/${userId}`),
+        fetch(`/api/mod-forms/completed/${userId}`),
+      ]);
+
+      if (!regularRes.ok || !modularRes.ok) {
+        throw new Error("Failed to fetch surveys");
+      }
+
+      const regularJson = await regularRes.json();
+      const modularJson = await modularRes.json();
+
+      const regularForms = (regularJson.data || []) as Form[];
+      const modularForms = ((modularJson.data || []) as ModularForm[]).map(
+        (f) => ({
+          ...f,
+          isModular: true,
+        }),
+      );
+
+      return [...regularForms, ...modularForms];
     },
   });
 
@@ -32,8 +58,12 @@ export default function CompletedSurveys() {
     });
   };
 
-  const handleSurveyClick = (formId: number) => {
-    navigate({ to: `/surveys/${formId}` });
+  const handleSurveyClick = (item: Form | ModularForm) => {
+    if ("isModular" in item && item.isModular) {
+      navigate({ to: `/surveys/modular-form/${item.id}` });
+    } else {
+      navigate({ to: `/surveys/${item.id}` });
+    }
   };
 
   if (isLoading) {
@@ -54,34 +84,28 @@ export default function CompletedSurveys() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {(formData as Form[]).map((form) => (
+      {formData.map((item) => (
         <div
-          key={form.id}
-          onClick={() => handleSurveyClick(form.id)}
+          key={item.id}
+          onClick={() => handleSurveyClick(item)}
           className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-200 cursor-pointer hover:border-yellow-500"
         >
           {/* Event Image */}
           <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
-            <span className="text-4xl">📝</span>
+            <span className="text-4xl">
+              {"isModular" in item && item.isModular ? "📋" : "📝"}
+            </span>
           </div>
 
           {/* Event Content */}
           <div className="p-6">
             {/* Event Title */}
-            <h3 className="text-xl font-bold text-red-900 mb-2">{form.name}</h3>
+            <h3 className="text-xl font-bold text-red-900 mb-2">{item.name}</h3>
 
             {/* Event Description */}
             <p className="text-gray-600 text-sm mb-4">
-              {form.description || "No description available"}
+              {item.description || "No description available"}
             </p>
-
-            {/* Event Date Range */}
-            <div className="mb-4 flex items-center gap-2">
-              <span className="text-red-900 font-semibold">🗓️</span>
-              <span className="text-gray-700 text-sm">
-                Created: {formatDate(form.createdAt)}
-              </span>
-            </div>
           </div>
         </div>
       ))}

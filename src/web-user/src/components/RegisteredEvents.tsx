@@ -265,17 +265,12 @@ export default function RegisteredEvents({ onCountChange }: Props) {
             </div>
 
             {/* Details */}
-            <div className="flex-1 px-8 py-6 flex flex-col justify-between gap-2 min-w-0">
-              <div>
-                <h4 className="text-xl font-black text-stone-900 leading-tight group-hover:text-red-900 transition-colors">
-                  {event.title}
-                </h4>
-                <p className="mt-2 text-stone-400 text-sm leading-relaxed line-clamp-2">
-                  {event.description || "No description available"}
-                </p>
-              </div>
+            <div className="flex-1 px-8 py-6 flex flex-col justify-between gap-3 min-w-0">
+              <h4 className="text-2xl font-black text-stone-900 leading-tight group-hover:text-red-900 transition-colors">
+                {event.title}
+              </h4>
 
-              <div className="flex flex-wrap gap-x-5 gap-y-2">
+              <div className="space-y-2.5">
                 {[
                   {
                     icon: "📅",
@@ -285,17 +280,19 @@ export default function RegisteredEvents({ onCountChange }: Props) {
                     icon: "⏰",
                     text: `${formatTime(event.startTime)} – ${formatTime(event.endTime)}`,
                   },
-                  { icon: "📍", text: event.location || "TBA" },
-                  { icon: "👥", text: `${event.capacity} capacity` },
+                  {
+                    icon: "📍",
+                    text: event.location || "TBA",
+                  },
                 ].map(({ icon, text }) => (
                   <div
                     key={icon}
-                    className="flex items-center gap-1.5 text-xs text-stone-500"
+                    className="flex items-center gap-2 text-sm text-stone-600"
                   >
-                    <span className="w-6 h-6 bg-yellow-50 rounded-md flex items-center justify-center shrink-0">
+                    <span className="w-7 h-7 bg-yellow-50 rounded-md flex items-center justify-center shrink-0">
                       {icon}
                     </span>
-                    {text}
+                    <span className="truncate">{text}</span>
                   </div>
                 ))}
               </div>
