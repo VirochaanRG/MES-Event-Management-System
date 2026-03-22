@@ -269,7 +269,9 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { uid } = request.params;
-      const allForms = await db
+      
+      // Get completed non-modular forms ONLY (where moduleId IS NULL)
+      const completedRegularForms = await db
         .select({
           id: form.id,
           name: form.name,
@@ -287,7 +289,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
             sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
             isNull(form.moduleId))));
 
-      console.log('FILLED: ', allForms);
+      console.log('FILLED: ', completedRegularForms);
 
       const allowedForms = await filterFormsByProfileAccess(allForms, uid);
 
@@ -561,36 +563,55 @@ export default async function formsRoutes(fastify: FastifyInstance)
     }
   });
 
-  //GET filled forms for user and modular form
+  //GET filled forms for user and modular form (returns forms when all parts of module are completed)
   fastify.get<{ Params: { mid: string, uid: string } }>('/api/mod-forms/:mid/completed/:uid', async (request, reply) =>
   {
     try
     {
       const { mid, uid } = request.params;
-      const allForms = await db
-        .select({
-          id: form.id,
-          name: form.name,
-          description: form.description,
-          createdAt: form.createdAt,
-          isPublic: form.isPublic
-        })
-        .from(modularForms)
-        .innerJoin(form, eq(form.moduleId, modularForms.id))
-        .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
+      
+      // Get all forms in this modular form
+      const formsInModule = await db
+        .select()
+        .from(form)
         .where(and(
-          eq(formSubmissions.userId, uid),
-          and(
-            eq(form.isPublic, true),
-            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
-            eq(modularForms.id, parseInt(mid))
-          )));
+          eq(form.moduleId, parseInt(mid)),
+          eq(form.isPublic, true),
+          sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
+        ));
 
-      console.log('FILLED: ', allForms);
+      // If no forms in module, return empty
+      if (formsInModule.length === 0)
+      {
+        return reply.send({
+          success: true,
+          data: [],
+        });
+      }
+
+      // Get user submissions for forms in this module
+      const userSubmissions = await db
+        .select({ formId: formSubmissions.formId })
+        .from(formSubmissions)
+        .where(eq(formSubmissions.userId, uid));
+
+      const submittedFormIds = userSubmissions.map(s => s.formId);
+
+      // Check if all forms in the module are submitted
+      const allFormsSubmitted = formsInModule.every(f => submittedFormIds.includes(f.id));
+
+      // Return the forms only if all forms are submitted
+      if (allFormsSubmitted)
+      {
+        return reply.send({
+          success: true,
+          data: formsInModule,
+        });
+      }
 
       return reply.send({
         success: true,
-        data: allForms,
+        data: [],
       });
     } catch (error)
     {
