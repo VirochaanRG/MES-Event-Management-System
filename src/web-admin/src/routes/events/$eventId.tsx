@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { FormQuestion } from "@/interfaces/interfaces";
 import RequireRole from "@/components/RequireRole";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
-import { useCustomAlert } from "@/components/CustomAlert";
+import { useCustomAlert, useCustomConfirm } from "@/components/CustomAlert";
 
 export const Route = createFileRoute("/events/$eventId")({
   component: EventDetail,
@@ -44,10 +44,15 @@ function EventDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { showAlert } = useCustomAlert();
+  const showConfirm = useCustomConfirm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [selectedRegistration, setSelectedRegistration] =
     useState<Registration | null>(null);
+  const [removingRegistrationId, setRemovingRegistrationId] = useState<
+    number | null
+  >(null);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionFormData>({
     question_type: "text_answer",
     label: "",
@@ -74,6 +79,8 @@ function EventDetail() {
       } else {
         navigate({ to: "/" });
       }
+
+      setIsAuthLoading(false);
     };
 
     initAuth();
@@ -85,6 +92,7 @@ function EventDetail() {
     error: registrationsError,
   } = useQuery({
     queryKey: ["eventRegistrations", eventId],
+    enabled: !!currentUser,
     queryFn: async () => {
       const response = await fetch(`/api/events/${eventId}/registrationlist`);
       if (!response.ok) throw new Error("Failed to fetch registrations");
@@ -99,6 +107,7 @@ function EventDetail() {
     error: formError,
   } = useQuery({
     queryKey: ["eventRegistrationForm", eventId],
+    enabled: !!currentUser,
     queryFn: async () => {
       const response = await fetch(`/api/events/${eventId}/registration-form`);
       if (!response.ok) throw new Error("Failed to fetch registration form");
@@ -125,6 +134,41 @@ function EventDetail() {
       });
       setIsModalOpen(false);
       setQuestions([]);
+    },
+  });
+
+  const removeRegistrationMutation = useMutation({
+    mutationFn: async (registration: Registration) => {
+      const response = await fetch(
+        `/api/events/${eventId}/registrations/${registration.id}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to remove registration");
+      }
+
+      return registration;
+    },
+    onSuccess: (registration) => {
+      queryClient.invalidateQueries({
+        queryKey: ["eventRegistrations", eventId],
+      });
+
+      if (selectedRegistration?.id === registration.id) {
+        setSelectedRegistration(null);
+      }
+
+      showAlert("Registration removed successfully");
+      setRemovingRegistrationId(null);
+    },
+    onError: (error: Error) => {
+      showAlert(error.message || "Failed to remove registration");
+      setRemovingRegistrationId(null);
     },
   });
 
@@ -250,11 +294,44 @@ function EventDetail() {
     setSelectedRegistration(null);
   };
 
+  const handleRemoveRegistration = async (registration: Registration) => {
+    const confirmed = await showConfirm(
+      `Remove ${registration.userEmail} from this event?`,
+    );
+
+    if (!confirmed) return;
+
+    setRemovingRegistrationId(registration.id);
+    removeRegistrationMutation.mutate(registration);
+  };
+
   const formatAnswer = (answer: string | string[]) => {
     if (Array.isArray(answer)) {
       return answer.join(", ");
     }
     return answer;
+  };
+
+  const getRegistrantName = (registration: Registration) => {
+    const details = registration.details ?? [];
+
+    const findAnswerByQuestion = (matcher: (question: string) => boolean) => {
+      const detail = details.find((d) => matcher(d.question.toLowerCase()));
+      if (!detail) return "";
+      return Array.isArray(detail.answer)
+        ? detail.answer.join(" ").trim()
+        : String(detail.answer ?? "").trim();
+    };
+
+    const firstName = findAnswerByQuestion(
+      (q) => q.includes("first") && q.includes("name"),
+    );
+    const lastName = findAnswerByQuestion(
+      (q) => q.includes("last") && q.includes("name"),
+    );
+
+    const fullName = `${firstName} ${lastName}`.trim();
+    return fullName || "N/A";
   };
 
   if (isLoadingRegistrations) {
@@ -272,6 +349,16 @@ function EventDetail() {
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
         <p className="text-lg text-red-700 font-semibold">
           Error loading event
+        </p>
+      </div>
+    );
+  }
+
+  if (isAuthLoading || !currentUser) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
+        <p className="text-lg text-slate-700 font-medium">
+          Loading event details...
         </p>
       </div>
     );
@@ -342,7 +429,7 @@ function EventDetail() {
                         Email
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
-                        Instance
+                        Name
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
                         Registered At
@@ -368,7 +455,7 @@ function EventDetail() {
                           {reg.userEmail}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-slate-700">
-                          {reg.instance ?? 0}
+                          {getRegistrantName(reg)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-slate-700">
                           {new Date(reg.registeredAt).toLocaleString()}
@@ -390,12 +477,23 @@ function EventDetail() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <button
-                            onClick={() => openDetailsModal(reg)}
-                            className="text-red-900 hover:text-red-700 font-semibold text-sm underline"
-                          >
-                            View Details
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => openDetailsModal(reg)}
+                              className="text-red-900 hover:text-red-700 font-semibold text-sm underline"
+                            >
+                              View Details
+                            </button>
+                            <button
+                              onClick={() => handleRemoveRegistration(reg)}
+                              disabled={removingRegistrationId === reg.id}
+                              className="text-red-700 hover:text-red-900 font-semibold text-sm underline disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {removingRegistrationId === reg.id
+                                ? "Removing..."
+                                : "Remove"}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -483,10 +581,10 @@ function EventDetail() {
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-red-900 uppercase tracking-wide">
-                        Instance
+                        Name
                       </p>
                       <p className="text-slate-900 font-medium mt-1">
-                        {selectedRegistration.instance ?? 0}
+                        {getRegistrantName(selectedRegistration)}
                       </p>
                     </div>
                     <div>

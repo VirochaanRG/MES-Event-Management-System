@@ -20,7 +20,7 @@ export interface FormQuestion
   createdAt: string;
   parentQuestionId: number | null;
   enablingAnswers: number[];
-  required : boolean
+  required: boolean
 }
 
 export interface Event
@@ -48,9 +48,17 @@ interface AuthUser
 export interface FormCondition
 {
   id: number;
-  formId : number;
-  dependentFormId : number;
+  formId: number;
+  dependentFormId: number;
   conditionType: string;
-  dependentQuestionId : number;
-  dependentAnswerIdx : number;
+  dependentQuestionId: number;
+  dependentAnswerIdx: number;
+}
+
+export interface FormProfileCondition
+{
+  id: number;
+  formId: number;
+  profileField: "faculty" | "program" | "isMcmasterStudent";
+  expectedValue: string;
 }

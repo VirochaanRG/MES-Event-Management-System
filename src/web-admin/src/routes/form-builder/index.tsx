@@ -6,14 +6,20 @@ import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 
-type FormStatus = "Private" | "Live" | "Scheduled";
+type FormStatus = "Private" | "Live" | "Scheduled" | "Unlocked";
+
+const getNowLocalDateTimeValue = () => {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+};
 
 const getFormStatus = (f: Form): FormStatus => {
   if (!f.isPublic) return "Private";
 
   const unlockAt = f.unlockAt ? new Date(f.unlockAt) : null;
   if (unlockAt) {
-    return unlockAt > new Date() ? "Scheduled" : "Live";
+    return unlockAt > new Date() ? "Scheduled" : "Unlocked";
   }
 
   return "Live";
@@ -27,6 +33,7 @@ function StatusPill({ status }: { status: FormStatus }) {
     Private: "bg-gray-50 text-gray-700 border-gray-200",
     Live: "bg-green-50 text-green-700 border-green-200",
     Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
+    Unlocked: "bg-emerald-50 text-emerald-700 border-emerald-200",
   };
 
   return <span className={`${base} ${styles[status]}`}>{status}</span>;
@@ -109,6 +116,11 @@ function RouteComponent() {
   const handleAddForm = async () => {
     if (!newFormName.trim()) {
       setError("Form name is required");
+      return;
+    }
+
+    if (newUnlockAt && new Date(newUnlockAt).getTime() < Date.now()) {
+      setError("Unlock date cannot be in the past");
       return;
     }
 
@@ -326,12 +338,13 @@ function RouteComponent() {
 
                             <StatusPill status={getFormStatus(form)} />
 
-                            {form.unlockAt && (
-                              <p className="text-sm text-gray-500">
-                                Unlocks:{" "}
-                                {new Date(form.unlockAt).toLocaleString()}
-                              </p>
-                            )}
+                            {form.unlockAt &&
+                              getFormStatus(form) === "Scheduled" && (
+                                <p className="text-sm text-gray-500">
+                                  Unlocks:{" "}
+                                  {new Date(form.unlockAt).toLocaleString()}
+                                </p>
+                              )}
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -437,6 +450,7 @@ function RouteComponent() {
                       </label>
                       <input
                         type="datetime-local"
+                        min={getNowLocalDateTimeValue()}
                         value={newUnlockAt}
                         onChange={(e) => setNewUnlockAt(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
