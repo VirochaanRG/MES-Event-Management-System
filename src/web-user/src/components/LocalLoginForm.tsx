@@ -29,7 +29,9 @@ export default function LocalLoginForm({
 
     // Validate McMaster email for registration
     if (!isLogin && !email.trim().endsWith("@mcmaster.ca")) {
-      setError("Please use a McMaster University email address (@mcmaster.ca) to register.");
+      setError(
+        "Please use a McMaster University email address (@mcmaster.ca) to register.",
+      );
       setIsLoading(false);
       return;
     }
@@ -86,7 +88,9 @@ export default function LocalLoginForm({
 
           <div className="relative z-10">
             <h2 className="text-3xl font-bold leading-tight">
-              {isLogin ? "MES Events" : "Join the McMaster Engineering Community."}
+              {isLogin
+                ? "MES Events"
+                : "Join the McMaster Engineering Community."}
             </h2>
             <p className="mt-4 text-yellow-300/70 font-medium">
               Access the latest MES events and find out what we're up to!

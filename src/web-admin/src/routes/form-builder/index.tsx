@@ -1,18 +1,25 @@
 import AdminLayout from "@/components/AdminLayout";
+import { useCustomConfirm } from "@/components/CustomAlert";
 import RequireRole from "@/components/RequireRole";
 import { Form } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 
-type FormStatus = "Private" | "Live" | "Scheduled";
+type FormStatus = "Private" | "Live" | "Scheduled" | "Unlocked";
+
+const getNowLocalDateTimeValue = () => {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+};
 
 const getFormStatus = (f: Form): FormStatus => {
   if (!f.isPublic) return "Private";
 
   const unlockAt = f.unlockAt ? new Date(f.unlockAt) : null;
   if (unlockAt) {
-    return unlockAt > new Date() ? "Scheduled" : "Live";
+    return unlockAt > new Date() ? "Scheduled" : "Unlocked";
   }
 
   return "Live";
@@ -26,11 +33,11 @@ function StatusPill({ status }: { status: FormStatus }) {
     Private: "bg-gray-50 text-gray-700 border-gray-200",
     Live: "bg-green-50 text-green-700 border-green-200",
     Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
+    Unlocked: "bg-emerald-50 text-emerald-700 border-emerald-200",
   };
 
   return <span className={`${base} ${styles[status]}`}>{status}</span>;
 }
-
 
 export const Route = createFileRoute("/form-builder/")({
   component: RouteComponent,
@@ -38,6 +45,7 @@ export const Route = createFileRoute("/form-builder/")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const showConfirm = useCustomConfirm();
   const [forms, setForms] = useState<Form[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +119,11 @@ function RouteComponent() {
       return;
     }
 
+    if (newUnlockAt && new Date(newUnlockAt).getTime() < Date.now()) {
+      setError("Unlock date cannot be in the past");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError(null);
@@ -153,7 +166,10 @@ function RouteComponent() {
   };
 
   const handleDeleteForm = async (form) => {
-    if (!confirm("Are you sure you want to delete this form?")) {
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this form?",
+    );
+    if (!confirmed) {
       return;
     }
 
@@ -316,16 +332,19 @@ function RouteComponent() {
                           </p>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <p className="text-sm text-gray-500">
-                              Created: {new Date(form.createdAt).toLocaleDateString()}
+                              Created:{" "}
+                              {new Date(form.createdAt).toLocaleDateString()}
                             </p>
 
                             <StatusPill status={getFormStatus(form)} />
 
-                            {form.unlockAt && (
-                              <p className="text-sm text-gray-500">
-                                Unlocks: {new Date(form.unlockAt).toLocaleString()}
-                              </p>
-                            )}
+                            {form.unlockAt &&
+                              getFormStatus(form) === "Scheduled" && (
+                                <p className="text-sm text-gray-500">
+                                  Unlocks:{" "}
+                                  {new Date(form.unlockAt).toLocaleString()}
+                                </p>
+                              )}
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -431,12 +450,14 @@ function RouteComponent() {
                       </label>
                       <input
                         type="datetime-local"
+                        min={getNowLocalDateTimeValue()}
                         value={newUnlockAt}
                         onChange={(e) => setNewUnlockAt(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                       />
                       <p className="mt-1 text-xs text-gray-500">
-                        If set, the form won’t be available to users until this date (when Public is enabled).
+                        If set, the form won’t be available to users until this
+                        date (when Public is enabled).
                       </p>
                     </div>
                   </div>

@@ -22,6 +22,20 @@
       "when": 1770779139202,
       "tag": "0002_jittery_newton_destine",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774132329869,
+      "tag": "0003_giant_silver_surfer",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774134817585,
+      "tag": "0004_lame_dust",
+      "breakpoints": true
     }
   ]
 }

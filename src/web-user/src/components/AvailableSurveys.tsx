@@ -18,7 +18,9 @@ export default function AvailableSurveys() {
       const formsResponse = await fetch(`/api/forms/available/${userId}`);
       if (!formsResponse.ok) throw new Error("Failed to fetch surveys");
       const formsJson = await formsResponse.json();
-      const modFormsResponse = await fetch(`/api/mod-forms/available/${userId}`);
+      const modFormsResponse = await fetch(
+        `/api/mod-forms/available/${userId}`,
+      );
       if (!modFormsResponse.ok) throw new Error("Failed to fetch surveys");
       const modFormsJson = await modFormsResponse.json();
       console.log(modFormsJson);
@@ -39,11 +41,11 @@ export default function AvailableSurveys() {
   const checkFormIsModular = (form) => {
     return form.moduleId === undefined;
   };
-  
+
   const handleSurveyClick = (form) => {
     const formId = form.id;
     console.log(form);
-    if(checkFormIsModular(form)) {
+    if (checkFormIsModular(form)) {
       navigate({ to: `/surveys/modular-form/${formId}` });
     } else {
       navigate({ to: `/surveys/${formId}` });
@@ -77,7 +79,9 @@ export default function AvailableSurveys() {
         >
           {/* Event Image */}
           <div className="w-full h-48 bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center">
-            <span className="text-4xl">📝</span>
+            <span className="text-4xl">
+              {checkFormIsModular(form) ? "📋" : "📝"}
+            </span>
           </div>
 
           {/* Event Content */}
@@ -89,14 +93,6 @@ export default function AvailableSurveys() {
             <p className="text-gray-600 text-sm mb-4">
               {form.description || "No description available"}
             </p>
-
-            {/* Event Date Range */}
-            <div className="mb-4 flex items-center gap-2">
-              <span className="text-red-900 font-semibold">🗓️</span>
-              <span className="text-gray-700 text-sm">
-                Created: {formatDate(form.createdAt)}
-              </span>
-            </div>
           </div>
         </div>
       ))}

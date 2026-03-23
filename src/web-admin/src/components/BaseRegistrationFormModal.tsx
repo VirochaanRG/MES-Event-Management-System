@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X, Plus, Trash2, GripVertical } from "lucide-react";
 import { TextAnswerQuestion } from "./TextAnswerQuestion";
 import { FormQuestion } from "@/interfaces/interfaces";
+import { useCustomAlert } from "./CustomAlert";
 
 export interface FormField {
   id: string;
@@ -53,6 +54,7 @@ export default function BaseRegistrationFormModal({
   onSave,
   initialFields,
 }: BaseRegistrationFormModalProps) {
+  const { showAlert } = useCustomAlert();
   const [fields, setFields] = useState<FormField[]>(
     initialFields && initialFields.length > 0 ? initialFields : DEFAULT_FIELDS,
   );
@@ -99,7 +101,7 @@ export default function BaseRegistrationFormModal({
     // Validate that all fields have labels
     const allFieldsValid = fields.every((field) => field.label.trim() !== "");
     if (!allFieldsValid) {
-      alert("Please provide labels for all fields");
+      showAlert("Please provide labels for all fields");
       return;
     }
 
@@ -108,7 +110,7 @@ export default function BaseRegistrationFormModal({
       .filter((f) => f.type === "select")
       .every((f) => f.options && f.options.length > 0);
     if (!selectFieldsValid) {
-      alert("Please provide options for all dropdown fields");
+      showAlert("Please provide options for all dropdown fields");
       return;
     }
 

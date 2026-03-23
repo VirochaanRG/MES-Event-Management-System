@@ -78,6 +78,62 @@ export interface Event {
 }
 
 /**
+ * Represents a survey or form. Forms consist of one or more questions
+ * that users answer. This mirrors the structure returned by the
+ * backend and used in the web project.
+ */
+export interface Form {
+  id: number;
+  title: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * A single question within a form. Questions can be of different
+ * types such as text input, multiple choice or linear scale. Some
+ * questions may depend on the answer of another question.
+ */
+export interface FormQuestion {
+  id: number;
+  formId: number;
+  question: string;
+  type: 'text' | 'multipleChoice' | 'linearScale';
+  options: string[] | null;
+  required: boolean;
+  order: number;
+  parentQuestionId: number | null;
+  enablingAnswers: string[] | null;
+}
+
+/**
+ * A saved answer for a form question. The structure of the answer
+ * property depends on the question type. For multiple choice it
+ * contains the selected option; for linear scale a numeric value;
+ * for text questions a string.
+ */
+export interface FormAnswer {
+  id: number;
+  formId: number;
+  userId: number;
+  questionId: number;
+  answer: any;
+}
+
+/**
+ * Status of a user's submission for a form. If no submission has
+ * started the status will be 'unfilled'. If answers exist but the
+ * form has not been submitted the status is 'started'. After
+ * submission the status is 'completed' and the submissionId is
+ * provided.
+ */
+export interface FormStatus {
+  status: 'unfilled' | 'started' | 'completed';
+  submissionId: number | null;
+}
+
+/**
  * Props passed to Team D mobile components by the mobile app. This
  * includes the authenticated user, JWT token, and a list of instances
  * visible to the user. An optional callback allows the component to

@@ -1,4 +1,5 @@
 import AdminLayout from "@/components/AdminLayout";
+import { useCustomConfirm } from "@/components/CustomAlert";
 import { Form } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/form-builder/modular-forms/$moduleId")({
 
 function RouteComponent() {
   const navigate = useNavigate();
+  const showConfirm = useCustomConfirm();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [subForms, setSubForms] = useState<Form[]>([]);
   const { moduleId } = Route.useParams();
@@ -101,6 +103,11 @@ function RouteComponent() {
   };
 
   const handleAddForm = async () => {
+    if (formData?.isPublic) {
+      setError("Unpublish the modular form before adding new forms");
+      return;
+    }
+
     if (!newFormName.trim()) {
       setError("Form name is required");
       return;
@@ -119,7 +126,7 @@ function RouteComponent() {
           name: newFormName.trim(),
           description: newFormDescription.trim() || null,
           moduleId: moduleId,
-          isPublic: true,
+          isPublic: false,
         }),
       });
 
@@ -150,7 +157,10 @@ function RouteComponent() {
   };
 
   const handleDeleteForm = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this form?")) {
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this form?",
+    );
+    if (!confirmed) {
       return;
     }
 
@@ -260,11 +270,25 @@ function RouteComponent() {
               </div>
               <div className="relative z-20">
                 <button
-                  onClick={() => setShowModal(true)}
-                  className="px-6 py-2 font-semibold bg-amber-500 text-white rounded hover:bg-amber-600 transition-colors"
+                  onClick={() => {
+                    if (formData?.isPublic) {
+                      setError(
+                        "Unpublish the modular form before adding new forms",
+                      );
+                      return;
+                    }
+                    setShowModal(true);
+                  }}
+                  disabled={formData?.isPublic}
+                  className="px-6 py-2 font-semibold bg-amber-500 text-white rounded hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   + Add New Form
                 </button>
+                {formData?.isPublic && (
+                  <p className="mt-2 text-xs text-gray-500 text-right">
+                    Unpublish to add forms
+                  </p>
+                )}
               </div>
             </div>
             {formData?.description && (

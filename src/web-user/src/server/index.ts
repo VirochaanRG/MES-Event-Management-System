@@ -5,12 +5,14 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { db } from '../../../db/src/db';
 import { events, registeredUsers } from '../../../db/src/schemas/events';
-import { users } from '../../../db/src/schemas/users';
-import { eq, and, sql, max } from 'drizzle-orm';
+import { profiles, users } from '../../../db/src/schemas/users';
+import { eq, and, sql, max, ne } from 'drizzle-orm';
+import type { InferSelectModel } from 'drizzle-orm';
 import { qrCodes } from '@db/schemas';
 import QRCode from 'qrcode';
 import formsRoutes from './formsAPI';
 import publicImageRoutes from './imagesAPI';
+import profileRoutes from './profiles';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -43,7 +45,7 @@ function verifyToken(token: string): { user: AuthUser } | null
 
 // Register plugins
 await fastify.register(cors, {
-  origin: 'http://localhost:3014',
+  origin: true,
   credentials: true,
 });
 
@@ -307,6 +309,31 @@ fastify.post<{
       });
     }
 
+    const normalizedEmail = userEmail.toLowerCase().trim();
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, normalizedEmail),
+    });
+
+    if (!existingUser)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'User not found',
+      });
+    }
+
+    const existingProfile = await db.query.profiles.findFirst({
+      where: eq(profiles.userId, existingUser.id),
+    });
+
+    if (!existingProfile)
+    {
+      return reply.code(403).send({
+        success: false,
+        error: 'Complete your profile before registering for events',
+      });
+    }
+
     const event = await db.query.events.findFirst({
       where: eq(events.id, parseInt(id)),
     });
@@ -324,7 +351,7 @@ fastify.post<{
     const existingRegistration = await db.query.registeredUsers.findFirst({
       where: and(
         eq(registeredUsers.eventId, parseInt(id)),
-        eq(registeredUsers.userEmail, userEmail.toLowerCase().trim())
+        eq(registeredUsers.userEmail, normalizedEmail)
       ),
     });
 
@@ -339,12 +366,7 @@ fastify.post<{
     const capacity = event.capacity ?? 0;
     if (capacity > 0)
     {
-      const registrationCount = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(registeredUsers)
-        .where(eq(registeredUsers.eventId, parseInt(id)));
-
-      const currentCount = registrationCount[0]?.count ?? 0;
+      const currentCount = await countPaidRegistrations(parseInt(id));
       if (currentCount >= capacity)
       {
         return reply.code(400).send({
@@ -353,37 +375,20 @@ fastify.post<{
         });
       }
     }
-    let formattedDetails;
-    if (details && event.registrationForm)
+    const eventCost = event.cost ?? 0;
+    if (eventCost > 0)
     {
-      const registrationForm = event.registrationForm as any;
-      const questions = registrationForm.questions || [];
-
-      formattedDetails = Object.entries(details).map(([questionOrder, answer]) =>
-      {
-        const question = questions[parseInt(questionOrder) - 1];
-        if (!question) return null;
-
-        let formattedAnswer = answer;
-
-        // For multiple choice and multi-select, convert indices to actual choice text
-        if (question.question_type === 'multiple_choice' && typeof answer === 'number')
-        {
-          formattedAnswer = question.options?.[answer] || answer;
-        } else if (question.question_type === 'multi_select' && Array.isArray(answer))
-        {
-          formattedAnswer = answer.map((index: number) => question.options?.[index] || index);
-        }
-
-        return {
-          question: question.label,
-          answer: formattedAnswer,
-          questionType: question.question_type
-        };
-      }).filter(Boolean); // Remove null entries
+      return reply.code(400).send({
+        success: false,
+        error: 'This event requires payment. Use the payment checkout flow.',
+      });
     }
 
-    const eventCost = event.cost ?? 0;
+    const formattedDetails = formatRegistrationDetails(
+      event.registrationForm as any,
+      details,
+    );
+
     const registration = await db
       .insert(registeredUsers)
       .values({
@@ -391,8 +396,8 @@ fastify.post<{
         userEmail: userEmail.toLowerCase().trim(),
         instance: instance ?? 0,
         status: 'confirmed',
-        paymentStatus: eventCost > 0 ? 'pending' : 'paid',
-        details: formattedDetails, // Store the formatted details
+        paymentStatus: 'paid',
+        details: formattedDetails,
       })
       .returning();
 
@@ -425,6 +430,91 @@ function buildQRContentString(payload: QRPayload)
     `instance:${payload.instance};${Date.now()}`;
 }
 
+type RegisteredUserRow = InferSelectModel<typeof registeredUsers>;
+
+async function countPaidRegistrations(eventId: number, excludeRegistrationId?: number)
+{
+  const conditions = [
+    eq(registeredUsers.eventId, eventId),
+    eq(registeredUsers.paymentStatus, 'paid'),
+  ];
+
+  if (excludeRegistrationId !== undefined)
+  {
+    conditions.push(ne(registeredUsers.id, excludeRegistrationId));
+  }
+
+  const registrationCount = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(registeredUsers)
+    .where(and(...conditions));
+
+  return registrationCount[0]?.count ?? 0;
+}
+
+function formatRegistrationDetails(eventRegistrationForm: any, details?: Record<string, any>)
+{
+  if (!details || !eventRegistrationForm) return null;
+
+  const questions = eventRegistrationForm.questions || [];
+
+  return Object.entries(details).map(([questionOrder, answer]) =>
+  {
+    const question = questions[parseInt(questionOrder) - 1];
+    if (!question) return null;
+
+    let formattedAnswer = answer;
+
+    if (question.question_type === 'multiple_choice' && typeof answer === 'number')
+    {
+      formattedAnswer = question.options?.[answer] || answer;
+    } else if (question.question_type === 'multi_select' && Array.isArray(answer))
+    {
+      formattedAnswer = answer.map((index: number) => question.options?.[index] || index);
+    }
+
+    return {
+      question: question.label,
+      answer: formattedAnswer,
+      questionType: question.question_type,
+    };
+  }).filter(Boolean);
+}
+
+async function createQrForRegistration(registration: RegisteredUserRow)
+{
+  const existingQr = await db.query.qrCodes.findFirst({
+    where: eq(qrCodes.id, registration.id),
+  });
+
+  if (existingQr) return existingQr;
+
+  const payload: QRPayload = {
+    registrationId: registration.id,
+    eventId: registration.eventId,
+    userEmail: registration.userEmail,
+    instance: registration.instance ?? 0,
+  };
+
+  const qrString = buildQRContentString(payload);
+  const qrSalt = await bcrypt.hash(qrString, SALT_ROUNDS);
+  const qrBuffer = await QRCode.toBuffer(qrSalt);
+
+  const [entry] = await db
+    .insert(qrCodes)
+    .values({
+      id: registration.id,
+      eventId: registration.eventId,
+      userEmail: registration.userEmail,
+      instance: registration.instance ?? 0,
+      image: qrBuffer,
+      content: qrSalt,
+    })
+    .returning();
+
+  return entry;
+}
+
 fastify.post<{
   Params: { id: string };
   Body: { registrationId: number };
@@ -432,7 +522,6 @@ fastify.post<{
 {
   try
   {
-    const { id: eventParamId } = request.params;
     const { registrationId } = request.body;
 
     const registration = await db.query.registeredUsers.findFirst({
@@ -447,30 +536,7 @@ fastify.post<{
       });
     }
 
-    const eventId = registration.eventId;
-    const userEmail = registration.userEmail;
-    const instance = registration.instance ?? 0;
-
-    const payload: QRPayload = {
-      registrationId,
-      eventId,
-      userEmail,
-      instance,
-    };
-    const qrString = buildQRContentString(payload);
-    const qrSalt = await bcrypt.hash(qrString, SALT_ROUNDS);
-    const qrBuffer = await QRCode.toBuffer(qrSalt);
-    const [entry] = await db
-      .insert(qrCodes)
-      .values({
-        id: registrationId,
-        eventId,
-        userEmail,
-        instance,
-        image: qrBuffer,
-        content: qrSalt
-      })
-      .returning();
+    const entry = await createQrForRegistration(registration);
 
     return reply.send({
       success: true,
@@ -482,6 +548,520 @@ fastify.post<{
     return reply.code(500).send({
       success: false,
       error: 'Failed to generate QR code',
+    });
+  }
+});
+
+// Create Stripe Checkout session for paid events
+fastify.post<{
+  Params: { id: string };
+  Body: { userEmail: string; instance?: number; details?: Record<string, any> };
+}>('/api/events/:id/payment/checkout', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { userEmail, instance, details } = request.body;
+
+    if (!userEmail || !userEmail.trim())
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'userEmail is required',
+      });
+    }
+
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey)
+    {
+      return reply.code(500).send({
+        success: false,
+        error: 'Stripe is not configured. Set STRIPE_SECRET_KEY.',
+      });
+    }
+
+    const normalizedEmail = userEmail.toLowerCase().trim();
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, normalizedEmail),
+    });
+
+    if (!existingUser)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'User not found',
+      });
+    }
+
+    const existingProfile = await db.query.profiles.findFirst({
+      where: eq(profiles.userId, existingUser.id),
+    });
+
+    if (!existingProfile)
+    {
+      return reply.code(403).send({
+        success: false,
+        error: 'Complete your profile before registering for events',
+      });
+    }
+
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, parseInt(id)),
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    const eventCost = event.cost ?? 0;
+    if (eventCost <= 0)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'This event is free. Use regular registration.',
+      });
+    }
+
+    const capacity = event.capacity ?? 0;
+    if (capacity > 0)
+    {
+      const currentCount = await countPaidRegistrations(parseInt(id));
+      if (currentCount >= capacity)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Event is at full capacity',
+        });
+      }
+    }
+
+    let registration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.eventId, parseInt(id)),
+        eq(registeredUsers.userEmail, normalizedEmail),
+      ),
+    });
+
+    if (registration && registration.paymentStatus === 'paid')
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'User is already registered for this event',
+      });
+    }
+
+    if (!registration)
+    {
+      const formattedDetails = formatRegistrationDetails(
+        event.registrationForm as any,
+        details,
+      );
+
+      const [created] = await db
+        .insert(registeredUsers)
+        .values({
+          eventId: parseInt(id),
+          userEmail: normalizedEmail,
+          instance: instance ?? 0,
+          status: 'confirmed',
+          paymentStatus: 'pending',
+          details: formattedDetails,
+        })
+        .returning();
+
+      registration = created;
+    }
+
+    const origin = request.headers.origin || process.env.WEB_USER_BASE_URL || 'http://localhost:3000';
+
+    const params = new URLSearchParams();
+    params.set('mode', 'payment');
+    params.set('success_url', `${origin}/payment-result?status=success&event_id=${id}&session_id={CHECKOUT_SESSION_ID}&registration_id=${registration.id}`);
+    params.set('cancel_url', `${origin}/payment-result?status=cancelled&event_id=${id}&registration_id=${registration.id}`);
+    params.set('customer_email', normalizedEmail);
+    params.set('line_items[0][price_data][currency]', 'cad');
+    params.set('line_items[0][price_data][unit_amount]', String(eventCost * 100));
+    params.set('line_items[0][price_data][product_data][name]', event.title);
+    params.set('line_items[0][quantity]', '1');
+    params.set('metadata[registration_id]', String(registration.id));
+    params.set('metadata[event_id]', String(id));
+    params.set('metadata[user_email]', normalizedEmail);
+
+    const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${stripeSecretKey}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+
+    const stripeResult = await stripeResponse.json();
+
+    if (!stripeResponse.ok || !stripeResult?.url)
+    {
+      fastify.log.error({ stripeResult }, 'Failed to create Stripe checkout session');
+      return reply.code(500).send({
+        success: false,
+        error: stripeResult?.error?.message || 'Failed to create payment session',
+      });
+    }
+
+    return reply.send({
+      success: true,
+      data: {
+        registrationId: registration.id,
+        checkoutUrl: stripeResult.url,
+        sessionId: stripeResult.id,
+      },
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to create payment checkout session');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to create payment checkout session',
+    });
+  }
+});
+
+// Confirm Stripe payment and mark registration as paid
+fastify.post<{
+  Params: { id: string };
+  Body: { registrationId?: number; sessionId: string; userEmail?: string };
+}>('/api/events/:id/payment/confirm', async (request, reply) =>
+{
+  try
+  {
+    const { id } = request.params;
+    const { registrationId, sessionId, userEmail } = request.body;
+    const eventId = parseInt(id);
+
+    if (!sessionId)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'sessionId is required',
+      });
+    }
+
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey)
+    {
+      return reply.code(500).send({
+        success: false,
+        error: 'Stripe is not configured. Set STRIPE_SECRET_KEY.',
+      });
+    }
+
+    const stripeResponse = await fetch(
+      `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${stripeSecretKey}`,
+        },
+      },
+    );
+
+    const stripeResult = await stripeResponse.json();
+
+    if (!stripeResponse.ok)
+    {
+      return reply.code(500).send({
+        success: false,
+        error: stripeResult?.error?.message || 'Failed to verify payment session',
+      });
+    }
+
+    if (stripeResult.payment_status !== 'paid')
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'Payment not completed yet',
+      });
+    }
+
+    let resolvedRegistrationId = registrationId;
+    if (!resolvedRegistrationId)
+    {
+      const metadataRegistrationId = Number(stripeResult?.metadata?.registration_id);
+      if (Number.isFinite(metadataRegistrationId) && metadataRegistrationId > 0)
+      {
+        resolvedRegistrationId = metadataRegistrationId;
+      }
+    }
+
+    if (!resolvedRegistrationId)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'Unable to resolve registration from payment session',
+      });
+    }
+
+    const registration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.id, resolvedRegistrationId),
+        eq(registeredUsers.eventId, eventId),
+      ),
+    });
+
+    if (!registration)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Registration not found',
+      });
+    }
+
+    if (userEmail)
+    {
+      const normalizedEmail = userEmail.toLowerCase().trim();
+      if (registration.userEmail !== normalizedEmail)
+      {
+        return reply.code(403).send({
+          success: false,
+          error: 'This payment confirmation does not match the registered user',
+        });
+      }
+    }
+
+    if (registration.paymentStatus === 'paid')
+    {
+      const qr = await createQrForRegistration(registration);
+      return reply.send({
+        success: true,
+        data: { registration, qr },
+        message: 'Payment already confirmed',
+      });
+    }
+
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, eventId),
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    const capacity = event.capacity ?? 0;
+    if (capacity > 0)
+    {
+      const currentCount = await countPaidRegistrations(eventId, registration.id);
+      if (currentCount >= capacity)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Event is at full capacity',
+        });
+      }
+    }
+
+    const [updated] = await db
+      .update(registeredUsers)
+      .set({
+        paymentStatus: 'paid',
+        status: 'confirmed',
+      })
+      .where(eq(registeredUsers.id, registration.id))
+      .returning();
+
+    const qr = await createQrForRegistration(updated);
+
+    return reply.send({
+      success: true,
+      data: {
+        registration: updated,
+        qr,
+      },
+      message: 'Payment confirmed',
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to confirm payment');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to confirm payment',
+    });
+  }
+});
+
+// Confirm Stripe payment using session metadata (works even when redirect URL misses event_id)
+fastify.post<{
+  Body: { sessionId: string; registrationId?: number; eventId?: number; userEmail?: string };
+}>('/api/payments/confirm', async (request, reply) =>
+{
+  try
+  {
+    const { sessionId, registrationId, eventId, userEmail } = request.body;
+
+    if (!sessionId)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'sessionId is required',
+      });
+    }
+
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey)
+    {
+      return reply.code(500).send({
+        success: false,
+        error: 'Stripe is not configured. Set STRIPE_SECRET_KEY.',
+      });
+    }
+
+    const stripeResponse = await fetch(
+      `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${stripeSecretKey}`,
+        },
+      },
+    );
+
+    const stripeResult = await stripeResponse.json();
+
+    if (!stripeResponse.ok)
+    {
+      return reply.code(500).send({
+        success: false,
+        error: stripeResult?.error?.message || 'Failed to verify payment session',
+      });
+    }
+
+    if (stripeResult.payment_status !== 'paid')
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'Payment not completed yet',
+      });
+    }
+
+    let resolvedEventId = eventId;
+    if (!resolvedEventId)
+    {
+      const metadataEventId = Number(stripeResult?.metadata?.event_id);
+      if (Number.isFinite(metadataEventId) && metadataEventId > 0)
+      {
+        resolvedEventId = metadataEventId;
+      }
+    }
+
+    let resolvedRegistrationId = registrationId;
+    if (!resolvedRegistrationId)
+    {
+      const metadataRegistrationId = Number(stripeResult?.metadata?.registration_id);
+      if (Number.isFinite(metadataRegistrationId) && metadataRegistrationId > 0)
+      {
+        resolvedRegistrationId = metadataRegistrationId;
+      }
+    }
+
+    if (!resolvedEventId || !resolvedRegistrationId)
+    {
+      return reply.code(400).send({
+        success: false,
+        error: 'Unable to resolve event or registration from payment session',
+      });
+    }
+
+    const registration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.id, resolvedRegistrationId),
+        eq(registeredUsers.eventId, resolvedEventId),
+      ),
+    });
+
+    if (!registration)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Registration not found',
+      });
+    }
+
+    if (userEmail)
+    {
+      const normalizedEmail = userEmail.toLowerCase().trim();
+      if (registration.userEmail !== normalizedEmail)
+      {
+        return reply.code(403).send({
+          success: false,
+          error: 'This payment confirmation does not match the registered user',
+        });
+      }
+    }
+
+    if (registration.paymentStatus === 'paid')
+    {
+      const qr = await createQrForRegistration(registration);
+      return reply.send({
+        success: true,
+        data: { registration, qr },
+        message: 'Payment already confirmed',
+      });
+    }
+
+    const event = await db.query.events.findFirst({
+      where: eq(events.id, resolvedEventId),
+    });
+
+    if (!event)
+    {
+      return reply.code(404).send({
+        success: false,
+        error: 'Event not found',
+      });
+    }
+
+    const capacity = event.capacity ?? 0;
+    if (capacity > 0)
+    {
+      const currentCount = await countPaidRegistrations(resolvedEventId, registration.id);
+      if (currentCount >= capacity)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Event is at full capacity',
+        });
+      }
+    }
+
+    const [updated] = await db
+      .update(registeredUsers)
+      .set({
+        paymentStatus: 'paid',
+        status: 'confirmed',
+      })
+      .where(eq(registeredUsers.id, registration.id))
+      .returning();
+
+    const qr = await createQrForRegistration(updated);
+
+    return reply.send({
+      success: true,
+      data: {
+        registration: updated,
+        qr,
+      },
+      message: 'Payment confirmed',
+    });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to confirm payment via session metadata');
+    return reply.code(500).send({
+      success: false,
+      error: 'Failed to confirm payment',
     });
   }
 });
@@ -515,9 +1095,11 @@ fastify.get<{
       where: eq(registeredUsers.userEmail, userEmail.toLowerCase().trim()),
     });
 
-    // Create a set of event IDs the user is already registered for
+    // Create a set of event IDs the user has fully paid registrations for
     const registeredEventIds = new Set(
-      userRegistrations.map((reg) => reg.eventId)
+      userRegistrations
+        .filter((reg) => reg.paymentStatus === 'paid')
+        .map((reg) => reg.eventId)
     );
 
     // Filter out events the user is already registered for
@@ -564,9 +1146,13 @@ fastify.get<{
       ),
     });
 
+    const hasRegistration = !!registration;
+    const isRegistered = !!registration && registration.paymentStatus === 'paid';
+
     return reply.send({
       success: true,
-      isRegistered: !!registration,
+      hasRegistration,
+      isRegistered,
       data: registration || null,
     });
   } catch (error)
@@ -795,6 +1381,7 @@ fastify.delete<{
 
 await fastify.register(formsRoutes)
 await fastify.register(publicImageRoutes)
+await fastify.register(profileRoutes)
 
 
 // Start server

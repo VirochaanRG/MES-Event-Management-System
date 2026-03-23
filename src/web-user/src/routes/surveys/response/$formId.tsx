@@ -13,6 +13,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import MultipleSelectAnswerQuestion from "@/components/MultipleSelectAnswerQuestion";
 import DropdownAnswerQuestion from "@/components/DropdownAnswerQuestion";
+import { useCustomConfirm } from "@/components/CustomAlert";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/surveys/response/$formId")({
   component: RouteComponent,
@@ -21,6 +23,8 @@ export const Route = createFileRoute("/surveys/response/$formId")({
 function RouteComponent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const showConfirm = useCustomConfirm();
+  const { user } = useAuth();
   const { formId } = Route.useParams();
   const userId = JSON.parse(
     sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
@@ -31,6 +35,7 @@ function RouteComponent() {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [responses, setResponses] = useState<FormResponse[]>([]);
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
 
   const visibleResponses = useMemo(() => {
     return [...responses]
@@ -66,10 +71,43 @@ function RouteComponent() {
   }, [responses]);
 
   useEffect(() => {
+    const ensureProfileCompleted = async () => {
+      if (!user?.id && !user?.email) {
+        setHasProfile(false);
+        return false;
+      }
+
+      try {
+        const endpoint = user.id
+          ? `/api/profiles/${user.id}`
+          : `/api/profiles?email=${encodeURIComponent(user.email)}`;
+
+        const res = await fetch(endpoint, {
+          credentials: "include",
+        });
+        const json = await res.json();
+
+        const completed = Boolean(json?.success && json?.data);
+        setHasProfile(completed);
+        return completed;
+      } catch {
+        setHasProfile(false);
+        return false;
+      }
+    };
+
     const fetchFormAndQuestions = async () => {
       try {
         setLoading(true);
-        const formResponse = await fetch(`/api/forms/${formId}`);
+        const profileCompleted = await ensureProfileCompleted();
+        if (!profileCompleted) {
+          setError("Complete your profile before answering surveys");
+          return;
+        }
+
+        const formResponse = await fetch(
+          `/api/forms/${formId}?uid=${encodeURIComponent(userId)}`,
+        );
         const formResult = await formResponse.json();
 
         if (!formResult.success) {
@@ -78,46 +116,82 @@ function RouteComponent() {
         setForm(formResult.data);
         console.log(form);
 
-        const questionsResponse = await fetch(`/api/forms/questions/${formId}`);
+        const questionsResponse = await fetch(
+          `/api/forms/questions/${formId}?uid=${encodeURIComponent(userId)}`,
+        );
         const questionsResult = await questionsResponse.json();
 
         if (!questionsResult.success) {
           throw new Error(questionsResult.error || "Failed to fetch form");
         }
-        var questions: FormQuestion[] = questionsResult.data;
+        const questions: FormQuestion[] = questionsResult.data;
 
         const answersResponse = await fetch(
           `/api/forms/${formId}/answers/${userId}`,
         );
         const answersResult = await answersResponse.json();
-        var answers: FormAnswer[] = answersResult.success
+        const answers: FormAnswer[] = answersResult.success
           ? answersResult.data
           : [];
         setResponses(
           questions.map((q) => {
-            var response: FormResponse = {
+            const foundAnswer = answers.find((a) => a.questionId == q.id);
+
+            // Multi-select answers are stored as PostgreSQL array text {"a","b"}
+            // or as a JSON string ["a","b"] — normalise back to a JS string[].
+            if (
+              foundAnswer &&
+              q.questionType === "multi_select" &&
+              typeof foundAnswer.answer === "string" &&
+              foundAnswer.answer.length > 0
+            ) {
+              const raw = foundAnswer.answer as string;
+              if (raw.startsWith("{") && raw.endsWith("}")) {
+                // PostgreSQL array literal: {"opt1","opt2"}
+                foundAnswer.answer = raw
+                  .slice(1, -1)
+                  .split(",")
+                  .map((s) => s.replace(/^"|"$/g, "").trim())
+                  .filter(Boolean);
+              } else if (raw.startsWith("[")) {
+                try {
+                  const parsed = JSON.parse(raw);
+                  if (Array.isArray(parsed)) foundAnswer.answer = parsed;
+                } catch {
+                  // ignore malformed
+                }
+              }
+            }
+
+            const response: FormResponse = {
               question: q,
-              answer: answers.find((a) => a.questionId == q.id),
+              answer: foundAnswer,
             };
 
             return response;
           }),
         );
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to fetch form");
       } finally {
         setLoading(false);
       }
     };
 
     fetchFormAndQuestions();
-  }, [formId]);
+  }, [formId, user?.id, user?.email]);
 
   const handleBack = () => {
-    if(form?.moduleId) {
+    if (form?.moduleId) {
       navigate({ to: `/surveys/modular-form/${form.moduleId}` });
     } else {
-      navigate({ to: "/" });
+      navigate({
+        to: "/",
+        search: {
+          tab: "surveys",
+          surveysSubTab: submitted ? "completed" : "available",
+        },
+      });
     }
   };
 
@@ -164,7 +238,11 @@ function RouteComponent() {
         body: JSON.stringify({
           qid: response.question.id,
           uid: userId ?? "",
-          answer: response.answer?.answer,
+          // Serialise arrays to a JSON string so the text column stores ["a","b"]
+          // instead of letting node-postgres convert to PostgreSQL {"a","b"} notation.
+          answer: Array.isArray(response.answer?.answer)
+            ? JSON.stringify(response.answer.answer)
+            : response.answer?.answer,
           questionType: response.question.questionType,
         }),
       };
@@ -179,7 +257,13 @@ function RouteComponent() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (hasProfile === false) {
+      toast.error("Complete your profile before answering surveys");
+      navigate({ to: "/profile" });
+      return;
+    }
+
     const postSubmission = async () => {
       const submitReponse = await fetch(
         `/api/forms/${formId}/submit/${userId}`,
@@ -206,27 +290,35 @@ function RouteComponent() {
       ) {
         toast.error("Please fill in all required fields");
       } else {
-        const confirmation = confirm("Are you sure you want to submit?");
+        const confirmation = await showConfirm(
+          "Are you sure you want to submit?",
+        );
         if (!confirmation) return;
-        saveForm();
-        postSubmission();
+        await saveForm();
+        await postSubmission();
         setSubmitted(true);
         queryClient.invalidateQueries({ queryKey: ["availableSurveys"] });
         queryClient.invalidateQueries({ queryKey: ["completedSurveys"] });
       }
-    } catch (err: any) {
+    } catch {
       toast.error("Unable to submit form");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (hasProfile === false) {
+      toast.error("Complete your profile before answering surveys");
+      navigate({ to: "/profile" });
+      return;
+    }
+
     try {
-      saveForm();
+      await saveForm();
       toast.success("Your response has been saved.");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to save response");
     }
   };
 
@@ -255,6 +347,14 @@ function RouteComponent() {
           <div className="text-lg text-red-900 mb-4">
             {error || "Survey not found"}
           </div>
+          {hasProfile === false && (
+            <button
+              onClick={() => navigate({ to: "/profile" })}
+              className="mr-3 px-4 py-2 bg-yellow-300 text-red-900 rounded-lg hover:bg-yellow-400 transition-colors"
+            >
+              Complete Profile
+            </button>
+          )}
           <button
             onClick={handleBack}
             className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
@@ -313,12 +413,8 @@ function RouteComponent() {
               onClick={handleBack}
               className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
             >
-            {form?.moduleId ? "Back to modules" : "Back to surveys"}
+              {form?.moduleId ? "Back to modules" : "Back to surveys"}
             </button>
-          </div>
-          {/* Metadata */}
-          <div className="mt-6 text-center text-sm text-gray-500">
-            Created {formatDate(form.createdAt)}
           </div>
         </div>
       </div>
@@ -346,7 +442,7 @@ function RouteComponent() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-            {form?.moduleId ? "Back to modules" : "Back to surveys"}
+          {form?.moduleId ? "Back to modules" : "Back to surveys"}
         </button>
 
         {/* Survey Header */}
@@ -425,11 +521,6 @@ function RouteComponent() {
               Submit
             </button>
           </div>
-        </div>
-
-        {/* Metadata */}
-        <div className="mt-6 text-center text-sm text-gray-500">
-          Created {formatDate(form.createdAt)}
         </div>
       </div>
     </div>

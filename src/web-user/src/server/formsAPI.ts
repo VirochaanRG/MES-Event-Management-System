@@ -1,12 +1,133 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
 import { form, formAnswers, formConditions, formQuestions, formSubmissions, modularForms } from './../../../db/src/schemas/form';
-import { and, eq, isNull, notInArray, sql } from 'drizzle-orm';
+import { profiles, users } from './../../../db/src/schemas/users';
+import { and, eq, inArray, isNull, notInArray, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
 {
 
-  const assertPublicForm = async (fid: string, reply: any) =>
+  const PROFILE_CONDITION_PREFIX = 'profile:';
+
+  const splitAllowedValues = (input: string) =>
+    input
+      .split(',')
+      .map((v) => v.trim().toLowerCase())
+      .filter(Boolean);
+
+  const parseProfileConditionType = (conditionType: string) =>
+  {
+    if (!conditionType.startsWith(PROFILE_CONDITION_PREFIX)) return null;
+
+    const rest = conditionType.slice(PROFILE_CONDITION_PREFIX.length);
+    const separatorIdx = rest.indexOf(':');
+    if (separatorIdx === -1) return null;
+
+    const profileField = rest.slice(0, separatorIdx);
+    const encodedExpected = rest.slice(separatorIdx + 1);
+    if (!profileField || !encodedExpected) return null;
+
+    return {
+      profileField,
+      expectedValue: decodeURIComponent(encodedExpected),
+    };
+  };
+
+  const resolveProfileByUid = async (uid: string) =>
+  {
+    // In web-user routes, uid is currently user email.
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, uid.toLowerCase().trim()),
+    });
+    if (!user) return null;
+
+    return db.query.profiles.findFirst({
+      where: eq(profiles.userId, user.id),
+    });
+  };
+
+  const isProfileConditionMet = (
+    profile: { faculty: string | null; program: string | null; isMcmasterStudent: boolean } | null,
+    profileField: string,
+    expectedValue: string,
+  ) =>
+  {
+    if (!profile) return false;
+
+    if (profileField === 'faculty')
+    {
+      const allowed = splitAllowedValues(expectedValue);
+      return allowed.includes((profile.faculty ?? '').trim().toLowerCase());
+    }
+
+    if (profileField === 'program')
+    {
+      const allowed = splitAllowedValues(expectedValue);
+      return allowed.includes((profile.program ?? '').trim().toLowerCase());
+    }
+
+    if (profileField === 'isMcmasterStudent')
+    {
+      const allowed = splitAllowedValues(expectedValue);
+      const normalizedAliases = profile.isMcmasterStudent
+        ? ['true', 'yes', '1']
+        : ['false', 'no', '0'];
+
+      return allowed.some((v) => normalizedAliases.includes(v));
+    }
+
+    return false;
+  };
+
+  const canUserAccessFormByProfile = async (uid: string | undefined, fid: number) =>
+  {
+    const conditions = await db.query.formConditions.findMany({
+      where: eq(formConditions.formId, fid),
+    });
+
+    const profileConditions = conditions
+      .map((c) => parseProfileConditionType(c.conditionType))
+      .filter(Boolean);
+
+    if (profileConditions.length === 0) return true;
+    if (!uid) return false;
+
+    const profile = await resolveProfileByUid(uid);
+    if (!profile) return false;
+
+    return profileConditions.every((c) =>
+      isProfileConditionMet(profile, c!.profileField, c!.expectedValue)
+    );
+  };
+
+  const filterFormsByProfileAccess = async <T extends { id: number }>(forms: T[], uid: string) =>
+  {
+    const checks = await Promise.all(
+      forms.map(async (f) => ({
+        form: f,
+        allowed: await canUserAccessFormByProfile(uid, f.id),
+      }))
+    );
+
+    return checks.filter((c) => c.allowed).map((c) => c.form);
+  };
+
+  const assertProfileCompleted = async (uid: string, reply: any) =>
+  {
+    const profile = await resolveProfileByUid(uid);
+    if (!profile)
+    {
+      reply.code(403).send({
+        success: false,
+        error: 'Complete your profile before answering surveys',
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const assertAccessiblePublicForm = async (fid: string, uid: string | undefined, reply: any) =>
   {
     const f = await db.query.form.findFirst({
       where: and(
@@ -15,11 +136,20 @@ export default async function formsRoutes(fastify: FastifyInstance)
         sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
       ),
     });
+
     if (!f)
     {
       reply.code(404).send({ success: false, error: "Survey not found" });
       return null;
     }
+
+    const allowed = await canUserAccessFormByProfile(uid, f.id);
+    if (!allowed)
+    {
+      reply.code(404).send({ success: false, error: "Survey not found" });
+      return null;
+    }
+
     return f;
   };
 
@@ -117,9 +247,11 @@ export default async function formsRoutes(fastify: FastifyInstance)
 
       console.log('UNFILLED: ', allForms);
 
+      const allowedForms = await filterFormsByProfileAccess(allForms, uid);
+
       return reply.send({
         success: true,
-        data: allForms,
+        data: allowedForms,
       });
     } catch (error)
     {
@@ -137,9 +269,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { uid } = request.params;
-      
-      // Get completed non-modular forms ONLY (where moduleId IS NULL)
-      const completedRegularForms = await db
+      const allForms = await db
         .select({
           id: form.id,
           name: form.name,
@@ -157,11 +287,13 @@ export default async function formsRoutes(fastify: FastifyInstance)
             sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
             isNull(form.moduleId))));
 
-      console.log('FILLED: ', completedRegularForms);
+      console.log('FILLED: ', allForms);
+
+      const allowedForms = await filterFormsByProfileAccess(allForms, uid);
 
       return reply.send({
         success: true,
-        data: completedRegularForms,
+        data: allowedForms,
       });
     } catch (error)
     {
@@ -179,44 +311,59 @@ export default async function formsRoutes(fastify: FastifyInstance)
     try
     {
       const { uid } = request.params;
-      
+
       // Get all public modular forms
-      const allModularForms = await db
+      const allModules = await db
         .select()
         .from(modularForms)
         .where(eq(modularForms.isPublic, true));
 
-      // For each modular form, check if at least one form is not completed
-      const availableModularForms = await Promise.all(
-        allModularForms.map(async (mf) =>
+      // Filter to only modules that have incomplete forms for this user
+      const availableModules = await Promise.all(
+        allModules.map(async (mod) =>
         {
-          // Get all forms in this modular form
-          const formsInModule = await db
+          // Get all forms in this module that are public and unlocked
+          const moduleFormsCount = await db
             .select()
             .from(form)
-            .where(eq(form.moduleId, mf.id));
-
-          // Get submissions for this user in this module
-          const userSubmissions = await db
-            .select({ formId: formSubmissions.formId })
-            .from(formSubmissions)
             .where(and(
-              eq(formSubmissions.userId, uid),
-              notInArray(formSubmissions.formId, [])
+              eq(form.moduleId, mod.id),
+              eq(form.isPublic, true),
+              sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
             ));
 
-          // Check if user has submitted all forms in this module
-          const submittedFormIds = userSubmissions.map(s => s.formId);
-          const allFormsSubmitted = formsInModule.every(f => submittedFormIds.includes(f.id));
+          const accessibleModuleForms = await filterFormsByProfileAccess(moduleFormsCount, uid);
 
-          // Return modular form only if not all forms are submitted
-          return allFormsSubmitted ? null : mf;
+          if (accessibleModuleForms.length === 0)
+          {
+            // Module has no forms, skip it
+            return null;
+          }
+
+          const accessibleIds = accessibleModuleForms.map((f) => f.id);
+          const submittedAccessible = accessibleIds.length === 0
+            ? []
+            : await db
+              .select({ formId: formSubmissions.formId })
+              .from(formSubmissions)
+              .where(and(
+                eq(formSubmissions.userId, uid),
+                inArray(formSubmissions.formId, accessibleIds)
+              ));
+
+          // Include only if not all accessible forms have been submitted
+          const submittedAccessibleCount = submittedAccessible.length;
+          const allFormsSubmitted = accessibleModuleForms.length === submittedAccessibleCount;
+
+          return !allFormsSubmitted ? mod : null;
         })
       );
 
+      const available = availableModules.filter(Boolean);
+
       return reply.send({
         success: true,
-        data: availableModularForms.filter(Boolean),
+        data: available,
       });
     } catch (error)
     {
@@ -228,84 +375,85 @@ export default async function formsRoutes(fastify: FastifyInstance)
     }
   });
 
-  //GET completed modular forms for user (returns individual forms that are part of completed modules)
+  //GET completed modular forms for user
   fastify.get<{ Params: { uid: string } }>('/api/mod-forms/completed/:uid', async (request, reply) =>
   {
     try
     {
       const { uid } = request.params;
-      
+
       // Get all public modular forms
-      const allModularForms = await db
+      const allModules = await db
         .select()
         .from(modularForms)
         .where(eq(modularForms.isPublic, true));
 
-      // For each modular form, check if ALL forms are completed, then return the modular form object
-      const completedModularForms: any[] = [];
-
-      for (const mf of allModularForms)
-      {
-        // Get all forms in this modular form
-        const formsInModule = await db
-          .select()
-          .from(form)
-          .where(and(
-            eq(form.moduleId, mf.id),
-            eq(form.isPublic, true),
-            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
-          ));
-
-        // If no forms in module, skip
-        if (formsInModule.length === 0) continue;
-
-        // Get user submissions for forms in this module
-        const userSubmissions = await db
-          .select({ formId: formSubmissions.formId })
-          .from(formSubmissions)
-          .where(eq(formSubmissions.userId, uid));
-
-        const submittedFormIds = userSubmissions.map(s => s.formId);
-
-        // Check if ALL forms in the module are submitted
-        const allFormsSubmitted = formsInModule.every(f => submittedFormIds.includes(f.id));
-
-        // If all forms are submitted, add the modular form object to the results (with moduleId undefined to mark it as modular)
-        if (allFormsSubmitted)
+      // For each module, check if all its forms have been submitted
+      const completedModules = await Promise.all(
+        allModules.map(async (mod) =>
         {
-          completedModularForms.push({
-            id: mf.id,
-            name: mf.name,
-            description: mf.description,
-            createdAt: mf.createdAt,
-            isPublic: mf.isPublic,
-            moduleId: undefined // Mark as modular form
-          });
-        }
-      }
+          // Get all forms in this module that are public and unlocked
+          const moduleFormsCount = await db
+            .select()
+            .from(form)
+            .where(and(
+              eq(form.moduleId, mod.id),
+              eq(form.isPublic, true),
+              sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
+            ));
+
+          const accessibleModuleForms = await filterFormsByProfileAccess(moduleFormsCount, uid);
+
+          if (accessibleModuleForms.length === 0)
+          {
+            // Module has no forms, skip it
+            return null;
+          }
+
+          const accessibleIds = accessibleModuleForms.map((f) => f.id);
+          const submittedAccessible = accessibleIds.length === 0
+            ? []
+            : await db
+              .select({ formId: formSubmissions.formId })
+              .from(formSubmissions)
+              .where(and(
+                eq(formSubmissions.userId, uid),
+                inArray(formSubmissions.formId, accessibleIds)
+              ));
+
+          // Check if all accessible module forms have been submitted
+          const submittedAccessibleCount = submittedAccessible.length;
+          const allFormsSubmitted = accessibleModuleForms.length === submittedAccessibleCount;
+
+          return allFormsSubmitted ? mod : null;
+        })
+      );
+
+      const completed = completedModules.filter(Boolean);
 
       return reply.send({
         success: true,
-        data: completedModularForms,
+        data: completed,
       });
     } catch (error)
     {
-      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      fastify.log.error({ err: error }, 'Failed to fetch completed modular forms');
       return reply.code(500).send({
         success: false,
-        error: 'Failed to fetch forms',
+        error: 'Failed to fetch completed modular forms',
       });
     }
   });
 
   // GET single form by ID
-  fastify.get<{ Params: { fid: string } }>('/api/forms/:fid', async (request, reply) =>
+  fastify.get<{ Params: { fid: string }; Querystring: { uid?: string } }>('/api/forms/:fid', async (request, reply) =>
   {
     try
     {
       const { fid } = request.params;
+      const { uid } = request.query;
 
-      const publicForm = await assertPublicForm(fid, reply);
+      const publicForm = await assertAccessiblePublicForm(fid, uid, reply);
       if (!publicForm) return;
 
       return reply.send({
@@ -394,7 +542,8 @@ export default async function formsRoutes(fastify: FastifyInstance)
         allForms.map(async (f) =>
         {
           const met = await checkConditionsMet(uid, f.id);
-          return met ? f : null;
+          const profileMet = await canUserAccessFormByProfile(uid, f.id);
+          return met && profileMet ? f : null;
         })
       );
 
@@ -412,15 +561,56 @@ export default async function formsRoutes(fastify: FastifyInstance)
     }
   });
 
-  //GET filled forms for user and modular form (returns forms when all parts of module are completed)
+  //GET filled forms for user and modular form
   fastify.get<{ Params: { mid: string, uid: string } }>('/api/mod-forms/:mid/completed/:uid', async (request, reply) =>
   {
     try
     {
       const { mid, uid } = request.params;
-      
-      // Get all forms in this modular form
-      const formsInModule = await db
+      const allForms = await db
+        .select({
+          id: form.id,
+          name: form.name,
+          description: form.description,
+          createdAt: form.createdAt,
+          isPublic: form.isPublic
+        })
+        .from(modularForms)
+        .innerJoin(form, eq(form.moduleId, modularForms.id))
+        .innerJoin(formSubmissions, eq(form.id, formSubmissions.formId))
+        .where(and(
+          eq(formSubmissions.userId, uid),
+          and(
+            eq(form.isPublic, true),
+            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
+            eq(modularForms.id, parseInt(mid))
+          )));
+
+      console.log('FILLED: ', allForms);
+
+      return reply.send({
+        success: true,
+        data: allForms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch forms',
+      });
+    }
+  });
+
+  //GET all forms for user and modular form with their status
+  fastify.get<{ Params: { mid: string, uid: string } }>('/api/mod-forms/:mid/all/:uid', async (request, reply) =>
+  {
+    try
+    {
+      const { mid, uid } = request.params;
+
+      // Get all public forms in the module that are unlocked
+      const allFormsInModule = await db
         .select()
         .from(form)
         .where(and(
@@ -429,38 +619,58 @@ export default async function formsRoutes(fastify: FastifyInstance)
           sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
         ));
 
-      // If no forms in module, return empty
-      if (formsInModule.length === 0)
-      {
-        return reply.send({
-          success: true,
-          data: [],
-        });
-      }
-
-      // Get user submissions for forms in this module
-      const userSubmissions = await db
+      // Get submitted forms for this user
+      const submittedFormIds = await db
         .select({ formId: formSubmissions.formId })
         .from(formSubmissions)
         .where(eq(formSubmissions.userId, uid));
 
-      const submittedFormIds = userSubmissions.map(s => s.formId);
+      const submittedIds = submittedFormIds.map(s => s.formId);
 
-      // Check if all forms in the module are submitted
-      const allFormsSubmitted = formsInModule.every(f => submittedFormIds.includes(f.id));
+      // Get all forms in the module (including locked/future)
+      const allModuleFormsIncludingLocked = await db
+        .select()
+        .from(form)
+        .where(and(
+          eq(form.moduleId, parseInt(mid)),
+          eq(form.isPublic, true)
+        ));
 
-      // Return the forms only if all forms are submitted
-      if (allFormsSubmitted)
-      {
-        return reply.send({
-          success: true,
-          data: formsInModule,
-        });
-      }
+      // Categorize each form
+      const formsWithStatus = await Promise.all(
+        allModuleFormsIncludingLocked.map(async (f) =>
+        {
+          const isSubmitted = submittedIds.includes(f.id);
+          const isUnlocked = !f.unlockAt || new Date(f.unlockAt) <= new Date();
+          const conditionsMet = isUnlocked ? await checkConditionsMet(uid, f.id) : false;
+          const profileMet = isUnlocked ? await canUserAccessFormByProfile(uid, f.id) : false;
+          let status: 'completed' | 'available' | 'locked';
+
+          if (isSubmitted)
+          {
+            status = 'completed';
+          } else if (isUnlocked && conditionsMet && profileMet)
+          {
+            status = 'available';
+          } else
+          {
+            status = 'locked';
+          }
+
+          return {
+            id: f.id,
+            name: f.name,
+            description: f.description,
+            createdAt: f.createdAt,
+            isPublic: f.isPublic,
+            status,
+          };
+        })
+      );
 
       return reply.send({
         success: true,
-        data: [],
+        data: formsWithStatus,
       });
     } catch (error)
     {
@@ -481,7 +691,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         const { fid, uid } = request.params;
 
-        const publicForm = await assertPublicForm(fid, reply);
+        const publicForm = await assertAccessiblePublicForm(fid, uid, reply);
         if (!publicForm) return;
 
         console.log('Checking status for:', { fid, uid }); // Debug log
@@ -547,13 +757,14 @@ export default async function formsRoutes(fastify: FastifyInstance)
   );
 
   // GET questions by form ID
-  fastify.get<{ Params: { fid: string } }>('/api/forms/questions/:fid', async (request, reply) =>
+  fastify.get<{ Params: { fid: string }; Querystring: { uid?: string } }>('/api/forms/questions/:fid', async (request, reply) =>
   {
     try
     {
       const { fid } = request.params;
+      const { uid } = request.query;
 
-      const publicForm = await assertPublicForm(fid, reply);
+      const publicForm = await assertAccessiblePublicForm(fid, uid, reply);
       if (!publicForm) return;
 
       const questions = await db
@@ -584,7 +795,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         const { fid, uid } = request.params;
 
-        const publicForm = await assertPublicForm(fid, reply);
+        const publicForm = await assertAccessiblePublicForm(fid, uid, reply);
         if (!publicForm) return;
 
         var answers = await db
@@ -593,8 +804,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
           .where(
             and(
               eq(formAnswers.formId, parseInt(fid)),
-              eq(formAnswers.userId, uid),
-              isNull(formAnswers.submissionId)
+              eq(formAnswers.userId, uid)
             )
           );
         if (!answers)
@@ -626,7 +836,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { fid, uid } = request.params;
 
-      const publicForm = await assertPublicForm(fid, reply);
+      const profileCompleted = await assertProfileCompleted(uid, reply);
+      if (!profileCompleted) return;
+
+      const publicForm = await assertAccessiblePublicForm(fid, uid, reply);
       if (!publicForm) return;
 
       const { qid, answer, questionType } = request.body;
@@ -691,7 +904,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { fid, uid } = request.params;
 
-      const publicForm = await assertPublicForm(fid, reply);
+      const profileCompleted = await assertProfileCompleted(uid, reply);
+      if (!profileCompleted) return;
+
+      const publicForm = await assertAccessiblePublicForm(fid, uid, reply);
       if (!publicForm) return;
 
       const existingSubmission = await db.query.formSubmissions.findFirst({
@@ -760,7 +976,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
     {
       const { fid, uid } = request.params;
 
-      const publicForm = await assertPublicForm(fid, reply);
+      const publicForm = await assertAccessiblePublicForm(fid, uid, reply);
       if (!publicForm) return;
 
       await db

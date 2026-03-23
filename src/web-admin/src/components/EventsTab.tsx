@@ -2,10 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Event } from "@/interfaces/interfaces";
+import { useCustomAlert } from "./CustomAlert";
 
 export default function EventsTab() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+  const { showAlert } = useCustomAlert();
 
   const {
     data: eventsData,
@@ -214,7 +216,7 @@ function CreateEventModal({
       onClose();
     } catch (error) {
       console.error("Error creating event:", error);
-      alert("Failed to create event. Please try again.");
+      showAlert("Failed to create event. Please try again.");
     }
   };
 

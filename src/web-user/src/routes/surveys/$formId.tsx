@@ -1,12 +1,10 @@
-import {
-  createFileRoute,
-  useLocation,
-  useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { Form } from "@/interfaces/interfaces";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useCustomConfirm } from "@/components/CustomAlert";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/surveys/$formId")({
   component: RouteComponent,
@@ -15,6 +13,8 @@ export const Route = createFileRoute("/surveys/$formId")({
 function RouteComponent() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const showConfirm = useCustomConfirm();
+  const { user } = useAuth();
   const { formId } = Route.useParams();
   const userId = JSON.parse(
     sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
@@ -25,12 +25,15 @@ function RouteComponent() {
   const [surveyProgress, setSurveyProgress] = useState<
     "unfilled" | "started" | "completed"
   >("unfilled");
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
 
   useEffect(() => {
     const fetchForm = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/forms/${formId}`);
+        const response = await fetch(
+          `/api/forms/${formId}?uid=${encodeURIComponent(userId)}`,
+        );
         const result = await response.json();
 
         if (!result.success) {
@@ -56,39 +59,78 @@ function RouteComponent() {
     fetchForm();
   }, [formId]);
 
+  useEffect(() => {
+    const loadProfileStatus = async () => {
+      if (!user?.id && !user?.email) {
+        setHasProfile(false);
+        return;
+      }
+
+      try {
+        const endpoint = user.id
+          ? `/api/profiles/${user.id}`
+          : `/api/profiles?email=${encodeURIComponent(user.email)}`;
+
+        const res = await fetch(endpoint, {
+          credentials: "include",
+        });
+        const json = await res.json();
+
+        setHasProfile(Boolean(json?.success && json?.data));
+      } catch {
+        setHasProfile(false);
+      }
+    };
+
+    loadProfileStatus();
+  }, [user?.id, user?.email]);
+
   const handleBack = () => {
-    if(form?.moduleId) {
+    if (form?.moduleId) {
       navigate({ to: `/surveys/modular-form/${form.moduleId}` });
     } else {
-      navigate({ to: "/" });
+      navigate({
+        to: "/",
+        search: {
+          tab: "surveys",
+          surveysSubTab:
+            surveyProgress === "completed" ? "completed" : "available",
+        },
+      });
     }
   };
 
   const handleFillSurvey = () => {
+    if (hasProfile === false) {
+      toast.error("Complete your profile before answering surveys");
+      navigate({ to: "/profile" });
+      return;
+    }
+
     navigate({ to: `/surveys/response/${formId}` });
   };
 
-  const handleDeleteSubmission = () => {
-    const deleteSubmission = async () => {
-      const confirmation = confirm(
-        "Are you sure you want to delete your submission?",
-      );
-      if (!confirmation) return;
-      const deleteResponse = await fetch(
-        `/api/forms/${formId}/delete/${userId}`,
-        { method: "DELETE" },
-      );
-      const deleteResult = await deleteResponse.json();
-      if (!deleteResult.success) {
-        toast.error("Unable to delete submission");
-      } else {
-        toast.success("Submission deleted");
-      }
+  const handleDeleteSubmission = async () => {
+    const confirmation = await showConfirm(
+      "Are you sure you want to delete your submission?",
+    );
+    if (!confirmation) return;
 
-      queryClient.invalidateQueries({ queryKey: ["availableSurveys"] });
-      queryClient.invalidateQueries({ queryKey: ["completedSurveys"] });
-    };
-    deleteSubmission();
+    const deleteResponse = await fetch(
+      `/api/forms/${formId}/delete/${userId}`,
+      {
+        method: "DELETE",
+      },
+    );
+    const deleteResult = await deleteResponse.json();
+    if (!deleteResult.success) {
+      toast.error("Unable to delete submission");
+      return;
+    }
+
+    toast.success("Submission deleted");
+    queryClient.invalidateQueries({ queryKey: ["availableSurveys"] });
+    queryClient.invalidateQueries({ queryKey: ["completedSurveys"] });
     setSurveyProgress("unfilled");
   };
 
@@ -121,7 +163,7 @@ function RouteComponent() {
             onClick={handleBack}
             className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors"
           >
-          {form?.moduleId ? "Back to modules" : "Back to Surveys"}
+            {form?.moduleId ? "Back to modules" : "Back to Surveys"}
           </button>
         </div>
       </div>
@@ -171,16 +213,24 @@ function RouteComponent() {
 
         {/* Action Buttons */}
         <div className="bg-white rounded-lg shadow-sm border-2 border-yellow-300 p-6">
+          {hasProfile === false && (
+            <div className="mb-4 p-4 rounded-lg border border-amber-200 bg-amber-50 text-amber-900">
+              Complete your profile before answering surveys.
+            </div>
+          )}
           <div className="flex gap-4">
             <button
               className="flex-1 px-6 py-3 bg-red-900 text-white font-semibold rounded-lg hover:bg-red-800 transition-colors"
               onClick={handleFillSurvey}
+              disabled={hasProfile === false}
             >
-              {surveyProgress === "unfilled"
-                ? "Fill out Survey"
-                : surveyProgress === "started"
-                  ? "Continue Filling"
-                  : "Edit Submission"}
+              {hasProfile === false
+                ? "Complete Profile to Answer"
+                : surveyProgress === "unfilled"
+                  ? "Fill out Survey"
+                  : surveyProgress === "started"
+                    ? "Continue Filling"
+                    : "Edit Submission"}
             </button>
             {(surveyProgress === "started" ||
               surveyProgress == "completed") && (
@@ -192,11 +242,6 @@ function RouteComponent() {
               </button>
             )}
           </div>
-        </div>
-
-        {/* Metadata */}
-        <div className="mt-6 text-center text-sm text-gray-500">
-          Created {formatDate(form.createdAt)}
         </div>
       </div>
     </div>

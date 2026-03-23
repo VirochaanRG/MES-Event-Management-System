@@ -6,10 +6,64 @@ import { and, eq, sql } from 'drizzle-orm';
 
 export default async function formBuilderRoutes(fastify: FastifyInstance)
 {
+  const PROFILE_CONDITION_PREFIX = 'profile:';
+  const PROFILE_FIELDS = ['faculty', 'program', 'isMcmasterStudent'] as const;
+
+  const encodeProfileConditionType = (field: string, expectedValue: string) =>
+    `${PROFILE_CONDITION_PREFIX}${field}:${encodeURIComponent(expectedValue.trim())}`;
+
+  const parseProfileConditionType = (conditionType: string) =>
+  {
+    if (!conditionType.startsWith(PROFILE_CONDITION_PREFIX)) return null;
+
+    const rest = conditionType.slice(PROFILE_CONDITION_PREFIX.length);
+    const separatorIdx = rest.indexOf(':');
+    if (separatorIdx === -1) return null;
+
+    const field = rest.slice(0, separatorIdx);
+    const encodedValue = rest.slice(separatorIdx + 1);
+    if (!field || !encodedValue) return null;
+
+    return {
+      field,
+      expectedValue: decodeURIComponent(encodedValue),
+    };
+  };
+
+  const isProfileCondition = (conditionType: string) =>
+    conditionType.startsWith(PROFILE_CONDITION_PREFIX);
+
+  const assertFormUnpublished = async (formId: number, reply: any) =>
+  {
+    const existingForm = await db.query.form.findFirst({
+      where: eq(form.id, formId),
+    });
+
+    if (!existingForm)
+    {
+      reply.code(404).send({
+        success: false,
+        error: 'Form not found',
+      });
+      return null;
+    }
+
+    if (existingForm.isPublic)
+    {
+      reply.code(400).send({
+        success: false,
+        error: 'Unpublish the form before modifying questions',
+      });
+      return null;
+    }
+
+    return existingForm;
+  };
+
   // CREATE a form question
   fastify.post<{
     Params: { id: string };
-    Body: { questionType: string; questionTitle?: string; optionsCategory?: string; qorder: number; parentQuestionId?: number; enablingAnswers?: number[]; required : boolean };
+    Body: { questionType: string; questionTitle?: string; optionsCategory?: string; qorder: number; parentQuestionId?: number; enablingAnswers?: number[]; required: boolean };
   }>('/api/forms/:id/questions', async (request, reply) =>
   {
     try
@@ -33,17 +87,8 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
         });
       }
 
-      const existingForm = await db.query.form.findFirst({
-        where: eq(form.id, parseInt(id)),
-      });
-
-      if (!existingForm)
-      {
-        return reply.code(404).send({
-          success: false,
-          error: 'Form not found',
-        });
-      }
+      const existingForm = await assertFormUnpublished(parseInt(id), reply);
+      if (!existingForm) return;
 
       const newQuestion = await db
         .insert(formQuestions)
@@ -55,7 +100,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
           qorder: qorder,
           parentQuestionId: parentQuestionId || null,
           enablingAnswers: enablingAnswers || [],
-          required : required
+          required: required
         })
         .returning();
 
@@ -120,17 +165,8 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       {
         const { formId, questionId } = request.params;
 
-        const existingForm = await db.query.form.findFirst({
-          where: eq(form.id, parseInt(formId)),
-        });
-
-        if (!existingForm)
-        {
-          return reply.code(404).send({
-            success: false,
-            error: 'Form not found',
-          });
-        }
+        const existingForm = await assertFormUnpublished(parseInt(formId), reply);
+        if (!existingForm) return;
 
         const existingQuestion = await db.query.formQuestions.findFirst({
           where: and(
@@ -182,17 +218,8 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       const { formId, questionId } = request.params;
       const { questionType, questionTitle, optionsCategory, qorder, enablingAnswers, required } = request.body;
 
-      const existingForm = await db.query.form.findFirst({
-        where: eq(form.id, parseInt(formId)),
-      });
-
-      if (!existingForm)
-      {
-        return reply.code(404).send({
-          success: false,
-          error: 'Form not found',
-        });
-      }
+      const existingForm = await assertFormUnpublished(parseInt(formId), reply);
+      if (!existingForm) return;
 
       const existingQuestion = await db.query.formQuestions.findFirst({
         where: and(
@@ -231,7 +258,8 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       {
         updateData.enablingAnswers = enablingAnswers;
       }
-      if (required !== undefined) {
+      if (required !== undefined)
+      {
         updateData.required = required;
       }
 
@@ -272,6 +300,9 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       try
       {
         const { formId, questionId } = request.params;
+
+        const existingForm = await assertFormUnpublished(parseInt(formId), reply);
+        if (!existingForm) return;
 
         const currentQuestion = await db.query.formQuestions.findFirst({
           where: and(
@@ -365,6 +396,9 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       {
         const { formId, questionId } = request.params;
 
+        const existingForm = await assertFormUnpublished(parseInt(formId), reply);
+        if (!existingForm) return;
+
         const currentQuestion = await db.query.formQuestions.findFirst({
           where: and(
             eq(formQuestions.id, parseInt(questionId)),
@@ -452,13 +486,13 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
   // CREATE a form condition
   fastify.post<{
     Params: { id: string };
-    Body: { conditionType: string; dependentFormId: string; dependentQuestionId?: string; dependentAnswerIdx?: number};
+    Body: { conditionType: string; dependentFormId: string; dependentQuestionId?: string; dependentAnswerIdx?: number };
   }>('/api/forms/:id/conditions', async (request, reply) =>
   {
     try
     {
       const { id } = request.params;
-      const { conditionType, dependentFormId, dependentQuestionId, dependentAnswerIdx} = request.body;
+      const { conditionType, dependentFormId, dependentQuestionId, dependentAnswerIdx } = request.body;
 
       if (!conditionType || conditionType.trim() === '')
       {
@@ -505,7 +539,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
 
       const conditionTypes = ['complete_form', 'answer_question', 'specific_answer'];
 
-      if(!conditionTypes.includes(conditionType))
+      if (!conditionTypes.includes(conditionType))
       {
         return reply.code(400).send({
           success: false,
@@ -519,8 +553,8 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
           formId: parseInt(id),
           dependentFormId: parseInt(dependentFormId),
           conditionType: conditionType,
-          dependentQuestionId : dependentQuestionId ? parseInt(dependentQuestionId) : null,
-          dependentAnswerIdx : dependentAnswerIdx ?? null
+          dependentQuestionId: dependentQuestionId ? parseInt(dependentQuestionId) : null,
+          dependentAnswerIdx: dependentAnswerIdx ?? null
         })
         .returning();
 
@@ -538,18 +572,18 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
     }
   });
 
-  
+
 
   // UPDATE a form condition
   fastify.put<{
-    Params: { fid: string , cid: string};
-    Body: { dependentFormId: string; dependentQuestionId?: string; dependentAnswerIdx?: number};
+    Params: { fid: string, cid: string };
+    Body: { dependentFormId: string; dependentQuestionId?: string; dependentAnswerIdx?: number };
   }>('/api/forms/:fid/conditions/:cid', async (request, reply) =>
   {
     try
     {
       const { fid, cid } = request.params;
-      const {dependentFormId, dependentQuestionId, dependentAnswerIdx} = request.body;
+      const { dependentFormId, dependentQuestionId, dependentAnswerIdx } = request.body;
 
       if (!dependentFormId)
       {
@@ -577,7 +611,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
 
       const existingCondition = await db.query.formConditions.findFirst({
         where: eq(formConditions.id, parseInt(cid)),
-      }); 
+      });
 
       if (!existingCondition)
       {
@@ -709,7 +743,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
 
       return reply.send({
         success: true,
-        data: conditions,
+        data: conditions.filter((c) => !isProfileCondition(c.conditionType)),
       });
     } catch (error)
     {
@@ -720,4 +754,206 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       });
     }
   });
+
+  // GET profile-based access conditions for a form
+  fastify.get<{ Params: { id: string } }>('/api/forms/:id/profile-conditions', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+      const formId = parseInt(id);
+
+      const existingForm = await db.query.form.findFirst({
+        where: eq(form.id, formId),
+      });
+
+      if (!existingForm)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      const allConditions = await db.query.formConditions.findMany({
+        where: eq(formConditions.formId, formId),
+      });
+
+      const profileConditions = allConditions
+        .map((c) =>
+        {
+          const parsed = parseProfileConditionType(c.conditionType);
+          if (!parsed) return null;
+          return {
+            id: c.id,
+            formId: c.formId,
+            profileField: parsed.field,
+            expectedValue: parsed.expectedValue,
+          };
+        })
+        .filter(Boolean);
+
+      return reply.send({
+        success: true,
+        data: profileConditions,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch profile conditions');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch profile conditions',
+      });
+    }
+  });
+
+  // CREATE/UPSERT profile-based access condition for a form
+  fastify.post<{
+    Params: { id: string };
+    Body: { profileField: string; expectedValue: string };
+  }>('/api/forms/:id/profile-conditions', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+      const formId = parseInt(id);
+      const { profileField, expectedValue } = request.body;
+
+      const normalizedField = profileField?.trim();
+      const normalizedValue = expectedValue?.trim();
+
+      if (!normalizedField)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Profile field is required',
+        });
+      }
+
+      if (!normalizedValue)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Expected value is required',
+        });
+      }
+
+      if (!PROFILE_FIELDS.includes(normalizedField as typeof PROFILE_FIELDS[number]))
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Invalid profile field',
+        });
+      }
+
+      const existingForm = await assertFormUnpublished(formId, reply);
+      if (!existingForm) return;
+
+      const allConditions = await db.query.formConditions.findMany({
+        where: eq(formConditions.formId, formId),
+      });
+
+      const existingForField = allConditions.find((c) =>
+      {
+        const parsed = parseProfileConditionType(c.conditionType);
+        return parsed?.field === normalizedField;
+      });
+
+      const encodedConditionType = encodeProfileConditionType(normalizedField, normalizedValue);
+
+      if (existingForField)
+      {
+        const [updated] = await db
+          .update(formConditions)
+          .set({ conditionType: encodedConditionType })
+          .where(eq(formConditions.id, existingForField.id))
+          .returning();
+
+        return reply.send({
+          success: true,
+          data: {
+            id: updated.id,
+            formId: updated.formId,
+            profileField: normalizedField,
+            expectedValue: normalizedValue,
+          },
+        });
+      }
+
+      const [created] = await db
+        .insert(formConditions)
+        .values({
+          formId,
+          // Keep FK valid without schema changes.
+          dependentFormId: formId,
+          conditionType: encodedConditionType,
+          dependentQuestionId: null,
+          dependentAnswerIdx: null,
+        })
+        .returning();
+
+      return reply.code(201).send({
+        success: true,
+        data: {
+          id: created.id,
+          formId: created.formId,
+          profileField: normalizedField,
+          expectedValue: normalizedValue,
+        },
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to save profile condition');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to save profile condition',
+      });
+    }
+  });
+
+  // DELETE profile-based access condition for a form
+  fastify.delete<{ Params: { fid: string; cid: string } }>(
+    '/api/forms/:fid/profile-conditions/:cid',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { fid, cid } = request.params;
+        const formId = parseInt(fid);
+        const conditionId = parseInt(cid);
+
+        const existingForm = await assertFormUnpublished(formId, reply);
+        if (!existingForm) return;
+
+        const existingCondition = await db.query.formConditions.findFirst({
+          where: and(
+            eq(formConditions.id, conditionId),
+            eq(formConditions.formId, formId),
+          ),
+        });
+
+        if (!existingCondition || !isProfileCondition(existingCondition.conditionType))
+        {
+          return reply.code(404).send({
+            success: false,
+            error: 'Profile condition not found',
+          });
+        }
+
+        await db.delete(formConditions).where(eq(formConditions.id, conditionId));
+
+        return reply.send({
+          success: true,
+          message: 'Profile condition deleted successfully',
+        });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Failed to delete profile condition');
+        return reply.code(500).send({
+          success: false,
+          error: 'Failed to delete profile condition',
+        });
+      }
+    }
+  );
 }

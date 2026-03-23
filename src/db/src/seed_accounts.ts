@@ -4,10 +4,10 @@ import { Pool } from "pg";
 import dotenv from "dotenv";
 import path from "path";
 import bcrypt from 'bcrypt';
-// dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../.ENV") });
 
 const pool = new Pool({
-  connectionString: "postgres://postgres:password@localhost:5432/db",
+  connectionString: process.env.DATABASE_URL || "postgresql://postgres:KreRSCsiYBjMoNufsEDnuFXQgIrKMaCp@mainline.proxy.rlwy.net:25707/railway",
 });
 
 const db = drizzle(pool);

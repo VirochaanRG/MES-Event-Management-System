@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
-import { form, formAnswers, formQuestions, modularForms } from './../../../db/src/schemas/form';
+import { form, formAnswers, formQuestions, formSubmissions, modularForms } from './../../../db/src/schemas/form';
+import { users } from '../../../db/src/schemas/users';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
@@ -157,7 +158,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
 
   // CREATE a new form
   fastify.post<{
-    Body: { name: string; description?: string; isModular?: boolean; moduleId?: number; isPublic?: boolean; unlockAt?: string| null };
+    Body: { name: string; description?: string; isModular?: boolean; moduleId?: number; isPublic?: boolean; unlockAt?: string | null };
   }>('/api/forms', async (request, reply) =>
   {
     try
@@ -171,37 +172,68 @@ export default async function formsRoutes(fastify: FastifyInstance)
           error: 'Form name is required',
         });
       }
-      
+
+      if (!isModular && moduleId !== undefined && moduleId !== null)
+      {
+        const existingModule = await db.query.modularForms.findFirst({
+          where: eq(modularForms.id, Number(moduleId)),
+        });
+
+        if (!existingModule)
+        {
+          return reply.code(404).send({
+            success: false,
+            error: 'Module not found',
+          });
+        }
+
+        if (existingModule.isPublic)
+        {
+          return reply.code(400).send({
+            success: false,
+            error: 'Unpublish the modular form before adding new forms',
+          });
+        }
+      }
+
       const parsedUnlockAt =
         unlockAt === null || unlockAt === undefined || unlockAt === ""
           ? null
           : new Date(String(unlockAt));
 
-      if (parsedUnlockAt && Number.isNaN(parsedUnlockAt.getTime())) {
+      if (parsedUnlockAt && Number.isNaN(parsedUnlockAt.getTime()))
+      {
         return reply.code(400).send({
           success: false,
           error: "Invalid unlockAt date",
         });
       }
+      if (parsedUnlockAt && parsedUnlockAt.getTime() < Date.now())
+      {
+        return reply.code(400).send({
+          success: false,
+          error: "unlockAt cannot be in the past",
+        });
+      }
 
-      const newForm = isModular ? 
+      const newForm = isModular ?
         await db
-        .insert(modularForms)
-        .values({
-          name: name.trim(),
-          description: description?.trim() || null,
-        }) 
-        : await db 
-        .insert(form)
-        .values({
-          name: name.trim(),
-          description: description?.trim() || null,
-          moduleId: moduleId,
-          isPublic: isPublic ?? false,
-          unlockAt: parsedUnlockAt,
-        })
-        .returning();
-      
+          .insert(modularForms)
+          .values({
+            name: name.trim(),
+            description: description?.trim() || null,
+          })
+        : await db
+          .insert(form)
+          .values({
+            name: name.trim(),
+            description: description?.trim() || null,
+            moduleId: moduleId,
+            isPublic: isPublic ?? false,
+            unlockAt: parsedUnlockAt,
+          })
+          .returning();
+
       return reply.code(201).send({
         success: true,
         data: newForm[0],
@@ -249,21 +281,42 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         updateData.description = description.trim() || null;
       }
-      if (moduleId !== undefined) {
+      if (moduleId !== undefined)
+      {
         updateData.moduleId = moduleId ?? null;
       }
-      if (isPublic !== undefined) {
+      if (isPublic !== undefined)
+      {
         updateData.isPublic = isPublic;
       }
-      if (unlockAt !== undefined) {
-        if (unlockAt === null || unlockAt === "") {
+      if (unlockAt !== undefined)
+      {
+        if (existingForm.isPublic && unlockAt !== null && unlockAt !== "")
+        {
+          return reply.code(400).send({
+            success: false,
+            error: "Unpublish the form before setting an unlock date",
+          });
+        }
+
+        if (unlockAt === null || unlockAt === "")
+        {
           updateData.unlockAt = null;
-        } else {
+        } else
+        {
           const parsed = new Date(String(unlockAt));
-          if (Number.isNaN(parsed.getTime())) {
+          if (Number.isNaN(parsed.getTime()))
+          {
             return reply.code(400).send({
               success: false,
               error: "Invalid unlockAt date",
+            });
+          }
+          if (parsed.getTime() < Date.now())
+          {
+            return reply.code(400).send({
+              success: false,
+              error: "unlockAt cannot be in the past",
             });
           }
           updateData.unlockAt = parsed;
@@ -331,7 +384,8 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         updateData.description = description.trim() || null;
       }
-      if (isPublic !== undefined) {
+      if (isPublic !== undefined)
+      {
         updateData.isPublic = isPublic;
       }
 
@@ -512,9 +566,10 @@ export default async function formsRoutes(fastify: FastifyInstance)
 
   // UPDATE visibility of a form
   fastify.patch<{
-  Params: { id: string };
-  Body: { isPublic: boolean };
-  }>('/api/forms/:id/visibility', async (request, reply) => {
+    Params: { id: string };
+    Body: { isPublic: boolean };
+  }>('/api/forms/:id/visibility', async (request, reply) =>
+  {
     const { id } = request.params;
     const { isPublic } = request.body;
 
@@ -524,18 +579,129 @@ export default async function formsRoutes(fastify: FastifyInstance)
       .where(eq(form.id, parseInt(id)))
       .returning();
 
-    if (!updated[0]) {
+    if (!updated[0])
+    {
       return reply.code(404).send({ success: false, error: 'Form not found' });
     }
 
     return reply.send({ success: true, data: updated[0] });
   });
 
+  // GET form analytics – all forms with submission counts
+  fastify.get('/api/forms/analytics', async (request, reply) =>
+  {
+    try
+    {
+      const forms = await db.query.form.findMany({
+        where: isNull(form.moduleId),
+      });
+
+      const submissionCounts = await db
+        .select({
+          formId: formSubmissions.formId,
+          count: sql<number>`count(*)`,
+        })
+        .from(formSubmissions)
+        .groupBy(formSubmissions.formId);
+
+      const questionCounts = await db
+        .select({
+          formId: formQuestions.formId,
+          count: sql<number>`count(*)`,
+        })
+        .from(formQuestions)
+        .groupBy(formQuestions.formId);
+
+      const subMap = new Map(submissionCounts.map((s) => [s.formId, Number(s.count)]));
+      const qMap = new Map(questionCounts.map((q) => [q.formId, Number(q.count)]));
+
+      const data = forms.map((f) => ({
+        id: f.id,
+        name: f.name,
+        description: f.description,
+        createdAt: f.createdAt,
+        isPublic: f.isPublic,
+        totalSubmissions: subMap.get(f.id) ?? 0,
+        totalQuestions: qMap.get(f.id) ?? 0,
+      }));
+
+      const totalForms = data.length;
+      const totalSubmissions = data.reduce((sum, f) => sum + f.totalSubmissions, 0);
+
+      return reply.send({
+        success: true,
+        data: { forms: data, totalForms, totalSubmissions },
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch form analytics');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch form analytics',
+      });
+    }
+  });
+
+  // GET users who completed a specific form
+  fastify.get<{ Params: { id: string } }>('/api/forms/:id/completions', async (request, reply) =>
+  {
+    try
+    {
+      const formId = parseInt(request.params.id);
+
+      const existingForm = await db.query.form.findFirst({
+        where: eq(form.id, formId),
+      });
+
+      if (!existingForm)
+      {
+        return reply.code(404).send({ success: false, error: 'Form not found' });
+      }
+
+      const submissions = await db
+        .select({
+          userId: formSubmissions.userId,
+          submittedAt: formSubmissions.createdAt,
+        })
+        .from(formSubmissions)
+        .where(eq(formSubmissions.formId, formId))
+        .orderBy(formSubmissions.createdAt);
+
+      // Resolve user emails
+      const userIds = [...new Set(submissions.map((s) => s.userId))];
+      const userRows = userIds.length
+        ? await db.query.users.findMany({
+          columns: { id: true, email: true },
+        })
+        : [];
+      const userMap = new Map(userRows.map((u) => [String(u.id), u.email]));
+
+      const completions = submissions.map((s) => ({
+        userId: s.userId,
+        email: userMap.get(s.userId) ?? s.userId,
+        submittedAt: s.submittedAt,
+      }));
+
+      return reply.send({
+        success: true,
+        data: { form: existingForm, completions, totalCompletions: completions.length },
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch form completions');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch form completions',
+      });
+    }
+  });
+
   // UPDATE visibility of a modular form
   fastify.patch<{
-  Params: { id: string };
-  Body: { isPublic: boolean };
-  }>('/api/mod-forms/:id/visibility', async (request, reply) => {
+    Params: { id: string };
+    Body: { isPublic: boolean };
+  }>('/api/mod-forms/:id/visibility', async (request, reply) =>
+  {
     const { id } = request.params;
     const { isPublic } = request.body;
 
@@ -545,7 +711,8 @@ export default async function formsRoutes(fastify: FastifyInstance)
       .where(eq(modularForms.id, parseInt(id)))
       .returning();
 
-    if (!updated[0]) {
+    if (!updated[0])
+    {
       return reply.code(404).send({ success: false, error: 'Form not found' });
     }
 
