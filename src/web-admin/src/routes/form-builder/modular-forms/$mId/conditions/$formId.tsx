@@ -38,6 +38,7 @@ function RouteComponent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [questionsForSelectedForm, setQuestionsForSelectedForm] = useState<FormQuestion[]>([])
 
   useEffect(() => {
     const fetchFormAndConditions = async () => {
@@ -188,7 +189,6 @@ function RouteComponent() {
           dependentAnswerIdx: selectedAnswer,
         });
       }
-      console.log(selectedConditionType);
       let result;
       if (editingCondition) {
         // Update existing question
@@ -215,8 +215,6 @@ function RouteComponent() {
           ),
         );
       } else {
-        console.log(form);
-        console.log(selectedParentForm);
         const response = await fetch(`/api/forms/${formId}/conditions`, {
           method: "POST",
           headers: {
@@ -259,13 +257,39 @@ function RouteComponent() {
     if (condition.conditionType === "complete_form") {
       return "Must complete " + dependentForm.name + " to unlock";
     } else if (condition.conditionType === "answer_question") {
-      //TODO
-      return "TODO";
+      return "Must answer \"" + selectedQuestion?.questionTitle + "\" in " + dependentForm.name + " to unlock";
     } else if (condition.conditionType === "specific_answer") {
       //TODO
       return "TODO";
     }
   };
+
+  const handleSelectParentForm = async (e) => {
+    const parentForm = allForms.find(
+      (f) => parseInt(e.target.value) === f.id,
+    );
+    if (parentForm) {
+      setSelectedParentForm(parentForm);
+      const questionsRes = await fetch(`/api/forms/${parentForm?.id}/questions`);
+      const questionsData = await questionsRes.json();
+      const allQuestions = questionsData.data;
+      if(selectedConditionType == "answer_question") {
+        const allowedQuestions = allQuestions.filter(q => !q.required);
+        setQuestionsForSelectedForm(allowedQuestions);
+      }
+      console.log(questionsForSelectedForm);
+    }
+  }
+
+  const handleSelectQuestion = async (e) => {
+    const question = questionsForSelectedForm.find(
+      (q) => parseInt(e.target.value) === q.id,
+    );
+    if (question) setSelectedQuestion(question);
+    // const answersRes = await fetch(`/api/forms/${formId}/questions`);
+    // const answersData = await questionsRes.json();
+    // setQuestionsForSelectedForm(a.data);
+  }
 
   return (
     <AdminLayout user={currentUser} title="Form Builder">
@@ -444,12 +468,7 @@ function RouteComponent() {
                         name="form"
                         id="form"
                         value={selectedParentForm?.id ?? ""}
-                        onChange={(e) => {
-                          const parentForm = allForms.find(
-                            (f) => parseInt(e.target.value) === f.id,
-                          );
-                          if (parentForm) setSelectedParentForm(parentForm);
-                        }}
+                        onChange={(e) => {handleSelectParentForm(e)}}
                         className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                                   focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500
                                   text-gray-700 bg-white"
@@ -471,7 +490,9 @@ function RouteComponent() {
 
                     {/* Dependent Question */}
                     {(selectedConditionType === "answer_question" ||
-                      selectedConditionType === "specific_answer") && (
+                      selectedConditionType === "specific_answer") && 
+                      selectedParentForm &&
+                      (
                       <div className="flex flex-col mb-4">
                         <label
                           htmlFor="question"
@@ -482,13 +503,24 @@ function RouteComponent() {
                         <select
                           name="question"
                           id="question"
+                          value={selectedQuestion?.id ?? ""}
+                          onChange={(e) => {handleSelectQuestion(e)}}
                           className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
-                                  focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500
-                                  text-gray-700 bg-white"
+                                    focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500
+                                    text-gray-700 bg-white"
                         >
-                          <option value="no_questions_found" disabled>
-                            No applicable questions found
+                          <option value="" disabled>
+                            Select a question
                           </option>
+                          {questionsForSelectedForm.length > 0 ? (
+                            questionsForSelectedForm.map((q) => {
+                              return <option value={q.id}>{q.questionTitle}</option>;
+                            })
+                          ) : (
+                            <option value="no_forms_found" disabled>
+                              No applicable questions found
+                            </option>
+                          )}
                         </select>
                       </div>
                     )}
