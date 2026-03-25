@@ -6,7 +6,7 @@ import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 
-type FormStatus = "Private" | "Live" | "Scheduled" | "Unlocked";
+type FormStatus = "Private" | "Live" | "Scheduled" | "Unlocked" | "Modular";
 
 const getNowLocalDateTimeValue = () => {
   const now = new Date();
@@ -34,6 +34,7 @@ function StatusPill({ status }: { status: FormStatus }) {
     Live: "bg-green-50 text-green-700 border-green-200",
     Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
     Unlocked: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    Modular : "bg-blue-50 text-gray-700 border-grey-200"
   };
 
   return <span className={`${base} ${styles[status]}`}>{status}</span>;
@@ -99,6 +100,10 @@ function RouteComponent() {
         throw new Error(data.error || "Failed to fetch forms");
       }
       const modFormData = await modFormsResponse.json();
+      const modForms = modFormData.data;
+      modForms.forEach(form => {
+        form.isModular = true;
+      });
       if (modFormData.success) {
         allForms = allForms.concat(modFormData.data);
       } else {
@@ -330,13 +335,14 @@ function RouteComponent() {
                           <p className="text-gray-600 mb-2">
                             {form.description || "No description"}
                           </p>
+                          <p className="text-sm text-gray-500">
+                            Created:{" "}
+                            {new Date(form.createdAt).toLocaleDateString()}
+                          </p>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
-                            <p className="text-sm text-gray-500">
-                              Created:{" "}
-                              {new Date(form.createdAt).toLocaleDateString()}
-                            </p>
 
                             <StatusPill status={getFormStatus(form)} />
+                            {form.isModular && <StatusPill status="Modular"/>}
 
                             {form.unlockAt &&
                               getFormStatus(form) === "Scheduled" && (
@@ -374,6 +380,8 @@ function RouteComponent() {
                                 <span className="text-sm text-gray-700">
                                   {form.isPublic ? "Public" : "Private"}
                                 </span>
+
+                                 
                               </div>
                             )}
                           </div>
