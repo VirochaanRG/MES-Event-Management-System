@@ -1,6 +1,6 @@
 import AdminLayout from "@/components/AdminLayout";
-import { useCustomConfirm } from "@/components/CustomAlert";
-import { Form } from "@/interfaces/interfaces";
+import { useCustomAlert, useCustomConfirm } from "@/components/CustomAlert";
+import { Form, FormProfileCondition } from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
@@ -9,9 +9,108 @@ export const Route = createFileRoute("/form-builder/modular-forms/$moduleId")({
   component: RouteComponent,
 });
 
+type FormStatus = "Private" | "Live" | "Scheduled" | "Unlocked" | "Locked";
+
+function StatusPill({ status }: { status: FormStatus }) {
+  const base =
+    "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border";
+
+  const styles: Record<FormStatus, string> = {
+    Private: "bg-gray-50 text-gray-700 border-gray-200",
+    Live: "bg-green-50 text-green-700 border-green-200",
+    Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
+    Unlocked: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    Locked: "bg-red-50 text-red-700 border-red-200",
+  };
+
+  return <span className={`${base} ${styles[status]}`}>{status}</span>;
+}
+
+const PROFILE_FIELD_LABELS: Record<string, string> = {
+  faculty: "Faculty",
+  program: "Program",
+  isMcmasterStudent: "McMaster Student",
+};
+
+const FACULTY_OPTIONS = [
+  "Engineering",
+  "Science",
+  "Business",
+  "Humanities",
+  "Social Sciences",
+  "Health",
+];
+
+const PROGRAM_OPTIONS = [
+  "Chemical Engineering",
+  "Civil Engineering",
+  "Computer Engineering",
+  "Electrical Engineering",
+  "Engineering Physics",
+  "Materials Engineering",
+  "Mechanical Engineering",
+  "Software Engineering",
+  "Mechatronics Engineering",
+  "Computer Science",
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "Earth and Environmental Sciences",
+  "Commerce",
+  "Business Analytics",
+  "Finance",
+  "Marketing",
+  "History",
+  "Philosophy",
+  "English",
+  "Linguistics",
+  "Economics",
+  "Political Science",
+  "Psychology",
+  "Sociology",
+  "Nursing",
+  "Health Sciences",
+  "Kinesiology",
+  "Biochemistry",
+];
+
+const PROFILE_VALUE_OPTIONS: Record<
+  "faculty" | "program" | "isMcmasterStudent",
+  string[]
+> = {
+  faculty: FACULTY_OPTIONS,
+  program: PROGRAM_OPTIONS,
+  isMcmasterStudent: ["true", "false"],
+};
+
+const parseProfileConditionValues = (value: string) =>
+  value
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+const getNowLocalDateTimeValue = () => {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+};
+
+function getFormStatus(form?: Form | null): FormStatus {
+  if (!form?.isPublic) return "Private";
+
+  if (!form.unlockAt) return "Live";
+
+  const unlock = new Date(form.unlockAt).getTime();
+  const now = Date.now();
+
+  return unlock > now ? "Scheduled" : "Unlocked";
+}
+
 function RouteComponent() {
   const navigate = useNavigate();
   const showConfirm = useCustomConfirm();
+    const { showAlert } = useCustomAlert();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [subForms, setSubForms] = useState<Form[]>([]);
   const { moduleId } = Route.useParams();
@@ -23,6 +122,34 @@ function RouteComponent() {
   const [newFormDescription, setNewFormDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const status = getFormStatus(formData);
+  const [profileConditions, setProfileConditions] = useState<
+    FormProfileCondition[]
+  >([]);
+  const [profileField, setProfileField] = useState<
+    "faculty" | "program" | "isMcmasterStudent"
+  >("faculty");
+  const [selectedProfileValues, setSelectedProfileValues] = useState<string[]>(
+    [],
+  );
+  const [isProfileAccessModalOpen, setIsProfileAccessModalOpen] =
+    useState(false);
+  const [isProfileValueDropdownOpen, setIsProfileValueDropdownOpen] =
+    useState(false);
+  const [savingProfileCondition, setSavingProfileCondition] = useState(false);
+  const [savingVisibility, setSavingVisibility] = useState(false);
+  const [unlockLocal, setUnlockLocal] = useState<string>("");
+  const [savingUnlock, setSavingUnlock] = useState(false);
+  const [isEditingUnlock, setIsEditingUnlock] = useState(false);
+  const [unlockDraft, setUnlockDraft] = useState<string>("");
+  const [isEditingMeta, setIsEditingMeta] = useState(false);
+  const [savingMeta, setSavingMeta] = useState(false);
+  const [metaName, setMetaName] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const profileValueDropdownRef = useRef<HTMLDivElement>(null);
+  const unlockInputRef = useRef<HTMLInputElement>(null);
+  const choiceInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     console.log("subforms updated:", subForms);
@@ -65,6 +192,25 @@ function RouteComponent() {
           throw new Error(result.error || "Failed to fetch data");
         }
         setFormData(result.data);
+        setMetaName(result.data?.name || "");
+        setMetaDescription(result.data?.description || "");
+        const u = result.data?.unlockAt ? new Date(result.data.unlockAt) : null;
+        const local = u
+          ? new Date(u.getTime() - u.getTimezoneOffset() * 60000)
+              .toISOString()
+              .slice(0, 16)
+          : "";
+        setUnlockLocal(local);
+        setUnlockDraft(local);
+        setIsEditingUnlock(false);
+        setIsEditingMeta(false);
+        const profileConditionsResponse = await fetch(
+          `/api/mod-forms/${moduleId}/profile-conditions`,
+        );
+        const profileConditionsResult = await profileConditionsResponse.json();
+        if (profileConditionsResult.success) {
+          setProfileConditions(profileConditionsResult.data || []);
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -77,6 +223,174 @@ function RouteComponent() {
   useEffect(() => {
     fetchForms();
   }, []);
+
+  const openProfileAccessModal = () => {
+    loadProfileConditionDraft(profileField);
+    setIsProfileValueDropdownOpen(false);
+    setIsProfileAccessModalOpen(true);
+  };
+
+  const handleTogglePublic = async (nextValue: boolean) => {
+    if (!formData) return;
+
+    const prev = formData.isPublic;
+
+    setFormData({ ...formData, isPublic: nextValue });
+    setSavingVisibility(true);
+
+    try {
+      const res = await fetch(`/api/mod-forms/${moduleId}/visibility`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic: nextValue }),
+      });
+
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        throw new Error(json?.error || "Failed to update visibility");
+      }
+
+      setFormData(json.data);
+      if (nextValue) {
+        setIsEditingUnlock(false);
+      }
+    } catch (err: any) {
+      // revert if it fails
+      setFormData({ ...formData, isPublic: prev });
+      showAlert(err?.message || "Failed to update visibility");
+    } finally {
+      setSavingVisibility(false);
+    }
+  };
+
+  const handleSaveUnlockAt = async (override?: string) => {
+    if (!formData) return;
+
+    if (formData.isPublic) {
+      showAlert("Unpublish the form before setting an unlock date");
+      return false;
+    }
+
+    const unlockInput = unlockInputRef.current;
+    const value = override ?? unlockLocal;
+
+    if (
+      unlockInput &&
+      value !== "" &&
+      (!unlockInput.validity.valid || unlockInput.matches(":invalid"))
+    ) {
+      showAlert("Unlock date is invalid. Please fix it and try again.");
+      unlockInput.focus();
+      return false;
+    }
+
+    setSavingUnlock(true);
+    try {
+      if (value) {
+        const parsedTime = new Date(value).getTime();
+
+        if (Number.isNaN(parsedTime)) {
+          showAlert("Unlock date is invalid. Please fix it and try again.");
+          return false;
+        }
+
+        if (parsedTime < Date.now()) {
+          showAlert(
+            "Unlock date is invalid. Please choose a future date and time.",
+          );
+          return false;
+        }
+      }
+      const nextUnlockAt = value ? new Date(value).toISOString() : null;
+      const res = await fetch(`/api/mod-forms/${moduleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          unlockAt: nextUnlockAt,
+          isPublic: false,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json?.error || "Failed to update unlock date");
+      }
+      setFormData(json.data);
+      setUnlockLocal(value || "");
+      setUnlockDraft(value || "");
+      return true;
+    } catch (err: any) {
+      showAlert(err?.message || "Failed to update unlock date");
+      return false;
+    } finally {
+      setSavingUnlock(false);
+    }
+  };
+
+   const loadProfileConditionDraft = (
+    field: "faculty" | "program" | "isMcmasterStudent",
+  ) => {
+    const existingCondition = profileConditions.find(
+      (condition) => condition.profileField === field,
+    );
+
+    const nextValues = existingCondition
+      ? parseProfileConditionValues(existingCondition.expectedValue).filter(
+          (value) => PROFILE_VALUE_OPTIONS[field].includes(value),
+        )
+      : [];
+
+    setSelectedProfileValues(nextValues);
+  };
+
+  const closeProfileAccessModal = () => {
+    setIsProfileValueDropdownOpen(false);
+    setIsProfileAccessModalOpen(false);
+  };
+
+  const toggleProfileValue = (value: string) => {
+    setSelectedProfileValues((prev) =>
+      prev.includes(value)
+        ? prev.filter((currentValue) => currentValue !== value)
+        : [...prev, value],
+    );
+  };
+
+  const handleSaveMeta = async () => {
+    if (!formData) return;
+
+    if (!metaName.trim()) {
+      showAlert("Form title is required");
+      return;
+    }
+
+    setSavingMeta(true);
+    try {
+      const res = await fetch(`/api/mod-forms/${moduleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: metaName.trim(),
+          description: metaDescription.trim() || null,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json?.error || "Failed to update form details");
+      }
+
+      setFormData(json.data);
+      setMetaName(json.data?.name || "");
+      setMetaDescription(json.data?.description || "");
+      setIsEditingMeta(false);
+    } catch (err: any) {
+      showAlert(err?.message || "Failed to update form details");
+    } finally {
+      setSavingMeta(false);
+    }
+  };
 
   const fetchForms = async () => {
     try {
@@ -216,6 +530,91 @@ function RouteComponent() {
     }
   };
 
+  const handleSaveProfileCondition = async () => {
+      try {
+        if (formData?.isPublic) {
+          showAlert("Unpublish the form before modifying profile conditions");
+          return;
+        }
+  
+        const normalizedValues = selectedProfileValues
+          .map((value) => value.trim())
+          .filter(Boolean);
+  
+        if (normalizedValues.length === 0) {
+          showAlert("Select at least one allowed value");
+          return;
+        }
+  
+        setSavingProfileCondition(true);
+        const response = await fetch(`/api/mod-forms/${moduleId}/profile-conditions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            profileField,
+            expectedValue: normalizedValues.join(", "),
+          }),
+        });
+  
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || "Failed to save profile condition");
+        }
+  
+        const updated = result.data as FormProfileCondition;
+        setProfileConditions((prev) => {
+          const idx = prev.findIndex(
+            (p) => p.profileField === updated.profileField,
+          );
+          if (idx === -1) return [...prev, updated];
+          const next = [...prev];
+          next[idx] = updated;
+          return next;
+        });
+        setSelectedProfileValues(
+          parseProfileConditionValues(updated.expectedValue),
+        );
+        setIsProfileValueDropdownOpen(false);
+      } catch (err: any) {
+        showAlert(err?.message || "Failed to save profile condition");
+      } finally {
+        setSavingProfileCondition(false);
+      }
+    };
+  
+    const handleDeleteProfileCondition = async (conditionId: number) => {
+      const confirmed = await showConfirm(
+        "Are you sure you want to delete this profile condition?",
+      );
+      if (!confirmed) return;
+  
+      try {
+        if (formData?.isPublic) {
+          showAlert("Unpublish the form before modifying profile conditions");
+          return;
+        }
+  
+        const response = await fetch(
+          `/api/mod-forms/${moduleId}/profile-conditions/${conditionId}`,
+          { method: "DELETE" },
+        );
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || "Failed to delete profile condition");
+        }
+  
+        setProfileConditions((prev) => prev.filter((p) => p.id !== conditionId));
+        const deletedCondition = profileConditions.find(
+          (p) => p.id === conditionId,
+        );
+        if (deletedCondition?.profileField === profileField) {
+          setSelectedProfileValues([]);
+        }
+      } catch (err: any) {
+        showAlert(err?.message || "Failed to delete profile condition");
+      }
+    };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -264,9 +663,166 @@ function RouteComponent() {
           <div className="mb-12">
             <div className="flex items-start justify-between gap-4 mb-3">
               <div className="flex-1">
-                <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-                  {formData?.name || "Untitled Form"}
-                </h1>
+                {isEditingMeta ? (
+                  <div className="max-w-2xl space-y-3">
+                    <input
+                      type="text"
+                      value={metaName}
+                      onChange={(e) => setMetaName(e.target.value)}
+                      placeholder="Form title"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-2xl font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    />
+                    <textarea
+                      value={metaDescription}
+                      onChange={(e) => setMetaDescription(e.target.value)}
+                      placeholder="Form description"
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleSaveMeta}
+                        disabled={savingMeta}
+                        className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
+                      >
+                        {savingMeta ? "Saving..." : "Save details"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setMetaName(formData?.name || "");
+                          setMetaDescription(formData?.description || "");
+                          setIsEditingMeta(false);
+                        }}
+                        disabled={savingMeta}
+                        className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50 disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+                      {formData?.name || "Untitled Form"}
+                    </h1>
+                    {formData?.description && (
+                      <p className="text-gray-600 text-lg mt-2">
+                        {formData.description}
+                      </p>
+                    )}
+                  </>
+                )}
+                {/* Publish controls + status */}
+                <div className="mt-3 flex items-center gap-3">
+                  <button
+                    onClick={() => handleTogglePublic(!formData?.isPublic)}
+                    disabled={savingVisibility}
+                    className={`px-4 py-2 text-sm font-semibold rounded-md border-2 disabled:opacity-50 ${
+                      formData?.isPublic
+                        ? "bg-white text-amber-800 border-amber-500 hover:bg-amber-50"
+                        : "bg-amber-500 text-white border-amber-500 hover:bg-amber-600"
+                    }`}
+                  >
+                    {formData?.isPublic ? "Unpublish" : "Publish"}
+                  </button>
+
+                  <StatusPill status={status} />
+                </div>
+                <div className="mt-4">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-900">
+                      Unlock date
+                    </span>
+
+                    {!isEditingUnlock ? (
+                      <div className="mt-1 flex flex-wrap items-center gap-2">
+                        <span className="text-sm text-gray-700">
+                          {formData?.unlockAt
+                            ? `Unlocks: ${new Date(formData.unlockAt).toLocaleString()}`
+                            : "No unlock date set"}
+                        </span>
+                        {formData?.unlockAt ? (
+                          <StatusPill
+                            status={
+                              new Date(formData.unlockAt).getTime() > Date.now()
+                                ? "Scheduled"
+                                : "Unlocked"
+                            }
+                          />
+                        ) : (
+                          <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-700 border-gray-200">
+                            None
+                          </span>
+                        )}
+                        {!formData?.isPublic ? (
+                          <button
+                            onClick={() => {
+                              setUnlockDraft(unlockLocal); // preload current value
+                              setIsEditingUnlock(true);
+                            }}
+                            className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50"
+                          >
+                            {formData?.unlockAt ? "Edit" : "Set date"}
+                          </button>
+                        ) : (
+                          <span className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-200 rounded-md">
+                            Unpublish to edit unlock date
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="mt-2 flex flex-wrap items-end gap-3">
+                        <input
+                          ref={unlockInputRef}
+                          type="datetime-local"
+                          min={getNowLocalDateTimeValue()}
+                          value={unlockDraft}
+                          onChange={(e) => setUnlockDraft(e.target.value)}
+                          className="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                        />
+                        <button
+                          onClick={async () => {
+                            const saved = await handleSaveUnlockAt(unlockDraft);
+                            if (saved) {
+                              setIsEditingUnlock(false);
+                            }
+                          }}
+                          disabled={savingUnlock}
+                          className="px-4 py-2 text-sm font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
+                        >
+                          {savingUnlock ? "Saving..." : "Save"}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setUnlockDraft(unlockLocal);
+                            setIsEditingUnlock(false);
+                          }}
+                          disabled={savingUnlock}
+                          className="px-4 py-2 text-sm font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50 disabled:opacity-50"
+                        >
+                          Cancel
+                        </button>
+                        {formData?.unlockAt && (
+                          <button
+                            onClick={async () => {
+                              const saved = await handleSaveUnlockAt("");
+                              if (saved) {
+                                setUnlockDraft("");
+                                setUnlockLocal("");
+                                setIsEditingUnlock(false);
+                              }
+                            }}
+                            disabled={savingUnlock}
+                            className="px-4 py-2 text-sm font-semibold text-red-700 bg-white border-2 border-red-300 rounded-md hover:bg-red-50 disabled:opacity-50"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    <p className="mt-1 text-xs text-gray-500"></p>
+                  </div>
+                </div>
               </div>
               <div className="relative z-20">
                 <button
@@ -284,6 +840,34 @@ function RouteComponent() {
                 >
                   + Add New Form
                 </button>
+                {!isEditingMeta && (
+                  <button
+                    onClick={() => setIsEditingMeta(true)}
+                    className="mt-2 w-full px-5 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-md hover:bg-amber-600 transition-all"
+                  >
+                    Edit details
+                  </button>
+                )}
+                <button
+                  onClick={openProfileAccessModal}
+                  className="mt-2 w-full px-5 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-md hover:bg-amber-600 transition-all"
+                >
+                  Profile Access
+                </button>
+                {profileConditions.length > 0 && (
+                  <p className="mt-2 text-xs text-gray-500 text-right">
+                    {profileConditions.length} profile rule
+                    {profileConditions.length === 1 ? "" : "s"} configured
+                  </p>
+                )}
+                {formData?.isPublic && (
+                  <p className="mt-2 text-xs text-gray-500 text-right">
+                    Unpublish to add questions
+                  </p>
+                )}
+
+
+
                 {formData?.isPublic && (
                   <p className="mt-2 text-xs text-gray-500 text-right">
                     Unpublish to add forms
@@ -444,6 +1028,182 @@ function RouteComponent() {
                 </div>
               )}
             </div>
+
+            {isProfileAccessModalOpen && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div
+                role="dialog"
+                className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              >
+                <div className="p-6 border-b border-gray-200">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    Profile Access Conditions
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Allow access only to users whose profile matches the selected
+                    values. If no rules are set, everyone can access the form.
+                  </p>
+                </div>
+
+                <div className="p-6 space-y-5">
+                  <div className="grid gap-4 md:grid-cols-[200px,1fr] md:items-start">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Profile Field
+                      </label>
+                      <select
+                        value={profileField}
+                        onChange={(e) => {
+                          const nextField = e.target.value as
+                            | "faculty"
+                            | "program"
+                            | "isMcmasterStudent";
+                          setProfileField(nextField);
+                          setIsProfileValueDropdownOpen(false);
+                          loadProfileConditionDraft(nextField);
+                        }}
+                        disabled={formData?.isPublic || savingProfileCondition}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white"
+                      >
+                        <option value="faculty">Faculty</option>
+                        <option value="program">Program</option>
+                        <option value="isMcmasterStudent">McMaster Student</option>
+                      </select>
+                    </div>
+
+                    <div ref={profileValueDropdownRef}>
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Allowed Values
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setIsProfileValueDropdownOpen((prev) => !prev)
+                        }
+                        disabled={formData?.isPublic || savingProfileCondition}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-left flex items-center justify-between disabled:opacity-50"
+                      >
+                        <span className="truncate pr-4 text-gray-700">
+                          {selectedProfileValues.length > 0
+                            ? selectedProfileValues.join(", ")
+                            : "Select one or more values"}
+                        </span>
+                        <span className="text-gray-400">▾</span>
+                      </button>
+
+                      {isProfileValueDropdownOpen && (
+                        <div className="mt-2 rounded-md border border-gray-200 bg-white shadow-lg">
+                          <div className="max-h-64 overflow-y-auto p-2 space-y-1">
+                            {PROFILE_VALUE_OPTIONS[profileField].map(
+                              (valueOption) => {
+                                const checked =
+                                  selectedProfileValues.includes(valueOption);
+
+                                return (
+                                  <label
+                                    key={valueOption}
+                                    className="flex items-start gap-3 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      onChange={() =>
+                                        toggleProfileValue(valueOption)
+                                      }
+                                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                                    />
+                                    <span>{valueOption}</span>
+                                  </label>
+                                );
+                              },
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedProfileValues([])}
+                              className="text-xs font-semibold text-gray-600 hover:text-gray-900"
+                            >
+                              Clear
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setIsProfileValueDropdownOpen(false)}
+                              className="text-xs font-semibold text-amber-700 hover:text-amber-900"
+                            >
+                              Done
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <p className="text-xs text-gray-500">
+                      Select multiple faculties or programs to grant access to more
+                      than one profile group.
+                    </p>
+                    <button
+                      onClick={handleSaveProfileCondition}
+                      disabled={formData?.isPublic || savingProfileCondition}
+                      className="px-4 py-2 text-sm font-semibold rounded-md bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50"
+                    >
+                      {savingProfileCondition ? "Saving..." : "Save Condition"}
+                    </button>
+                  </div>
+
+                  {formData?.isPublic && (
+                    <p className="text-sm text-gray-500">
+                      Unpublish the form before modifying profile access rules.
+                    </p>
+                  )}
+
+                  <div className="space-y-2">
+                    {profileConditions.length === 0 ? (
+                      <p className="text-sm text-gray-600">
+                        No profile conditions set.
+                      </p>
+                    ) : (
+                      profileConditions.map((condition) => (
+                        <div
+                          key={condition.id}
+                          className="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2"
+                        >
+                          <p className="text-sm text-gray-800">
+                            <span className="font-semibold">
+                              {PROFILE_FIELD_LABELS[condition.profileField] ??
+                                condition.profileField}
+                            </span>{" "}
+                            must be one of: {condition.expectedValue}
+                          </p>
+                          <button
+                            onClick={() =>
+                              handleDeleteProfileCondition(condition.id)
+                            }
+                            disabled={formData?.isPublic}
+                            className="px-2.5 py-1.5 text-xs font-semibold text-red-700 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-6 border-t border-gray-200 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={closeProfileAccessModal}
+                    className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
             {/* Add Form Modal */}
             {showModal && (

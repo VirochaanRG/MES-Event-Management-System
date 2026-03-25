@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
-import { form, formAnswers, formConditions, formQuestions } from './../../../db/src/schemas/form';
+import { form, formAnswers, formConditions, formQuestions, modularForms } from './../../../db/src/schemas/form';
 import { and, eq, sql } from 'drizzle-orm';
 
 
@@ -33,11 +33,12 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
   const isProfileCondition = (conditionType: string) =>
     conditionType.startsWith(PROFILE_CONDITION_PREFIX);
 
-  const assertFormUnpublished = async (formId: number, reply: any) =>
+  const assertFormUnpublished = async (formId: number, reply: any, modular : boolean) =>
   {
-    const existingForm = await db.query.form.findFirst({
+    const existingForm = await (modular ? db.query.modularForms : db.query.form).findFirst({
       where: eq(form.id, formId),
     });
+
 
     if (!existingForm)
     {
@@ -59,7 +60,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
 
     return existingForm;
   };
-
+  
   // CREATE a form question
   fastify.post<{
     Params: { id: string };
@@ -87,7 +88,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
         });
       }
 
-      const existingForm = await assertFormUnpublished(parseInt(id), reply);
+      const existingForm = await assertFormUnpublished(parseInt(id), reply, false);
       if (!existingForm) return;
 
       const newQuestion = await db
@@ -165,7 +166,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       {
         const { formId, questionId } = request.params;
 
-        const existingForm = await assertFormUnpublished(parseInt(formId), reply);
+        const existingForm = await assertFormUnpublished(parseInt(formId), reply, false);
         if (!existingForm) return;
 
         const existingQuestion = await db.query.formQuestions.findFirst({
@@ -218,7 +219,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       const { formId, questionId } = request.params;
       const { questionType, questionTitle, optionsCategory, qorder, enablingAnswers, required } = request.body;
 
-      const existingForm = await assertFormUnpublished(parseInt(formId), reply);
+      const existingForm = await assertFormUnpublished(parseInt(formId), reply, false);
       if (!existingForm) return;
 
       const existingQuestion = await db.query.formQuestions.findFirst({
@@ -301,7 +302,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       {
         const { formId, questionId } = request.params;
 
-        const existingForm = await assertFormUnpublished(parseInt(formId), reply);
+        const existingForm = await assertFormUnpublished(parseInt(formId), reply, false);
         if (!existingForm) return;
 
         const currentQuestion = await db.query.formQuestions.findFirst({
@@ -396,7 +397,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       {
         const { formId, questionId } = request.params;
 
-        const existingForm = await assertFormUnpublished(parseInt(formId), reply);
+        const existingForm = await assertFormUnpublished(parseInt(formId), reply, false);
         if (!existingForm) return;
 
         const currentQuestion = await db.query.formQuestions.findFirst({
@@ -846,7 +847,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
         });
       }
 
-      const existingForm = await assertFormUnpublished(formId, reply);
+      const existingForm = await assertFormUnpublished(formId, reply, false);
       if (!existingForm) return;
 
       const allConditions = await db.query.formConditions.findMany({
@@ -922,7 +923,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
         const formId = parseInt(fid);
         const conditionId = parseInt(cid);
 
-        const existingForm = await assertFormUnpublished(formId, reply);
+        const existingForm = await assertFormUnpublished(formId, reply, false);
         if (!existingForm) return;
 
         const existingCondition = await db.query.formConditions.findFirst({
@@ -956,4 +957,208 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       }
     }
   );
+
+  // GET profile-based access conditions for a mod form
+  fastify.get<{ Params: { id: string } }>('/api/mod-forms/:id/profile-conditions', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+      const formId = parseInt(id);
+
+      const existingForm = await db.query.modularForms.findFirst({
+        where: eq(modularForms.id, formId),
+      });
+
+      if (!existingForm)
+      {
+        return reply.code(404).send({
+          success: false,
+          error: 'Form not found',
+        });
+      }
+
+      const allConditions = await db.query.formConditions.findMany({
+        where: eq(formConditions.modFormId, formId),
+      });
+
+      const profileConditions = allConditions
+        .map((c) =>
+        {
+          const parsed = parseProfileConditionType(c.conditionType);
+          if (!parsed) return null;
+          return {
+            id: c.id,
+            modFormId: c.modFormId,
+            profileField: parsed.field,
+            expectedValue: parsed.expectedValue,
+          };
+        })
+        .filter(Boolean);
+
+      return reply.send({
+        success: true,
+        data: profileConditions,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch profile conditions');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch profile conditions',
+      });
+    }
+  });
+
+  // CREATE/UPSERT profile-based access condition for a form
+  fastify.post<{
+    Params: { id: string };
+    Body: { profileField: string; expectedValue: string };
+  }>('/api/mod-forms/:id/profile-conditions', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+      const formId = parseInt(id);
+      const { profileField, expectedValue } = request.body;
+
+      const normalizedField = profileField?.trim();
+      const normalizedValue = expectedValue?.trim();
+
+      if (!normalizedField)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Profile field is required',
+        });
+      }
+
+      if (!normalizedValue)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Expected value is required',
+        });
+      }
+
+      if (!PROFILE_FIELDS.includes(normalizedField as typeof PROFILE_FIELDS[number]))
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Invalid profile field',
+        });
+      }
+
+      const existingForm = await assertFormUnpublished(formId, reply, true);
+      if (!existingForm) return;
+
+      const allConditions = await db.query.formConditions.findMany({
+        where: eq(formConditions.modFormId, formId),
+      });
+
+      const existingForField = allConditions.find((c) =>
+      {
+        const parsed = parseProfileConditionType(c.conditionType);
+        return parsed?.field === normalizedField;
+      });
+
+      const encodedConditionType = encodeProfileConditionType(normalizedField, normalizedValue);
+
+      if (existingForField)
+      {
+        const [updated] = await db
+          .update(formConditions)
+          .set({ conditionType: encodedConditionType })
+          .where(eq(formConditions.id, existingForField.id))
+          .returning();
+
+        return reply.send({
+          success: true,
+          data: {
+            id: updated.id,
+            modFormId: updated.formId,
+            profileField: normalizedField,
+            expectedValue: normalizedValue,
+          },
+        });
+      }
+
+      const [created] = await db
+        .insert(formConditions)
+        .values({
+          modFormId : formId,
+          // Keep FK valid without schema changes.
+          dependentFormId: formId,
+          conditionType: encodedConditionType,
+          dependentQuestionId: null,
+          dependentAnswerIdx: null,
+        })
+        .returning();
+
+      return reply.code(201).send({
+        success: true,
+        data: {
+          id: created.id,
+          formId: created.formId,
+          profileField: normalizedField,
+          expectedValue: normalizedValue,
+        },
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to save profile condition');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to save profile condition',
+      });
+    }
+  });
+
+  // DELETE profile-based access condition for a form
+  fastify.delete<{ Params: { fid: string; cid: string } }>(
+    '/api/mod-forms/:fid/profile-conditions/:cid',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { fid, cid } = request.params;
+        const formId = parseInt(fid);
+        const conditionId = parseInt(cid);
+
+        const existingForm = await assertFormUnpublished(formId, reply, true);
+        if (!existingForm) return;
+
+        const existingCondition = await db.query.formConditions.findFirst({
+          where: and(
+            eq(formConditions.id, conditionId),
+            eq(formConditions.modFormId, formId),
+          ),
+        });
+
+        if (!existingCondition || !isProfileCondition(existingCondition.conditionType))
+        {
+          return reply.code(404).send({
+            success: false,
+            error: 'Profile condition not found',
+          });
+        }
+
+        await db.delete(formConditions).where(eq(formConditions.id, conditionId));
+
+        return reply.send({
+          success: true,
+          message: 'Profile condition deleted successfully',
+        });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Failed to delete profile condition');
+        return reply.code(500).send({
+          success: false,
+          error: 'Failed to delete profile condition',
+        });
+      }
+    }
+  );
 }
+
+
