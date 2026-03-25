@@ -62,11 +62,14 @@ export const formAnswers = pgTable("form_answers", {
 export const formConditions = pgTable("form_conditions", {
   id: serial("id").primaryKey().notNull(),
   formId: integer("form_id")
-    .notNull()
     .references(() => form.id, { onDelete: "cascade" }),
+  modFormId: integer("mod_form_id")
+    .references(() => modularForms.id, { onDelete: "cascade" }),
   conditionType: text("condition_type").notNull(),
-  dependentFormId: integer("dependent_form_id").notNull()
+  dependentFormId: integer("dependent_form_id")
     .references(() => form.id, { onDelete: "cascade" }),
+  dependentModFormId: integer("dependent_mod_form_id")
+    .references(() => modularForms.id, { onDelete: "cascade" }),
   dependentQuestionId: integer("dependent_question_id")
     .references(() => formQuestions.id, { onDelete: "cascade" }),
   dependentAnswerIdx: integer("dependent_answer_idx")
