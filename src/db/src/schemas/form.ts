@@ -1,7 +1,12 @@
-import { pgTable, serial, varchar, text, timestamp, integer, json, boolean } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { pgTable, serial, varchar, text, timestamp, integer, json, boolean, pgSequence } from "drizzle-orm/pg-core";
+
+export const sharedFormIdSeq = pgSequence("shared_form_id_seq");
 
 export const modularForms = pgTable("modular_forms", {
-  id: serial("id").primaryKey().notNull(),
+  id: integer("id")
+    .default(sql`nextval('shared_form_id_seq')`)
+    .primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
@@ -9,7 +14,9 @@ export const modularForms = pgTable("modular_forms", {
 });
 
 export const form = pgTable("form", {
-  id: serial("id").primaryKey().notNull(),
+  id: integer("id")
+    .default(sql`nextval('shared_form_id_seq')`)
+    .primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
