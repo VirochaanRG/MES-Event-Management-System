@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
 import { form, formAnswers, formConditions, formQuestions, formSubmissions, modularForms } from './../../../db/src/schemas/form';
 import { profiles, users } from './../../../db/src/schemas/users';
-import { and, eq, inArray, isNull, notInArray, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, notInArray, or, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
 {
@@ -82,7 +82,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
   const canUserAccessFormByProfile = async (uid: string | undefined, fid: number) =>
   {
     const conditions = await db.query.formConditions.findMany({
-      where: eq(formConditions.formId, fid),
+      where: or(eq(formConditions.formId, fid),eq(formConditions.modFormId, fid)),
     });
 
     const profileConditions = conditions
@@ -165,11 +165,12 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         if (c.conditionType === 'complete_form')
         {
+          if(!c.dependentFormId) return false;
           const submission = await db.query.formSubmissions.findFirst({
             where: and(
               eq(formSubmissions.userId, uid),
               eq(formSubmissions.formId, c.dependentFormId)
-            ),
+            )
           });
           return !!submission;
         }
@@ -318,9 +319,11 @@ export default async function formsRoutes(fastify: FastifyInstance)
         .from(modularForms)
         .where(eq(modularForms.isPublic, true));
 
+      const allowedModules = await filterFormsByProfileAccess(allModules, uid);
+
       // Filter to only modules that have incomplete forms for this user
       const availableModules = await Promise.all(
-        allModules.map(async (mod) =>
+        allowedModules.map(async (mod) =>
         {
           // Get all forms in this module that are public and unlocked
           const moduleFormsCount = await db
