@@ -6,6 +6,7 @@ export interface Form
   createdAt: string;
   isPublic: boolean;
   moduleId: number;
+  isModular: boolean;
   unlockAt: string | null;
 }
 

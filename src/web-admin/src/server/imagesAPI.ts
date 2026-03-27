@@ -148,6 +148,99 @@ export default async function imageRoutes(fastify: FastifyInstance)
     }
   });
 
+  // Upload multiple images for a gallery (always creates new rows)
+  fastify.post('/api/images/upload-multiple', async (request: FastifyRequest, reply: FastifyReply) =>
+  {
+    try
+    {
+      const parts = request.parts();
+      const files: Array<{ buffer: Buffer; filename: string; mimetype: string }> = [];
+      let component: string | undefined;
+      let indexValue: number | null = null;
+
+      for await (const part of parts)
+      {
+        if (part.type === 'file')
+        {
+          if (!part.mimetype.startsWith('image/'))
+          {
+            return reply.code(400).send({
+              success: false,
+              error: `Only image files are allowed: ${part.filename}`,
+            });
+          }
+
+          const buffer = await part.toBuffer();
+          files.push({
+            buffer,
+            filename: part.filename,
+            mimetype: part.mimetype,
+          });
+        } else
+        {
+          if (part.fieldname === 'component')
+          {
+            component = String(part.value);
+          }
+
+          if (part.fieldname === 'index')
+          {
+            const parsed = parseInt(String(part.value));
+            indexValue = Number.isNaN(parsed) ? null : parsed;
+          }
+        }
+      }
+
+      if (!component)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'Component is required',
+        });
+      }
+
+      if (files.length === 0)
+      {
+        return reply.code(400).send({
+          success: false,
+          error: 'No images uploaded',
+        });
+      }
+
+      const result = await db
+        .insert(images)
+        .values(
+          files.map((file) => ({
+            imageData: file.buffer,
+            component,
+            index: indexValue,
+            fileName: file.filename,
+            mimeType: file.mimetype,
+            fileSize: file.buffer.length,
+          }))
+        )
+        .returning({
+          id: images.id,
+          fileName: images.fileName,
+          component: images.component,
+          index: images.index,
+        });
+
+      return reply.code(201).send({
+        success: true,
+        data: result,
+        message: `${result.length} image(s) uploaded successfully`,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Error uploading multiple images');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to upload images',
+      });
+    }
+  });
+
   // Get all images for a specific component
   fastify.get<{ Params: ComponentParams }>(
     '/api/images/:component',
@@ -349,6 +442,48 @@ export default async function imageRoutes(fastify: FastifyInstance)
       {
         fastify.log.error({ err: error }, 'Error fetching image');
         return reply.code(500).send({ success: false, error: 'Failed to fetch image' });
+      }
+    }
+  );
+
+  // Get event gallery images metadata
+  fastify.get<{ Params: { eventId: string } }>(
+    '/api/images/event/:eventId/gallery',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { eventId } = request.params;
+        const eventIdNum = parseInt(eventId, 10);
+
+        if (Number.isNaN(eventIdNum))
+        {
+          return reply.code(400).send({ success: false, error: 'Invalid event ID' });
+        }
+
+        const result = await db
+          .select({
+            id: images.id,
+            fileName: images.fileName,
+            mimeType: images.mimeType,
+            fileSize: images.fileSize,
+            createdAt: images.createdAt,
+          })
+          .from(images)
+          .where(and(eq(images.component, 'event-gallery'), eq(images.index, eventIdNum)))
+          .orderBy(images.createdAt);
+
+        return reply.send({
+          success: true,
+          data: result,
+        });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Error fetching event gallery images');
+        return reply.code(500).send({
+          success: false,
+          error: 'Failed to fetch event gallery images',
+        });
       }
     }
   );

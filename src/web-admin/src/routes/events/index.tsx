@@ -62,6 +62,9 @@ function EventsPageContent() {
   const [uploadingImageFor, setUploadingImageFor] = useState<number | null>(
     null,
   );
+  const [uploadingGalleryFor, setUploadingGalleryFor] = useState<number | null>(
+    null,
+  );
   const [eventImages, setEventImages] = useState<Map<number, string>>(
     new Map(),
   );
@@ -207,6 +210,74 @@ function EventsPageContent() {
       if (file) {
         handleImageUpload(eventId, file);
       }
+    };
+    input.click();
+  };
+
+  const handleGalleryUpload = async (
+    eventId: number,
+    files: FileList | null,
+  ) => {
+    if (!files || files.length === 0) return;
+
+    const validFiles = Array.from(files);
+
+    for (const file of validFiles) {
+      if (!file.type.startsWith("image/")) {
+        showAlert(`Only image files are allowed: ${file.name}`);
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        showAlert(`Image is too large (max 5MB): ${file.name}`);
+        return;
+      }
+    }
+
+    setUploadingGalleryFor(eventId);
+
+    try {
+      const formData = new FormData();
+      formData.append("component", "event-gallery");
+      formData.append("index", eventId.toString());
+
+      validFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      const response = await fetch("/api/images/upload-multiple", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const uploadedCount = Array.isArray(data.data)
+          ? data.data.length
+          : validFiles.length;
+        showAlert(`Uploaded ${uploadedCount} gallery image(s) successfully.`);
+      } else {
+        showAlert(
+          "Failed to upload gallery images: " + (data.error || "Unknown error"),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to upload gallery images:", error);
+      showAlert("Failed to upload gallery images");
+    } finally {
+      setUploadingGalleryFor(null);
+    }
+  };
+
+  const triggerGalleryInput = (eventId: number) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      handleGalleryUpload(eventId, files);
     };
     input.click();
   };
@@ -574,6 +645,27 @@ function EventsPageContent() {
                   </div>
 
                   <div className="flex gap-2 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerGalleryInput(event.id);
+                      }}
+                      disabled={uploadingGalleryFor === event.id}
+                      className="flex items-center justify-center gap-2 px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 font-medium rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Upload event gallery images"
+                    >
+                      {uploadingGalleryFor === event.id ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-700"></div>
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <ImageIcon className="w-4 h-4" />
+                          Upload Gallery
+                        </>
+                      )}
+                    </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

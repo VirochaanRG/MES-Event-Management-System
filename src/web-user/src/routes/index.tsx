@@ -8,6 +8,7 @@ import AvailableSurveys from "@/components/AvailableSurveys";
 import RegisteredEvents from "@/components/RegisteredEvents";
 import CompletedSurveys from "@/components/CompletedSurveys";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
+import PastEvents from "@/components/PastEvents";
 
 interface Event {
   id: number;
@@ -22,7 +23,7 @@ interface Event {
 }
 
 type HomeTab = "home" | "events" | "surveys";
-type EventsSubTab = "available" | "registered";
+type EventsSubTab = "available" | "registered" | "past";
 type SurveysSubTab = "available" | "completed";
 
 type HomeSearch = {
@@ -504,6 +505,16 @@ function HomePage() {
                     </span>
                   )}
                 </button>
+                <button
+                  onClick={() => setEventsSubTab("past")}
+                  className={`pb-3 mr-8 text-sm font-semibold border-b-2 -mb-px transition-all duration-200 ${
+                    eventsSubTab === "past"
+                      ? "border-red-900 text-red-900"
+                      : "border-transparent text-stone-400 hover:text-red-900"
+                  }`}
+                >
+                  Past Events
+                </button>
               </div>
 
               {eventsSubTab === "available" && (
@@ -512,6 +523,7 @@ function HomePage() {
               {eventsSubTab === "registered" && (
                 <RegisteredEvents onCountChange={setRegisteredCount} />
               )}
+              {eventsSubTab === "past" && <PastEvents />}
             </div>
           )}
 
@@ -604,7 +616,8 @@ export const Route = createFileRoute("/")({
 
     const eventsSubTab =
       search.eventsSubTab === "available" ||
-      search.eventsSubTab === "registered"
+      search.eventsSubTab === "registered" ||
+      search.eventsSubTab === "past"
         ? search.eventsSubTab
         : undefined;
 
