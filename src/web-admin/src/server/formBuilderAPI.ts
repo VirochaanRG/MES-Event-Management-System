@@ -1114,7 +1114,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
         .values({
           modFormId : formId,
           // Keep FK valid without schema changes.
-          dependentFormId: formId,
+          dependentModFormId: formId,
           conditionType: encodedConditionType,
           dependentQuestionId: null,
           dependentAnswer: null,

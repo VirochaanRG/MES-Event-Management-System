@@ -265,6 +265,9 @@ function RouteComponent() {
       }
 
       closeModal();
+      setSelectedParentForm(null);
+      setSelectedQuestion(null);
+      setSelectedAnswer(null);
     } catch (err: any) {
       console.error("Failed to save condition:", err.message);
       showAlert("Failed to save condition: " + err.message);
@@ -549,7 +552,9 @@ function RouteComponent() {
                     )}
 
                     {/* Dependent Answer */}
-                    {selectedConditionType === "specific_answer" && (
+                    {selectedConditionType === "specific_answer" && 
+                     selectedParentForm && selectedQuestion
+                      &&(
                       <div className="flex flex-col mb-4">
                         <label
                           htmlFor="answer"
