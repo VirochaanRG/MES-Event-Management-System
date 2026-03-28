@@ -138,7 +138,8 @@ function ProfilePageContent() {
       setConfirmPassword("");
       setShowChangePw(false);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Failed to change password";
+      const message =
+        error instanceof Error ? error.message : "Failed to change password";
       showAlert(message);
     } finally {
       setChangingPw(false);
