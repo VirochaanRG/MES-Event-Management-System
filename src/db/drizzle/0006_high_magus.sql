@@ -1,0 +1,1 @@
+ALTER TABLE "form_conditions" RENAME COLUMN "dependent_answer_idx" TO "dependent_answer";

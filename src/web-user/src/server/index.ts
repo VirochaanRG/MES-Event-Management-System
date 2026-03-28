@@ -13,6 +13,7 @@ import QRCode from 'qrcode';
 import formsRoutes from './formsAPI';
 import publicImageRoutes from './imagesAPI';
 import profileRoutes from './profiles';
+import userAnnouncementsRoutes from './announcementsAPI';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -1382,6 +1383,7 @@ fastify.delete<{
 await fastify.register(formsRoutes)
 await fastify.register(publicImageRoutes)
 await fastify.register(profileRoutes)
+await fastify.register(userAnnouncementsRoutes)
 
 
 // Start server

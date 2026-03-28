@@ -9,6 +9,7 @@ import RegisteredEvents from "@/components/RegisteredEvents";
 import CompletedSurveys from "@/components/CompletedSurveys";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import PastEvents from "@/components/PastEvents";
+import AnnouncementsPopup from "@/components/AnnouncementsPopup";
 
 interface Event {
   id: number;
@@ -158,6 +159,9 @@ function HomePage() {
                 </button>
               ))}
             </nav>
+
+            {/* Announcements bell */}
+            <AnnouncementsPopup userEmail={user?.email} />
 
             {/* User menu */}
             <div className="relative shrink-0">
