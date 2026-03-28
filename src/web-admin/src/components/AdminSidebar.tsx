@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   Lock,
+  Megaphone,
 } from "lucide-react";
 import { logout, AuthUser } from "../lib/auth";
 import { getUserPermissions } from "../lib/access";
@@ -55,6 +56,12 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
       icon: FileText,
       path: "/form-builder",
       canAccess: permissions.canAccessForms,
+    },
+    {
+      name: "Announcements",
+      icon: Megaphone,
+      path: "/announcements",
+      canAccess: permissions.canAccessDashboard,
     },
   ];
 
@@ -123,7 +130,9 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
               >
                 <Lock className="w-5 h-5 text-yellow-300/40" />
                 {sidebarOpen && (
-                  <span className="font-medium text-yellow-300/40">{item.name}</span>
+                  <span className="font-medium text-yellow-300/40">
+                    {item.name}
+                  </span>
                 )}
               </div>
             );
@@ -139,7 +148,9 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
               }}
             >
               <item.icon className="w-5 h-5 text-yellow-300 group-hover:text-yellow-200" />
-              {sidebarOpen && <span className="font-medium text-yellow-300">{item.name}</span>}
+              {sidebarOpen && (
+                <span className="font-medium text-yellow-300">{item.name}</span>
+              )}
             </Link>
           );
         })}
@@ -154,7 +165,9 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
                 {user.email?.[0].toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate text-yellow-300">{user.email}</p>
+                <p className="text-sm font-medium truncate text-yellow-300">
+                  {user.email}
+                </p>
                 {user.roles && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {user.roles.map((role) => (

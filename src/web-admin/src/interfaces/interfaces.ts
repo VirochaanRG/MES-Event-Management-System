@@ -48,12 +48,15 @@ interface AuthUser
 
 export interface FormCondition
 {
+  text: string;
   id: number;
   formId: number;
+  modFormId: number;
   dependentFormId: number;
+  dependentModFormId: number;
   conditionType: string;
   dependentQuestionId: number;
-  dependentAnswerIdx: number;
+  dependentAnswer: string;
 }
 
 export interface FormProfileCondition

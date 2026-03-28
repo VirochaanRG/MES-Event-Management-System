@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
 import { form, formAnswers, formConditions, formQuestions, formSubmissions, modularForms } from './../../../db/src/schemas/form';
 import { profiles, users } from './../../../db/src/schemas/users';
+import { eventForms, registeredUsers } from './../../../db/src/schemas/events';
 import { and, eq, inArray, isNull, notInArray, or, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
@@ -82,7 +83,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
   const canUserAccessFormByProfile = async (uid: string | undefined, fid: number) =>
   {
     const conditions = await db.query.formConditions.findMany({
-      where: or(eq(formConditions.formId, fid),eq(formConditions.modFormId, fid)),
+      where: or(eq(formConditions.formId, fid), eq(formConditions.modFormId, fid)),
     });
 
     const profileConditions = conditions
@@ -110,6 +111,44 @@ export default async function formsRoutes(fastify: FastifyInstance)
     );
 
     return checks.filter((c) => c.allowed).map((c) => c.form);
+  };
+
+  const canUserAccessFormByEventRegistration = async (uid: string | undefined, fid: number) =>
+  {
+    const links = await db.query.eventForms.findMany({
+      where: eq(eventForms.formId, fid),
+    });
+
+    if (links.length === 0) return true;
+    if (!uid) return false;
+
+    const eventIds = links.map((link) => link.eventId);
+    if (eventIds.length === 0) return true;
+
+    const registration = await db.query.registeredUsers.findFirst({
+      where: and(
+        eq(registeredUsers.userEmail, uid.toLowerCase().trim()),
+        eq(registeredUsers.paymentStatus, 'paid'),
+        inArray(registeredUsers.eventId, eventIds),
+      ),
+    });
+
+    return !!registration;
+  };
+
+  const filterFormsByAccess = async <T extends { id: number }>(forms: T[], uid: string) =>
+  {
+    const checks = await Promise.all(
+      forms.map(async (f) => ({
+        form: f,
+        allowedByProfile: await canUserAccessFormByProfile(uid, f.id),
+        allowedByEventRegistration: await canUserAccessFormByEventRegistration(uid, f.id),
+      }))
+    );
+
+    return checks
+      .filter((c) => c.allowedByProfile && c.allowedByEventRegistration)
+      .map((c) => c.form);
   };
 
   const assertProfileCompleted = async (uid: string, reply: any) =>
@@ -144,7 +183,8 @@ export default async function formsRoutes(fastify: FastifyInstance)
     }
 
     const allowed = await canUserAccessFormByProfile(uid, f.id);
-    if (!allowed)
+    const hasEventAccess = await canUserAccessFormByEventRegistration(uid, f.id);
+    if (!allowed || !hasEventAccess)
     {
       reply.code(404).send({ success: false, error: "Survey not found" });
       return null;
@@ -165,7 +205,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
       {
         if (c.conditionType === 'complete_form')
         {
-          if(!c.dependentFormId) return false;
+          if (!c.dependentFormId) return false;
           const submission = await db.query.formSubmissions.findFirst({
             where: and(
               eq(formSubmissions.userId, uid),
@@ -174,7 +214,76 @@ export default async function formsRoutes(fastify: FastifyInstance)
           });
           return !!submission;
         }
-        // TODO: handle other condition types
+
+        else if (c.conditionType === 'answer_question')
+        {
+          if (!c.dependentFormId) return false;
+          if (!c.dependentQuestionId) return false;
+          const submission = await db.query.formSubmissions.findFirst({
+            where: and(
+              eq(formSubmissions.userId, uid),
+              eq(formSubmissions.formId, c.dependentFormId)
+            )
+          });
+          if (!submission)
+          {
+            return false;
+          }
+          const answer = await db.query.formAnswers.findFirst({
+            where: and(
+              eq(formAnswers.submissionId, submission.id),
+              eq(formAnswers.questionId, c.dependentQuestionId)
+            )
+          });
+          return !!answer;
+        }
+
+        else if (c.conditionType === 'specific_answer')
+        {
+          if (!c.dependentFormId) return false;
+          if (!c.dependentQuestionId) return false;
+          if (!c.dependentAnswer) return false;
+          const submission = await db.query.formSubmissions.findFirst({
+            where: and(
+              eq(formSubmissions.userId, uid),
+              eq(formSubmissions.formId, c.dependentFormId)
+            )
+          });
+          if (!submission)
+          {
+            return false;
+          }
+          const answer = await db.query.formAnswers.findFirst({
+            where: and(
+              eq(formAnswers.submissionId, submission.id),
+              eq(formAnswers.questionId, c.dependentQuestionId)
+            )
+          });
+
+          if (!answer)
+          {
+            return false;
+          }
+
+          const question = await db.query.formQuestions.findFirst({
+            where: eq(formQuestions.id, answer.questionId)
+          });
+
+          if (!question)
+          {
+            return false
+          }
+
+          if (question.questionType === "multi_select")
+          {
+            const givenAnswers = JSON.parse(answer.answer ?? "[]");
+            return givenAnswers.includes(c.dependentAnswer);
+          }
+          else if (question.questionType === "multiple_choice" || question.questionType === "dropdown")
+          {
+            return c.dependentAnswer === answer.answer;
+          }
+        }
         return true;
       })
     );
@@ -248,7 +357,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
 
       console.log('UNFILLED: ', allForms);
 
-      const allowedForms = await filterFormsByProfileAccess(allForms, uid);
+      const allowedForms = await filterFormsByAccess(allForms, uid);
 
       return reply.send({
         success: true,
@@ -290,7 +399,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
 
       console.log('FILLED: ', allForms);
 
-      const allowedForms = await filterFormsByProfileAccess(allForms, uid);
+      const allowedForms = await filterFormsByAccess(allForms, uid);
 
       return reply.send({
         success: true,
@@ -305,6 +414,136 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
+
+  fastify.get<{ Params: { eventId: string; uid: string } }>(
+    '/api/events/:eventId/forms/available/:uid',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { eventId, uid } = request.params;
+        const parsedEventId = parseInt(eventId, 10);
+
+        const registration = await db.query.registeredUsers.findFirst({
+          where: and(
+            eq(registeredUsers.eventId, parsedEventId),
+            eq(registeredUsers.userEmail, uid.toLowerCase().trim()),
+            eq(registeredUsers.paymentStatus, 'paid'),
+          ),
+        });
+
+        if (!registration)
+        {
+          return reply.send({
+            success: true,
+            data: [],
+          });
+        }
+
+        const eventLinkedForms = await db
+          .select({
+            id: form.id,
+            name: form.name,
+            description: form.description,
+            createdAt: form.createdAt,
+            moduleId: form.moduleId,
+            isPublic: form.isPublic,
+            unlockAt: form.unlockAt,
+          })
+          .from(eventForms)
+          .innerJoin(form, eq(eventForms.formId, form.id))
+          .where(and(
+            eq(eventForms.eventId, parsedEventId),
+            eq(form.isPublic, true),
+            isNull(form.moduleId),
+            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
+          ));
+
+        const submittedFormIds = await db
+          .select({ formId: formSubmissions.formId })
+          .from(formSubmissions)
+          .where(eq(formSubmissions.userId, uid));
+
+        const submittedIds = new Set(submittedFormIds.map((s) => s.formId));
+        const unsubmitted = eventLinkedForms.filter((f) => !submittedIds.has(f.id));
+        const allowedForms = await filterFormsByAccess(unsubmitted, uid);
+
+        return reply.send({
+          success: true,
+          data: allowedForms,
+        });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Failed to fetch available event-linked forms');
+        return reply.code(500).send({
+          success: false,
+          error: 'Failed to fetch available event-linked forms',
+        });
+      }
+    }
+  );
+
+  fastify.get<{ Params: { eventId: string; uid: string } }>(
+    '/api/events/:eventId/forms/completed/:uid',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { eventId, uid } = request.params;
+        const parsedEventId = parseInt(eventId, 10);
+
+        const registration = await db.query.registeredUsers.findFirst({
+          where: and(
+            eq(registeredUsers.eventId, parsedEventId),
+            eq(registeredUsers.userEmail, uid.toLowerCase().trim()),
+            eq(registeredUsers.paymentStatus, 'paid'),
+          ),
+        });
+
+        if (!registration)
+        {
+          return reply.send({
+            success: true,
+            data: [],
+          });
+        }
+
+        const completed = await db
+          .select({
+            id: form.id,
+            name: form.name,
+            description: form.description,
+            createdAt: form.createdAt,
+            isPublic: form.isPublic,
+            moduleId: form.moduleId,
+          })
+          .from(eventForms)
+          .innerJoin(form, eq(eventForms.formId, form.id))
+          .innerJoin(formSubmissions, eq(formSubmissions.formId, form.id))
+          .where(and(
+            eq(eventForms.eventId, parsedEventId),
+            eq(formSubmissions.userId, uid),
+            eq(form.isPublic, true),
+            isNull(form.moduleId),
+            sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`,
+          ));
+
+        const allowedForms = await filterFormsByAccess(completed, uid);
+
+        return reply.send({
+          success: true,
+          data: allowedForms,
+        });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Failed to fetch completed event-linked forms');
+        return reply.code(500).send({
+          success: false,
+          error: 'Failed to fetch completed event-linked forms',
+        });
+      }
+    }
+  );
 
   //GET available modular forms for user
   fastify.get<{ Params: { uid: string } }>('/api/mod-forms/available/:uid', async (request, reply) =>
@@ -335,7 +574,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
               sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
             ));
 
-          const accessibleModuleForms = await filterFormsByProfileAccess(moduleFormsCount, uid);
+          const accessibleModuleForms = await filterFormsByAccess(moduleFormsCount, uid);
 
           if (accessibleModuleForms.length === 0)
           {
@@ -405,7 +644,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
               sql`(form.unlock_at IS NULL OR form.unlock_at <= NOW())`
             ));
 
-          const accessibleModuleForms = await filterFormsByProfileAccess(moduleFormsCount, uid);
+          const accessibleModuleForms = await filterFormsByAccess(moduleFormsCount, uid);
 
           if (accessibleModuleForms.length === 0)
           {
@@ -546,7 +785,8 @@ export default async function formsRoutes(fastify: FastifyInstance)
         {
           const met = await checkConditionsMet(uid, f.id);
           const profileMet = await canUserAccessFormByProfile(uid, f.id);
-          return met && profileMet ? f : null;
+          const eventMet = await canUserAccessFormByEventRegistration(uid, f.id);
+          return met && profileMet && eventMet ? f : null;
         })
       );
 
@@ -647,12 +887,13 @@ export default async function formsRoutes(fastify: FastifyInstance)
           const isUnlocked = !f.unlockAt || new Date(f.unlockAt) <= new Date();
           const conditionsMet = isUnlocked ? await checkConditionsMet(uid, f.id) : false;
           const profileMet = isUnlocked ? await canUserAccessFormByProfile(uid, f.id) : false;
+          const eventMet = isUnlocked ? await canUserAccessFormByEventRegistration(uid, f.id) : false;
           let status: 'completed' | 'available' | 'locked';
 
           if (isSubmitted)
           {
             status = 'completed';
-          } else if (isUnlocked && conditionsMet && profileMet)
+          } else if (isUnlocked && conditionsMet && profileMet && eventMet)
           {
             status = 'available';
           } else
@@ -788,6 +1029,8 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
+
+
 
   // GET answers by form ID
   fastify.get<{ Params: { fid: string; uid: string } }>(

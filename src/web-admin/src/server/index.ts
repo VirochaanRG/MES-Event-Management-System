@@ -12,6 +12,7 @@ import eventsRoutes from './eventsAPI';
 import formsRoutes from './formsAPI';
 import formBuilderRoutes from './formBuilderAPI';
 import imageRoutes from './imagesAPI';
+import announcementsRoutes from './announcementsAPI';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
@@ -429,6 +430,7 @@ await fastify.register(eventsRoutes)
 await fastify.register(formsRoutes)
 await fastify.register(formBuilderRoutes)
 await fastify.register(imageRoutes)
+await fastify.register(announcementsRoutes)
 
 
 // Start server

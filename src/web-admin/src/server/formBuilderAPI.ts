@@ -155,6 +155,32 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
         error: 'Failed to fetch questions',
       });
     }
+  }); 
+  
+  // GET single question
+  fastify.get<{ Params: { id: string } }>('/api/forms/question/:id', async (request, reply) =>
+  {
+    try
+    {
+      const { id } = request.params;
+
+     
+      const question = await db.query.formQuestions.findFirst({
+        where: eq(formQuestions.id, parseInt(id))
+      });
+
+      return reply.send({
+        success: true,
+        data: question,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch questions');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch questions',
+      });
+    }
   });
 
   // DELETE a form question
@@ -487,13 +513,13 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
   // CREATE a form condition
   fastify.post<{
     Params: { id: string };
-    Body: { conditionType: string; dependentFormId: string; dependentQuestionId?: string; dependentAnswerIdx?: number };
+    Body: { conditionType: string; dependentFormId: string; dependentQuestionId?: string; dependentAnswer?: string };
   }>('/api/forms/:id/conditions', async (request, reply) =>
   {
     try
     {
       const { id } = request.params;
-      const { conditionType, dependentFormId, dependentQuestionId, dependentAnswerIdx } = request.body;
+      const { conditionType, dependentFormId, dependentQuestionId, dependentAnswer } = request.body;
 
       if (!conditionType || conditionType.trim() === '')
       {
@@ -555,7 +581,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
           dependentFormId: parseInt(dependentFormId),
           conditionType: conditionType,
           dependentQuestionId: dependentQuestionId ? parseInt(dependentQuestionId) : null,
-          dependentAnswerIdx: dependentAnswerIdx ?? null
+          dependentAnswer: dependentAnswer ?? null
         })
         .returning();
 
@@ -578,13 +604,13 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
   // UPDATE a form condition
   fastify.put<{
     Params: { fid: string, cid: string };
-    Body: { dependentFormId: string; dependentQuestionId?: string; dependentAnswerIdx?: number };
+    Body: { dependentFormId: string; dependentQuestionId?: string; dependentAnswer?: string };
   }>('/api/forms/:fid/conditions/:cid', async (request, reply) =>
   {
     try
     {
       const { fid, cid } = request.params;
-      const { dependentFormId, dependentQuestionId, dependentAnswerIdx } = request.body;
+      const { dependentFormId, dependentQuestionId, dependentAnswer } = request.body;
 
       if (!dependentFormId)
       {
@@ -632,9 +658,9 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       {
         updateData.dependentQuestionId = parseInt(dependentQuestionId);
       }
-      if (dependentAnswerIdx)
+      if (dependentAnswer)
       {
-        updateData.dependentAnswerIdx = dependentAnswerIdx;
+        updateData.dependentAnswer = dependentAnswer;
       }
 
       if (Object.keys(updateData).length === 0)
@@ -889,7 +915,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
           dependentFormId: formId,
           conditionType: encodedConditionType,
           dependentQuestionId: null,
-          dependentAnswerIdx: null,
+          dependentAnswer: null,
         })
         .returning();
 
@@ -1088,10 +1114,10 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
         .values({
           modFormId : formId,
           // Keep FK valid without schema changes.
-          dependentFormId: formId,
+          dependentModFormId: formId,
           conditionType: encodedConditionType,
           dependentQuestionId: null,
-          dependentAnswerIdx: null,
+          dependentAnswer: null,
         })
         .returning();
 

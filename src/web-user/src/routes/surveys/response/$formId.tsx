@@ -285,7 +285,8 @@ function RouteComponent() {
             (r) =>
               !r.answer ||
               !r.answer.answer ||
-              (Array.isArray(r.answer.answer) && r.answer.answer.length === 0),
+              (r.question.questionType === "multi_select" && Array.isArray(r.answer.answer) && 
+              r.answer.answer.length < JSON.parse(r.question.optionsCategory ?? "{min:0}").min)
           )
       ) {
         toast.error("Please fill in all required fields");

@@ -1,7 +1,8 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
 import { and, eq, inArray } from 'drizzle-orm';
-import { events, qrCodes, registeredUsers } from '../../../db/src/schemas/events';
+import { events, eventForms, qrCodes, registeredUsers } from '../../../db/src/schemas/events';
+import { form } from '../../../db/src/schemas/form';
 
 // Default registration form template
 const DEFAULT_REGISTRATION_FORM = {
@@ -515,6 +516,108 @@ export default async function eventsRoutes(fastify: FastifyInstance)
         return reply.code(500).send({
           success: false,
           error: 'Failed to update registration form',
+        });
+      }
+    }
+  );
+
+  // GET forms linked to an event
+  fastify.get<{ Params: { id: string } }>('/api/events/:id/forms', async (request, reply) =>
+  {
+    try
+    {
+      const eventId = parseInt(request.params.id, 10);
+
+      const linkedForms = await db
+        .select({
+          id: form.id,
+          name: form.name,
+          description: form.description,
+          createdAt: form.createdAt,
+          moduleId: form.moduleId,
+          isPublic: form.isPublic,
+          unlockAt: form.unlockAt,
+        })
+        .from(eventForms)
+        .innerJoin(form, eq(eventForms.formId, form.id))
+        .where(eq(eventForms.eventId, eventId));
+
+      return reply.send({
+        success: true,
+        data: linkedForms,
+      });
+    } catch (error)
+    {
+      fastify.log.error({ err: error }, 'Failed to fetch linked event forms');
+      return reply.code(500).send({
+        success: false,
+        error: 'Failed to fetch linked event forms',
+      });
+    }
+  });
+
+  // REPLACE forms linked to an event
+  fastify.put<{ Params: { id: string }; Body: { formIds: number[] } }>(
+    '/api/events/:id/forms',
+    async (request, reply) =>
+    {
+      try
+      {
+        const eventId = parseInt(request.params.id, 10);
+        const formIds = Array.isArray(request.body?.formIds)
+          ? Array.from(new Set(request.body.formIds.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0)))
+          : [];
+
+        const event = await db.query.events.findFirst({
+          where: eq(events.id, eventId),
+        });
+
+        if (!event)
+        {
+          return reply.code(404).send({
+            success: false,
+            error: 'Event not found',
+          });
+        }
+
+        if (formIds.length > 0)
+        {
+          const existingForms = await db
+            .select({ id: form.id })
+            .from(form)
+            .where(inArray(form.id, formIds));
+
+          const existingFormIds = new Set(existingForms.map((f) => f.id));
+          const missing = formIds.filter((id) => !existingFormIds.has(id));
+          if (missing.length > 0)
+          {
+            return reply.code(400).send({
+              success: false,
+              error: `Unknown form ids: ${missing.join(', ')}`,
+            });
+          }
+        }
+
+        await db.delete(eventForms).where(eq(eventForms.eventId, eventId));
+
+        if (formIds.length > 0)
+        {
+          await db.insert(eventForms).values(
+            formIds.map((formId) => ({ eventId, formId }))
+          );
+        }
+
+        return reply.send({
+          success: true,
+          data: { eventId, formIds },
+          message: 'Event form links updated successfully',
+        });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Failed to update linked event forms');
+        return reply.code(500).send({
+          success: false,
+          error: 'Failed to update linked event forms',
         });
       }
     }

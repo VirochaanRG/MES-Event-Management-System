@@ -24,10 +24,10 @@ export default function MultipleSelectAnswerQuestion({
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="text-lg text-gray-900 font-medium">
-            {question.questionTitle || "Untitled Question"}
+            {questionTitle || "Untitled Question"}
           </div>
         </div>
-        {question.required && (
+        {required&& (
           <div className="text-sm text-red-900 font-medium mb-2">
             * Required
           </div>
@@ -63,6 +63,7 @@ export default function MultipleSelectAnswerQuestion({
                 id={id}
                 name={`question-${question.id}`}
                 checked={Array.isArray(answer) && answer.includes(choice)}
+                disabled={Array.isArray(answer) && answer.length == maxSelect && !answer.includes(choice)}
                 onChange={() => onChange(choice)}
                 className="h-4 w-4 accent-red-900 border-red-900 focus:ring-yellow-300"
               />
