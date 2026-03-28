@@ -33,10 +33,10 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
   const isProfileCondition = (conditionType: string) =>
     conditionType.startsWith(PROFILE_CONDITION_PREFIX);
 
-  const assertFormUnpublished = async (formId: number, reply: any, modular : boolean) =>
+  const assertFormUnpublished = async (formId: number, reply: any, modular: boolean) =>
   {
     const existingForm = await (modular ? db.query.modularForms : db.query.form).findFirst({
-      where: eq(form.id, formId),
+      where: modular ? eq(modularForms.id, formId) : eq(form.id, formId),
     });
 
 
@@ -60,7 +60,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
 
     return existingForm;
   };
-  
+
   // CREATE a form question
   fastify.post<{
     Params: { id: string };
@@ -155,8 +155,8 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
         error: 'Failed to fetch questions',
       });
     }
-  }); 
-  
+  });
+
   // GET single question
   fastify.get<{ Params: { id: string } }>('/api/forms/question/:id', async (request, reply) =>
   {
@@ -164,7 +164,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
     {
       const { id } = request.params;
 
-     
+
       const question = await db.query.formQuestions.findFirst({
         where: eq(formQuestions.id, parseInt(id))
       });
@@ -1112,7 +1112,7 @@ export default async function formBuilderRoutes(fastify: FastifyInstance)
       const [created] = await db
         .insert(formConditions)
         .values({
-          modFormId : formId,
+          modFormId: formId,
           // Keep FK valid without schema changes.
           dependentModFormId: formId,
           conditionType: encodedConditionType,
