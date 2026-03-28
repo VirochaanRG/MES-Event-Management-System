@@ -32,13 +32,34 @@ function RouteComponent() {
   const [selectedQuestion, setSelectedQuestion] = useState<FormQuestion | null>(
     null,
   );
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [editingCondition, setEditingCondition] =
     useState<FormCondition | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [questionsForSelectedForm, setQuestionsForSelectedForm] = useState<FormQuestion[]>([])
+  const [answersForSelectedQuestion, setAnswersForSelectedQuestion] = useState<string[]>([])
+
+  const getConditionText = async (condition : FormCondition, forms) => {
+    const dependentForm = forms.find(
+      (f) => f.id === condition.dependentFormId,
+    );
+    if (!dependentForm) return "";
+    if (condition.conditionType === "complete_form") {
+      return "Must complete " + dependentForm.name + " to unlock";
+    } else if (condition.conditionType === "answer_question") {
+      const questionRes = await fetch(`/api/forms/question/${condition.dependentQuestionId}`);
+      const questionData = await questionRes.json();
+      const question = questionData.data;
+      return "Must answer \"" + question?.questionTitle + "\" in " + dependentForm.name + " to unlock";
+    } else if (condition.conditionType === "specific_answer") {
+      const questionRes = await fetch(`/api/forms/question/${condition.dependentQuestionId}`);
+      const questionData = await questionRes.json();
+      const question = questionData.data;
+      return "Must answer with \"" + condition.dependentAnswer + "\" to the question \"" + question?.questionTitle +"\" in " + dependentForm.name + " to unlock";
+    }
+  };
 
   useEffect(() => {
     const fetchFormAndConditions = async () => {
@@ -57,10 +78,18 @@ function RouteComponent() {
           throw new Error(formData.error || "Failed to fetch conditions");
         if (!allFormsData.success)
           throw new Error(allFormsData.error || "Failed to fetch form");
-
+        const forms = allFormsData.data.filter((f) => f.id !== parseInt(formId))
+        setAllForms(forms);
         setForm(formData.data);
-        setAllForms(allFormsData.data.filter((f) => f.id !== parseInt(formId)));
-        setConditions(conditionsData.data);
+
+        const allConditions = conditionsData.data;
+        const conditionsWithText = await Promise.all(
+          allConditions.map(async (c) => ({
+            ...c,
+            text: await getConditionText(c, forms),
+          }))
+        );
+        setConditions(conditionsWithText);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -114,7 +143,7 @@ function RouteComponent() {
       allForms.find((f) => f.id === condition.dependentFormId) ?? null;
     setSelectedParentForm(parentForm);
     setSelectedQuestion(condition.dependentQuestionId);
-    setSelectedAnswer(condition.dependentAnswerIdx);
+    setSelectedAnswer(condition.dependentAnswer);
     setEditingCondition(condition);
     setIsModalOpen(true);
   };
@@ -186,7 +215,7 @@ function RouteComponent() {
           conditionType: selectedConditionType,
           dependentFormId: selectedParentForm.id,
           dependentQuestionId: selectedQuestion.id,
-          dependentAnswerIdx: selectedAnswer,
+          dependentAnswer: selectedAnswer,
         });
       }
       let result;
@@ -229,7 +258,10 @@ function RouteComponent() {
           throw new Error(result.error || "Failed to add condition");
         }
 
-        setConditions([...conditions, result.data]);
+        const condition = result.data;
+        condition.text = await getConditionText(condition, allForms)
+
+        setConditions([...conditions, condition]);
       }
 
       closeModal();
@@ -249,21 +281,6 @@ function RouteComponent() {
     );
   if (!currentUser) return null;
 
-  const getConditionText = (condition) => {
-    const dependentForm = allForms.find(
-      (f) => f.id === condition.dependentFormId,
-    );
-    if (!dependentForm) return "";
-    if (condition.conditionType === "complete_form") {
-      return "Must complete " + dependentForm.name + " to unlock";
-    } else if (condition.conditionType === "answer_question") {
-      return "Must answer \"" + selectedQuestion?.questionTitle + "\" in " + dependentForm.name + " to unlock";
-    } else if (condition.conditionType === "specific_answer") {
-      //TODO
-      return "TODO";
-    }
-  };
-
   const handleSelectParentForm = async (e) => {
     const parentForm = allForms.find(
       (f) => parseInt(e.target.value) === f.id,
@@ -274,7 +291,11 @@ function RouteComponent() {
       const questionsData = await questionsRes.json();
       const allQuestions = questionsData.data;
       if(selectedConditionType == "answer_question") {
-        const allowedQuestions = allQuestions.filter(q => !q.required);
+        const allowedQuestions = allQuestions.filter(q => !q.required || q.enablingAnswers.length > 0);
+        setQuestionsForSelectedForm(allowedQuestions);
+      } 
+      if(selectedConditionType == "specific_answer") {
+        const allowedQuestions = allQuestions.filter(q => ["multiple_choice", "multi_select", "dropdown"].includes(q.questionType));
         setQuestionsForSelectedForm(allowedQuestions);
       }
       console.log(questionsForSelectedForm);
@@ -285,10 +306,12 @@ function RouteComponent() {
     const question = questionsForSelectedForm.find(
       (q) => parseInt(e.target.value) === q.id,
     );
-    if (question) setSelectedQuestion(question);
-    // const answersRes = await fetch(`/api/forms/${formId}/questions`);
-    // const answersData = await questionsRes.json();
-    // setQuestionsForSelectedForm(a.data);
+    if (question) {
+      setSelectedQuestion(question);
+      if(selectedConditionType == "specific_answer") {
+        setAnswersForSelectedQuestion(JSON.parse(question.optionsCategory ?? "{choices:[]}").choices)
+      }
+    }
   }
 
   return (
@@ -426,7 +449,7 @@ function RouteComponent() {
                       </div>
                       <div className="mt-4">
                         <p className="text-black">
-                          {getConditionText(condition)}
+                          {condition.text}
                         </p>
                       </div>
                     </div>
@@ -532,18 +555,29 @@ function RouteComponent() {
                           htmlFor="answer"
                           className="mb-1 text-sm font-medium text-gray-900"
                         >
-                          Answer
+                          Answer 
                         </label>
                         <select
                           name="answer"
                           id="answer"
+                          value={selectedAnswer ?? ""}
+                          onChange={(e) => {setSelectedAnswer(e.target.value)}}
                           className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
                                   focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500
                                   text-gray-700 bg-white"
                         >
-                          <option value="no_answers_found" disabled>
-                            No applicable answers found
+                          <option value="" disabled>
+                            Select an answer
                           </option>
+                          {answersForSelectedQuestion.length > 0 ? (
+                            answersForSelectedQuestion.map((a) => {
+                              return <option value={a}>{a}</option>;
+                            })
+                          ) : (
+                            <option value="no_forms_found" disabled>
+                              No applicable answers found
+                            </option>
+                          )}
                         </select>
                       </div>
                     )}

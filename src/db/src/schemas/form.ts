@@ -79,7 +79,7 @@ export const formConditions = pgTable("form_conditions", {
     .references(() => modularForms.id, { onDelete: "cascade" }),
   dependentQuestionId: integer("dependent_question_id")
     .references(() => formQuestions.id, { onDelete: "cascade" }),
-  dependentAnswerIdx: integer("dependent_answer_idx")
+  dependentAnswer: text("dependent_answer")
 });
 
 

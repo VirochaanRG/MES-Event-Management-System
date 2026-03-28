@@ -174,7 +174,70 @@ export default async function formsRoutes(fastify: FastifyInstance)
           });
           return !!submission;
         }
-        // TODO: handle other condition types
+
+        else if (c.conditionType === 'answer_question')
+        {
+          if(!c.dependentFormId) return false;
+          if(!c.dependentQuestionId) return false;
+          const submission = await db.query.formSubmissions.findFirst({
+            where: and(
+              eq(formSubmissions.userId, uid),
+              eq(formSubmissions.formId, c.dependentFormId)
+            )
+          });
+          if(!submission) {
+            return false;
+          }
+          const answer = await db.query.formAnswers.findFirst({
+            where : and(
+              eq(formAnswers.submissionId, submission.id),
+              eq(formAnswers.questionId, c.dependentQuestionId)
+            )
+          });
+          return !!answer;
+        }
+
+        else if (c.conditionType === 'specific_answer')
+        {
+          if(!c.dependentFormId) return false;
+          if(!c.dependentQuestionId) return false;
+          if(!c.dependentAnswer) return false;
+          const submission = await db.query.formSubmissions.findFirst({
+            where: and(
+              eq(formSubmissions.userId, uid),
+              eq(formSubmissions.formId, c.dependentFormId)
+            )
+          });
+          if(!submission) {
+            return false;
+          }
+          const answer = await db.query.formAnswers.findFirst({
+            where : and(
+              eq(formAnswers.submissionId, submission.id),
+              eq(formAnswers.questionId, c.dependentQuestionId)
+            )
+          });
+          
+          if(!answer) {
+            return false;
+          }
+
+          const question = await db.query.formQuestions.findFirst({
+            where : eq(formQuestions.id, answer.questionId)
+          });
+
+          if(!question) {
+            return false
+          }
+
+          if(question.questionType === "multi_select") {
+            const givenAnswers = JSON.parse(answer.answer ?? "[]");
+            return givenAnswers.includes(c.dependentAnswer);
+          }
+          else if (question.questionType === "multiple_choice" || question.questionType === "dropdown"){
+            return c.dependentAnswer === answer.answer;
+          }
+        }
         return true;
       })
     );
@@ -788,6 +851,8 @@ export default async function formsRoutes(fastify: FastifyInstance)
       });
     }
   });
+
+  
 
   // GET answers by form ID
   fastify.get<{ Params: { fid: string; uid: string } }>(
