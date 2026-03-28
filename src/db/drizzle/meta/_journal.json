@@ -64,6 +64,13 @@
       "when": 1774732858855,
       "tag": "0008_pale_maverick",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1774735049242,
+      "tag": "0009_nice_speed",
+      "breakpoints": true
     }
   ]
 }

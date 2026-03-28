@@ -344,7 +344,13 @@ function ProfilePageContent() {
         </form>
 
         {/* Change Password Section */}
-        <div className="border-t border-gray-200 px-6 pb-6 pt-4">
+        <div className="border-t border-gray-200 bg-amber-50/60 px-6 pb-6 pt-4">
+          <div className="mb-3">
+            <h2 className="text-lg font-bold text-red-900">
+              Password Settings
+            </h2>
+            <p className="text-sm text-gray-600">Change your password here.</p>
+          </div>
           <button
             type="button"
             onClick={() => {
@@ -356,7 +362,7 @@ function ProfilePageContent() {
             className="flex items-center gap-2 text-sm font-semibold text-red-900 hover:text-red-700"
           >
             <span>{showChangePw ? "▲" : "▼"}</span>
-            Change Password
+            {showChangePw ? "Hide Change Password" : "Show Change Password"}
           </button>
 
           {showChangePw && (

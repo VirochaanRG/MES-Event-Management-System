@@ -948,20 +948,28 @@ function RouteComponent() {
   return (
     <AdminLayout user={currentUser} title="Form Builder">
       <div className="max-w-5xl mx-auto px-4 py-8">
-
         {/* Back Button */}
         <button
           onClick={handleBack}
           className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
           {formData?.moduleId ? "Back to Module" : "Back to Forms"}
         </button>
 
         <div className="border-2 border-gray-300 rounded-lg bg-white divide-y divide-gray-200">
-
           {/*  HEADER  */}
           <div className="px-8 py-6">
             {isEditingMeta ? (
@@ -1012,16 +1020,27 @@ function RouteComponent() {
                     <button
                       onClick={() => setIsEditingMeta(true)}
                       title="Edit title and description"
-                      className="flex-shrink-0 p-1.5 text-gray-400 hover:text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                      className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.414.586H9v-2a2 2 0 01.586-1.414z" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.414.586H9v-2a2 2 0 01.586-1.414z"
+                        />
                       </svg>
                     </button>
                   </div>
                   {formData?.description && (
-                    <p className="mt-1 text-gray-500 text-base">{formData.description}</p>
+                    <p className="mt-1 text-gray-500 text-base">
+                      {formData.description}
+                    </p>
                   )}
                 </div>
 
@@ -1037,7 +1056,11 @@ function RouteComponent() {
                         : "bg-amber-500 text-white border-amber-500 hover:bg-amber-600"
                     }`}
                   >
-                    {savingVisibility ? "Saving…" : formData?.isPublic ? "Unpublish" : "Publish"}
+                    {savingVisibility
+                      ? "Saving…"
+                      : formData?.isPublic
+                        ? "Unpublish"
+                        : "Publish"}
                   </button>
                 </div>
               </div>
@@ -1050,15 +1073,24 @@ function RouteComponent() {
               Settings
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
               {/* Unlock Date card */}
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-gray-800">Unlock Date</span>
+                  <span className="text-sm font-semibold text-gray-800">
+                    Unlock Date
+                  </span>
                   {formData?.unlockAt ? (
-                    <StatusPill status={new Date(formData.unlockAt).getTime() > Date.now() ? "Scheduled" : "Unlocked"} />
+                    <StatusPill
+                      status={
+                        new Date(formData.unlockAt).getTime() > Date.now()
+                          ? "Scheduled"
+                          : "Unlocked"
+                      }
+                    />
                   ) : (
-                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-500 border-gray-200">None</span>
+                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-500 border-gray-200">
+                      None
+                    </span>
                   )}
                 </div>
 
@@ -1071,13 +1103,18 @@ function RouteComponent() {
                     </p>
                     {!formData?.isPublic ? (
                       <button
-                        onClick={() => { setUnlockDraft(unlockLocal); setIsEditingUnlock(true); }}
-                      className="px-2 py-1 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => {
+                          setUnlockDraft(unlockLocal);
+                          setIsEditingUnlock(true);
+                        }}
+                        className="px-2 py-1 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Configure
                       </button>
                     ) : (
-                      <span className="ml-3 text-xs text-gray-400 italic">Unpublish to edit</span>
+                      <span className="ml-3 text-xs text-gray-400 italic">
+                        Unpublish to edit
+                      </span>
                     )}
                   </div>
                 ) : (
@@ -1092,14 +1129,20 @@ function RouteComponent() {
                     />
                     <div className="flex gap-2">
                       <button
-                        onClick={async () => { const ok = await handleSaveUnlockAt(unlockDraft); if (ok) setIsEditingUnlock(false); }}
+                        onClick={async () => {
+                          const ok = await handleSaveUnlockAt(unlockDraft);
+                          if (ok) setIsEditingUnlock(false);
+                        }}
                         disabled={savingUnlock}
                         className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
                       >
                         {savingUnlock ? "Saving…" : "Save"}
                       </button>
                       <button
-                        onClick={() => { setUnlockDraft(unlockLocal); setIsEditingUnlock(false); }}
+                        onClick={() => {
+                          setUnlockDraft(unlockLocal);
+                          setIsEditingUnlock(false);
+                        }}
                         disabled={savingUnlock}
                         className="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                       >
@@ -1107,7 +1150,14 @@ function RouteComponent() {
                       </button>
                       {formData?.unlockAt && (
                         <button
-                          onClick={async () => { const ok = await handleSaveUnlockAt(""); if (ok) { setUnlockDraft(""); setUnlockLocal(""); setIsEditingUnlock(false); } }}
+                          onClick={async () => {
+                            const ok = await handleSaveUnlockAt("");
+                            if (ok) {
+                              setUnlockDraft("");
+                              setUnlockLocal("");
+                              setIsEditingUnlock(false);
+                            }
+                          }}
                           disabled={savingUnlock}
                           className="px-3 py-1.5 text-xs font-semibold text-red-700 bg-white border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
                         >
@@ -1122,30 +1172,39 @@ function RouteComponent() {
               {/* Profile Access card */}
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-gray-800">Profile Access</span>
+                  <span className="text-sm font-semibold text-gray-800">
+                    Profile Access
+                  </span>
                   {profileConditions.length > 0 ? (
                     <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200">
-                      {profileConditions.length} rule{profileConditions.length !== 1 && "s"}
+                      {profileConditions.length} rule
+                      {profileConditions.length !== 1 && "s"}
                     </span>
                   ) : (
-                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-500 border-gray-200">Open</span>
+                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-500 border-gray-200">
+                      Open
+                    </span>
                   )}
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-gray-600 truncate pr-2">
                     {profileConditions.length === 0
                       ? "All users can access this form"
-                      : profileConditions.map(c => `${PROFILE_FIELD_LABELS[c.profileField]}: ${c.expectedValue}`).join(" · ")}
+                      : profileConditions
+                          .map(
+                            (c) =>
+                              `${PROFILE_FIELD_LABELS[c.profileField]}: ${c.expectedValue}`,
+                          )
+                          .join(" · ")}
                   </p>
                   <button
                     onClick={openProfileAccessModal}
-                      className="px-2 py-1 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-2 py-1 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Configure
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -1153,9 +1212,13 @@ function RouteComponent() {
           <div className="px-8 py-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Questions</h2>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Questions
+                </h2>
                 <p className="text-sm text-gray-500 mt-0.5">
-                  {questions.length === 0 ? "No questions yet" : `${questions.length} question${questions.length !== 1 ? "s" : ""}`}
+                  {questions.length === 0
+                    ? "No questions yet"
+                    : `${questions.length} question${questions.length !== 1 ? "s" : ""}`}
                 </p>
               </div>
 
@@ -1170,11 +1233,36 @@ function RouteComponent() {
                 </button>
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30">
-                    <button onClick={() => openModal("multiple_choice")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Multiple Choice</button>
-                    <button onClick={() => openModal("dropdown")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dropdown</button>
-                    <button onClick={() => openModal("text_answer")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Text Answer</button>
-                    <button onClick={() => openModal("linear_scale")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Linear Scale</button>
-                    <button onClick={() => openModal("multi_select")} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Multiple Selection</button>
+                    <button
+                      onClick={() => openModal("multiple_choice")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Multiple Choice
+                    </button>
+                    <button
+                      onClick={() => openModal("dropdown")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Dropdown
+                    </button>
+                    <button
+                      onClick={() => openModal("text_answer")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Text Answer
+                    </button>
+                    <button
+                      onClick={() => openModal("linear_scale")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Linear Scale
+                    </button>
+                    <button
+                      onClick={() => openModal("multi_select")}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Multiple Selection
+                    </button>
                   </div>
                 )}
               </div>
@@ -1184,7 +1272,9 @@ function RouteComponent() {
             <div className="space-y-6">
               {questions.length === 0 ? (
                 <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
-                  <p className="text-gray-400 text-sm">No questions yet. Click "+ Add Question" to get started.</p>
+                  <p className="text-gray-400 text-sm">
+                    No questions yet. Click "+ Add Question" to get started.
+                  </p>
                 </div>
               ) : (
                 questions.map((question, index) => (
@@ -1198,91 +1288,240 @@ function RouteComponent() {
                       {/* Action Buttons */}
                       <div className="absolute top-4 right-4 flex gap-2">
                         {index > 0 && (
-                          <button onClick={() => handleMoveUp(question.id)} className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50" title="Move Up">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                          <button
+                            onClick={() => handleMoveUp(question.id)}
+                            className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                            title="Move Up"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 15l7-7 7 7"
+                              />
                             </svg>
                           </button>
                         )}
                         {index < questions.length - 1 && (
-                          <button onClick={() => handleMoveDown(question.id)} className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50" title="Move Down">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          <button
+                            onClick={() => handleMoveDown(question.id)}
+                            className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                            title="Move Down"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                              />
                             </svg>
                           </button>
                         )}
 
                         {/* Follow-up dropdown */}
-                        {allowedTypesForFollowUp.includes(question.questionType) && (
+                        {allowedTypesForFollowUp.includes(
+                          question.questionType,
+                        ) && (
                           <div className="relative">
                             <button
-                              onClick={() => setOpenFollowupFor(openFollowupFor === question.id ? null : question.id)}
+                              onClick={() =>
+                                setOpenFollowupFor(
+                                  openFollowupFor === question.id
+                                    ? null
+                                    : question.id,
+                                )
+                              }
                               className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
                               title="Add follow-up question"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
                               </svg>
                             </button>
                             {openFollowupFor === question.id && (
                               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30">
-                                <span className="w-full text-left px-4 py-2 text-sm text-gray-400 italic block">Add a follow-up question</span>
-                                <button onClick={() => openFollowUpModal("multiple_choice", question.id)} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Multiple Choice</button>
-                                <button onClick={() => openFollowUpModal("dropdown", question.id)} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dropdown</button>
-                                <button onClick={() => openFollowUpModal("text_answer", question.id)} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Text Answer</button>
-                                <button onClick={() => openFollowUpModal("linear_scale", question.id)} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Linear Scale</button>
+                                <span className="w-full text-left px-4 py-2 text-sm text-gray-400 italic block">
+                                  Add a follow-up question
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    openFollowUpModal(
+                                      "multiple_choice",
+                                      question.id,
+                                    )
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  Multiple Choice
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    openFollowUpModal("dropdown", question.id)
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  Dropdown
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    openFollowUpModal(
+                                      "text_answer",
+                                      question.id,
+                                    )
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  Text Answer
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    openFollowUpModal(
+                                      "linear_scale",
+                                      question.id,
+                                    )
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  Linear Scale
+                                </button>
                               </div>
                             )}
                           </div>
                         )}
 
-                        <button onClick={() => openEditModal(question)} className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50" title="Edit">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <button
+                          onClick={() => openEditModal(question)}
+                          className="p-2 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                          title="Edit"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
                           </svg>
                         </button>
-                        <button onClick={() => handleDeleteQuestion(question.id)} className="p-1.5 bg-white border border-gray-300 text-red-900 rounded hover:bg-red-50" title="Delete">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <button
+                          onClick={() => handleDeleteQuestion(question.id)}
+                          className="p-1.5 bg-white border border-gray-300 text-red-900 rounded hover:bg-red-50"
+                          title="Delete"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
                           </svg>
                         </button>
                       </div>
 
                       {/* Question Component */}
-                      {question.questionType === "multiple_choice" && <MultipleChoiceQuestion question={question} questionsList={questions} />}
-                      {question.questionType === "dropdown" && <DropdownQuestion question={question} questionsList={questions} />}
-                      {question.questionType === "linear_scale" && <LinearScaleQuestion question={question} questionsList={questions} />}
-                      {question.questionType === "text_answer" && <TextAnswerQuestion question={question} questionsList={questions} />}
-                      {question.questionType === "multi_select" && <MultiSelectQuestion question={question} questionsList={questions} />}
+                      {question.questionType === "multiple_choice" && (
+                        <MultipleChoiceQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
+                      )}
+                      {question.questionType === "dropdown" && (
+                        <DropdownQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
+                      )}
+                      {question.questionType === "linear_scale" && (
+                        <LinearScaleQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
+                      )}
+                      {question.questionType === "text_answer" && (
+                        <TextAnswerQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
+                      )}
+                      {question.questionType === "multi_select" && (
+                        <MultiSelectQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
+                      )}
                     </div>
                   </div>
                 ))
               )}
             </div>
           </div>
-
-        </div>{/* end outer border */}
+        </div>
+        {/* end outer border */}
       </div>
 
       {/* MODALS */}
 
       {isProfileAccessModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div role="dialog" className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div
+            role="dialog"
+            className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
             <div className="p-6 border-b border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900">Profile Access Conditions</h3>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Profile Access Conditions
+              </h3>
               <p className="text-sm text-gray-500 mt-1">
-                Allow access only to users whose profile matches the selected values. If no rules are set, everyone can access the form.
+                Allow access only to users whose profile matches the selected
+                values. If no rules are set, everyone can access the form.
               </p>
             </div>
             <div className="p-6 space-y-5">
               <div className="grid gap-4 md:grid-cols-[200px,1fr] md:items-start">
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">Profile Field</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Profile Field
+                  </label>
                   <select
                     value={profileField}
                     onChange={(e) => {
-                      const nextField = e.target.value as "faculty" | "program" | "isMcmasterStudent";
+                      const nextField = e.target.value as
+                        | "faculty"
+                        | "program"
+                        | "isMcmasterStudent";
                       setProfileField(nextField);
                       setIsProfileValueDropdownOpen(false);
                       loadProfileConditionDraft(nextField);
@@ -1296,43 +1535,71 @@ function RouteComponent() {
                   </select>
                 </div>
                 <div ref={profileValueDropdownRef}>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">Allowed Values</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Allowed Values
+                  </label>
                   <button
                     type="button"
-                    onClick={() => setIsProfileValueDropdownOpen((prev) => !prev)}
+                    onClick={() =>
+                      setIsProfileValueDropdownOpen((prev) => !prev)
+                    }
                     disabled={formData?.isPublic || savingProfileCondition}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-left flex items-center justify-between disabled:opacity-50"
                   >
                     <span className="truncate pr-4 text-gray-700">
-                      {selectedProfileValues.length > 0 ? selectedProfileValues.join(", ") : "Select one or more values"}
+                      {selectedProfileValues.length > 0
+                        ? selectedProfileValues.join(", ")
+                        : "Select one or more values"}
                     </span>
                     <span className="text-gray-400">▾</span>
                   </button>
                   {isProfileValueDropdownOpen && (
                     <div className="mt-2 rounded-md border border-gray-200 bg-white shadow-lg">
                       <div className="max-h-64 overflow-y-auto p-2 space-y-1">
-                        {PROFILE_VALUE_OPTIONS[profileField].map((valueOption) => (
-                          <label key={valueOption} className="flex items-start gap-3 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={selectedProfileValues.includes(valueOption)}
-                              onChange={() => toggleProfileValue(valueOption)}
-                              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-                            />
-                            <span>{valueOption}</span>
-                          </label>
-                        ))}
+                        {PROFILE_VALUE_OPTIONS[profileField].map(
+                          (valueOption) => (
+                            <label
+                              key={valueOption}
+                              className="flex items-start gap-3 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedProfileValues.includes(
+                                  valueOption,
+                                )}
+                                onChange={() => toggleProfileValue(valueOption)}
+                                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                              />
+                              <span>{valueOption}</span>
+                            </label>
+                          ),
+                        )}
                       </div>
                       <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2">
-                        <button type="button" onClick={() => setSelectedProfileValues([])} className="text-xs font-semibold text-gray-600 hover:text-gray-900">Clear</button>
-                        <button type="button" onClick={() => setIsProfileValueDropdownOpen(false)} className="text-xs font-semibold text-amber-700 hover:text-amber-900">Done</button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProfileValues([])}
+                          className="text-xs font-semibold text-gray-600 hover:text-gray-900"
+                        >
+                          Clear
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsProfileValueDropdownOpen(false)}
+                          className="text-xs font-semibold text-amber-700 hover:text-amber-900"
+                        >
+                          Done
+                        </button>
                       </div>
                     </div>
                   )}
                 </div>
               </div>
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                <p className="text-xs text-gray-500">Select multiple values to grant access to more than one profile group.</p>
+                <p className="text-xs text-gray-500">
+                  Select multiple values to grant access to more than one
+                  profile group.
+                </p>
                 <button
                   onClick={handleSaveProfileCondition}
                   disabled={formData?.isPublic || savingProfileCondition}
@@ -1348,24 +1615,44 @@ function RouteComponent() {
               )}
               <div className="space-y-2">
                 {profileConditions.length === 0 ? (
-                  <p className="text-sm text-gray-500">No profile conditions set.</p>
-                ) : profileConditions.map((condition) => (
-                  <div key={condition.id} className="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2">
-                    <p className="text-sm text-gray-800">
-                      <span className="font-semibold">{PROFILE_FIELD_LABELS[condition.profileField] ?? condition.profileField}</span>{" "}
-                      must be one of: {condition.expectedValue}
-                    </p>
-                    <button
-                      onClick={() => handleDeleteProfileCondition(condition.id)}
-                      disabled={formData?.isPublic}
-                      className="px-2.5 py-1.5 text-xs font-semibold text-red-700 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
-                    >Delete</button>
-                  </div>
-                ))}
+                  <p className="text-sm text-gray-500">
+                    No profile conditions set.
+                  </p>
+                ) : (
+                  profileConditions.map((condition) => (
+                    <div
+                      key={condition.id}
+                      className="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2"
+                    >
+                      <p className="text-sm text-gray-800">
+                        <span className="font-semibold">
+                          {PROFILE_FIELD_LABELS[condition.profileField] ??
+                            condition.profileField}
+                        </span>{" "}
+                        must be one of: {condition.expectedValue}
+                      </p>
+                      <button
+                        onClick={() =>
+                          handleDeleteProfileCondition(condition.id)
+                        }
+                        disabled={formData?.isPublic}
+                        className="px-2.5 py-1.5 text-xs font-semibold text-red-700 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
             <div className="p-6 border-t border-gray-200 flex justify-end">
-              <button type="button" onClick={closeProfileAccessModal} className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Close</button>
+              <button
+                type="button"
+                onClick={closeProfileAccessModal}
+                className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
@@ -1373,18 +1660,29 @@ function RouteComponent() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div role="dialog" className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div
+            role="dialog"
+            className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
             <div className="p-6 border-b border-gray-200">
               <h3 className="text-xl font-semibold text-gray-900">
-                {editingQuestion ? "Edit" : "Add"}{followupParentId ? " Follow-up" : ""} Question
+                {editingQuestion ? "Edit" : "Add"}
+                {followupParentId ? " Follow-up" : ""} Question
               </h3>
-              <p className="text-sm text-gray-500 mt-1">{selectedQuestionType.replace("_", " ")}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {selectedQuestionType.replace("_", " ")}
+              </p>
             </div>
 
             <div className="p-6 space-y-5">
               {/* Required */}
               <div className="flex items-center gap-2">
-                <label htmlFor="required" className="text-sm font-medium text-gray-900">Required Question</label>
+                <label
+                  htmlFor="required"
+                  className="text-sm font-medium text-gray-900"
+                >
+                  Required Question
+                </label>
                 <input
                   type="checkbox"
                   id="required"
@@ -1395,37 +1693,61 @@ function RouteComponent() {
               </div>
 
               {/* Follow-up triggers */}
-              {followupParentId && (() => {
-                const parentQuestion = questions.find((q) => q.id === followupParentId);
-                const answers = parentQuestion?.optionsCategory ? JSON.parse(parentQuestion.optionsCategory).choices : [];
-                if (!parentQuestion || !allowedTypesForFollowUp.includes(parentQuestion.questionType)) return null;
-                return (
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-900 mb-2">Show question when answering with…</label>
-                    <div className="space-y-2">
-                      {answers?.map((answer: string, index: number) => (
-                        <label key={index} className="flex items-center gap-3 text-sm text-gray-700">
-                          <input
-                            type="checkbox"
-                            value={index}
-                            checked={selectedTriggers?.includes(index) || false}
-                            onChange={(e) => {
-                              const checked = e.target.checked;
-                              setSelectedTriggers((prev) => checked ? [...(prev || []), index] : (prev || []).filter((i) => i !== index));
-                            }}
-                            className="w-4 h-4 text-blue-600 border-gray-300 rounded"
-                          />
-                          <span className="truncate">{answer}</span>
-                        </label>
-                      ))}
+              {followupParentId &&
+                (() => {
+                  const parentQuestion = questions.find(
+                    (q) => q.id === followupParentId,
+                  );
+                  const answers = parentQuestion?.optionsCategory
+                    ? JSON.parse(parentQuestion.optionsCategory).choices
+                    : [];
+                  if (
+                    !parentQuestion ||
+                    !allowedTypesForFollowUp.includes(
+                      parentQuestion.questionType,
+                    )
+                  )
+                    return null;
+                  return (
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Show question when answering with…
+                      </label>
+                      <div className="space-y-2">
+                        {answers?.map((answer: string, index: number) => (
+                          <label
+                            key={index}
+                            className="flex items-center gap-3 text-sm text-gray-700"
+                          >
+                            <input
+                              type="checkbox"
+                              value={index}
+                              checked={
+                                selectedTriggers?.includes(index) || false
+                              }
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setSelectedTriggers((prev) =>
+                                  checked
+                                    ? [...(prev || []), index]
+                                    : (prev || []).filter((i) => i !== index),
+                                );
+                              }}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                            />
+                            <span className="truncate">{answer}</span>
+                          </label>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })()}
+                  );
+                })()}
 
               {/* Question Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 mb-2">Question Title</label>
+                <label className="block text-sm font-medium text-gray-900 mb-2">
+                  Question Title
+                </label>
                 <input
                   type="text"
                   value={questionTitle}
@@ -1436,38 +1758,90 @@ function RouteComponent() {
               </div>
 
               {/* Multiple Choice / Dropdown */}
-              {(selectedQuestionType === "multiple_choice" || selectedQuestionType === "dropdown") && (
+              {(selectedQuestionType === "multiple_choice" ||
+                selectedQuestionType === "dropdown") && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">Answer Choices</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Answer Choices
+                  </label>
                   <div className="space-y-2">
                     {mcChoices.map((choice, index) => (
                       <div key={index} className="flex gap-2">
                         <input
                           type="text"
                           value={choice}
-                          ref={(el) => { choiceInputRefs.current[index] = el; }}
-                          onChange={(e) => updateMcChoice(index, e.target.value)}
-                          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addMcChoice(); } }}
+                          ref={(el) => {
+                            choiceInputRefs.current[index] = el;
+                          }}
+                          onChange={(e) =>
+                            updateMcChoice(index, e.target.value)
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addMcChoice();
+                            }
+                          }}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                           placeholder={`Choice ${index + 1}`}
                         />
                         {mcChoices.length > 2 && (
-                          <button onClick={() => removeMcChoice(index)} className="px-3 py-2 text-sm text-red-900 hover:bg-red-50 rounded-md">Remove</button>
+                          <button
+                            onClick={() => removeMcChoice(index)}
+                            className="px-3 py-2 text-sm text-red-900 hover:bg-red-50 rounded-md"
+                          >
+                            Remove
+                          </button>
                         )}
                       </div>
                     ))}
                   </div>
                   <div className="mt-3 flex items-center gap-4">
-                    <button onClick={addMcChoice} className="text-sm font-medium text-gray-700 hover:text-gray-900">+ Add choice</button>
-                    <button onClick={() => { setIsImportingChoices(!isImportingChoices); setImportText(""); }} className="text-sm font-medium text-amber-700 hover:text-amber-900">Import options</button>
+                    <button
+                      onClick={addMcChoice}
+                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                    >
+                      + Add choice
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsImportingChoices(!isImportingChoices);
+                        setImportText("");
+                      }}
+                      className="text-sm font-medium text-amber-700 hover:text-amber-900"
+                    >
+                      Import options
+                    </button>
                   </div>
                   {isImportingChoices && (
                     <div className="mt-3 space-y-2">
-                      <p className="text-xs text-gray-500">Enter options separated by commas or new lines. Existing choices will be replaced.</p>
-                      <textarea rows={4} value={importText} onChange={(e) => setImportText(e.target.value)} placeholder={"Option 1, Option 2\nOption 3"} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent" />
+                      <p className="text-xs text-gray-500">
+                        Enter options separated by commas or new lines. Existing
+                        choices will be replaced.
+                      </p>
+                      <textarea
+                        rows={4}
+                        value={importText}
+                        onChange={(e) => setImportText(e.target.value)}
+                        placeholder={"Option 1, Option 2\nOption 3"}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      />
                       <div className="flex gap-2">
-                        <button onClick={handleImportChoices} className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600">Import</button>
-                        <button onClick={() => { setIsImportingChoices(false); setImportText(""); }} className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50">Cancel</button>
+                        <button
+                          onClick={handleImportChoices}
+                          className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600"
+                        >
+                          Import
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsImportingChoices(false);
+                            setImportText("");
+                          }}
+                          className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50"
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   )}
@@ -1479,22 +1853,52 @@ function RouteComponent() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">From</label>
-                      <input type="number" value={scaleMin} onChange={(e) => setScaleMin(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" />
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        From
+                      </label>
+                      <input
+                        type="number"
+                        value={scaleMin}
+                        onChange={(e) => setScaleMin(parseInt(e.target.value))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">To</label>
-                      <input type="number" value={scaleMax} onChange={(e) => setScaleMax(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" />
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        To
+                      </label>
+                      <input
+                        type="number"
+                        value={scaleMax}
+                        onChange={(e) => setScaleMax(parseInt(e.target.value))}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">Min label (optional)</label>
-                      <input type="text" value={scaleMinLabel} onChange={(e) => setScaleMinLabel(e.target.value)} placeholder="Not at all" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" />
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Min label (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={scaleMinLabel}
+                        onChange={(e) => setScaleMinLabel(e.target.value)}
+                        placeholder="Not at all"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">Max label (optional)</label>
-                      <input type="text" value={scaleMaxLabel} onChange={(e) => setScaleMaxLabel(e.target.value)} placeholder="Extremely" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" />
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Max label (optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={scaleMaxLabel}
+                        onChange={(e) => setScaleMaxLabel(e.target.value)}
+                        placeholder="Extremely"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
                     </div>
                   </div>
                 </div>
@@ -1505,44 +1909,115 @@ function RouteComponent() {
                 <div>
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">Minimum required selections</label>
-                      <input min={0} type="number" value={selectionsMin} onChange={(e) => setSelectionsMin(parseInt(e.target.value ?? "0"))} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" />
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Minimum required selections
+                      </label>
+                      <input
+                        min={0}
+                        type="number"
+                        value={selectionsMin}
+                        onChange={(e) =>
+                          setSelectionsMin(parseInt(e.target.value ?? "0"))
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">Maximum allowed selections</label>
-                      <input min={1} type="number" value={selectionsMax ?? ""} onChange={(e) => setSelectionsMax(parseInt(e.target.value))} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent" />
+                      <label className="block text-sm font-medium text-gray-900 mb-2">
+                        Maximum allowed selections
+                      </label>
+                      <input
+                        min={1}
+                        type="number"
+                        value={selectionsMax ?? ""}
+                        onChange={(e) =>
+                          setSelectionsMax(parseInt(e.target.value))
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                      />
                     </div>
                   </div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">Answer Choices</label>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Answer Choices
+                  </label>
                   <div className="space-y-2">
                     {mcChoices.map((choice, index) => (
                       <div key={index} className="flex gap-2">
                         <input
                           type="text"
                           value={choice}
-                          ref={(el) => { choiceInputRefs.current[index] = el; }}
-                          onChange={(e) => updateMcChoice(index, e.target.value)}
-                          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addMcChoice(); } }}
+                          ref={(el) => {
+                            choiceInputRefs.current[index] = el;
+                          }}
+                          onChange={(e) =>
+                            updateMcChoice(index, e.target.value)
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addMcChoice();
+                            }
+                          }}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                           placeholder={`Choice ${index + 1}`}
                         />
                         {mcChoices.length > 2 && (
-                          <button onClick={() => removeMcChoice(index)} className="px-3 py-2 text-sm text-red-900 hover:bg-red-50 rounded-md">Remove</button>
+                          <button
+                            onClick={() => removeMcChoice(index)}
+                            className="px-3 py-2 text-sm text-red-900 hover:bg-red-50 rounded-md"
+                          >
+                            Remove
+                          </button>
                         )}
                       </div>
                     ))}
                   </div>
                   <div className="mt-3 flex items-center gap-4">
-                    <button onClick={addMcChoice} className="text-sm font-medium text-gray-700 hover:text-gray-900">+ Add choice</button>
-                    <button onClick={() => { setIsImportingChoices(!isImportingChoices); setImportText(""); }} className="text-sm font-medium text-amber-700 hover:text-amber-900">Import options</button>
+                    <button
+                      onClick={addMcChoice}
+                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                    >
+                      + Add choice
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsImportingChoices(!isImportingChoices);
+                        setImportText("");
+                      }}
+                      className="text-sm font-medium text-amber-700 hover:text-amber-900"
+                    >
+                      Import options
+                    </button>
                   </div>
                   {isImportingChoices && (
                     <div className="mt-3 space-y-2">
-                      <p className="text-xs text-gray-500">Enter options separated by commas or new lines. Existing choices will be replaced.</p>
-                      <textarea rows={4} value={importText} onChange={(e) => setImportText(e.target.value)} placeholder={"Option 1, Option 2\nOption 3"} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent" />
+                      <p className="text-xs text-gray-500">
+                        Enter options separated by commas or new lines. Existing
+                        choices will be replaced.
+                      </p>
+                      <textarea
+                        rows={4}
+                        value={importText}
+                        onChange={(e) => setImportText(e.target.value)}
+                        placeholder={"Option 1, Option 2\nOption 3"}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      />
                       <div className="flex gap-2">
-                        <button onClick={handleImportChoices} className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600">Import</button>
-                        <button onClick={() => { setIsImportingChoices(false); setImportText(""); }} className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50">Cancel</button>
+                        <button
+                          onClick={handleImportChoices}
+                          className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600"
+                        >
+                          Import
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsImportingChoices(false);
+                            setImportText("");
+                          }}
+                          className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50"
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   )}
@@ -1551,16 +2026,22 @@ function RouteComponent() {
             </div>
 
             <div className="p-6 border-t border-gray-200 flex justify-end gap-3 bg-gray-50">
-              <button onClick={closeModal} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Cancel</button>
-              <button onClick={handleSaveQuestion} className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveQuestion}
+                className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800"
+              >
                 {editingQuestion ? "Save changes" : "Add question"}
               </button>
             </div>
           </div>
         </div>
       )}
-
     </AdminLayout>
   );
-
 }

@@ -218,6 +218,17 @@ function LoginPageContent() {
     textDecoration: "underline",
     fontWeight: 500,
   };
+  const secondaryBtn: React.CSSProperties = {
+    width: "100%",
+    backgroundColor: "#fff7ed",
+    color: "#7f1d1d",
+    padding: "11px 12px",
+    borderRadius: "6px",
+    border: "1px solid #fbbf24",
+    fontSize: "14px",
+    fontWeight: 600,
+    cursor: "pointer",
+  };
 
   return (
     <div
@@ -337,6 +348,30 @@ function LoginPageContent() {
             >
               {isLoading ? "Signing in…" : "Sign In"}
             </button>
+            <div style={{ marginTop: "12px", display: "grid", gap: "10px" }}>
+              <button
+                type="button"
+                style={secondaryBtn}
+                onClick={() => {
+                  clearMessages();
+                  setForgotEmail(email);
+                  setScreen("forgot");
+                }}
+              >
+                Forgot Password
+              </button>
+              <button
+                type="button"
+                style={secondaryBtn}
+                onClick={() => {
+                  clearMessages();
+                  setResetEmail(email);
+                  setScreen("reset");
+                }}
+              >
+                I Already Have A Temporary Password
+              </button>
+            </div>
           </form>
         )}
 

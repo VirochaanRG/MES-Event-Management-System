@@ -283,6 +283,29 @@ export default async function formsRoutes(fastify: FastifyInstance)
       }
       if (moduleId !== undefined)
       {
+        if (moduleId !== null)
+        {
+          const existingModule = await db.query.modularForms.findFirst({
+            where: eq(modularForms.id, Number(moduleId)),
+          });
+
+          if (!existingModule)
+          {
+            return reply.code(404).send({
+              success: false,
+              error: 'Module not found',
+            });
+          }
+
+          if (existingModule.isPublic)
+          {
+            return reply.code(400).send({
+              success: false,
+              error: 'Unpublish the modular form before adding new forms',
+            });
+          }
+        }
+
         updateData.moduleId = moduleId ?? null;
       }
       if (isPublic !== undefined)
