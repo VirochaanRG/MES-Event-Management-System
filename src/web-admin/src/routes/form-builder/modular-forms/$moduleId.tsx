@@ -634,639 +634,451 @@ function RouteComponent() {
     return null;
   }
   return (
-    <AdminLayout user={currentUser} title="Form Builder">
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Back Button */}
-        <button
-          onClick={handleBackToForms}
-          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          Back to Forms
-        </button>
+  <AdminLayout user={currentUser} title="Form Builder">
+    <div className="max-w-5xl mx-auto px-4 py-8">
 
-        {/* Outer Form Border */}
-        <div className="border-2 border-gray-300 rounded-lg bg-white p-8">
-          {/* Header Section */}
-          <div className="mb-12">
-            <div className="flex items-start justify-between gap-4 mb-3">
-              <div className="flex-1">
-                {isEditingMeta ? (
-                  <div className="max-w-2xl space-y-3">
-                    <input
-                      type="text"
-                      value={metaName}
-                      onChange={(e) => setMetaName(e.target.value)}
-                      placeholder="Form title"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-2xl font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    />
-                    <textarea
-                      value={metaDescription}
-                      onChange={(e) => setMetaDescription(e.target.value)}
-                      placeholder="Form description"
-                      rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    />
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={handleSaveMeta}
-                        disabled={savingMeta}
-                        className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
-                      >
-                        {savingMeta ? "Saving..." : "Save details"}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setMetaName(formData?.name || "");
-                          setMetaDescription(formData?.description || "");
-                          setIsEditingMeta(false);
-                        }}
-                        disabled={savingMeta}
-                        className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50 disabled:opacity-50"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-                      {formData?.name || "Untitled Form"}
-                    </h1>
-                    {formData?.description && (
-                      <p className="text-gray-600 text-lg mt-2">
-                        {formData.description}
-                      </p>
-                    )}
-                  </>
-                )}
-                {/* Publish controls + status */}
-                <div className="mt-3 flex items-center gap-3">
-                  <button
-                    onClick={() => handleTogglePublic(!formData?.isPublic)}
-                    disabled={savingVisibility}
-                    className={`px-4 py-2 text-sm font-semibold rounded-md border-2 disabled:opacity-50 ${
-                      formData?.isPublic
-                        ? "bg-white text-amber-800 border-amber-500 hover:bg-amber-50"
-                        : "bg-amber-500 text-white border-amber-500 hover:bg-amber-600"
-                    }`}
-                  >
-                    {formData?.isPublic ? "Unpublish" : "Publish"}
-                  </button>
+      {/* Back Button */}
+      <button
+        onClick={handleBackToForms}
+        className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Forms
+      </button>
 
-                  <StatusPill status={status} />
-                </div>
-                <div className="mt-4">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-900">
-                      Unlock date
-                    </span>
+      <div className="border-2 border-gray-300 rounded-lg bg-white divide-y divide-gray-200">
 
-                    {!isEditingUnlock ? (
-                      <div className="mt-1 flex flex-wrap items-center gap-2">
-                        <span className="text-sm text-gray-700">
-                          {formData?.unlockAt
-                            ? `Unlocks: ${new Date(formData.unlockAt).toLocaleString()}`
-                            : "No unlock date set"}
-                        </span>
-                        {formData?.unlockAt ? (
-                          <StatusPill
-                            status={
-                              new Date(formData.unlockAt).getTime() > Date.now()
-                                ? "Scheduled"
-                                : "Unlocked"
-                            }
-                          />
-                        ) : (
-                          <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-700 border-gray-200">
-                            None
-                          </span>
-                        )}
-                        {!formData?.isPublic ? (
-                          <button
-                            onClick={() => {
-                              setUnlockDraft(unlockLocal); // preload current value
-                              setIsEditingUnlock(true);
-                            }}
-                            className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50"
-                          >
-                            {formData?.unlockAt ? "Edit" : "Set date"}
-                          </button>
-                        ) : (
-                          <span className="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-200 rounded-md">
-                            Unpublish to edit unlock date
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="mt-2 flex flex-wrap items-end gap-3">
-                        <input
-                          ref={unlockInputRef}
-                          type="datetime-local"
-                          min={getNowLocalDateTimeValue()}
-                          value={unlockDraft}
-                          onChange={(e) => setUnlockDraft(e.target.value)}
-                          className="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                        />
-                        <button
-                          onClick={async () => {
-                            const saved = await handleSaveUnlockAt(unlockDraft);
-                            if (saved) {
-                              setIsEditingUnlock(false);
-                            }
-                          }}
-                          disabled={savingUnlock}
-                          className="px-4 py-2 text-sm font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
-                        >
-                          {savingUnlock ? "Saving..." : "Save"}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setUnlockDraft(unlockLocal);
-                            setIsEditingUnlock(false);
-                          }}
-                          disabled={savingUnlock}
-                          className="px-4 py-2 text-sm font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50 disabled:opacity-50"
-                        >
-                          Cancel
-                        </button>
-                        {formData?.unlockAt && (
-                          <button
-                            onClick={async () => {
-                              const saved = await handleSaveUnlockAt("");
-                              if (saved) {
-                                setUnlockDraft("");
-                                setUnlockLocal("");
-                                setIsEditingUnlock(false);
-                              }
-                            }}
-                            disabled={savingUnlock}
-                            className="px-4 py-2 text-sm font-semibold text-red-700 bg-white border-2 border-red-300 rounded-md hover:bg-red-50 disabled:opacity-50"
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </div>
-                    )}
-                    <p className="mt-1 text-xs text-gray-500"></p>
-                  </div>
-                </div>
-              </div>
-              <div className="relative z-20">
+        <div className="px-8 py-6">
+          {isEditingMeta ? (
+            <div className="max-w-2xl space-y-3">
+              <input
+                type="text"
+                value={metaName}
+                onChange={(e) => setMetaName(e.target.value)}
+                placeholder="Form title"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-2xl font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+              <textarea
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                placeholder="Form description (optional)"
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleSaveMeta}
+                  disabled={savingMeta}
+                  className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
+                >
+                  {savingMeta ? "Saving…" : "Save"}
+                </button>
                 <button
                   onClick={() => {
-                    if (formData?.isPublic) {
-                      setError(
-                        "Unpublish the modular form before adding new forms",
-                      );
-                      return;
-                    }
-                    setShowModal(true);
+                    setMetaName(formData?.name || "");
+                    setMetaDescription(formData?.description || "");
+                    setIsEditingMeta(false);
                   }}
-                  disabled={formData?.isPublic}
-                  className="px-6 py-2 font-semibold bg-amber-500 text-white rounded hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={savingMeta}
+                  className="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                 >
-                  + Add New Form
+                  Cancel
                 </button>
-                {!isEditingMeta && (
-                  <button
-                    onClick={() => setIsEditingMeta(true)}
-                    className="mt-2 w-full px-5 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-md hover:bg-amber-600 transition-all"
-                  >
-                    Edit details
-                  </button>
-                )}
-                <button
-                  onClick={openProfileAccessModal}
-                  className="mt-2 w-full px-5 py-2.5 bg-amber-500 text-white text-sm font-semibold rounded-md hover:bg-amber-600 transition-all"
-                >
-                  Profile Access
-                </button>
-                {profileConditions.length > 0 && (
-                  <p className="mt-2 text-xs text-gray-500 text-right">
-                    {profileConditions.length} profile rule
-                    {profileConditions.length === 1 ? "" : "s"} configured
-                  </p>
-                )}
-                {formData?.isPublic && (
-                  <p className="mt-2 text-xs text-gray-500 text-right">
-                    Unpublish to add questions
-                  </p>
-                )}
-
-
-
-                {formData?.isPublic && (
-                  <p className="mt-2 text-xs text-gray-500 text-right">
-                    Unpublish to add forms
-                  </p>
-                )}
               </div>
             </div>
-            {formData?.description && (
-              <p className="text-gray-600 text-lg mt-2">
-                {formData.description}
-              </p>
-            )}
-
-            {/* Sub-forms section*/}
-
-            <div className="mt-12">
-              {loading ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">Loading forms...</p>
+          ) : (
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-3xl font-bold text-gray-900 tracking-tight truncate">
+                    {formData?.name || "Untitled Form"}
+                  </h1>
+                  <button
+                    onClick={() => setIsEditingMeta(true)}
+                    title="Edit title and description"
+                    className="flex-shrink-0 p-1.5 text-gray-400 hover:text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.414.586H9v-2a2 2 0 01.586-1.414z" />
+                    </svg>
+                  </button>
                 </div>
-              ) : subForms.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg mb-4">No forms</p>
+                {formData?.description && (
+                  <p className="mt-1 text-gray-500 text-base">{formData.description}</p>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <StatusPill status={status} />
+                <button
+                  onClick={() => handleTogglePublic(!formData?.isPublic)}
+                  disabled={savingVisibility}
+                  className={`px-4 py-2 text-sm font-semibold rounded-md border-2 disabled:opacity-50 transition-colors ${
+                    formData?.isPublic
+                      ? "bg-white text-amber-800 border-amber-400 hover:bg-amber-50"
+                      : "bg-amber-500 text-white border-amber-500 hover:bg-amber-600"
+                  }`}
+                >
+                  {savingVisibility ? "Saving…" : formData?.isPublic ? "Unpublish" : "Publish"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* SETTINGS*/}
+        <div className="px-8 py-5 bg-gray-50">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
+            Settings
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            {/* Unlock Date  */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-gray-800">Unlock Date</span>
+                {formData?.unlockAt ? (
+                  <StatusPill status={new Date(formData.unlockAt).getTime() > Date.now() ? "Scheduled" : "Unlocked"} />
+                ) : (
+                  <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-500 border-gray-200">None</span>
+                )}
+              </div>
+
+              {!isEditingUnlock ? (
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600">
+                    {formData?.unlockAt
+                      ? new Date(formData.unlockAt).toLocaleString()
+                      : "No unlock date set"}
+                  </p>
+                  {!formData?.isPublic ? (
+                    <button
+                      onClick={() => { setUnlockDraft(unlockLocal); setIsEditingUnlock(true); }}
+                      className="px-2 py-1 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Configure
+                    </button>
+                  ) : (
+                    <span className="ml-3 text-xs text-gray-400 italic">Unpublish to edit</span>
+                  )}
                 </div>
               ) : (
-                <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                  {subForms.map((form) => (
-                    <div
-                      key={form.id}
-                      onClick={() =>
-                        navigate({
-                          to: "/form-builder/$formId",
-                          params: { formId: form.id.toString() },
-                        })
-                      }
-                      className="group p-6 bg-white rounded-xl border border-gray-200 
-                                hover:border-amber-400 hover:shadow-md 
-                                transition-all cursor-pointer"
+                <div className="space-y-2 mt-1">
+                  <input
+                    ref={unlockInputRef}
+                    type="datetime-local"
+                    min={getNowLocalDateTimeValue()}
+                    value={unlockDraft}
+                    onChange={(e) => setUnlockDraft(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => { const ok = await handleSaveUnlockAt(unlockDraft); if (ok) setIsEditingUnlock(false); }}
+                      disabled={savingUnlock}
+                      className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
                     >
-                      <div className="flex flex-col h-full">
-                        {/* Header */}
-                        <div className="flex items-start justify-between">
-                          <h3 className="text-xl font-semibold text-gray-800 mb-1 group-hover:text-amber-700">
-                            {form.name}
-                          </h3>
-
-                          <div
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex items-center gap-2"
-                          >
-                            <button
-                              onClick={() => handleToggleVisibility(form)}
-                              className={`
-                                relative inline-flex h-6 w-11 items-center rounded-full
-                                transition-colors
-                                ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}
-                              `}
-                            >
-                              <span
-                                className={`
-                                  inline-block h-4 w-4 transform rounded-full bg-white
-                                  transition-transform
-                                  ${form.isPublic ? "translate-x-6" : "translate-x-1"}
-                                `}
-                              />
-                            </button>
-
-                            <span className="text-sm text-gray-700">
-                              {form.isPublic ? "Public" : "Private"}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        <div className="flex-1 mt-2">
-                          <p className="text-gray-600 mb-4 line-clamp-3">
-                            {form.description || "No description"}
-                          </p>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                          <p className="text-sm text-gray-500">
-                            Created{" "}
-                            {new Date(form.createdAt).toLocaleDateString()}
-                          </p>
-
-                          {/* Dropdown */}
-                          <div
-                            className="relative"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <button
-                              onClick={() =>
-                                setOpenMenuId(
-                                  openMenuId === form.id ? null : form.id,
-                                )
-                              }
-                              className="p-2 rounded-full hover:bg-gray-100 transition"
-                            >
-                              <svg
-                                className="w-5 h-5 text-gray-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M12 6h.01M12 12h.01M12 18h.01"
-                                />
-                              </svg>
-                            </button>
-
-                            {openMenuId === form.id && (
-                              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
-                                <button
-                                  onClick={() =>
-                                    navigate({
-                                      to: "/form-builder/$formId",
-                                      params: { formId: form.id.toString() },
-                                    })
-                                  }
-                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                                >
-                                  Edit
-                                </button>
-
-                                <button
-                                  onClick={() =>
-                                    navigate({
-                                      to: "/form-builder/modular-forms/$mId/conditions/$formId",
-                                      params: {
-                                        mId: moduleId,
-                                        formId: form.id.toString(),
-                                      },
-                                    })
-                                  }
-                                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                                >
-                                  Conditions
-                                </button>
-
-                                <button
-                                  onClick={() => handleDeleteForm(form.id)}
-                                  className="w-full text-left px-4 py-2 text-sm text-red-900 hover:bg-red-50"
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      {savingUnlock ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      onClick={() => { setUnlockDraft(unlockLocal); setIsEditingUnlock(false); }}
+                      disabled={savingUnlock}
+                      className="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    {formData?.unlockAt && (
+                      <button
+                        onClick={async () => { const ok = await handleSaveUnlockAt(""); if (ok) { setUnlockDraft(""); setUnlockLocal(""); setIsEditingUnlock(false); }}}
+                        disabled={savingUnlock}
+                        className="px-3 py-1.5 text-xs font-semibold text-red-700 bg-white border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
 
-            {isProfileAccessModalOpen && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-              <div
-                role="dialog"
-                className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-              >
-                <div className="p-6 border-b border-gray-200">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Profile Access Conditions
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Allow access only to users whose profile matches the selected
-                    values. If no rules are set, everyone can access the form.
-                  </p>
-                </div>
-
-                <div className="p-6 space-y-5">
-                  <div className="grid gap-4 md:grid-cols-[200px,1fr] md:items-start">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">
-                        Profile Field
-                      </label>
-                      <select
-                        value={profileField}
-                        onChange={(e) => {
-                          const nextField = e.target.value as
-                            | "faculty"
-                            | "program"
-                            | "isMcmasterStudent";
-                          setProfileField(nextField);
-                          setIsProfileValueDropdownOpen(false);
-                          loadProfileConditionDraft(nextField);
-                        }}
-                        disabled={formData?.isPublic || savingProfileCondition}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white"
-                      >
-                        <option value="faculty">Faculty</option>
-                        <option value="program">Program</option>
-                        <option value="isMcmasterStudent">McMaster Student</option>
-                      </select>
-                    </div>
-
-                    <div ref={profileValueDropdownRef}>
-                      <label className="block text-sm font-medium text-gray-900 mb-2">
-                        Allowed Values
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setIsProfileValueDropdownOpen((prev) => !prev)
-                        }
-                        disabled={formData?.isPublic || savingProfileCondition}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-left flex items-center justify-between disabled:opacity-50"
-                      >
-                        <span className="truncate pr-4 text-gray-700">
-                          {selectedProfileValues.length > 0
-                            ? selectedProfileValues.join(", ")
-                            : "Select one or more values"}
-                        </span>
-                        <span className="text-gray-400">▾</span>
-                      </button>
-
-                      {isProfileValueDropdownOpen && (
-                        <div className="mt-2 rounded-md border border-gray-200 bg-white shadow-lg">
-                          <div className="max-h-64 overflow-y-auto p-2 space-y-1">
-                            {PROFILE_VALUE_OPTIONS[profileField].map(
-                              (valueOption) => {
-                                const checked =
-                                  selectedProfileValues.includes(valueOption);
-
-                                return (
-                                  <label
-                                    key={valueOption}
-                                    className="flex items-start gap-3 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={checked}
-                                      onChange={() =>
-                                        toggleProfileValue(valueOption)
-                                      }
-                                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
-                                    />
-                                    <span>{valueOption}</span>
-                                  </label>
-                                );
-                              },
-                            )}
-                          </div>
-                          <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2">
-                            <button
-                              type="button"
-                              onClick={() => setSelectedProfileValues([])}
-                              className="text-xs font-semibold text-gray-600 hover:text-gray-900"
-                            >
-                              Clear
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setIsProfileValueDropdownOpen(false)}
-                              className="text-xs font-semibold text-amber-700 hover:text-amber-900"
-                            >
-                              Done
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 flex-wrap">
-                    <p className="text-xs text-gray-500">
-                      Select multiple faculties or programs to grant access to more
-                      than one profile group.
-                    </p>
-                    <button
-                      onClick={handleSaveProfileCondition}
-                      disabled={formData?.isPublic || savingProfileCondition}
-                      className="px-4 py-2 text-sm font-semibold rounded-md bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50"
-                    >
-                      {savingProfileCondition ? "Saving..." : "Save Condition"}
-                    </button>
-                  </div>
-
-                  {formData?.isPublic && (
-                    <p className="text-sm text-gray-500">
-                      Unpublish the form before modifying profile access rules.
-                    </p>
-                  )}
-
-                  <div className="space-y-2">
-                    {profileConditions.length === 0 ? (
-                      <p className="text-sm text-gray-600">
-                        No profile conditions set.
-                      </p>
-                    ) : (
-                      profileConditions.map((condition) => (
-                        <div
-                          key={condition.id}
-                          className="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2"
-                        >
-                          <p className="text-sm text-gray-800">
-                            <span className="font-semibold">
-                              {PROFILE_FIELD_LABELS[condition.profileField] ??
-                                condition.profileField}
-                            </span>{" "}
-                            must be one of: {condition.expectedValue}
-                          </p>
-                          <button
-                            onClick={() =>
-                              handleDeleteProfileCondition(condition.id)
-                            }
-                            disabled={formData?.isPublic}
-                            className="px-2.5 py-1.5 text-xs font-semibold text-red-700 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-6 border-t border-gray-200 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={closeProfileAccessModal}
-                    className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-                  >
-                    Close
-                  </button>
-                </div>
+            {/* Profile Access card */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-gray-800">Profile Access</span>
+                {profileConditions.length > 0 ? (
+                  <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200">
+                    {profileConditions.length} rule{profileConditions.length !== 1 && "s"}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-500 border-gray-200">Open</span>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-600">
+                  {profileConditions.length === 0
+                    ? "All users can access this form"
+                    : profileConditions.map(c => `${PROFILE_FIELD_LABELS[c.profileField]}: ${c.expectedValue}`).join(" · ")}
+                </p>
+                <button
+                  onClick={openProfileAccessModal}
+                  className="px-2 py-1 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {profileConditions.length > 0 ? "Edit" : "Configure"}
+                </button>
               </div>
             </div>
-          )}
 
-            {/* Add Form Modal */}
-            {showModal && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 border-2 border-amber-500">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
-                    Create New Form
-                  </h3>
+          </div>
+        </div>
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Form Name
-                      </label>
-                      <input
-                        type="text"
-                        value={newFormName}
-                        onChange={(e) => setNewFormName(e.target.value)}
-                        placeholder="Enter form name"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                      />
+        {/* FORMS SECTION */}
+        <div className="px-8 py-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Forms</h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {subForms.length === 0 ? "No forms yet" : `${subForms.length} form${subForms.length !== 1 ? "s" : ""}`}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                if (formData?.isPublic) {
+                  showAlert("Unpublish the modular form before adding new forms");
+                  return;
+                }
+                setShowModal(true);
+              }}
+              disabled={formData?.isPublic}
+              className="px-4 py-2 text-sm font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              + Add Form
+            </button>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-400 text-sm">Loading forms…</p>
+            </div>
+          ) : subForms.length === 0 ? (
+            <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+              <p className="text-gray-400 text-sm">No forms added yet. Click "+ Add Form" to get started.</p>
+            </div>
+          ) : (
+            <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {subForms.map((form) => (
+                <div
+                  key={form.id}
+                  onClick={() => navigate({ to: "/form-builder/$formId", params: { formId: form.id.toString() } })}
+                  className="group p-5 bg-white rounded-xl border border-gray-200 hover:border-amber-400 hover:shadow-md transition-all cursor-pointer"
+                >
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-base font-semibold text-gray-800 group-hover:text-amber-700 leading-snug">
+                        {form.name}
+                      </h3>
+                      <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-2 ml-2 flex-shrink-0">
+                        <button
+                          onClick={() => handleToggleVisibility(form)}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${form.isPublic ? "bg-amber-500" : "bg-gray-300"}`}
+                        >
+                          <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${form.isPublic ? "translate-x-5" : "translate-x-1"}`} />
+                        </button>
+                      </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Description
-                      </label>
-                      <textarea
-                        value={newFormDescription}
-                        onChange={(e) => setNewFormDescription(e.target.value)}
-                        placeholder="Enter form description"
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none"
-                      />
-                    </div>
-                  </div>
+                    <p className="mt-2 text-sm text-gray-500 flex-1 line-clamp-2">
+                      {form.description || "No description"}
+                    </p>
 
-                  <div className="flex gap-3 mt-6">
-                    <button
-                      onClick={() => {
-                        setShowModal(false);
-                        setNewFormName("");
-                        setNewFormDescription("");
-                      }}
-                      disabled={submitting}
-                      className="flex-1 px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors font-semibold disabled:opacity-50"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handleAddForm}
-                      disabled={submitting}
-                      className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-semibold disabled:opacity-50"
-                    >
-                      {submitting ? "Creating..." : "Create Form"}
-                    </button>
+                    <div className="flex items-center justify-between pt-3 mt-3 border-t border-gray-100">
+                      <p className="text-xs text-gray-400">
+                        {new Date(form.createdAt).toLocaleDateString()}
+                      </p>
+                      <div className="relative" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => setOpenMenuId(openMenuId === form.id ? null : form.id)}
+                          className="p-1.5 rounded-full hover:bg-gray-100 transition"
+                        >
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6h.01M12 12h.01M12 18h.01" />
+                          </svg>
+                        </button>
+                        {openMenuId === form.id && (
+                          <div className="absolute right-0 mt-1 w-36 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                            <button
+                              onClick={() => navigate({ to: "/form-builder/$formId", params: { formId: form.id.toString() } })}
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                            >Edit</button>
+                            <button
+                              onClick={() => navigate({ to: "/form-builder/modular-forms/$mId/conditions/$formId", params: { mId: moduleId, formId: form.id.toString() } })}
+                              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
+                            >Conditions</button>
+                            <button
+                              onClick={() => handleDeleteForm(form.id)}
+                              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                            >Delete</button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+      </div>
+    </div>
+
+    {isProfileAccessModalOpen && (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div role="dialog" className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-xl font-semibold text-gray-900">Profile Access Conditions</h3>
+            <p className="text-sm text-gray-500 mt-1">
+              Allow access only to users whose profile matches the selected values. If no rules are set, everyone can access the form.
+            </p>
+          </div>
+          <div className="p-6 space-y-5">
+            <div className="grid gap-4 md:grid-cols-[200px,1fr] md:items-start">
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">Profile Field</label>
+                <select
+                  value={profileField}
+                  onChange={(e) => {
+                    const nextField = e.target.value as "faculty" | "program" | "isMcmasterStudent";
+                    setProfileField(nextField);
+                    setIsProfileValueDropdownOpen(false);
+                    loadProfileConditionDraft(nextField);
+                  }}
+                  disabled={formData?.isPublic || savingProfileCondition}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white"
+                >
+                  <option value="faculty">Faculty</option>
+                  <option value="program">Program</option>
+                  <option value="isMcmasterStudent">McMaster Student</option>
+                </select>
               </div>
-            )}
+              <div ref={profileValueDropdownRef}>
+                <label className="block text-sm font-medium text-gray-900 mb-2">Allowed Values</label>
+                <button
+                  type="button"
+                  onClick={() => setIsProfileValueDropdownOpen((prev) => !prev)}
+                  disabled={formData?.isPublic || savingProfileCondition}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-left flex items-center justify-between disabled:opacity-50"
+                >
+                  <span className="truncate pr-4 text-gray-700">
+                    {selectedProfileValues.length > 0 ? selectedProfileValues.join(", ") : "Select one or more values"}
+                  </span>
+                  <span className="text-gray-400">▾</span>
+                </button>
+                {isProfileValueDropdownOpen && (
+                  <div className="mt-2 rounded-md border border-gray-200 bg-white shadow-lg">
+                    <div className="max-h-64 overflow-y-auto p-2 space-y-1">
+                      {PROFILE_VALUE_OPTIONS[profileField].map((valueOption) => (
+                        <label key={valueOption} className="flex items-start gap-3 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={selectedProfileValues.includes(valueOption)}
+                            onChange={() => toggleProfileValue(valueOption)}
+                            className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                          />
+                          <span>{valueOption}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2">
+                      <button type="button" onClick={() => setSelectedProfileValues([])} className="text-xs font-semibold text-gray-600 hover:text-gray-900">Clear</button>
+                      <button type="button" onClick={() => setIsProfileValueDropdownOpen(false)} className="text-xs font-semibold text-amber-700 hover:text-amber-900">Done</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-xs text-gray-500">Select multiple values to grant access to more than one profile group.</p>
+              <button
+                onClick={handleSaveProfileCondition}
+                disabled={formData?.isPublic || savingProfileCondition}
+                className="px-4 py-2 text-sm font-semibold rounded-md bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50"
+              >
+                {savingProfileCondition ? "Saving…" : "Save Condition"}
+              </button>
+            </div>
+            {formData?.isPublic && <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">Unpublish the form before modifying profile access rules.</p>}
+            <div className="space-y-2">
+              {profileConditions.length === 0 ? (
+                <p className="text-sm text-gray-500">No profile conditions set.</p>
+              ) : profileConditions.map((condition) => (
+                <div key={condition.id} className="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2">
+                  <p className="text-sm text-gray-800">
+                    <span className="font-semibold">{PROFILE_FIELD_LABELS[condition.profileField] ?? condition.profileField}</span>{" "}
+                    must be one of: {condition.expectedValue}
+                  </p>
+                  <button
+                    onClick={() => handleDeleteProfileCondition(condition.id)}
+                    disabled={formData?.isPublic}
+                    className="px-2.5 py-1.5 text-xs font-semibold text-red-700 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
+                  >Delete</button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="p-6 border-t border-gray-200 flex justify-end">
+            <button type="button" onClick={closeProfileAccessModal} className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Close</button>
           </div>
         </div>
       </div>
-    </AdminLayout>
-  );
+    )}
+
+    {showModal && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 border-2 border-amber-400">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Create New Form</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Form Name</label>
+              <input
+                type="text"
+                value={newFormName}
+                onChange={(e) => setNewFormName(e.target.value)}
+                placeholder="Enter form name"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+              <textarea
+                value={newFormDescription}
+                onChange={(e) => setNewFormDescription(e.target.value)}
+                placeholder="Enter form description (optional)"
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 resize-none"
+              />
+            </div>
+          </div>
+          <div className="flex gap-3 mt-6">
+            <button
+              onClick={() => { setShowModal(false); setNewFormName(""); setNewFormDescription(""); }}
+              disabled={submitting}
+              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors font-semibold disabled:opacity-50"
+            >Cancel</button>
+            <button
+              onClick={handleAddForm}
+              disabled={submitting}
+              className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors font-semibold disabled:opacity-50"
+            >
+              {submitting ? "Creating…" : "Create Form"}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+  </AdminLayout>
+);
 }
