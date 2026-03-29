@@ -34,7 +34,7 @@ function StatusPill({ status }: { status: FormStatus }) {
     Live: "bg-green-50 text-green-700 border-green-200",
     Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
     Unlocked: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    Modular : "bg-blue-50 text-gray-700 border-grey-200"
+    Modular: "bg-blue-50 text-gray-700 border-grey-200",
   };
 
   return <span className={`${base} ${styles[status]}`}>{status}</span>;
@@ -100,12 +100,14 @@ function RouteComponent() {
         throw new Error(data.error || "Failed to fetch forms");
       }
       const modFormData = await modFormsResponse.json();
-      const modForms = modFormData.data;
-      modForms.forEach(form => {
-        form.isModular = true;
-      });
       if (modFormData.success) {
-        allForms = allForms.concat(modFormData.data);
+        const modForms = Array.isArray(modFormData.data)
+          ? modFormData.data
+          : [];
+        modForms.forEach((form) => {
+          form.isModular = true;
+        });
+        allForms = allForms.concat(modForms);
       } else {
         throw new Error(modFormData.error || "Failed to fetch forms");
       }
@@ -205,7 +207,7 @@ function RouteComponent() {
   };
 
   const checkFormIsModular = (form) => {
-    return form.moduleId === undefined;
+    return form?.isModular === true || form.moduleId === undefined;
   };
 
   const handleClickForm = (form) => {
@@ -340,9 +342,8 @@ function RouteComponent() {
                             {new Date(form.createdAt).toLocaleDateString()}
                           </p>
                           <div className="mt-2 flex flex-wrap items-center gap-2">
-
                             <StatusPill status={getFormStatus(form)} />
-                            {form.isModular && <StatusPill status="Modular"/>}
+                            {form.isModular && <StatusPill status="Modular" />}
 
                             {form.unlockAt &&
                               getFormStatus(form) === "Scheduled" && (
@@ -380,8 +381,6 @@ function RouteComponent() {
                                 <span className="text-sm text-gray-700">
                                   {form.isPublic ? "Public" : "Private"}
                                 </span>
-
-                                 
                               </div>
                             )}
                           </div>

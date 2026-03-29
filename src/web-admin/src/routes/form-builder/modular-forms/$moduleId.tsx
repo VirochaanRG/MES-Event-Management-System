@@ -470,6 +470,12 @@ function RouteComponent() {
       return;
     }
 
+    const moduleIdNum = Number(moduleId);
+    if (Number.isNaN(moduleIdNum)) {
+      setError("Invalid modular form id");
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError(null);
@@ -482,7 +488,7 @@ function RouteComponent() {
         body: JSON.stringify({
           name: newFormName.trim(),
           description: newFormDescription.trim() || null,
-          moduleId: moduleId,
+          moduleId: moduleIdNum,
           isPublic: false,
         }),
       });
