@@ -14,11 +14,21 @@
     },
     "android": {
       "package": "com.largeevent.teamd",
-      "permissions": ["CAMERA"],
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
       "usesCleartextTraffic": true
     },
     "plugins": [
       "expo-camera"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "450aefbd-c740-4884-bc99-912aee1b31e3"
+      }
+    },
+    "owner": "omartest"
   }
 }

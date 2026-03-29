@@ -283,9 +283,7 @@ export function AdminEventsScreen() {
     } catch (err: any) {
       const serverMsg =
         err?.response?.data?.error || err?.response?.data?.message;
-      if (serverMsg?.toLowerCase().includes("already")) {
-        Alert.alert("Already Checked In", serverMsg);
-      } else if (serverMsg) {
+      if (serverMsg) {
         Alert.alert("Check-in Failed", serverMsg);
       } else {
         Alert.alert("Error", "Failed to check in. Please try again.");
@@ -423,12 +421,7 @@ export function AdminEventsScreen() {
                               eventId: r.eventId ?? r.event_id ?? event.id,
                               userEmail: r.userEmail ?? r.user_email,
                               instance: r.instance ?? 0,
-                              checkedIn:
-                                registeredUsersMap[event.id]?.find(
-                                  (u: RegisteredUser) =>
-                                    u.userEmail ===
-                                    (r.userEmail ?? r.user_email),
-                                )?.checkedIn ?? false,
+                              checkedIn: r.status === 'attended',
                             }));
                             setRegisteredUsersMap((prev) => ({
                               ...prev,
