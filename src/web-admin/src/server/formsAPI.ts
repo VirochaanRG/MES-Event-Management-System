@@ -6,6 +6,28 @@ import { and, eq, isNull, sql } from 'drizzle-orm';
 
 export default async function formsRoutes(fastify: FastifyInstance)
 {
+  const syncSharedFormIdSequence = async () =>
+  {
+    await db.execute(sql`
+      SELECT setval(
+        'shared_form_id_seq',
+        GREATEST(
+          COALESCE((SELECT MAX(id) FROM form), 0),
+          COALESCE((SELECT MAX(id) FROM modular_forms), 0)
+        ) + 1,
+        false
+      )
+    `);
+  };
+
+  const isFormPrimaryKeyCollision = (error: unknown) =>
+  {
+    const pgError = error as { code?: string; constraint?: string };
+    if (pgError?.code !== '23505') return false;
+
+    return pgError.constraint === 'form_pkey' || pgError.constraint === 'modular_forms_pkey';
+  };
+
   // GET all standard forms
   fastify.get('/api/forms', async (request, reply) =>
   {
@@ -216,23 +238,42 @@ export default async function formsRoutes(fastify: FastifyInstance)
         });
       }
 
-      const newForm = isModular ?
-        await db
-          .insert(modularForms)
-          .values({
-            name: name.trim(),
-            description: description?.trim() || null,
-          })
-        : await db
-          .insert(form)
-          .values({
-            name: name.trim(),
-            description: description?.trim() || null,
-            moduleId: moduleId,
-            isPublic: isPublic ?? false,
-            unlockAt: parsedUnlockAt,
-          })
-          .returning();
+      const insertForm = async () =>
+      {
+        return isModular ?
+          db
+            .insert(modularForms)
+            .values({
+              name: name.trim(),
+              description: description?.trim() || null,
+            })
+            .returning()
+          : db
+            .insert(form)
+            .values({
+              name: name.trim(),
+              description: description?.trim() || null,
+              moduleId: moduleId,
+              isPublic: isPublic ?? false,
+              unlockAt: parsedUnlockAt,
+            })
+            .returning();
+      };
+
+      await syncSharedFormIdSequence();
+
+      let newForm;
+      try
+      {
+        newForm = await insertForm();
+      } catch (error)
+      {
+        if (!isFormPrimaryKeyCollision(error)) throw error;
+
+        // Handles rare race/drift cases by advancing the shared sequence and retrying once.
+        await syncSharedFormIdSequence();
+        newForm = await insertForm();
+      }
 
       return reply.code(201).send({
         success: true,
@@ -494,7 +535,7 @@ export default async function formsRoutes(fastify: FastifyInstance)
         });
       }
 
-      await db.delete(modularForms).where(eq(form.id, parseInt(id)));
+      await db.delete(modularForms).where(eq(modularForms.id, parseInt(id)));
 
       return reply.send({
         success: true,
