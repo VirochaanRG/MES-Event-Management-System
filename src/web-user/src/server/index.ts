@@ -7,7 +7,7 @@ import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import { db } from '../../../db/src/db';
 import { events, registeredUsers } from '../../../db/src/schemas/events';
-import { profiles, users } from '../../../db/src/schemas/users';
+import { profiles, users, pushTokens } from '../../../db/src/schemas/users';
 import { eq, and, sql, max, ne } from 'drizzle-orm';
 import type { InferSelectModel } from 'drizzle-orm';
 import { qrCodes } from '@db/schemas';
@@ -1575,6 +1575,35 @@ fastify.delete<{
       success: false,
       error: 'Failed to deregister from event',
     });
+  }
+});
+
+// POST /api/user/push-token — register or update a device push token
+fastify.post<{ Body: { email: string; token: string } }>('/api/user/push-token', async (request, reply) =>
+{
+  try
+  {
+    const { email, token } = request.body;
+    if (!email?.trim() || !token?.trim())
+    {
+      return reply.code(400).send({ success: false, error: 'email and token are required' });
+    }
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Upsert: update email if token already exists (device re-login), otherwise insert
+    await db
+      .insert(pushTokens)
+      .values({ userEmail: normalizedEmail, token: token.trim() })
+      .onConflictDoUpdate({
+        target: pushTokens.token,
+        set: { userEmail: normalizedEmail, updatedAt: new Date() },
+      });
+
+    return reply.send({ success: true });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Failed to register push token');
+    return reply.code(500).send({ success: false, error: 'Failed to register push token' });
   }
 });
 

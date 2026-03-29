@@ -1,7 +1,35 @@
 import { FastifyInstance } from 'fastify';
 import { db } from '../../../db/src/db';
-import { eq } from 'drizzle-orm';
-import { announcements, events } from '../../../db/src/schemas/events';
+import { eq, and, inArray } from 'drizzle-orm';
+import { announcements, events, registeredUsers } from '../../../db/src/schemas/events';
+import { pushTokens } from '../../../db/src/schemas/users';
+
+async function sendExpoPushNotifications(tokens: string[], title: string, body: string)
+{
+  if (tokens.length === 0) return;
+  // Expo push API accepts batches of up to 100
+  const BATCH_SIZE = 100;
+  for (let i = 0; i < tokens.length; i += BATCH_SIZE)
+  {
+    const batch = tokens.slice(i, i + BATCH_SIZE).map(to => ({
+      to,
+      title,
+      body,
+      sound: 'default',
+    }));
+    try
+    {
+      await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(batch),
+      });
+    } catch (err)
+    {
+      console.error('Failed to send Expo push batch', err);
+    }
+  }
+}
 
 export default async function announcementsRoutes(fastify: FastifyInstance)
 {
@@ -71,6 +99,48 @@ export default async function announcementsRoutes(fastify: FastifyInstance)
         .insert(announcements)
         .values({ title: title.trim(), body: body.trim(), eventId: eventId ?? null })
         .returning();
+
+      // Send push notifications to relevant users (fire-and-forget)
+      (async () =>
+      {
+        try
+        {
+          let targetEmails: string[];
+          if (eventId != null)
+          {
+            // Event-specific: notify users registered (paid) for this event
+            const registrations = await db.query.registeredUsers.findMany({
+              where: and(
+                eq(registeredUsers.eventId, eventId),
+                eq(registeredUsers.paymentStatus, 'paid'),
+              ),
+              columns: { userEmail: true },
+            });
+            targetEmails = registrations.map(r => r.userEmail);
+          } else
+          {
+            // General announcement: notify all users with registered tokens
+            const allTokens = await db.query.pushTokens.findMany({
+              columns: { token: true },
+            });
+            const tokens = allTokens.map(t => t.token);
+            await sendExpoPushNotifications(tokens, created.title, created.body);
+            return;
+          }
+
+          if (targetEmails.length > 0)
+          {
+            const tokenRows = await db.query.pushTokens.findMany({
+              where: inArray(pushTokens.userEmail, targetEmails),
+              columns: { token: true },
+            });
+            await sendExpoPushNotifications(tokenRows.map(t => t.token), created.title, created.body);
+          }
+        } catch (err)
+        {
+          console.error('Push notification dispatch error', err);
+        }
+      })();
 
       return reply.code(201).send({ success: true, data: created });
     } catch (error)

@@ -26,9 +26,10 @@ function RouteComponent() {
   const showConfirm = useCustomConfirm();
   const { user } = useAuth();
   const { formId } = Route.useParams();
-  const userId = JSON.parse(
-    sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
-  ).email;
+  const userId =
+    user?.email ??
+    JSON.parse(sessionStorage.getItem("teamd-auth-user") ?? '{"email":""}')
+      .email;
   const [form, setForm] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -286,7 +287,7 @@ function RouteComponent() {
               !r.answer ||
               !r.answer.answer ||
               (r.question.questionType === "multi_select" && Array.isArray(r.answer.answer) && 
-              r.answer.answer.length < JSON.parse(r.question.optionsCategory ?? "{min:0}").min)
+              r.answer.answer.length < (r.question.optionsCategory ? JSON.parse(r.question.optionsCategory).min ?? 0 : 0))
           )
       ) {
         toast.error("Please fill in all required fields");

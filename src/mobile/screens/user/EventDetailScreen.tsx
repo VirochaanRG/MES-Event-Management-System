@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, useNavigation } from "@react-navigation/native";
@@ -70,7 +71,22 @@ export function EventDetailScreen() {
       await userApi.generateEventQR(eventId, registrationId, user.email);
       setIsRegistered(true);
     } catch (err: any) {
-      console.warn("[EventDetail] Registration error", err);
+      if (err?.response?.status === 403) {
+        Alert.alert(
+          "Profile Required",
+          "Please complete your profile before registering for events.",
+          [
+            { text: "Cancel", style: "cancel" },
+            {
+              text: "Complete Profile",
+              onPress: () => navigation.getParent()?.navigate("Profile"),
+            },
+          ],
+        );
+      } else {
+        console.warn("[EventDetail] Registration error", err);
+        Alert.alert("Registration Failed", err?.response?.data?.error ?? "Could not register for this event.");
+      }
     } finally {
       setRegistering(false);
     }

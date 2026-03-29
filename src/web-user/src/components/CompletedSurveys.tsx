@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Form } from "@/interfaces/interfaces";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ModularForm {
   id: number;
@@ -13,9 +14,11 @@ interface ModularForm {
 
 export default function CompletedSurveys() {
   const navigate = useNavigate();
-  const userId = JSON.parse(
-    sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
-  ).email;
+  const { user } = useAuth();
+  const userId =
+    user?.email ??
+    JSON.parse(sessionStorage.getItem("teamd-auth-user") ?? '{"email":""}')
+      .email;
 
   const {
     data: formData,

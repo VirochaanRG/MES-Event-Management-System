@@ -235,13 +235,17 @@ export default async function eventsRoutes(fastify: FastifyInstance)
           .where(
             and(
               eq(registeredUsers.status, 'confirmed'),
+              eq(registeredUsers.eventId, parseInt(id)),
               inArray(
                 registeredUsers.id,
                 db
                   .select({ id: qrCodes.id })
                   .from(qrCodes)
                   .where(
-                    eq(qrCodes.content, registrationHash)
+                    and(
+                      eq(qrCodes.content, registrationHash),
+                      eq(qrCodes.eventId, parseInt(id))
+                    )
                   )
               )
             )

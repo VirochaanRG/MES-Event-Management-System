@@ -12,6 +12,13 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const pushTokens = pgTable("push_tokens", {
+  id: serial("id").primaryKey(),
+  userEmail: varchar("user_email", { length: 255 }).notNull(),
+  token: varchar("token", { length: 500 }).notNull().unique(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const profiles = pgTable("profiles", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")

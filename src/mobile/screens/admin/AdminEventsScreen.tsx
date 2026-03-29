@@ -281,7 +281,6 @@ export function AdminEventsScreen() {
         `Attendee${email ? ` (${email})` : ""} checked in.`,
       );
     } catch (err: any) {
-      console.warn("[AdminEvents] QR check-in failed", err);
       const serverMsg =
         err?.response?.data?.error || err?.response?.data?.message;
       if (serverMsg?.toLowerCase().includes("already")) {

@@ -110,9 +110,20 @@ function mapQuestionFromApi(question: any) {
   let options = question.options;
   if (!options && question.optionsCategory) {
     try {
-      options = typeof question.optionsCategory === 'string'
+      const parsed = typeof question.optionsCategory === 'string'
         ? JSON.parse(question.optionsCategory)
         : question.optionsCategory;
+      if (Array.isArray(parsed)) {
+        options = parsed;
+      } else if (parsed && typeof parsed === 'object') {
+        if (Array.isArray(parsed.choices)) {
+          // multiple_choice / dropdown / multi_select: choices array
+          options = parsed.choices;
+        } else if (parsed.min != null && parsed.max != null) {
+          // linear_scale: store as [min, max] strings for the scale renderer
+          options = [String(parsed.min), String(parsed.max)];
+        }
+      }
     } catch {
       options = question.optionsCategory ? [question.optionsCategory] : null;
     }
@@ -130,26 +141,27 @@ function mapQuestionFromApi(question: any) {
   };
 }
 
-export async function getAvailableForms(userId: number) {
-  const response = await api.get(`/forms/available/${userId}`);
+export async function getAvailableForms(userEmail: string) {
+  const response = await api.get(`/forms/available/${encodeURIComponent(userEmail)}`);
   const forms = response.data.data ?? response.data;
   return Array.isArray(forms) ? forms.map(mapFormFromApi) : forms;
 }
 
-export async function getCompletedForms(userId: number) {
-  const response = await api.get(`/forms/completed/${userId}`);
+export async function getCompletedForms(userEmail: string) {
+  const response = await api.get(`/forms/completed/${encodeURIComponent(userEmail)}`);
   const forms = response.data.data ?? response.data;
   return Array.isArray(forms) ? forms.map(mapFormFromApi) : forms;
 }
 
-export async function getForm(formId: number) {
-  const response = await api.get(`/forms/${formId}`);
+export async function getForm(formId: number, userEmail?: string) {
+  const params = userEmail ? { uid: userEmail } : {};
+  const response = await api.get(`/forms/${formId}`, { params });
   const form = response.data.data ?? response.data;
   return mapFormFromApi(form);
 }
 
-export async function getFormStatus(formId: number, userId: number): Promise<FormStatus> {
-  const response = await api.get(`/forms/${formId}/status/${userId}`);
+export async function getFormStatus(formId: number, userEmail: string): Promise<FormStatus> {
+  const response = await api.get(`/forms/${formId}/status/${encodeURIComponent(userEmail)}`);
   const raw = response.data.data ?? response.data;
 
   if (typeof raw === 'string') {
@@ -164,33 +176,139 @@ export async function getFormStatus(formId: number, userId: number): Promise<For
   return { status: 'unfilled', submissionId: null };
 }
 
-export async function getFormQuestions(formId: number) {
-  const response = await api.get(`/forms/questions/${formId}`);
+export async function getFormQuestions(formId: number, userEmail?: string) {
+  const params = userEmail ? { uid: userEmail } : {};
+  const response = await api.get(`/forms/questions/${formId}`, { params });
   const questions = response.data.data ?? response.data;
   return Array.isArray(questions) ? questions.map(mapQuestionFromApi) : questions;
 }
 
-export async function getFormAnswers(formId: number, userId: number) {
-  const response = await api.get(`/forms/${formId}/answers/${userId}`);
+export async function getFormAnswers(formId: number, userEmail: string) {
+  const response = await api.get(`/forms/${formId}/answers/${encodeURIComponent(userEmail)}`);
   return response.data.data ?? response.data;
 }
 
-export async function saveFormAnswer(formId: number, userId: number, questionId: number, answer: any, questionType: string = 'text') {
-  const response = await api.post(`/forms/${formId}/answers/${userId}`, {
+export async function saveFormAnswer(formId: number, userEmail: string, questionId: number, answer: any, questionType: string = 'text') {
+  const response = await api.post(`/forms/${formId}/answers/${encodeURIComponent(userEmail)}`, {
     qid: String(questionId),
-    uid: String(userId),
+    uid: userEmail,
     answer: typeof answer === 'string' ? answer : JSON.stringify(answer),
     questionType,
   });
   return response.data.data ?? response.data;
 }
 
-export async function submitForm(formId: number, userId: number) {
-  const response = await api.patch(`/forms/${formId}/submit/${userId}`);
+export async function submitForm(formId: number, userEmail: string) {
+  const response = await api.patch(`/forms/${formId}/submit/${encodeURIComponent(userEmail)}`);
   return response.data.data ?? response.data;
 }
 
-export async function deleteFormSubmission(formId: number, userId: number) {
-  const response = await api.delete(`/forms/${formId}/delete/${userId}`);
+export async function deleteFormSubmission(formId: number, userEmail: string) {
+  const response = await api.delete(`/forms/${formId}/delete/${encodeURIComponent(userEmail)}`);
   return response.data.data ?? response.data;
+}
+
+// Modular Forms
+
+export interface ModularForm {
+  id: number;
+  title: string;
+  description: string | null;
+  createdAt: string;
+  isPublic: boolean;
+}
+
+export interface ModularFormPage {
+  id: number;
+  title: string;
+  description: string | null;
+  createdAt: string;
+  isPublic: boolean;
+  status: 'available' | 'completed' | 'locked';
+}
+
+function mapModularFormFromApi(mf: any): ModularForm {
+  return {
+    id: mf.id,
+    title: mf.name || mf.title,
+    description: mf.description ?? null,
+    createdAt: mf.createdAt || mf.created_at,
+    isPublic: mf.isPublic ?? mf.is_public ?? false,
+  };
+}
+
+export async function getAvailableModularForms(userEmail: string): Promise<ModularForm[]> {
+  const response = await api.get(`/mod-forms/available/${encodeURIComponent(userEmail)}`);
+  const forms = response.data.data ?? response.data;
+  return Array.isArray(forms) ? forms.map(mapModularFormFromApi) : [];
+}
+
+export async function getCompletedModularForms(userEmail: string): Promise<ModularForm[]> {
+  const response = await api.get(`/mod-forms/completed/${encodeURIComponent(userEmail)}`);
+  const forms = response.data.data ?? response.data;
+  return Array.isArray(forms) ? forms.map(mapModularFormFromApi) : [];
+}
+
+export async function getModularFormPages(modularFormId: number, userEmail: string): Promise<ModularFormPage[]> {
+  const response = await api.get(`/mod-forms/${modularFormId}/all/${encodeURIComponent(userEmail)}`);
+  const pages = response.data.data ?? response.data;
+  return Array.isArray(pages)
+    ? pages.map((p: any) => ({
+        id: p.id,
+        title: p.name || p.title,
+        description: p.description ?? null,
+        createdAt: p.createdAt || p.created_at,
+        isPublic: p.isPublic ?? p.is_public ?? false,
+        status: p.status ?? 'available',
+      }))
+    : [];
+}
+
+// Announcements
+
+export interface Announcement {
+  id: number;
+  title: string;
+  body: string;
+  eventId: number | null;
+  eventTitle: string | null;
+  createdAt: string;
+  read: boolean;
+}
+
+export async function getAnnouncements(userEmail: string): Promise<Announcement[]> {
+  const response = await api.get('/user/announcements', { params: { email: userEmail } });
+  return response.data.data ?? [];
+}
+
+export async function markAnnouncementsRead(userEmail: string, announcementIds: number[]): Promise<void> {
+  await api.post('/user/announcements/read', { email: userEmail, announcementIds });
+}
+
+// Push tokens
+
+export async function registerPushToken(userEmail: string, token: string): Promise<void> {
+  await api.post('/user/push-token', { email: userEmail, token });
+}
+
+// Profile
+
+export interface UserProfile {
+  id?: number;
+  userId?: number;
+  firstName: string;
+  lastName: string;
+  isMcmasterStudent: boolean;
+  faculty?: string | null;
+  program?: string | null;
+}
+
+export async function getProfile(userId: number): Promise<UserProfile | null> {
+  const response = await api.get(`/profiles/${userId}`);
+  return response.data.data ?? null;
+}
+
+export async function saveProfile(data: UserProfile & { userId: number }): Promise<UserProfile> {
+  const response = await api.post('/profiles', data);
+  return response.data.data;
 }

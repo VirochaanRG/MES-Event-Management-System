@@ -71,6 +71,20 @@
       "when": 1774735049242,
       "tag": "0009_nice_speed",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1743120000000,
+      "tag": "0010_push_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1774756744280,
+      "tag": "0011_empty_mole_man",
+      "breakpoints": true
     }
   ]
 }

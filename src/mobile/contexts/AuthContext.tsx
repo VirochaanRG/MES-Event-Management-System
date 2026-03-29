@@ -8,6 +8,7 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AuthUser, InstanceResponse } from "../types";
 import * as userApi from "../services/userApi";
+import { registerForPushNotifications } from "../services/notificationsService";
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -51,6 +52,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     loadAuth();
   }, []);
+
+  const syncPushToken = async (email: string) => {
+    try {
+      const token = await registerForPushNotifications();
+      if (token) {
+        await userApi.registerPushToken(email, token);
+      }
+    } catch {
+      // Non-fatal — notifications just won't work if this fails
+    }
+  };
 
   const login = async (email: string, password: string): Promise<void> => {
     const trimmed = email.trim();
@@ -102,10 +114,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     setUser(authUser);
     setToken(apiToken!);
-    // Update API client with the new token
     userApi.setToken(apiToken!);
     await AsyncStorage.setItem(STORAGE_USER_KEY, JSON.stringify(authUser));
     await AsyncStorage.setItem(STORAGE_TOKEN_KEY, apiToken!);
+    await syncPushToken(authUser.email);
   };
 
   const register = async (email: string, password: string): Promise<void> => {
@@ -133,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     userApi.setToken(apiToken);
     await AsyncStorage.setItem(STORAGE_USER_KEY, JSON.stringify(authUser));
     await AsyncStorage.setItem(STORAGE_TOKEN_KEY, apiToken);
+    await syncPushToken(authUser.email);
   };
 
   const logout = async (): Promise<void> => {

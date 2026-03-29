@@ -1,12 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Form } from "@/interfaces/interfaces";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function AvailableSurveys() {
   const navigate = useNavigate();
-  const userId = JSON.parse(
-    sessionStorage.getItem("teamd-auth-user") ?? '{"email" : ""}',
-  ).email;
+  const { user } = useAuth();
+  const userId =
+    user?.email ??
+    JSON.parse(sessionStorage.getItem("teamd-auth-user") ?? '{"email":""}')
+      .email;
 
   const {
     data: formData,

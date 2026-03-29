@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../contexts/AuthContext";
@@ -32,27 +33,21 @@ export function SurveyFormScreen() {
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+      if (!user) { setLoading(false); return; }
       try {
         const [f, qs, ans] = await Promise.all([
-          userApi.getForm(formId),
-          userApi.getFormQuestions(formId),
-          userApi.getFormAnswers(formId, user.id),
+          userApi.getForm(formId, user.email),
+          userApi.getFormQuestions(formId, user.email),
+          userApi.getFormAnswers(formId, user.email),
         ]);
         if (!cancelled) {
           setForm(f);
-          // Sort questions by their order field
           const sorted = qs
             .slice()
             .sort((a: FormQuestion, b: FormQuestion) => a.order - b.order);
           setQuestions(sorted);
           const ansMap: Record<number, any> = {};
-          ans.forEach((a: any) => {
-            ansMap[a.questionId] = a.answer;
-          });
+          ans.forEach((a: any) => { ansMap[a.questionId] = a.answer; });
           setAnswers(ansMap);
         }
       } catch (err: any) {
@@ -63,28 +58,31 @@ export function SurveyFormScreen() {
       }
     };
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [formId, user]);
 
   const handleChange = async (
     questionId: number,
     value: any,
-    questionType: string = "text",
+    questionType: string,
   ) => {
     setAnswers((prev) => ({ ...prev, [questionId]: value }));
     if (user) {
       try {
-        await userApi.saveFormAnswer(
-          formId,
-          user.id,
-          questionId,
-          value,
-          questionType,
-        );
-      } catch (err) {
-        console.warn("[SurveyFormScreen] Failed to save answer", err);
+        await userApi.saveFormAnswer(formId, user.email, questionId, value, questionType);
+      } catch (err: any) {
+        if (err?.response?.status === 403) {
+          Alert.alert(
+            "Profile Required",
+            "Please complete your profile before answering surveys.",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Complete Profile", onPress: () => navigation.getParent()?.navigate("Profile") },
+            ],
+          );
+        } else {
+          console.warn("[SurveyFormScreen] Failed to save answer", err);
+        }
       }
     }
   };
@@ -93,56 +91,88 @@ export function SurveyFormScreen() {
     if (!user) return;
     setSubmitting(true);
     try {
-      await userApi.submitForm(formId, user.id);
+      await userApi.submitForm(formId, user.email);
       navigation.goBack();
     } catch (err: any) {
-      console.warn("[SurveyFormScreen] Failed to submit form", err);
+      if (err?.response?.status === 403) {
+        Alert.alert(
+          "Profile Required",
+          "Please complete your profile before submitting surveys.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Complete Profile", onPress: () => navigation.getParent()?.navigate("Profile") },
+          ],
+        );
+      } else {
+        console.warn("[SurveyFormScreen] Failed to submit form", err);
+      }
     } finally {
       setSubmitting(false);
     }
   };
 
-  const shouldShowQuestion = (q: FormQuestion) => {
+  /**
+   * A question is visible when it has no parent, or when the parent's selected
+   * answer matches one of the enabling answer indices (stored as numbers in the DB).
+   */
+  const shouldShowQuestion = (q: FormQuestion): boolean => {
     if (!q.parentQuestionId) return true;
     const parentAnswer = answers[q.parentQuestionId];
     if (parentAnswer === undefined || parentAnswer === null) return false;
     if (!q.enablingAnswers || q.enablingAnswers.length === 0) return true;
-    return q.enablingAnswers.includes(String(parentAnswer));
+
+    // Find parent question to resolve index-based enabling answers
+    const parentQ = questions.find((pq) => pq.id === q.parentQuestionId);
+    if (parentQ?.options && parentQ.options.length > 0) {
+      const selectedIndex = parentQ.options.indexOf(String(parentAnswer));
+      if (selectedIndex !== -1) {
+        return (q.enablingAnswers as unknown as number[]).includes(selectedIndex);
+      }
+    }
+    // Fallback: direct string comparison
+    return (q.enablingAnswers as unknown as number[]).some(
+      (ea) => String(ea) === String(parentAnswer),
+    );
   };
 
   const renderQuestion = (q: FormQuestion) => {
     if (!shouldShowQuestion(q)) return null;
     const value = answers[q.id];
-    if (q.type === "text") {
+    const type = q.type; // already mapped by mapQuestionFromApi
+
+    // ── Text answer ────────────────────────────────────────────────────────
+    if (type === "text_answer" || type === "text") {
       return (
         <View key={q.id} style={styles.questionContainer}>
-          <Text style={styles.questionText}>{q.question}</Text>
+          <Text style={styles.questionText}>
+            {q.question}{q.required ? " *" : ""}
+          </Text>
           <TextInput
             style={styles.textInput}
             value={value || ""}
-            onChangeText={(text) => handleChange(q.id, text, q.type)}
+            onChangeText={(text) => handleChange(q.id, text, type)}
             placeholder="Your answer"
+            multiline
           />
         </View>
       );
     }
-    if (q.type === "multipleChoice") {
+
+    // ── Multiple choice (single select) ────────────────────────────────────
+    if (type === "multiple_choice" || type === "multipleChoice") {
       const options: string[] = q.options || [];
       return (
         <View key={q.id} style={styles.questionContainer}>
-          <Text style={styles.questionText}>{q.question}</Text>
+          <Text style={styles.questionText}>
+            {q.question}{q.required ? " *" : ""}
+          </Text>
           {options.map((opt) => (
             <TouchableOpacity
               key={opt}
               style={styles.optionRow}
-              onPress={() => handleChange(q.id, opt, q.type)}
+              onPress={() => handleChange(q.id, opt, type)}
             >
-              <View
-                style={[
-                  styles.radioOuter,
-                  value === opt && styles.radioOuterSelected,
-                ]}
-              >
+              <View style={[styles.radioOuter, value === opt && styles.radioOuterSelected]}>
                 {value === opt && <View style={styles.radioInner} />}
               </View>
               <Text style={styles.optionText}>{opt}</Text>
@@ -151,13 +181,72 @@ export function SurveyFormScreen() {
         </View>
       );
     }
-    if (q.type === "linearScale") {
+
+    // ── Dropdown (render as radio list for simplicity) ─────────────────────
+    if (type === "dropdown") {
+      const options: string[] = q.options || [];
+      return (
+        <View key={q.id} style={styles.questionContainer}>
+          <Text style={styles.questionText}>
+            {q.question}{q.required ? " *" : ""}
+          </Text>
+          {options.map((opt) => (
+            <TouchableOpacity
+              key={opt}
+              style={styles.optionRow}
+              onPress={() => handleChange(q.id, opt, type)}
+            >
+              <View style={[styles.radioOuter, value === opt && styles.radioOuterSelected]}>
+                {value === opt && <View style={styles.radioInner} />}
+              </View>
+              <Text style={styles.optionText}>{opt}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      );
+    }
+
+    // ── Multi-select (checkboxes) ───────────────────────────────────────────
+    if (type === "multi_select") {
+      const options: string[] = q.options || [];
+      const selected: string[] = Array.isArray(value) ? value : value ? [value] : [];
+      const toggleOption = (opt: string) => {
+        const next = selected.includes(opt)
+          ? selected.filter((s) => s !== opt)
+          : [...selected, opt];
+        handleChange(q.id, next, type);
+      };
+      return (
+        <View key={q.id} style={styles.questionContainer}>
+          <Text style={styles.questionText}>
+            {q.question}{q.required ? " *" : ""}
+          </Text>
+          {options.map((opt) => {
+            const checked = selected.includes(opt);
+            return (
+              <TouchableOpacity
+                key={opt}
+                style={styles.optionRow}
+                onPress={() => toggleOption(opt)}
+              >
+                <View style={[styles.checkboxOuter, checked && styles.checkboxChecked]}>
+                  {checked && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+                <Text style={styles.optionText}>{opt}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      );
+    }
+
+    // ── Linear scale ───────────────────────────────────────────────────────
+    if (type === "linear_scale" || type === "linearScale") {
       let scale: number[] = [];
       if (q.options && q.options.length >= 2) {
         if (q.options.length === 2) {
-          const [minStr, maxStr] = q.options;
-          const min = parseInt(minStr, 10);
-          const max = parseInt(maxStr, 10);
+          const min = parseInt(q.options[0], 10);
+          const max = parseInt(q.options[1], 10);
           for (let i = min; i <= max; i++) scale.push(i);
         } else {
           scale = q.options.map((o) => parseInt(o, 10));
@@ -167,23 +256,17 @@ export function SurveyFormScreen() {
       }
       return (
         <View key={q.id} style={styles.questionContainer}>
-          <Text style={styles.questionText}>{q.question}</Text>
+          <Text style={styles.questionText}>
+            {q.question}{q.required ? " *" : ""}
+          </Text>
           <View style={styles.scaleRow}>
             {scale.map((num) => (
               <TouchableOpacity
                 key={num}
-                style={[
-                  styles.scaleItem,
-                  value === num && styles.scaleItemSelected,
-                ]}
-                onPress={() => handleChange(q.id, num, q.type)}
+                style={[styles.scaleItem, value === num && styles.scaleItemSelected]}
+                onPress={() => handleChange(q.id, num, type)}
               >
-                <Text
-                  style={[
-                    styles.scaleItemText,
-                    value === num && styles.scaleItemTextSelected,
-                  ]}
-                >
+                <Text style={[styles.scaleItemText, value === num && styles.scaleItemTextSelected]}>
                   {num}
                 </Text>
               </TouchableOpacity>
@@ -192,6 +275,7 @@ export function SurveyFormScreen() {
         </View>
       );
     }
+
     return null;
   };
 
@@ -205,17 +289,15 @@ export function SurveyFormScreen() {
   if (error || !form) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#7f1d1d" />
-        <Text style={styles.loadingText}>Form not found</Text>
+        <Text style={styles.loadingText}>Survey not found</Text>
       </View>
     );
   }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>{form.title}</Text>
-      {form.description && (
-        <Text style={styles.description}>{form.description}</Text>
-      )}
+      {form.description && <Text style={styles.description}>{form.description}</Text>}
       {questions.map((q) => renderQuestion(q))}
       <TouchableOpacity
         style={[styles.submitButton, submitting && { opacity: 0.6 }]}
@@ -231,111 +313,42 @@ export function SurveyFormScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    marginTop: 46,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: "#9ca3af",
-    marginTop: 12,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#111827",
-    marginBottom: 8,
-  },
-  description: {
-    fontSize: 14,
-    color: "#374151",
-    marginBottom: 12,
-  },
-  questionContainer: {
-    marginBottom: 20,
-  },
-  questionText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1f2937",
-    marginBottom: 8,
-  },
+  container: { padding: 16, marginTop: 46, paddingBottom: 40 },
+  centered: { flex: 1, justifyContent: "center", alignItems: "center", padding: 16 },
+  loadingText: { fontSize: 14, color: "#9ca3af", marginTop: 12 },
+  title: { fontSize: 20, fontWeight: "bold", color: "#111827", marginBottom: 8 },
+  description: { fontSize: 14, color: "#374151", marginBottom: 12 },
+  questionContainer: { marginBottom: 22 },
+  questionText: { fontSize: 15, fontWeight: "600", color: "#1f2937", marginBottom: 10 },
   textInput: {
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: "#ffffff",
+    borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8,
+    padding: 12, fontSize: 15, backgroundColor: "#ffffff", minHeight: 44,
   },
-  optionRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
+  optionRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   radioOuter: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#7f1d1d",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 8,
+    width: 20, height: 20, borderRadius: 10, borderWidth: 2,
+    borderColor: "#7f1d1d", alignItems: "center", justifyContent: "center", marginRight: 10,
   },
-  radioOuterSelected: {
-    borderColor: "#7f1d1d",
+  radioOuterSelected: { borderColor: "#7f1d1d" },
+  radioInner: { width: 10, height: 10, borderRadius: 5, backgroundColor: "#7f1d1d" },
+  checkboxOuter: {
+    width: 22, height: 22, borderRadius: 4, borderWidth: 2,
+    borderColor: "#7f1d1d", alignItems: "center", justifyContent: "center", marginRight: 10,
   },
-  radioInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#7f1d1d",
-  },
-  optionText: {
-    fontSize: 14,
-    color: "#374151",
-  },
-  scaleRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 8,
-  },
+  checkboxChecked: { backgroundColor: "#7f1d1d" },
+  checkmark: { color: "#ffffff", fontSize: 13, fontWeight: "bold" },
+  optionText: { fontSize: 14, color: "#374151", flex: 1 },
+  scaleRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
   scaleItem: {
-    flex: 1,
-    paddingVertical: 8,
-    marginHorizontal: 4,
-    borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: 4,
-    alignItems: "center",
+    minWidth: 40, paddingVertical: 8, paddingHorizontal: 6,
+    borderWidth: 1, borderColor: "#d1d5db", borderRadius: 6, alignItems: "center",
   },
-  scaleItemSelected: {
-    backgroundColor: "#7f1d1d",
-  },
-  scaleItemText: {
-    fontSize: 14,
-    color: "#374151",
-  },
-  scaleItemTextSelected: {
-    color: "#ffffff",
-  },
+  scaleItemSelected: { backgroundColor: "#7f1d1d", borderColor: "#7f1d1d" },
+  scaleItemText: { fontSize: 14, color: "#374151" },
+  scaleItemTextSelected: { color: "#ffffff" },
   submitButton: {
-    marginTop: 24,
-    backgroundColor: "#16a34a",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
+    marginTop: 24, backgroundColor: "#16a34a",
+    paddingVertical: 14, borderRadius: 8, alignItems: "center",
   },
-  submitButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  submitButtonText: { color: "#ffffff", fontSize: 16, fontWeight: "600" },
 });

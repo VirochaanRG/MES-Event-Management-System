@@ -45,8 +45,8 @@ export function SurveyDetailScreen() {
           setLoading(true);
           setError(null);
           const [f, s] = await Promise.all([
-            userApi.getForm(formId),
-            userApi.getFormStatus(formId, user.id),
+            userApi.getForm(formId, user.email),
+            userApi.getFormStatus(formId, user.email),
           ]);
           if (!cancelled) {
             setForm(f);
@@ -78,7 +78,7 @@ export function SurveyDetailScreen() {
           style: "destructive",
           onPress: async () => {
             try {
-              await userApi.deleteFormSubmission(formId, user.id);
+              await userApi.deleteFormSubmission(formId, user.email);
               setStatus({ status: "unfilled", submissionId: null });
             } catch (err: any) {
               console.warn(
