@@ -278,6 +278,7 @@ function RouteComponent() {
     "multiple_choice",
     "linear_scale",
     "dropdown",
+    "multi_select",
   ];
 
   useEffect(() => {

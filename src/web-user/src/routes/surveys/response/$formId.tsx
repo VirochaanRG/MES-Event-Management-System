@@ -37,6 +37,37 @@ function RouteComponent() {
   const [responses, setResponses] = useState<FormResponse[]>([]);
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
 
+  const getMultiSelectMin = (question: FormQuestion) => {
+    if (question.questionType !== "multi_select" || !question.optionsCategory) {
+      return 0;
+    }
+
+    try {
+      const parsed = JSON.parse(question.optionsCategory);
+      const min = Number(parsed?.min);
+      return Number.isFinite(min) && min > 0 ? min : 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  const isMissingRequiredAnswer = (response: FormResponse) => {
+    const answer = response.answer?.answer;
+
+    if (answer === undefined || answer === null) {
+      return true;
+    }
+
+    if (Array.isArray(answer)) {
+      if (response.question.questionType === "multi_select") {
+        return answer.length < getMultiSelectMin(response.question);
+      }
+      return answer.length === 0;
+    }
+
+    return String(answer).trim().length === 0;
+  };
+
   const visibleResponses = useMemo(() => {
     return [...responses]
       .sort((a, b) => (a.question.qorder ?? 0) - (b.question.qorder ?? 0))
@@ -231,7 +262,7 @@ function RouteComponent() {
 
   const saveForm = async () => {
     for (const response of visibleResponses) {
-      if (!response.answer || response.answer.answer.length == 0) continue;
+      if (isMissingRequiredAnswer(response)) continue;
       const request = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -281,13 +312,7 @@ function RouteComponent() {
       if (
         visibleResponses
           .filter((r) => r.question.required)
-          .some(
-            (r) =>
-              !r.answer ||
-              !r.answer.answer ||
-              (r.question.questionType === "multi_select" && Array.isArray(r.answer.answer) && 
-              r.answer.answer.length < JSON.parse(r.question.optionsCategory ?? "{min:0}").min)
-          )
+          .some((r) => isMissingRequiredAnswer(r))
       ) {
         toast.error("Please fill in all required fields");
       } else {
