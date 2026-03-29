@@ -116,6 +116,216 @@ export const Route = createFileRoute("/form-builder/$formId")({
   component: RouteComponent,
 });
 
+// ── CSV import helpers ────────────────────────────────────────────────────────
+
+type CSVImportRow = {
+  id: number;
+  questionTitle: string;
+  questionType: string;
+  choices: string[];
+  scaleMin: number;
+  scaleMax: number;
+  scaleMinLabel: string;
+  scaleMaxLabel: string;
+  selectionsMin: number;
+  selectionsMax: number | null;
+  required: boolean;
+  parseWarning?: string;
+  parseError?: string;
+};
+
+function parseRawCSV(text: string): string[][] {
+  const rows: string[][] = [];
+  let cur = "";
+  let inQuote = false;
+  let row: string[] = [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') {
+      if (inQuote && text[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuote = !inQuote;
+      }
+    } else if (ch === "," && !inQuote) {
+      row.push(cur);
+      cur = "";
+    } else if (
+      (ch === "\n" || (ch === "\r" && text[i + 1] === "\n")) &&
+      !inQuote
+    ) {
+      if (ch === "\r") i++;
+      row.push(cur);
+      cur = "";
+      if (row.some((c) => c.trim() !== "")) rows.push(row);
+      row = [];
+    } else {
+      cur += ch;
+    }
+  }
+  row.push(cur);
+  if (row.some((c) => c.trim() !== "")) rows.push(row);
+  return rows;
+}
+
+function normalizeQuestionType(raw: string): string {
+  // Handle Google Apps Script ItemType integer values (written when enum is
+  // placed in a sheet cell without explicit .toString() conversion)
+  const intTypeMap: Record<string, string> = {
+    "0": "multiple_choice", // MULTIPLE_CHOICE
+    "1": "multi_select", // CHECKBOX
+    "2": "text_answer", // GRID (no direct equivalent, fallback)
+    "8": "dropdown", // LIST
+    "11": "text_answer", // PARAGRAPH_TEXT
+    "12": "linear_scale", // SCALE
+    "16": "text_answer", // TEXT
+    "18": "text_answer", // TIME
+  };
+  if (intTypeMap[raw.trim()]) return intTypeMap[raw.trim()];
+
+  const t = raw.toLowerCase().replace(/[\s_-]/g, "");
+  if (["multiplechoice", "radio", "singlechoice", "mc"].includes(t))
+    return "multiple_choice";
+  if (["dropdown", "select", "list"].includes(t)) return "dropdown";
+  if (["linearscale", "scale", "rating", "likert"].includes(t))
+    return "linear_scale";
+  if (
+    [
+      "multiselect",
+      "multipleselection",
+      "checkboxes",
+      "checkbox",
+      "multi",
+    ].includes(t)
+  )
+    return "multi_select";
+  return "text_answer";
+}
+
+function parseCSVToImportRows(text: string): CSVImportRow[] {
+  const raw = parseRawCSV(text);
+  if (raw.length === 0) return [];
+
+  const headers = raw[0].map((h) => h.trim().toLowerCase());
+  const qCol = headers.findIndex((h) =>
+    ["question", "title", "question title"].includes(h),
+  );
+  const typeCol = headers.findIndex((h) =>
+    ["type", "question type", "questiontype"].includes(h),
+  );
+  const optCol = headers.findIndex((h) =>
+    ["options", "choices", "config"].includes(h),
+  );
+  const reqCol = headers.findIndex((h) =>
+    ["required", "mandatory"].includes(h),
+  );
+
+  const skipHeaders = new Set(["timestamp", "time", "date"]);
+
+  if (qCol !== -1 && typeCol !== -1) {
+    // Format A: structured CSV with question/type columns
+    return raw
+      .slice(1)
+      .filter((row) => row.some((c) => c.trim()))
+      .map((row, idx) => {
+        const questionTitle = row[qCol]?.trim() || "";
+        const rawType = row[typeCol]?.trim() || "";
+        const questionType = normalizeQuestionType(rawType);
+        const optStr = optCol !== -1 ? row[optCol]?.trim() || "" : "";
+        const reqStr =
+          reqCol !== -1 ? row[reqCol]?.trim().toLowerCase() || "" : "";
+        const required = ["true", "yes", "1"].includes(reqStr);
+
+        let choices: string[] = [];
+        let scaleMin = 1,
+          scaleMax = 5,
+          scaleMinLabel = "",
+          scaleMaxLabel = "";
+        const selectionsMin = 0;
+        const selectionsMax: number | null = null;
+        let parseWarning: string | undefined;
+
+        if (questionType === "linear_scale") {
+          const parts = optStr.split(";").map((s) => s.trim());
+          scaleMin = parseInt(parts[0] || "1") || 1;
+          scaleMax = parseInt(parts[1] || "5") || 5;
+          scaleMinLabel = parts[2] || "";
+          scaleMaxLabel = parts[3] || "";
+          if (scaleMin >= scaleMax) {
+            scaleMax = scaleMin + 4;
+            parseWarning = "Adjusted scale (min must be less than max)";
+          }
+        } else if (
+          ["multiple_choice", "dropdown", "multi_select"].includes(questionType)
+        ) {
+          // Prefer semicolon separator; fall back to comma for old-format exports
+          const delimiter = optStr.includes(";") ? ";" : ",";
+          choices = optStr
+            .split(delimiter)
+            .map((s) => s.trim())
+            .filter(Boolean);
+        }
+
+        let parseError: string | undefined;
+        if (!questionTitle.trim()) {
+          parseError = "Question title is required";
+        } else if (
+          ["multiple_choice", "dropdown", "multi_select"].includes(
+            questionType,
+          ) &&
+          choices.length < 2
+        ) {
+          const typeLabel = QUESTION_TYPE_LABELS[questionType] ?? questionType;
+          const found = choices.length;
+          parseError = `${typeLabel} requires at least 2 options (${found} found)`;
+        }
+
+        return {
+          id: idx,
+          questionTitle,
+          questionType,
+          choices,
+          scaleMin,
+          scaleMax,
+          scaleMinLabel,
+          scaleMaxLabel,
+          selectionsMin,
+          selectionsMax,
+          required,
+          parseWarning,
+          parseError,
+        };
+      });
+  }
+
+  // Format B: column headers are questions (Google Forms / Sheets response export)
+  return raw[0]
+    .map((h, colIdx) => ({ h: h.trim(), colIdx }))
+    .filter(({ h }) => h && !skipHeaders.has(h.toLowerCase()))
+    .map(({ h }, rowIdx) => ({
+      id: rowIdx,
+      questionTitle: h,
+      questionType: "text_answer",
+      choices: [],
+      scaleMin: 1,
+      scaleMax: 5,
+      scaleMinLabel: "",
+      scaleMaxLabel: "",
+      selectionsMin: 0,
+      selectionsMax: null,
+      required: false,
+    }));
+}
+
+const QUESTION_TYPE_LABELS: Record<string, string> = {
+  text_answer: "Text Answer",
+  multiple_choice: "Multiple Choice",
+  dropdown: "Dropdown",
+  linear_scale: "Linear Scale",
+  multi_select: "Multiple Selection",
+};
+
 function RouteComponent() {
   const navigate = useNavigate();
   const { showAlert } = useCustomAlert();
@@ -273,6 +483,11 @@ function RouteComponent() {
   const profileValueDropdownRef = useRef<HTMLDivElement>(null);
   const unlockInputRef = useRef<HTMLInputElement>(null);
   const choiceInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [isCSVImportModalOpen, setIsCSVImportModalOpen] = useState(false);
+  const [csvRows, setCSVRows] = useState<CSVImportRow[]>([]);
+  const [csvSelected, setCSVSelected] = useState<Set<number>>(new Set());
+  const [isImportingCSV, setIsImportingCSV] = useState(false);
+  const csvFileInputRef = useRef<HTMLInputElement>(null);
 
   const allowedTypesForFollowUp = [
     "multiple_choice",
@@ -613,6 +828,124 @@ function RouteComponent() {
     setMcChoices(next);
     setIsImportingChoices(false);
     setImportText("");
+  };
+
+  const handleCSVFileRead = (text: string) => {
+    const rows = parseCSVToImportRows(text);
+    setCSVRows(rows);
+    // Only pre-select rows that have no blocking errors
+    setCSVSelected(new Set(rows.filter((r) => !r.parseError).map((r) => r.id)));
+  };
+
+  const handleCSVFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => handleCSVFileRead(ev.target?.result as string);
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  const handleDownloadTemplate = () => {
+    const lines = [
+      "question,type,options,required",
+      "What is your name?,text_answer,,false",
+      "How satisfied are you?,linear_scale,1;5;Not at all;Very satisfied,true",
+      "Which features do you use?,multi_select,Feature A;Feature B;Feature C,false",
+      "What is your department?,dropdown,HR;Engineering;Marketing,true",
+      "Preferred option?,multiple_choice,Option A;Option B;Option C,false",
+    ];
+    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "question_import_template.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCSVImportSubmit = async () => {
+    if (formData?.isPublic) {
+      showAlert("Unpublish the form before adding questions");
+      return;
+    }
+    const toImport = csvRows.filter(
+      (r) => csvSelected.has(r.id) && !r.parseError,
+    );
+    if (toImport.length === 0) {
+      showAlert("No valid questions selected to import");
+      return;
+    }
+
+    setIsImportingCSV(true);
+    let nextOrder =
+      questions.length > 0
+        ? Math.max(...questions.map((q) => q.qorder)) + 1
+        : 1;
+    const newQuestions: import("@/interfaces/interfaces").FormQuestion[] = [];
+
+    try {
+      for (const row of toImport) {
+        if (!row.questionTitle.trim()) continue;
+
+        let optionsCategory = "";
+        if (
+          row.questionType === "multiple_choice" ||
+          row.questionType === "dropdown"
+        ) {
+          const validChoices = row.choices.filter((c) => c.trim());
+          optionsCategory = JSON.stringify({ choices: validChoices });
+        } else if (row.questionType === "linear_scale") {
+          optionsCategory = JSON.stringify({
+            min: row.scaleMin,
+            max: row.scaleMax,
+            minLabel: row.scaleMinLabel,
+            maxLabel: row.scaleMaxLabel,
+            choices: Array.from(
+              { length: row.scaleMax - row.scaleMin + 1 },
+              (_, i) => row.scaleMin + i,
+            ),
+          });
+        } else if (row.questionType === "multi_select") {
+          const validChoices = row.choices.filter((c) => c.trim());
+          optionsCategory = JSON.stringify({
+            choices: validChoices,
+            min: row.selectionsMin,
+            max: row.selectionsMax,
+          });
+        }
+
+        const res = await fetch(`/api/forms/${formId}/questions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            questionType: row.questionType,
+            questionTitle: row.questionTitle.trim(),
+            optionsCategory,
+            qorder: nextOrder++,
+            required: row.required,
+            enablingAnswers: [],
+          }),
+        });
+
+        const result = await res.json();
+        if (!result.success)
+          throw new Error(result.error || "Failed to import question");
+        newQuestions.push(result.data);
+      }
+
+      setQuestions((prev) => [...prev, ...newQuestions]);
+      setIsCSVImportModalOpen(false);
+      setCSVRows([]);
+      setCSVSelected(new Set());
+      showAlert(
+        `Imported ${newQuestions.length} question${newQuestions.length !== 1 ? "s" : ""} successfully`,
+      );
+    } catch (err: any) {
+      showAlert("Import failed: " + err.message);
+    } finally {
+      setIsImportingCSV(false);
+    }
   };
 
   const handleDeleteQuestion = async (questionId: number) => {
@@ -1223,49 +1556,64 @@ function RouteComponent() {
                 </p>
               </div>
 
-              {/* Add Question dropdown */}
-              <div className="relative" ref={dropdownRef}>
+              {/* Questions toolbar */}
+              <div className="flex items-center gap-3">
                 <button
-                  onClick={handleAddComponent}
+                  onClick={() => {
+                    setCSVRows([]);
+                    setCSVSelected(new Set());
+                    setIsCSVImportModalOpen(true);
+                  }}
                   disabled={formData?.isPublic}
-                  className="px-4 py-2 text-sm font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-semibold bg-white text-gray-700 border-2 border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  + Add Question
+                  Import CSV
                 </button>
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30">
-                    <button
-                      onClick={() => openModal("multiple_choice")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Multiple Choice
-                    </button>
-                    <button
-                      onClick={() => openModal("dropdown")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Dropdown
-                    </button>
-                    <button
-                      onClick={() => openModal("text_answer")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Text Answer
-                    </button>
-                    <button
-                      onClick={() => openModal("linear_scale")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Linear Scale
-                    </button>
-                    <button
-                      onClick={() => openModal("multi_select")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Multiple Selection
-                    </button>
-                  </div>
-                )}
+
+                {/* Add Question dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={handleAddComponent}
+                    disabled={formData?.isPublic}
+                    className="px-4 py-2 text-sm font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    + Add Question
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30">
+                      <button
+                        onClick={() => openModal("multiple_choice")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Multiple Choice
+                      </button>
+                      <button
+                        onClick={() => openModal("dropdown")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Dropdown
+                      </button>
+                      <button
+                        onClick={() => openModal("text_answer")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Text Answer
+                      </button>
+                      <button
+                        onClick={() => openModal("linear_scale")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Linear Scale
+                      </button>
+                      <button
+                        onClick={() => openModal("multi_select")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Multiple Selection
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -2039,6 +2387,313 @@ function RouteComponent() {
               >
                 {editingQuestion ? "Save changes" : "Add question"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CSV Import */}
+      {isCSVImportModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div
+            role="dialog"
+            className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col"
+          >
+            {/* Header */}
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Import Questions from CSV
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Upload a CSV file to import questions into this form
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setIsCSVImportModalOpen(false);
+                  setCSVRows([]);
+                  setCSVSelected(new Set());
+                }}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1">
+              {csvRows.length === 0 ? (
+                <div className="space-y-4">
+                  <div
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-amber-400 hover:bg-amber-50 transition-colors"
+                    onClick={() => csvFileInputRef.current?.click()}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) =>
+                        handleCSVFileRead(ev.target?.result as string);
+                      reader.readAsText(file);
+                    }}
+                  >
+                    <svg
+                      className="w-12 h-12 text-gray-400 mx-auto mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    <p className="text-gray-600 font-medium">Attach CSV file</p>
+                  </div>
+                  <input
+                    ref={csvFileInputRef}
+                    type="file"
+                    accept=".csv,text/csv"
+                    className="hidden"
+                    onChange={handleCSVFileChange}
+                  />
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm space-y-2">
+                    <p className="font-semibold text-gray-700">Format:</p>
+                    <ul className="space-y-1.5 text-gray-600">
+                      <li>
+                        <span className="font-medium">
+                          Google Forms / Sheets / Excel export:
+                        </span>{" "}
+                        Columns for question, type, and options (if applicable).
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Selection header */}
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={
+                          csvRows.filter((r) => !r.parseError).length > 0 &&
+                          csvSelected.size ===
+                            csvRows.filter((r) => !r.parseError).length
+                        }
+                        onChange={(e) => {
+                          if (e.target.checked)
+                            setCSVSelected(
+                              new Set(
+                                csvRows
+                                  .filter((r) => !r.parseError)
+                                  .map((r) => r.id),
+                              ),
+                            );
+                          else setCSVSelected(new Set());
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                      />
+                      Select all
+                      <span className="text-gray-400 font-normal">
+                        ({csvSelected.size} of{" "}
+                        {csvRows.filter((r) => !r.parseError).length}{" "}
+                        importable)
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Preview table */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="w-10 px-3 py-2" />
+                          <th className="px-3 py-2 text-left font-medium text-gray-600">
+                            Question
+                          </th>
+                          <th className="w-44 px-3 py-2 text-left font-medium text-gray-600">
+                            Type
+                          </th>
+                          <th className="w-52 px-3 py-2 text-left font-medium text-gray-600">
+                            Options
+                          </th>
+                          <th className="w-16 px-3 py-2 text-center font-medium text-gray-600">
+                            Required?
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {csvRows.map((row) => (
+                          <tr
+                            key={row.id}
+                            className={
+                              row.parseError
+                                ? "bg-red-50"
+                                : csvSelected.has(row.id)
+                                  ? "bg-white"
+                                  : "bg-gray-50 opacity-50"
+                            }
+                          >
+                            {/* Select */}
+                            <td className="px-3 py-2 text-center">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  !row.parseError && csvSelected.has(row.id)
+                                }
+                                disabled={!!row.parseError}
+                                onChange={(e) => {
+                                  if (row.parseError) return;
+                                  setCSVSelected((prev) => {
+                                    const next = new Set(prev);
+                                    if (e.target.checked) next.add(row.id);
+                                    else next.delete(row.id);
+                                    return next;
+                                  });
+                                }}
+                                className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                              />
+                            </td>
+
+                            {/* Title */}
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={row.questionTitle}
+                                onChange={(e) =>
+                                  setCSVRows((prev) =>
+                                    prev.map((r) =>
+                                      r.id === row.id
+                                        ? {
+                                            ...r,
+                                            questionTitle: e.target.value,
+                                          }
+                                        : r,
+                                    ),
+                                  )
+                                }
+                                className="w-full px-2 py-1 border border-gray-200 rounded text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-transparent"
+                              />
+                              {row.parseError ? (
+                                <p className="text-xs text-red-600 mt-0.5 flex items-center gap-1">
+                                  <svg
+                                    className="w-3 h-3 flex-shrink-0"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                  {row.parseError}
+                                </p>
+                              ) : row.parseWarning ? (
+                                <p className="text-xs text-amber-600 mt-0.5">
+                                  {row.parseWarning}
+                                </p>
+                              ) : null}
+                            </td>
+
+                            {/* Type — read-only, locked to parsed value */}
+                            <td className="px-3 py-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                                {QUESTION_TYPE_LABELS[row.questionType] ??
+                                  row.questionType}
+                              </span>
+                            </td>
+
+                            {/* Options preview */}
+                            <td className="px-3 py-2 text-xs text-gray-500">
+                              {row.questionType === "linear_scale" ? (
+                                `${row.scaleMin}–${row.scaleMax}${row.scaleMinLabel ? ` (${row.scaleMinLabel} → ${row.scaleMaxLabel})` : ""}`
+                              ) : row.choices.length > 0 ? (
+                                row.choices.slice(0, 3).join(", ") +
+                                (row.choices.length > 3
+                                  ? ` +${row.choices.length - 3} more`
+                                  : "")
+                              ) : (
+                                <span className="text-gray-300 italic">—</span>
+                              )}
+                            </td>
+
+                            {/* Required */}
+                            <td className="px-3 py-2 text-center">
+                              <input
+                                type="checkbox"
+                                checked={row.required}
+                                onChange={(e) =>
+                                  setCSVRows((prev) =>
+                                    prev.map((r) =>
+                                      r.id === row.id
+                                        ? { ...r, required: e.target.checked }
+                                        : r,
+                                    ),
+                                  )
+                                }
+                                className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-200 flex items-center justify-between bg-gray-50 flex-shrink-0">
+              <button
+                onClick={() => {
+                  setIsCSVImportModalOpen(false);
+                  setCSVRows([]);
+                  setCSVSelected(new Set());
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <div className="flex items-center gap-4">
+                {csvRows.some((r) => r.parseError) && (
+                  <p className="text-xs text-red-500">
+                    {csvRows.filter((r) => r.parseError).length} row
+                    {csvRows.filter((r) => r.parseError).length !== 1
+                      ? "s"
+                      : ""}{" "}
+                    Failed to upload
+                  </p>
+                )}
+                {csvRows.length > 0 && (
+                  <button
+                    onClick={handleCSVImportSubmit}
+                    disabled={isImportingCSV || csvSelected.size === 0}
+                    className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isImportingCSV
+                      ? "Importing…"
+                      : `Import ${csvSelected.size} Question${csvSelected.size !== 1 ? "s" : ""}`}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
