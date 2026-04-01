@@ -1,8 +1,15 @@
 \documentclass[12pt, titlepage]{article}
 
 \usepackage{booktabs}
+\usepackage{fvextra}
 \usepackage{tabularx}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage[table]{xcolor}
 \usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{float}
+
 \hypersetup{
     colorlinks,
     citecolor=black,
@@ -10,17 +17,16 @@
     linkcolor=red,
     urlcolor=blue
 }
-\usepackage[round]{natbib}
 
 \input{../Comments}
 \input{../Common}
 
 \begin{document}
 
-\title{Verification and Validation Report: \progname} 
+\title{Verification and Validation Report: \progname}
 \author{\authname}
 \date{\today}
-	
+
 \maketitle
 
 \pagenumbering{roman}
@@ -30,25 +36,9 @@
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+March 9, 2025 & Version 1 & Inital draft of VnV Report
 \bottomrule
 \end{tabularx}
-
-~\newpage
-
-\section{Symbols, Abbreviations and Acronyms}
-
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{l l} 
-  \toprule		
-  \textbf{symbol} & \textbf{description}\\
-  \midrule 
-  T & Test\\
-  \bottomrule
-\end{tabular}\\
-
-\wss{symbols, abbreviations or acronyms -- you can reference the SRS tables if needed}
 
 \newpage
 
@@ -62,64 +52,921 @@ Date 2 & 1.1 & Notes\\
 
 \pagenumbering{arabic}
 
-This document ...
-
 \section{Functional Requirements Evaluation}
+\subsection{Area of Testing 1: Admin Portal}
+\subsubsection{Test-FR-AP-1: Create Form}
+\textbf{Type:} Manual \\ \textbf{Initial State:} Administrator is logged into the admin portal with permission to create forms. \\ \textbf{Test Procedure:}
+\begin{verbatim}
+Input:
+- Navigate to the form creation page
+- Enter form name = "Event Feedback Form"
+- Add field: Text field labelled "Name"
+- Add field: Checkbox labelled "Events Attended"
+- Add field: Rating field labelled "Overall Experience"
+- Click "Create Form"
+\end{verbatim}
+\textbf{Expected Result:}
+\begin{verbatim}
+Output:
+- System confirms successful form creation
+- Newly created form appears in the admin dashboard
+- Form fields are stored correctly in the database
+\end{verbatim}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} The administrator successfully created a new form with multiple fields and the form appeared correctly in the dashboard with all fields stored in the system database. \\
+\subsubsection{Test-FR-AP-2: View and Analyze Form Data}
+\textbf{Type:} Manual \\ \textbf{Initial State:} At least two forms exist with previously collected responses. \\ \textbf{Test Procedure:}
+\begin{verbatim}
+Input:
+- Navigate to the analytics dashboard
+- Select multiple forms with collected responses
+- Click "View Analytics"
+\end{verbatim}
+\textbf{Expected Result:}
+\begin{verbatim}
+Output:
+- Aggregated analytics are displayed
+- Charts and response summaries appear
+- Displayed analytics match stored backend data
+\end{verbatim}
+\textbf{Result:} Pass \\ \textbf{Discussion:} The analytics dashboard correctly aggregated the responses from multiple forms and displayed charts and summary statistics consistent with the stored backend data. \\
+\subsubsection{Test-FR-AP-3: Manage Events via Dashboard}
+\textbf{Type:} Manual \\ \textbf{Initial State:} Multiple events exist in the system with various payment statuses. \\ \textbf{Test Procedure:}
+\begin{verbatim}
+Input:
+- Navigate to the admin dashboard
+- Select the filter option
+- Apply filter "Pending Payment"
+\end{verbatim}
+\textbf{Expected Result:}
+\begin{verbatim}
+Output:
+- Dashboard displays only events with pending payment status
+- Displayed events match stored system records
+\end{verbatim}
+\textbf{Result:} Pass \\ \textbf{Discussion:} The dashboard filtering functionality worked correctly and displayed only the events matching the selected payment status filter. \\
+\subsubsection{Test-FR-AP-4: View and Export Event Analytics}
+\textbf{Type:} Manual \\ \textbf{Initial State:} Events exist with collected survey responses. \\ \textbf{Test Procedure:}
+\begin{verbatim}
+Input:
+- Navigate to the event analytics dashboard
+- Select an event with stored responses
+- Click "Export Analytics"
+\end{verbatim}
+\textbf{Expected Result:}
+\begin{verbatim}
+Output:
+- Event analytics are displayed in the dashboard
+- System generates a downloadable report file
+- Exported data matches the analytics displayed
+\end{verbatim}
+\textbf{Result:} Pass \\ \textbf{Discussion:} The export functionality successfully generated a downloadable analytics report containing the correct event statistics and survey response summaries. \\
+\subsection{Area of Testing 2: Attendee Application}
+This section evaluates the functional requirements specific to the attendee's mobile experience. Testing focuses on the end-to-end journey for students, including registration workflows, event discovery, and the feedback submission process.
+
+\subsubsection{Test-FR-AA-1: Register for Event}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} An event is open and attendee is authenticated. \\
+\textbf{Input/Condition:} Attendee submits an event registration form. \\
+\textbf{Expected Output:} Registration is saved and a confirmation message is displayed and sent to attendee and a QR ticket is generated. \\
+\textbf{How the test will be performed:} An automated test script will simulate a form submission for a test event and verify the existence of the generated QR code object in the database and the success response from the server. \\
+\textbf{Actual Result:} The registration was processed successfully; a unique QR ticket was generated and linked to the attendee's profile in the database.
+
+\subsubsection{Test-FR-AA-2: Access Event Listings}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} The system has multiple upcoming and past events. \\
+\textbf{Test Procedure:} \\
+\textbf{Input:}
+\begin{itemize}
+    \item Login as an authenticated attendee.
+    \item Navigate to the "Upcoming Events" tab.
+    \item Navigate to the "Registered Events" tab.
+    \item Select a specific event to view its details.
+\end{itemize}
+\textbf{Expected Result:} \\
+\textbf{Output:}
+\begin{itemize}
+    \item Each tab displays the correct filtered list of events.
+    \item Event information (time, location, description) accurately matches the database records.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} The attendee was able to browse all available events and view their specific registered events without discrepancy between the UI and the backend data.
+
+\subsubsection{Test-FR-AA-3: Fill out Form}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} A survey is available and attendee is authenticated. \\
+\textbf{Input/Condition:} Attendee completes and submits the survey. \\
+\textbf{Expected Output:} Survey responses are stored and a confirmation message appears. \\
+\textbf{How the test will be performed:} Using a headless browser, the system will fill out all required fields in a dynamic feedback form and click submit, then check for a 201 Created status from the API. \\
+\textbf{Actual Result:} Feedback data was successfully committed to the database and associated with the correct Event ID.
+
+\subsection{Area of Testing 3: System Integration and Security}
+This section verifies the robustness of the system's internal communications and its defensive posture. Testing includes real-time data synchronization between the admin and attendee interfaces, as well as manual verification of role-based access controls to prevent unauthorized data access.
+
+\subsubsection{Test-FR-SI-1: Real-Time Data Synchronization}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} Admin and attendee interfaces are active. \\
+\textbf{Input/Condition:} Admin updates event details (e.g., venue or date). \\
+\textbf{Expected Output:} Attendee view updates automatically without manual refresh. \\
+\textbf{How the test will be performed:} A script will trigger a PATCH request to the event endpoint and then verify if the WebSocket listener on the client-side received the payload and updated the local state. \\
+\textbf{Actual Result:} The attendee UI updated within 200ms of the admin change, reflecting the new location details without a page reload.
+
+\subsubsection{Test-FR-SI-2: Role-Based Access Verification}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} Admin and attendee accounts exist with distinct permissions. \\
+\textbf{Test Procedure:} \\
+\textbf{Input:}
+\begin{itemize}
+    \item Login with an "Attendee" role account.
+    \item Attempt to access the Admin Dashboard URL manually.
+    \item Attempt to trigger a "Create Form" API request using the attendee token.
+\end{itemize}
+\textbf{Expected Result:} \\
+\textbf{Output:}
+\begin{itemize}
+    \item The system denies access to admin features.
+    \item Proper error handling (e.g., 403 Forbidden or redirection) is observed.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} The system successfully enforced role-based access control, ensuring that sensitive administrative functions are strictly limited to authorized accounts.
+
+\subsubsection{Test-FR-SI-3: API Security - SQL Injection}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} System API is live and accepting search queries. \\
+\textbf{Input/Condition:} Submit a string containing SQL commands (e.g., "OR 1=1") into the event search bar. \\
+\textbf{Expected Output:} The system treats the input as a string and returns no results; no data leak occurs. \\
+\textbf{How the test will be performed:} An automated security suite will run a payload of common SQL injection strings against all search endpoints to check for database error leaks or unauthorized data retrieval. \\
+\textbf{Actual Result:} All payloads were successfully sanitized or rejected; the database remained secure.
 
 \section{Nonfunctional Requirements Evaluation}
 
-\subsection{Usability}
-		
-\subsection{Performance}
+\subsection{System Testing - Look and Feel}
+This section evaluates the visual and aesthetic requirements of the EvENGage system, ensuring the user interface aligns with the McMaster Engineering Society's branding and meets stakeholder expectations for professional design.
+
+\subsubsection{Test-NFR-LF-1: MES Branding Conformance}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} The UI for the latest web and mobile builds are finalized and accessible. \\
+\textbf{Input:}
+\begin{itemize}
+    \item Present the latest build to an MES representative or project stakeholder.
+    \item Review key visual elements including color palette, typography, and logo placement.
+    \item Compare the interface against intended MES branding guidelines and prior design discussions.
+\end{itemize}
+\textbf{Output:}
+\begin{itemize}
+    \item Representative confirms whether the interface aligns with MES branding.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} A meeting was held with the stakeholder where the design decisions were assessed. The representative confirmed that the UI adheres to the requirements. Minor visual suggestions were noted for future iterations, but the overall direction was approved.
+
+\subsubsection{Test-NFR-LF-2: Design Reception Survey}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} A deployed build is available and a short feedback survey has been prepared \href{https://forms.gle/GEDjaME9pe6QebEx6}{here}. \\
+\textbf{Input:}
+\begin{itemize}
+    \item Share the build with a small group of students (5-8 participants).
+    \item Ask participants to explore interface and interact with main functions.
+    \item Request participants complete the survey.
+\end{itemize}
+\textbf{Output:}
+\begin{itemize}
+    \item Survey responses provide ratings on a scale of 1-5.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Survey responses were collected and analyzed. Average responses were positive and suggested that userse enjoyed the design.
+
+\subsection{System Testing - Usability and Humanity}
+This section focuses on the ease of use, accessibility, and user-centric design of the platform for both administrators and student attendees.
+
+\subsubsection{Test-NFR-UH-1: Intuitive Feedback and Registration}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} A deployed build is available and there are functional live events and forms. \\
+\textbf{Input:}
+\begin{itemize}
+    \item Instruct a small group of students (5-8 participants) to register to an event.
+    \item Instruct them to complete a feedback form.
+    \item Collect a short usability rating (1-5 scale) for ease of use.
+\end{itemize}
+\textbf{Output:}
+\begin{itemize}
+    \item Successful event registration and survey submission.
+    \item Average usability rating of 4 or higher.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} All participants were able to navigate the registration and feedback workflows without any guidance. While a few users took more time than others, all participants successfully completed the task, suggesting it is intuitive.
+
+\subsubsection{Test-NFR-UH-6: Accessibility Conformance}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} Fully configured UI themes. \\
+\textbf{Input:}
+\begin{itemize}
+    \item All members manually inspect color contrast, button labeling, and page structure for readability based on WCAG 2.0 guidelines.
+\end{itemize}
+\textbf{Output:}
+\begin{itemize}
+    \item No major accessibility violations are discovered.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Accessibility checks were performed manually. No significant accessibility issues were detected during testing. In the future, we plan to use an established web tool, such as WebAIM to ensure the interface meets basic accessibility expectations.
+
+\subsection{System Testing - Performance}
+This section evaluates the system's responsiveness and capacity, ensuring it can handle typical usage scenarios.
+
+\subsubsection{Test-NFR-PF-1: Form Latency}
+\textbf{Type:} Automatic \\
+\textbf{Initial State:} Platform is running locally on desktop browser. \\
+\textbf{Input:}
+\begin{itemize}
+    \item Open event registration and survey forms on different devices on chrome.
+    \item Use browser developer tools (F12) to measure page load times and request latency.
+    \item Repeat test multiple times.
+\end{itemize}
+\textbf{Output:}
+\begin{itemize}
+    \item Form pages load within 2 seconds.
+    \item No severe delays or loading failures.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Performance measurements were taken using chrome developer tools in a limited development environment. Forms consistently loaded within the acceptable threshold during testing. Next step is to test the deployed build on different browsers, as well as the mobile app.
+
+\subsection{System Testing - Security}
+This section validates the protection of user data and the integrity of administrative actions within the system.
+
+\subsubsection{Test-NFR-ST-1: Secure Email Authentication}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} A deployed build is available and authentication is configured to McMaster email domains. \\
+\textbf{Input:}
+\begin{itemize}
+    \item Attempt account creation/log-in with a non-authorized email address.
+    \item Attempt account creation/log-in with a valid McMaster email.
+\end{itemize}
+\textbf{Output:}
+\begin{itemize}
+    \item Unauthorized email addresses are rejected by the authentication system.
+    \item Authorized accounts are successfully authenticated.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Controlled login attempts were performed using both valid and invalid email domains. The system correctly restricted access to unauthorized accounts, and allowed valid users to log-in.
+
+\subsubsection{Test-NFR-ST-4: Secure Data Encryption}
+\textbf{Type:} Manual \\
+\textbf{Initial State:} No test account exists in the database. \\
+\textbf{Input:}
+\begin{itemize}
+    \item Create a new user account and submit registration information.
+    \item Inspect the corresponding database entry for stored data.
+\end{itemize}
+\textbf{Output:}
+\begin{itemize}
+    \item Sensitive authentication fields such as passwords are encrypted.
+\end{itemize}
+\textbf{Result:} Pass \\
+\textbf{Discussion:} Direct inspection of the PostgreSQL database confirmed that sensitive data is stored using AES-256 encryption.
 
 \subsection{etc.}
-	
-\section{Comparison to Existing Implementation}	
+
+\section{Comparison to Existing Implementation}
 
 This section will not be appropriate for every project.
 
 \section{Unit Testing}
 
+\subsection{Admin Server Testing - Events API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC1 & GET /api/events - Return all events sorted by date & Events array returned, sorted with future events first & Events returned in correct order & \cellcolor{green!30}Pass \\
+\hline
+TC2 & GET /api/events - Sort future events before past events & Future events appear before past events in response & Events correctly sorted by date & \cellcolor{green!30}Pass \\
+\hline
+TC3 & GET /api/events - Handle database errors gracefully & Error response with 500 status code & Error caught and returned & \cellcolor{green!30}Pass \\
+\hline
+TC4 & POST /api/event/create - Create new event with all required fields & 201 status code with created event data & Event successfully created & \cellcolor{green!30}Pass \\
+\hline
+TC5 & POST /api/event/create - Create event with default registration form & Default form fields populated & Registration form created with defaults & \cellcolor{green!30}Pass \\
+\hline
+TC6 & POST /api/event/create - Return 400 when missing required fields & 400 error response & Validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC7 & POST /api/event/create - Handle creation errors gracefully & 500 error response & Error caught and returned & \cellcolor{green!30}Pass \\
+\hline
+TC8 & PUT /api/events/:id - Update existing event & 200 status with updated data & Event fields updated correctly & \cellcolor{green!30}Pass \\
+\hline
+TC9 & PUT /api/events/:id - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC10 & PUT /api/events/:id - Convert date strings to Date objects & Date strings converted to Date objects in update & Dates properly formatted & \cellcolor{green!30}Pass \\
+\hline
+TC11 & GET /api/events/:id/registration - Return registration status for user & Registration status returned & User registration found & \cellcolor{green!30}Pass \\
+\hline
+TC12 & GET /api/events/:id/registration - Return false when user not registered & isRegistered field false & Correctly indicates no registration & \cellcolor{green!30}Pass \\
+\hline
+TC13 & GET /api/events/:id/registration - Return 400 when userEmail missing & 400 error response & Parameter validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC14 & GET /api/events/:id/registrationlist - Return list of registered users & Array of registrations returned & Registered users listed & \cellcolor{green!30}Pass \\
+\hline
+TC15 & GET /api/events/:id/registrationlist - Handle empty registration list & Empty array returned & Successfully handles empty list & \cellcolor{green!30}Pass \\
+\hline
+TC16 & GET /api/events/:id/registration-form - Return event registration form & Registration form questions returned & Form questions retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC17 & GET /api/events/:id/registration-form - Return empty questions when form null & Empty questions array returned & Handles null form gracefully & \cellcolor{green!30}Pass \\
+\hline
+TC18 & GET /api/events/:id/registration-form - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC19 & GET /api/events/:id/registration-form - Transform questions to correct format & Questions properly formatted with required fields & Question format transformation correct & \cellcolor{green!30}Pass \\
+\hline
+TC20 & PUT /api/events/:id/registration-form - Update registration form & 200 status with updated form & Registration form updated successfully & \cellcolor{green!30}Pass \\
+\hline
+TC21 & PUT /api/events/:id/registration-form - Return 400 for invalid form & 400 error response & Form validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC22 & PUT /api/events/:id/registration-form - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC23 & PATCH /api/events/:id/check-in - Check in registered user & 200 status with attended status & User checked in successfully & \cellcolor{green!30}Pass \\
+\hline
+TC24 & PATCH /api/events/:id/check-in - Return 404 when user not found or already checked in & 404 error response & User status error returned & \cellcolor{green!30}Pass \\
+\hline
+TC25 & PATCH /api/events/:id/check-in - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC26 & GET /api/events/:id/qr-registration - Check QR code registration & Registration checked and returned & QR code validation successful & \cellcolor{green!30}Pass \\
+\hline
+TC27 & GET /api/events/:id/qr-registration - Return false when QR not found & isRegistered false & Correctly indicates no registration & \cellcolor{green!30}Pass \\
+\hline
+TC28 & GET /api/events/:id/qr-registration - Return 400 when registrationHash missing & 400 error response & Parameter validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC29 & GET /api/events/:id/qr-registration - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC30 & PATCH /api/events/:id/qr-check-in - Check in user via QR code & 200 status with check-in data & User QR check-in successful & \cellcolor{green!30}Pass \\
+\hline
+TC31 & PATCH /api/events/:id/qr-check-in - Return 400 when registrationHash missing & 400 error response & Parameter validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC32 & PATCH /api/events/:id/qr-check-in - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Events API Unit Tests}}
+
+\subsection{Admin Server Testing - Forms API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC33 & GET /api/forms - Return all standard forms & Array of forms returned & Forms successfully retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC34 & GET /api/forms/all - Return all forms including sub-forms & Complete forms array returned & All forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC35 & GET /api/mod-forms - Return all modular forms & Modular forms array returned & Modular forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC36 & GET /api/forms/:id - Return single form by ID & Form object with matching ID returned & Correct form retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC37 & GET /api/forms/:id - Return 404 when form not found & 404 error response & Form not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC38 & POST /api/forms - Create new standard form & 201 status with created form data & Form created successfully & \cellcolor{green!30}Pass \\
+\hline
+TC39 & POST /api/forms - Return 400 when form name missing & 400 error response & Validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC40 & PUT /api/forms/:id - Update existing form & 200 status with updated form data & Form updated successfully & \cellcolor{green!30}Pass \\
+\hline
+TC41 & PUT /api/forms/:id - Return 404 when form not found & 404 error response & Form not found error returned & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Forms API Unit Tests}}
+
+\subsection{Admin Server Testing - Form Builder API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC42 & POST /api/forms/:id/questions - Create new form question & 201 status with created question data & Question created successfully & \cellcolor{green!30}Pass \\
+\hline
+TC43 & POST /api/forms/:id/questions - Return 400 when questionType missing & 400 error response & Question validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC44 & GET /api/forms/:id/questions - Return all questions for form & Array of questions returned & Form questions retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC45 & GET /api/forms/:id/questions - Return 404 when form not found & 404 error response & Form not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC46 & PUT /api/forms/:formId/questions/:questionId - Update form question & 200 status with updated question & Question updated successfully & \cellcolor{green!30}Pass \\
+\hline
+TC47 & DELETE /api/forms/:formId/questions/:questionId - Delete form question & 200 status with success message & Question deleted successfully & \cellcolor{green!30}Pass \\
+\hline
+TC48 & DELETE /api/forms/:formId/questions/:questionId - Return 404 when question not found & 404 error response & Question not found error returned & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Form Builder API Unit Tests}}
+
+\subsection{Admin Server Testing - Images API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC49 & GET /api/images/:component - Return all images for component & Array of images returned & Images retrieved successfully & \cellcolor{green!30}Pass \\
+\hline
+TC50 & GET /api/images/:component - Handle empty result gracefully & Empty array returned & Successfully handles empty list & \cellcolor{green!30}Pass \\
+\hline
+TC51 & GET /api/images/:id/view - Return image file data & Image file returned with correct MIME type & Image data retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC52 & GET /api/images/:id/view - Return 404 when image not found & 404 error response & Image not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC53 & DELETE /api/images/:id - Delete image & 200 status with success message & Image deleted successfully & \cellcolor{green!30}Pass \\
+\hline
+TC54 & DELETE /api/images/:id - Return 404 when image not found & 404 error response & Image not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC55 & GET /api/images/:component/:index - Return image by component and index & Image object returned & Correct image retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC56 & GET /api/images/:component/:index - Return 404 when image not found & 404 error response & Image not found error returned & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Images API Unit Tests}}
+
+\subsubsection{User Server Testing - Authentication API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC57 & POST /api/auth/register - Register new user with valid credentials & 201 status with user data & User successfully registered & \cellcolor{green!30}Pass \\
+\hline
+TC58 & POST /api/auth/register - Return 400 when email or password missing & 400 error response & Validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC59 & POST /api/auth/register - Return 400 for password less than 8 characters & 400 error response & Password length validation error & \cellcolor{green!30}Pass \\
+\hline
+TC60 & POST /api/auth/login - Return 401 with invalid credentials & 401 error response & Authentication error returned & \cellcolor{green!30}Pass \\
+\hline
+TC61 & POST /api/auth/logout - Clear authentication token & 200 status with success message & Token cleared successfully & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Authentication API Unit Tests}}
+
+\subsubsection{User Server Testing - Events API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC62 & GET /api/events - Return all available events & Events array returned & All events retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC63 & GET /api/events/:id - Return single event by ID & Event object with matching ID & Event successfully retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC64 & GET /api/events/:id - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC65 & POST /api/events/:id/register - Register user for event & 201 status with registration data & User event registration created & \cellcolor{green!30}Pass \\
+\hline
+TC66 & POST /api/events/:id/register - Return 400 when userEmail missing & 400 error response & Parameter validation error returned & \cellcolor{green!30}Pass \\
+\hline
+TC67 & POST /api/events/:id/register - Return 404 when event not found & 404 error response & Event not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC68 & POST /api/events/:id/register - Register with event registration details & 201 status with registration & Registration with details created & \cellcolor{green!30}Pass \\
+\hline
+TC69 & POST /api/events/:id/register - Return 400 for duplicate registrations & 400 error response & Duplicate registration error & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Events API Unit Tests (User Server)}}
+
+\subsubsection{User Server Testing - Forms API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC70 & GET /api/forms - Return all public forms & Forms array returned & All public forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC71 & GET /api/forms/available/:uid - Return unfilled forms for user & Available forms array & User available forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC72 & GET /api/forms/completed/:uid - Return completed forms for user & Completed forms array & User completed forms retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC73 & GET /api/forms/:fid - Return single form by ID & Form object with matching ID & Form successfully retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC74 & GET /api/forms/:fid - Return 404 when form not found & 404 error response & Form not found error returned & \cellcolor{green!30}Pass \\
+\hline
+TC75 & GET /api/mod-forms/:fid - Return single modular form by ID & Modular form object & Modular form retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC76 & POST /api/forms/:fid/answers/:uid - Post form answer for question & 201 status with answer data & Form answer created successfully & \cellcolor{green!30}Pass \\
+\hline
+TC77 & PATCH /api/forms/:fid/submit/:uid - Submit completed form & 200 status with submission data & Form submission created & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Forms API Unit Tests (User Server)}}
+
+\subsubsection{User Server Testing - Images API}
+
+\noindent
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
+\hline
+\textbf{ID} & \textbf{Action} & \textbf{Expected Result} & \textbf{Actual Result} & \textbf{Result} \\\hline
+\endhead
+\hline
+TC78 & GET /api/images/event/:eventId - Return event image by event ID & Image file with correct MIME type & Image data retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC79 & GET /api/images/event/:eventId - Return 400 for invalid event ID & 400 error response & Invalid ID error returned & \cellcolor{green!30}Pass \\
+\hline
+TC80 & GET /api/public/images/:component - Return all images for component & Array of images returned & Component images retrieved & \cellcolor{green!30}Pass \\
+\hline
+TC81 & GET /api/public/images/:id/view - View specific image file by ID & Image file returned with MIME type & Image successfully viewed & \cellcolor{green!30}Pass \\
+\hline
+TC82 & GET /api/public/images/:id/view - Return image with correct headers & Image with caching headers & Image returned with cache control & \cellcolor{green!30}Pass \\
+\hline
+\end{longtable}
+
+\vspace{0.5cm}
+
+{\small \textit{Table: Images API Unit Tests (User Server)}}
+
 \section{Changes Due to Testing}
 
-\wss{This section should highlight how feedback from the users and from 
-the supervisor (when one exists) shaped the final product.  In particular 
-the feedback from the Rev 0 demo to the supervisor (or to potential users) 
-should be highlighted.}
+Reviews from peers and our supervisor revealed many issues with the first revision of the software, including usability issues and bugs that are difficult to catch with regular unit testing or were simply overlooked during manual testing by developers.
+
+\subsection{Server Robustness Improvements}
+
+Based on the results from unit testing, some changes can be made to improve server robustness. For example, TC69 verifies duplicate registration prevention, but enforcing uniqueness constraints at the database level on (userId, eventId) would provide stronger protection. Additionally, TC3 demonstrates graceful error handling, however, implementing centralized logging and monitoring would improve debugging and system reliability during unexpected failures.
+
+\subsection{Rendering Bug Fixes}
+
+During the reviews, a couple minor bugs were found mostly related to the initial rendering of pages and transfer of parameters between pages of the web application.
+
+\subsubsection{User Portal}
+\begin{itemize}
+    \item
+    \textbf{Bug:} Clicking the "Back to Surveys" buttons within the form filling interface brings the user back to the dashboard page, but on the "Overview" tab, not the "Surveys" tab.
+    \\
+    \textbf{Fix:} Each tab (Overview, Events, Surveys) can be attached to a URL route (e.g. /overview, /events, /surveys).
+    \item
+    \textbf{Bug:} Clicking "Save" under the form filling interface, then reloading the page does not retain the user's current answers.
+    \\
+    \textbf{Fix:} Ensure the database is queried for any saved responses to the selected form, and the reponses are loaded before the page is rendered.
+    \item
+    \textbf{Bug:} The modular form filling interface does not render the "Completed Sections" interface until all modules are completed.
+    \\
+    \textbf{Fix:} Change the rendering conditions for the "Completed Sections" UI element to render if there are 1 or more completed sections.
+    \item
+    \textbf{Bug:} Clicking "View Details" on an event card under the "Featured Events" section loads the overall "Events" tab, instead of bringing the user to the details page for the selected event.
+    \\
+    \textbf{Fix:} Update the click handler for the "View Details" button to route to the event details page.
+\end{itemize}
+
+\subsubsection{Admin Portal}
+\begin{itemize}
+    \item
+    \textbf{Bug:} Setting the unlock date on a form to an invalid date will set no date instead of prompting the user to correct the invalid entry.
+    \\
+    \textbf{Fix:} Add error handling for the selected unlock date, with validity checks that trigger a correction prompt on invalid entries.
+    \item
+    \textbf{Bug:} Empty sections (e.g. form with no description) are not rendered, causing inconsistencies in UI elements and visual bugs
+    \\
+    \textbf{Fix:} Add placeholder text for missing information (e.g. No description, no deadline) or render the element without any text.
+\end{itemize}
+
+\subsection{Missing Features}
+
+The following are important features or functionality of the software that was noted to be missing by reviewers due to oversights during development.
+
+\subsubsection{User Portal}
+\begin{itemize}
+    \item
+    \textbf{Issue:} No option to view a completed submission, only to edit or delete.
+    \\
+    \textbf{Fix:} Render a "View Submission" button if the form is completed. When clicked it should open the form filling interface but disable all input fields to prevent edits.
+    \item
+    \textbf{Issue:} The form details interface displays the time the form was created, which is irrelevant to the user. Should display the last edit or submission instead.
+    \\
+    \textbf{Fix:} Populate this field with the last submission time, queried from the form submissions database table.
+    \item
+    \textbf{Issue:} Instead of prompting the user for their personal information (e.g. name, email), this information should be pulled from the user's profile.
+    \\
+    \textbf{Fix:} Create a user profile page, allowing the user to edit this information. This page can be rendered and required for completion upon creation of a new account.
+\end{itemize}
+
+\subsubsection{Admin Portal}
+\begin{itemize}
+    \item
+    \textbf{Issue:} No option to edit the name and description of a form
+    \\
+    \textbf{Fix:} Similar to the events dashboard, add an edit button for each form which prompts the admin to edit the name and description of the form.
+    \item
+    \textbf{Issue:} The status of an event ("Scheduled", "Ongoing", or "Completed") should be an automatically assigned state instead of manually selected.
+    \\
+    \textbf{Fix:} Add functionality in the backend to do this automatically at the indicated timestamps (e.g. set to "Ongoing" when the event date and time is reached).
+    \item
+    \textbf{Issue:} Cannot set the status of an attendee from "Registed" to "Attended"
+    \\
+    \textbf{Fix:} This can be done by scanning the user's QR code, but should add an interface to set this manually
+    \item
+    \textbf{Issue:} The dropdown question type in the form builder should have the option to populate the dropdown with options by pasting multiple options seperated by newlines, instead of having to manually enter each choice for larger dropdowns.
+    \\
+    \textbf{Fix:} Add a seperate field to enter multiple options at once, or detect new line characters in the existing interface.
+    \item
+    \textbf{Issue:} Pressing the Enter key while adding options to a multiple selection question should create a new option, instead of having to use the UI buttons.
+    \\
+    \textbf{Fix:} Add detection for new lines in the option field, or an event handler for the enter key.
+\end{itemize}
+
+\subsection{Understandability Improvements}
+
+The following are parts of the system that reviewers found confusing or abiguous that can be updated for additional clarity. It can be noted that more issues were found on the admin side of the application due to assumptions that the admin users are more knowledgable of the system. This should be kept in mind for further changes to the admin portal.
+
+\subsubsection{User Portal}
+\begin{itemize}
+    \item In the "Available Events" tab, there is no indication or status pill on an event if the user has already registered.
+\end{itemize}
+
+\subsubsection{Admin Portal}
+\begin{itemize}
+    \item Confusion around what the "Instance" column represents in the attendee overview table
+    \item No column for name in the attendee overview table
+    \item A form that is set to auto unlock and has already been unlocked is displayed as being set to unlock at a past date.
+    \item The status text next to the visibility slider is confusing, as it appears as if "Private" is turned off when toggled.
+    \item Two different interfaces, indicating a form is "Public" and "Live" is unnecessary and confusing.
+    \item The "Set Date" button is too far from the "Unlock date" header, making it look unrelated.
+    \item Unclear whether a form that is private and scheduled to unlock will remain private after unlocking.
+    \item Unclear whether a form that is public and scheduled to unlock will be visible to users before the unlock date.
+    \item "Maximum required selections" for multiple selection questions is confusing wording, should be called "Maximum allowed selections".
+\end{itemize}
+
+\subsection{Look and Feel Improvements}
+
+The following are minor visual changes which reviewers noted can be made to improve the user experience and overall feel of the application.
+
+\begin{itemize}
+    \item Usage of UI modals instead of browser default alerts and confirmations.
+    \item Custom UI for dropdown menus to match the look of the interface, instead of the browser default.
+    \item Change the blue form selection UI to match wider UI theming (McMaster red and gold).
+\end{itemize}
 
 \section{Automated Testing}
-		
+Our unit tests are automated by running the `pnpm test` command within the respective directories based on the unit tests that we want run. We used Vitest to do the unit testing and integrated the Postman type API testing with these Vitest unit tests. This allowed us to both create mocks and snapshots of the database while testing to easily complete the tests and not having to create a seperate profile and testing database doing it all in memory.\\
+\\
+For integration testing we utilized github actions which ran the our test workflow on pushes and merges into the dev branch to ensure that our new changes worked with our previous ones with out causing any problems.
 \section{Trace to Requirements}
-		
-\section{Trace to Modules}		
+\begin{longtable}{p{0.25\linewidth} p{0.65\linewidth}}
+\toprule
+\textbf{Requirement} & \textbf{Unit Tests} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Requirement} & \textbf{Unit Tests} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+% Section 9 – Functional Requirements
+\textbf{FR-1}  & TC38, TC39, TC42, TC43, TC44, TC45, TC46, TC47, TC48 \\[4mm]
+\textbf{FR-2}  & TC33, TC34, TC35, TC36, TC37, TC40, TC41, TC70, TC71, TC72, TC73, TC74, TC75 \\[4mm]
+\textbf{FR-3}  & TC11, TC12, TC13, TC14, TC15, TC62, TC63, TC64, TC65, TC66, TC67, TC68, TC69 \\[4mm]
+\textbf{FR-4}  & TC26, TC27, TC28, TC29, TC30, TC31, TC32, TC65 \\[4mm]
+\textbf{FR-5}  & TC1, TC2, TC3, TC14, TC15 \\[4mm]
+\textbf{FR-6}  & TC4, TC5, TC6, TC7, TC8, TC9, TC10, TC62, TC63, TC64, TC65, TC66, TC67, TC68, TC69 \\[4mm]
+\textbf{FR-7}  & TC33, TC34, TC35, TC38, TC39, TC40, TC41, TC70, TC71, TC72, TC73, TC74, TC75, TC76, TC77 \\[4mm]
+\textbf{FR-9}  & TC70, TC71, TC72, TC73, TC74, TC75, TC76, TC77 \\[4mm]
+\textbf{FR-10} & TC33, TC34, TC35, TC36, TC37, TC40, TC41 \\[4mm]
+\textbf{FR-11} & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+
+\textbf{ER-2}  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{PI-1}  & TC38, TC42, TC43, TC44, TC46, TC47 \\[4mm]
+\textbf{PI-2}  & TC1, TC2 \\[4mm]
+\textbf{LR-2}  & TC38, TC42, TC43, TC44, TC45, TC46, TC47, TC48 \\[4mm]
+\textbf{UR-2}  & TC6, TC7, TC9, TC13, TC18, TC21, TC22, TC24, TC25, TC28, TC29, TC31, TC32,
+                  TC37, TC39, TC41, TC43, TC45, TC47, TC48, TC52, TC54, TC56, TC58, TC59,
+                  TC60, TC64, TC66, TC67, TC69, TC74, TC79 \\[4mm]
+\textbf{UR-3}  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{SC-1}  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{PA-1}  & TC1, TC2 \\[4mm]
+\textbf{FT-1}  & TC76, TC77 \\[4mm]
+\textbf{FT-2}  & TC76, TC77 \\[4mm]
+\textbf{FT-3}  & TC38, TC42, TC44 \\[4mm]
+\textbf{FT-4}  & TC8, TC9, TC10, TC20, TC21, TC22 \\[4mm]
+\textbf{SE-1}  & TC14, TC15, TC65, TC69 \\[4mm]
+
+% Section 15 – Security Requirements
+\textbf{SAR-1} & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+\textbf{SAR-2} & TC57, TC60, TC61 \\[4mm]
+\textbf{SIR-1} & TC6, TC7, TC9, TC13, TC18, TC21, TC22, TC24, TC25, TC28, TC29, TC31,
+                  TC32, TC37, TC39, TC41, TC43, TC45, TC47, TC48, TC52, TC54, TC56,
+                  TC58, TC59, TC64, TC66, TC67, TC69, TC74, TC79 \\[4mm]
+
+\end{longtable}
+\section{Trace to Modules}
+\begin{longtable}{p{0.30\linewidth} p{0.60\linewidth}}
+\toprule
+\textbf{Module} & \textbf{Unit Tests} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Module} & \textbf{Unit Tests} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\textbf{M1: Main System Module}
+  & TC1, TC2, TC3, TC4, TC5, TC6, TC7, TC8, TC9, TC10,
+    TC11, TC12, TC13, TC14, TC15, TC16, TC17, TC18, TC19,
+    TC20, TC21, TC22, TC23, TC24, TC25, TC26, TC27, TC28,
+    TC29, TC30, TC31, TC32, TC33, TC34, TC35, TC36, TC37,
+    TC38, TC39, TC40, TC41, TC42, TC43, TC44, TC45, TC46,
+    TC47, TC48, TC49, TC50, TC51, TC52, TC53, TC54, TC55,
+    TC56, TC57, TC58, TC59, TC60, TC61, TC62, TC63, TC64,
+    TC65, TC66, TC67, TC68, TC69, TC70, TC71, TC72, TC73,
+    TC74, TC75, TC76, TC77, TC78, TC79, TC80, TC81, TC82 \\[4mm]
+
+\textbf{M2: User Authentication Module}
+  & TC57, TC58, TC59, TC60, TC61 \\[4mm]
+
+\textbf{M3: User Authorization Module}
+  & TC57, TC60, TC61 \\[4mm]
+
+\textbf{M4: Form Template Module}
+  & TC33, TC34, TC35, TC36, TC37, TC38, TC39, TC40, TC41,
+    TC42, TC43, TC44, TC45, TC46, TC47, TC48,
+    TC70, TC71, TC72, TC73, TC74, TC75 \\[4mm]
+
+\textbf{M5: Form Submission Module}
+  & TC76, TC77 \\[4mm]
+
+\textbf{M6: Event Management Module}
+  & TC1, TC2, TC3, TC4, TC5, TC6, TC7, TC8, TC9, TC10,
+    TC49, TC50, TC51, TC52, TC53, TC54, TC55, TC56,
+    TC62, TC63, TC64,
+    TC78, TC79, TC80, TC81, TC82 \\[4mm]
+
+
+\textbf{M8: Registration Module}
+  & TC11, TC12, TC13, TC14, TC15,
+    TC65, TC66, TC67, TC68, TC69 \\[4mm]
+
+\textbf{M9: Attendance Tracking Module}
+  & TC23, TC24, TC25, TC26, TC27, TC28, TC29,
+    TC30, TC31, TC32 \\[4mm]
+
+\textbf{M12: Database Access Module}
+  & TC3, TC7, TC9, TC15, TC17, TC22, TC25, TC29,
+    TC32, TC37, TC41, TC45, TC48, TC52, TC54, TC56,
+    TC64, TC67, TC69, TC74 \\[4mm]
+
+
+\end{longtable}
 
 \section{Code Coverage Metrics}
 
-\bibliographystyle{plainnat}
-\bibliography{../../refs/References}
+The code coverage reports for the backend APIs and database schemas were generated using Vitest. Overall, the coverage of the system was about 50\% for statement coverage,  48\% branch coverage, 56\% function coverage and 51\% line coverage. Main areas for improvement include the events and forms schemas, which both have a considerably low function coverage, as well as the form builder and form fetching API. 
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/report.png}
+    \caption{Code coverage report}\label{fig:workcontextuser}
+\end{figure}
+\end{center}
+
+A coverage report was not generated for the frontend code. This is due to the high difficultly and intricacy of testing interactive and state driven nature of modern UI frameworks such as React. Traditional code coverage reports and unit testing were replaced with peer reviews and user accceptance testing. 
 
 \newpage{}
 \section*{Appendix --- Reflection}
 
-The information in this section will be used to evaluate the team members on the
-graduate attribute of Reflection.
+\subsubsection*{Ibrahim Quraishi Reflection}
 
-\input{../Reflection.tex}
+\textbf{1. What went well while writing this deliverable?}
 
-\begin{enumerate}
-  \item What went well while writing this deliverable? 
-  \item What pain points did you experience during this deliverable, and how
-    did you resolve them?
-  \item Which parts of this document stemmed from speaking to your client(s) or
-  a proxy (e.g. your peers)? Which ones were not, and why?
-  \item In what ways was the Verification and Validation (VnV) Plan different
-  from the activities that were actually conducted for VnV?  If there were
-  differences, what changes required the modification in the plan?  Why did
-  these changes occur?  Would you be able to anticipate these changes in future
-  projects?  If there weren't any differences, how was your team able to clearly
-  predict a feasible amount of effort and the right tasks needed to build the
-  evidence that demonstrates the required quality?  (It is expected that most
-  teams will have had to deviate from their original VnV Plan.)
-\end{enumerate}
+Due to the highly detailed reports left by our supervisor from his review of the system, it was very simple to understand changes that needed to be made to the system to maintain consistency as well as general improvements. Analyzing the user's interactions with the application also helped guide us with designing unit tests based around what the system expects and does not expect from the user.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+
+Finding ways to imrpove our code coverage was difficult, due to the large scale and distributed nature of our system. It was especially difficult figuring out how the test the frontend components of our system as it is not something that can be tested with traditional unit testing. We did our best to resolve these issues by asking advice from our supervisor and our TA, and using code coverage reports to find where coverage was missing.   
+
+\subsubsection*{Rayyan Suhail Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+
+During this deliverable was that our team already
+had a strong understanding of the system from previous documents such as
+the SRS and design deliverables. Because of this, it was easier to connect
+the verification and validation activities to the actual components of the
+platform like event registration, the form builder, and the admin dashboard.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+
+Making sure that the testing approaches we described were realistic and would actually match the features that were implemented in the system.
+To resolve this, I reviewed the project requirements and thought about
+how those features would realistically be tested during development.
+Discussing these ideas with my teammates also helped clarify which
+verification activities made the most sense for our platform.
+
+\subsubsection*{Mohammad Mahdi Mahboob Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+
+One aspect of this deliverable that went well was the integration of AI
+into our testing workflow. With the rapid advancement of AI, we were able
+to quickly generate a test suite which helped us get the figures we needed
+for this deliverable without having to spend too much time thinking about,
+setting up, and deploying tests and testing technologies. We only needed to
+verify the testing methodology was consistent with our goals. I think this is
+a prime example of how AI can be used productively in our field, and is
+definitely going to become a staple of my workflow as I transition to the
+professional market.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+
+The biggest pain point I encountered was attempting to quantify, evaluate, and
+represent our NFR evaluations. This type of evaluation was completely new to me
+and I had difficulty figuring out how to conduct it, as well as identifying and
+accounting for any directive changes that had occurred since our Rev0 SRS plan.
+I was able to ask my fellow teammates for assistance in this aspect and
+referenced previous years' examples to get a better visualization of what the
+NFR evaluation looked like. My team also noted changes we need to make to our
+SRS, and we will regroup to determine what changes we will revert or commit to
+for Rev1. I am extremely grateful to my teammates for their continued support.
+
+\subsubsection*{Virochaan Ravichandran Gowri Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+Our VNV plan was quite thorough in what and how we would be testing and the tools and/or methodology we planned on using within our tests. We also were quite proactive in understanding that we were gonna do usability testing so we got extra feedback on how to improve our project. Also I think we figured out how to use the tools and like vitest quite easily so this was not a large barrier to our progress for this deliverable.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+Setting up the testing did cause some problems because there were some dependencies in the setup that we needed to figure out. Also we felt that front-end testing was a bit redundant as it really only just confirmed what could be seen in the validation and acceptance tests so we needed to ensure that there was no redundancy in code coverage. Also we needed to ensure that the testing methodology for the NFR's was actually effective in showing that the NFR was achieved as well. So this caused us to tweak our process to evaluating the NFR's multiple times to actually ensure we achieved our goals. Finally, there were some problems in getting good code coverage metrics specifically for the tests relating to the NFR because they are harder to measure.
+
+\subsubsection*{Omar Al-Asfar Reflection}
+
+\textbf{1. What went well while writing this deliverable?}
+We were very meticulous when writing our VnV Plan, which laid the foundation for this deliverable. We already had a detailed understanding of the testing approaches we wanted to use and how they would be applied to our system. Our VnV Plan also had good traceability, so we were able to efficiently reference the pertinent requirements and show the traceability in this report. As a result, the evaluation process was relatively simple, involving following the plan aside from some adjustments we made to the NFR evaluation process.
+
+\textbf{2. What pain points did you experience during this deliverable,
+and how did you resolve them?}
+The NFR Evaluation was the biggest pain point we had to deal with for this deliverable. While the FR Evaluation was in-line with the plan, there were a few adjustments required for the NFR's. The tests from the plan were occasionally too ambitious to perform, or not effective enough in demonstrating completion. We resolved this simply by refining the test approaches to be more feasible for our use case, or used different metrics to evaluate the success of the test. Overall, the NFR evaluation was a pain point relative to the rest of the deliverable since it required more consideration and review.
+
+\subsubsection*{Team Reflection}
+
+\textbf{3. Which parts of this document stemmed from speaking to your
+client(s) or a proxy (e.g. your peers)? Which ones were not, and why?}
+
+Some parts of the document were influenced by conversations with our
+project supervisor and internal team discussions about how the platform
+would actually be used by MES organizers and students. In particular, the
+validation activities related to usability, event registration workflows,
+and the overall user experience were shaped by our understanding of the
+client’s needs and how the system would be used in practice.
+
+Other parts of the document, such as the structure of the verification
+process and the different testing strategies, were based more on standard
+software engineering practices rather than direct client input. These
+sections were included to ensure the system could be tested thoroughly
+and maintain a good level of reliability.
+
+\textbf{4. In what ways was the Verification and Validation (VnV) Plan
+different from the activities that were actually conducted for VnV?}
+
+Although the VnV plan outlined a structured set of verification and
+validation activities, the testing that actually took place during
+development was more iterative than originally planned.
+
+Many tests happened while features were being implemented rather than
+only after development was finished. For example, the team regularly
+tested components such as form creation, event registration, and data
+handling while building them to ensure they worked before integration.
+
+This difference mainly occurred because development progressed in small
+increments, and it made more sense to validate features as they were
+built. In future projects, we would anticipate this by planning for more
+continuous testing throughout development rather than assuming testing
+would happen mostly at the end.
 
 \end{document}

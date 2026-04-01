@@ -15,7 +15,9 @@
     "clean": "rm -rf .next dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@fastify/cookie": "^10.0.1",
@@ -23,6 +25,11 @@
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-router": "^1.58.3",
     "@types/nodemailer": "^7.0.11",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitest/browser": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
@@ -31,6 +38,7 @@
     "drizzle-orm": "^0.44.7",
     "fastify": "^5.2.0",
     "framer-motion": "^12.29.0",
+    "happy-dom": "^20.8.3",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.563.0",
     "nodemailer": "^8.0.3",
@@ -40,7 +48,8 @@
     "react-dom": "^19.1.1",
     "react-hot-toast": "^2.6.0",
     "react-loading-indicators": "^1.0.1",
-    "styled-components": "^6.1.19"
+    "styled-components": "^6.1.19",
+    "vitest": "^4.0.18"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
