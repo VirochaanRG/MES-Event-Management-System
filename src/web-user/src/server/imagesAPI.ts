@@ -56,6 +56,87 @@ export default async function publicImageRoutes(fastify: FastifyInstance)
     }
   );
 
+  // Get event gallery images metadata
+  fastify.get<{ Params: { eventId: string } }>(
+    '/api/images/event/:eventId/gallery',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { eventId } = request.params;
+        const eventIdNum = parseInt(eventId, 10);
+
+        if (Number.isNaN(eventIdNum))
+        {
+          return reply.code(400).send({ success: false, error: 'Invalid event ID' });
+        }
+
+        const result = await db
+          .select({
+            id: images.id,
+            fileName: images.fileName,
+            mimeType: images.mimeType,
+            fileSize: images.fileSize,
+            createdAt: images.createdAt,
+          })
+          .from(images)
+          .where(and(eq(images.component, 'event-gallery'), eq(images.index, eventIdNum)))
+          .orderBy(images.createdAt);
+
+        return reply.send({
+          success: true,
+          data: result,
+        });
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Error fetching event gallery images');
+        return reply.code(500).send({ success: false, error: 'Failed to fetch gallery images' });
+      }
+    }
+  );
+
+  // View image by ID
+  fastify.get<{ Params: IdParams }>(
+    '/api/images/:id/view',
+    async (request, reply) =>
+    {
+      try
+      {
+        const { id } = request.params;
+        const imageId = parseInt(id, 10);
+
+        if (Number.isNaN(imageId))
+        {
+          return reply.code(400).send({ success: false, error: 'Invalid image ID' });
+        }
+
+        const result = await db
+          .select()
+          .from(images)
+          .where(eq(images.id, imageId))
+          .limit(1);
+
+        if (result.length === 0)
+        {
+          return reply.code(404).send({ success: false, error: 'Image not found' });
+        }
+
+        const image = result[0];
+
+        return reply
+          .header('Content-Type', image.mimeType || 'application/octet-stream')
+          .header('Content-Disposition', `inline; filename="${image.fileName || `image-${id}`}"`)
+          .header('Content-Length', image.imageData.length)
+          .header('Cache-Control', 'public, max-age=86400')
+          .send(image.imageData);
+      } catch (error)
+      {
+        fastify.log.error({ err: error }, 'Error viewing image by id');
+        return reply.code(500).send({ success: false, error: 'Failed to view image' });
+      }
+    }
+  );
+
   // Get all images for a specific component (public route)
   fastify.get<{ Params: ComponentParams }>(
     '/api/public/images/:component',

@@ -11,7 +11,6 @@ import {
   TrendingUp,
   Calendar,
   Search,
-  Eye,
 } from "lucide-react";
 
 interface Form {
@@ -184,7 +183,7 @@ function AnalyticsPageContent() {
         <div className="p-6">
           {/* Overview Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
@@ -200,7 +199,7 @@ function AnalyticsPageContent() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
@@ -216,7 +215,7 @@ function AnalyticsPageContent() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">
@@ -236,17 +235,15 @@ function AnalyticsPageContent() {
           </div>
 
           {/* Search Bar */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search forms by name or description..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
-              />
-            </div>
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search forms by name or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-900 focus:border-transparent"
+            />
           </div>
 
           {/* Forms Grid */}
@@ -257,27 +254,19 @@ function AnalyticsPageContent() {
                 <Link
                   key={form.id}
                   to={`/analytics/${form.id}`}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow overflow-hidden group"
+                  className="bg-white rounded-lg shadow-sm border-2 border-gray-300 hover:shadow-md transition-shadow overflow-hidden group"
                 >
                   <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="mb-4">
                       <div className="flex-1">
                         <h3 className="text-lg font-bold text-gray-900 group-hover:text-red-900 transition-colors mb-1">
                           {form.name}
                         </h3>
-                        {form.description && (
-                          <p className="text-sm text-gray-600 line-clamp-2">
-                            {form.description}
-                          </p>
-                        )}
-                      </div>
-                      <div className="ml-4">
-                        <Eye className="w-5 h-5 text-gray-400 group-hover:text-red-900 transition-colors" />
                       </div>
                     </div>
 
                     {stats ? (
-                      <div className="space-y-3 pt-4 border-t border-gray-200">
+                      <div className="space-y-3 pt-4 border-t-2 border-gray-300">
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-gray-600">Submissions</span>
                           <span className="font-semibold text-gray-900">
@@ -300,7 +289,7 @@ function AnalyticsPageContent() {
                         </div>
                       </div>
                     ) : (
-                      <div className="pt-4 border-t border-gray-200">
+                      <div className="pt-4 border-t-2 border-gray-300">
                         <div className="animate-pulse space-y-2">
                           <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                           <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -309,7 +298,7 @@ function AnalyticsPageContent() {
                     )}
                   </div>
 
-                  <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
+                  <div className="bg-gray-50 px-6 py-3 border-t-2 border-gray-300">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">View Analytics</span>
                       <BarChart3 className="w-4 h-4 text-red-900" />
@@ -321,7 +310,7 @@ function AnalyticsPageContent() {
           </div>
 
           {filteredForms.length === 0 && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+            <div className="bg-white rounded-lg shadow-sm border-2 border-gray-300 p-12 text-center">
               <BarChart3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 No forms found

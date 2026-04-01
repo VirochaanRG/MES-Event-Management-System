@@ -12,6 +12,7 @@ import eventsRoutes from './eventsAPI';
 import formsRoutes from './formsAPI';
 import formBuilderRoutes from './formBuilderAPI';
 import imageRoutes from './imagesAPI';
+import announcementsRoutes from './announcementsAPI';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3124;
@@ -43,7 +44,7 @@ function verifyToken(token: string): { user: AuthUser } | null
 
 // Register plugins
 await fastify.register(cors, {
-  origin: 'http://localhost:3024',
+  origin: true,
   credentials: true,
 });
 
@@ -429,6 +430,7 @@ await fastify.register(eventsRoutes)
 await fastify.register(formsRoutes)
 await fastify.register(formBuilderRoutes)
 await fastify.register(imageRoutes)
+await fastify.register(announcementsRoutes)
 
 
 // Start server

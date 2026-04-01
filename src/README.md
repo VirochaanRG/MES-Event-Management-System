@@ -33,7 +33,10 @@ Stay in the root folder and all commands should be done in the root folder unles
 
 Then install pnpm (faster npm) after you have node installed with `npm install -g pnpm`.
 
-After having pnpm installed run `pnpm install` to download all the node modules. **Make sure your gitignore has node_modules. You should NOT push any node_modules files to the repo.**
+After having pnpm installed run `pnpm install:all` to download all the node modules for both the web and mobile apps. **Make sure your gitignore has node_modules. You should NOT push any node_modules files to the repo.**
+
+To install just the web app modules, you can use `pnpm install` from the root.
+To install just the mobile app modules, use `pnpm install:mobile` from the root.
 
 ### Database Setup
 
@@ -48,3 +51,7 @@ If the database already exists and you need to update the schemas so cd int to t
 Run `pnpm dev` to run both web-admin and web-user. If it is your first time you have to run `pnpm build:full` first and then run `pnpm dev`.
 
 ### Running the Mobile App
+
+Start the server with `pnpm dev:server`. In another terminal, connect to an emulator/physical device, and run `pnpm dev:mobile` to build and preview the app in an Expo development server.
+
+**Note: concurrently often does not work with expo, which is why you have to run both commands separately in split terminals.**

@@ -26,11 +26,19 @@ interface Event {
 interface FormQuestion {
   id?: string;
   formId: number;
-  questionType: "text_answer" | "multiple_choice" | "multi_select";
+  questionType: "text_answer" | "multiple_choice" | "multi_select" | "dropdown";
   questionTitle: string;
   optionsCategory: string | null;
   qorder: number;
   required: boolean;
+}
+
+interface UserProfile {
+  firstName: string;
+  lastName: string;
+  isMcmasterStudent: boolean;
+  faculty: string | null;
+  program: string | null;
 }
 
 function RouteComponent() {
@@ -49,6 +57,13 @@ function RouteComponent() {
   const [formQuestions, setFormQuestions] = useState<FormQuestion[]>([]);
   const [formAnswers, setFormAnswers] = useState<Record<string, any>>({});
   const [formLoading, setFormLoading] = useState(false);
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+  const [hasAnyRegistration, setHasAnyRegistration] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [paymentCheckoutUrl, setPaymentCheckoutUrl] = useState<string | null>(
+    null,
+  );
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -72,8 +87,71 @@ function RouteComponent() {
     fetchEvent();
   }, [eventId]);
 
+  useEffect(() => {
+    const loadProfileStatus = async () => {
+      if (!user?.id && !user?.email) {
+        setHasProfile(false);
+        return;
+      }
+
+      try {
+        const endpoint = user.id
+          ? `/api/profiles/${user.id}`
+          : `/api/profiles?email=${encodeURIComponent(user.email)}`;
+
+        const res = await fetch(endpoint, {
+          credentials: "include",
+        });
+        const json = await res.json();
+
+        const profileExists = Boolean(json?.success && json?.data);
+        setHasProfile(profileExists);
+        setUserProfile(profileExists ? (json.data as UserProfile) : null);
+      } catch {
+        setHasProfile(false);
+        setUserProfile(null);
+      }
+    };
+
+    loadProfileStatus();
+  }, [user?.id, user?.email]);
+
+  useEffect(() => {
+    const checkRegistrationStatus = async () => {
+      if (!user?.email) {
+        setHasAnyRegistration(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/events/${eventId}/registration?userEmail=${encodeURIComponent(user.email)}`,
+        );
+        const result = await response.json();
+
+        if (result.success) {
+          const hasRegistration = Boolean(
+            result.hasRegistration ?? result.isRegistered,
+          );
+          setHasAnyRegistration(hasRegistration);
+
+          if (result.isRegistered) {
+            setRegisterStatus("registered");
+          }
+        }
+      } catch {
+        setHasAnyRegistration(false);
+      }
+    };
+
+    checkRegistrationStatus();
+  }, [eventId, user?.email]);
+
   const handleBack = () => {
-    navigate({ to: "/" });
+    navigate({
+      to: "/",
+      search: { tab: "events", eventsSubTab: "available" },
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -110,9 +188,111 @@ function RouteComponent() {
     }
   };
 
+  const findChoiceIndex = (choices: string[], expectedValue: string) => {
+    const normalizedExpected = expectedValue.trim().toLowerCase();
+    return choices.findIndex(
+      (choice) => choice.trim().toLowerCase() === normalizedExpected,
+    );
+  };
+
+  const getAutofillValueForQuestion = (questionTitle: string) => {
+    if (!userProfile) return undefined;
+
+    const normalizedTitle = questionTitle.toLowerCase();
+    const looksLikeEmail = normalizedTitle.includes("email");
+    const looksLikeFirstName =
+      normalizedTitle.includes("first") && normalizedTitle.includes("name");
+    const looksLikeLastName =
+      normalizedTitle.includes("last") && normalizedTitle.includes("name");
+    const looksLikeFullName =
+      normalizedTitle.includes("full") && normalizedTitle.includes("name");
+    const looksLikeFaculty = normalizedTitle.includes("faculty");
+    const looksLikeProgram =
+      normalizedTitle.includes("program") ||
+      normalizedTitle.includes("major") ||
+      normalizedTitle.includes("field of study");
+    const looksLikeMacStudent =
+      normalizedTitle.includes("mcmaster") ||
+      normalizedTitle.includes("mac student") ||
+      (normalizedTitle.includes("student") &&
+        normalizedTitle.includes("yes") &&
+        normalizedTitle.includes("no"));
+
+    if (looksLikeEmail) return user?.email ?? "";
+    if (looksLikeFirstName) return userProfile.firstName;
+    if (looksLikeLastName) return userProfile.lastName;
+    if (looksLikeFullName)
+      return `${userProfile.firstName} ${userProfile.lastName}`.trim();
+    if (looksLikeFaculty) return userProfile.faculty ?? "";
+    if (looksLikeProgram) return userProfile.program ?? "";
+    if (looksLikeMacStudent)
+      return userProfile.isMcmasterStudent ? "yes" : "no";
+
+    return undefined;
+  };
+
+  const buildAutofilledAnswers = (questions: FormQuestion[]) => {
+    const autofilled: Record<string, any> = {};
+
+    for (const question of questions) {
+      const qKey = question.qorder.toString();
+      const mappedValue = getAutofillValueForQuestion(question.questionTitle);
+      if (!mappedValue) continue;
+
+      if (question.questionType === "text_answer") {
+        autofilled[qKey] = mappedValue;
+        continue;
+      }
+
+      if (
+        (question.questionType === "multiple_choice" ||
+          question.questionType === "dropdown") &&
+        question.optionsCategory
+      ) {
+        const options = JSON.parse(question.optionsCategory);
+        const choices = Array.isArray(options?.choices) ? options.choices : [];
+        const idx = findChoiceIndex(choices, mappedValue);
+        if (idx >= 0) autofilled[qKey] = idx;
+        continue;
+      }
+
+      if (
+        question.questionType === "multi_select" &&
+        question.optionsCategory
+      ) {
+        const options = JSON.parse(question.optionsCategory);
+        const choices = Array.isArray(options?.choices) ? options.choices : [];
+
+        const targetValues = mappedValue
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean);
+
+        const indices = targetValues
+          .map((value) => findChoiceIndex(choices, value))
+          .filter((idx) => idx >= 0);
+
+        if (indices.length > 0) autofilled[qKey] = indices;
+      }
+    }
+
+    return autofilled;
+  };
+
   const openRegistrationForm = async () => {
     if (!user?.email) {
       toast.error("You must be logged in to register for this event");
+      return;
+    }
+
+    if (hasProfile === false) {
+      toast.error("Complete your profile before registering for events");
+      navigate({ to: "/profile" });
+      return;
+    }
+
+    if (hasAnyRegistration) {
+      toast.error("You are already registered for this event");
       return;
     }
 
@@ -122,7 +302,9 @@ function RouteComponent() {
       const result = await response.json();
 
       if (result.success) {
-        setFormQuestions(result.questions || []);
+        const questions = result.questions || [];
+        setFormQuestions(questions);
+        setFormAnswers(buildAutofilledAnswers(questions));
         setShowRegistrationForm(true);
       } else {
         toast.error("Failed to load registration form");
@@ -133,6 +315,27 @@ function RouteComponent() {
     } finally {
       setFormLoading(false);
     }
+  };
+
+  const startPaidCheckout = async () => {
+    const response = await fetch(`/api/events/${eventId}/payment/checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userEmail: user?.email,
+        details: formAnswers,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success || !result?.data?.checkoutUrl) {
+      throw new Error(result?.error || "Failed to start payment");
+    }
+
+    setPaymentCheckoutUrl(result.data.checkoutUrl);
+    setShowRegistrationForm(false);
+    setShowPaymentModal(true);
   };
 
   const closeRegistrationForm = () => {
@@ -180,12 +383,16 @@ function RouteComponent() {
       }
 
       // Validate email fields
-      const isEmailField = question.questionTitle?.toLowerCase().includes("email");
+      const isEmailField = question.questionTitle
+        ?.toLowerCase()
+        .includes("email");
       if (isEmailField && formAnswers[question.qorder.toString()]) {
         const emailValue = formAnswers[question.qorder.toString()];
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(emailValue)) {
-          toast.error(`${question.questionTitle}: Please enter a valid email address`);
+          toast.error(
+            `${question.questionTitle}: Please enter a valid email address`,
+          );
           return false;
         }
       }
@@ -217,12 +424,24 @@ function RouteComponent() {
   };
 
   const submitRegistration = async () => {
+    if (hasProfile === false) {
+      toast.error("Complete your profile before registering for events");
+      navigate({ to: "/profile" });
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
 
     setRegisterStatus("loading");
     try {
+      if ((event?.cost ?? 0) > 0) {
+        await startPaidCheckout();
+        setRegisterStatus("idle");
+        return;
+      }
+
       const response = await fetch(`/api/events/${eventId}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -263,7 +482,7 @@ function RouteComponent() {
     } catch (err: any) {
       console.error(err);
       setRegisterStatus("idle");
-      toast.error("Something went wrong while registering");
+      toast.error(err?.message || "Something went wrong while registering");
     }
   };
 
@@ -275,7 +494,9 @@ function RouteComponent() {
 
     switch (question.questionType) {
       case "text_answer":
-        const isEmailField = question.questionTitle?.toLowerCase().includes("email");
+        const isEmailField = question.questionTitle
+          ?.toLowerCase()
+          .includes("email");
         return (
           <div key={questionKey} className="mb-6">
             <label className="block text-sm font-semibold text-gray-800 mb-2">
@@ -287,16 +508,24 @@ function RouteComponent() {
             <textarea
               value={formAnswers[questionKey] || ""}
               onChange={(e) => handleInputChange(questionKey, e.target.value)}
-              placeholder={isEmailField ? "Enter your email address..." : "Enter your answer..."}
+              placeholder={
+                isEmailField
+                  ? "Enter your email address..."
+                  : "Enter your answer..."
+              }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent resize-none transition-all"
               rows={1}
             />
             {isEmailField && formAnswers[questionKey] && (
               <div className="text-xs mt-1">
                 {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formAnswers[questionKey]) ? (
-                  <span className="text-green-600 font-medium">✓ Valid email</span>
+                  <span className="text-green-600 font-medium">
+                    ✓ Valid email
+                  </span>
                 ) : (
-                  <span className="text-red-600 font-medium">❌ Invalid email format</span>
+                  <span className="text-red-600 font-medium">
+                    ❌ Invalid email format
+                  </span>
                 )}
               </div>
             )}
@@ -439,6 +668,14 @@ function RouteComponent() {
     );
   }
 
+  const normalizedLocation = event.location?.trim() || "";
+  const googleMapsUrl = normalizedLocation
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(normalizedLocation)}`
+    : "";
+  const googleMapsEmbedUrl = normalizedLocation
+    ? `https://www.google.com/maps?q=${encodeURIComponent(normalizedLocation)}&output=embed`
+    : "";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-amber-50 py-8 px-4">
       <div className="max-w-5xl mx-auto">
@@ -577,6 +814,32 @@ function RouteComponent() {
             <p className="text-gray-800 text-lg font-medium leading-relaxed">
               {event.location || "No location specified"}
             </p>
+            {normalizedLocation ? (
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="block mt-4"
+                aria-label={`Open ${normalizedLocation} in Google Maps`}
+              >
+                <div className="rounded-lg overflow-hidden border border-amber-200 shadow-sm hover:shadow-md transition-shadow">
+                  <iframe
+                    title={`Map for ${event.title}`}
+                    src={googleMapsEmbedUrl}
+                    loading="lazy"
+                    className="w-full h-56 border-0"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+                <p className="mt-2 text-xs font-semibold text-rose-900">
+                  Open in Google Maps ↗
+                </p>
+              </a>
+            ) : (
+              <div className="mt-4 rounded-lg border border-dashed border-stone-300 bg-stone-50 p-4 text-sm text-stone-500">
+                No map available for this event location.
+              </div>
+            )}
           </div>
 
           {/* Capacity */}
@@ -640,16 +903,35 @@ function RouteComponent() {
 
         {/* Action Buttons */}
         <div className="bg-white rounded-xl shadow-xl p-6 border-t-4 border-rose-900">
+          {hasProfile === false && (
+            <div className="mb-4 p-4 rounded-lg border border-amber-200 bg-amber-50 text-amber-900">
+              Complete your profile before registering for this event.
+            </div>
+          )}
+          {hasAnyRegistration && (
+            <div className="mb-4 p-4 rounded-lg border border-blue-200 bg-blue-50 text-blue-900">
+              You already have a registration for this event.
+            </div>
+          )}
           <div className="flex flex-col sm:flex-row gap-4">
             <button
               className="flex-1 px-8 py-4 bg-rose-900 text-amber-300 font-bold rounded-lg hover:bg-rose-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
               onClick={openRegistrationForm}
-              disabled={formLoading || registerStatus === "loading"}
+              disabled={
+                formLoading ||
+                registerStatus === "loading" ||
+                hasProfile === false ||
+                hasAnyRegistration
+              }
             >
               {formLoading ? (
                 <div className="flex items-center justify-center">
                   <ThreeDot color="#fcd34d" size="small" text="" textColor="" />
                 </div>
+              ) : hasAnyRegistration ? (
+                "Already Registered"
+              ) : hasProfile === false ? (
+                "Complete Profile to Register"
               ) : registerStatus === "registered" ? (
                 "Successfully Registered"
               ) : (
@@ -671,6 +953,51 @@ function RouteComponent() {
           {formatDate(event.updatedAt)}
         </div>
       </div>
+
+      {/* Stripe Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden">
+            <div className="bg-rose-900 text-amber-300 p-6 border-b-4 border-amber-400">
+              <h3 className="text-2xl font-bold">Complete Payment</h3>
+              <p className="text-amber-200 text-sm mt-1">
+                Your registration has been created with pending payment.
+              </p>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-700 mb-3">
+                You will be redirected to Stripe Checkout to complete payment.
+              </p>
+              <p className="text-lg font-bold text-rose-900 mb-6">
+                Amount: ${(event?.cost ?? 0).toFixed(2)}
+              </p>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setShowPaymentModal(false);
+                    setPaymentCheckoutUrl(null);
+                  }}
+                  className="px-5 py-2.5 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    if (paymentCheckoutUrl) {
+                      window.location.href = paymentCheckoutUrl;
+                    }
+                  }}
+                  className="px-5 py-2.5 bg-rose-900 text-amber-300 font-bold rounded-lg hover:bg-rose-800 transition-colors"
+                >
+                  Continue to Stripe
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Registration Form Modal */}
       {showRegistrationForm && (
@@ -711,7 +1038,9 @@ function RouteComponent() {
                     No additional information required
                   </p>
                   <p className="text-gray-400 text-sm mt-2">
-                    Click submit to complete your registration
+                    {(event?.cost ?? 0) > 0
+                      ? "Continue to payment to complete your registration"
+                      : "Click submit to complete your registration"}
                   </p>
                 </div>
               ) : (
@@ -744,6 +1073,8 @@ function RouteComponent() {
                     />
                     <span>Submitting...</span>
                   </>
+                ) : (event?.cost ?? 0) > 0 ? (
+                  "Go to Payment"
                 ) : (
                   "Submit Registration"
                 )}

@@ -7,26 +7,58 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 
 export function LoginScreen() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { login, register } = useAuth();
 
   const handleLogin = async () => {
-    if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email');
+    setErrorMsg(null);
+    if (!email.trim() || !password) {
+      setErrorMsg('Please enter your email and password');
       return;
     }
 
     setLoading(true);
     try {
-      await login(email.trim());
+      await login(email.trim(), password);
     } catch (error) {
-      Alert.alert('Login Failed', 'Unable to login. Please try again.');
+      console.warn('[LoginScreen] Login error', error);
+      setErrorMsg('Unable to login. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async () => {
+    setErrorMsg(null);
+    const trimmed = email.trim();
+    if (!trimmed || !password) {
+      setErrorMsg('Please enter your email and password');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmed)) {
+      setErrorMsg('Please enter a valid email address');
+      return;
+    }
+    if (password.length < 8) {
+      setErrorMsg('Password must be at least 8 characters');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await register(trimmed, password);
+    } catch (error: any) {
+      console.warn('[LoginScreen] Register error', error);
+      setErrorMsg('Unable to create account. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -38,8 +70,10 @@ export function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Team D Mobile</Text>
-        <Text style={styles.subtitle}>Standalone Development Mode</Text>
+        <Text style={styles.title}>EVENGAGE</Text>
+        <Text style={styles.subtitle}>
+          {isSignUp ? 'Create a New Account' : 'Standalone Development Mode'}
+        </Text>
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email</Text>
@@ -54,20 +88,37 @@ export function LoginScreen() {
             editable={!loading}
           />
         </View>
-
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={isSignUp ? 'Min 8 characters' : 'Enter your password'}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            editable={!loading}
+          />
+        </View>
+        {errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
         <TouchableOpacity
           style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleLogin}
+          onPress={isSignUp ? handleSignUp : handleLogin}
           disabled={loading}
         >
           <Text style={styles.buttonText}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading
+              ? (isSignUp ? 'Creating Account...' : 'Logging in...')
+              : (isSignUp ? 'Create Account' : 'Login')}
           </Text>
         </TouchableOpacity>
 
-        <Text style={styles.hint}>
-          No password required for development
-        </Text>
+        <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)} disabled={loading}>
+          <Text style={styles.toggleText}>
+            {isSignUp
+              ? 'Already have an account? Login'
+              : "Don't have an account? Create one"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -113,8 +164,14 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
   },
+  errorText: {
+    color: '#dc2626',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
   button: {
-    backgroundColor: '#a855f7',
+    backgroundColor: '#7f1d1d',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
@@ -127,10 +184,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  hint: {
-    fontSize: 12,
-    color: '#9ca3af',
+  toggleText: {
+    fontSize: 14,
+    color: '#7f1d1d',
     textAlign: 'center',
-    marginTop: 16,
+    marginTop: 20,
   },
 });

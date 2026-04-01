@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Upload, Image as ImageIcon, Trash2, Eye, X } from "lucide-react";
+import { useCustomAlert, useCustomConfirm } from "./CustomAlert";
 
 interface ImageData {
   id: number;
@@ -20,6 +21,8 @@ const COMPONENTS = [
 ];
 
 export default function HomePageManagement() {
+  const { showAlert } = useCustomAlert();
+  const showConfirm = useCustomConfirm();
   const [selectedComponent, setSelectedComponent] = useState(
     COMPONENTS[0].value,
   );
@@ -59,13 +62,13 @@ export default function HomePageManagement() {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file");
+      showAlert("Please upload an image file");
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("File size must be less than 5MB");
+      showAlert("File size must be less than 5MB");
       return;
     }
 
@@ -96,11 +99,11 @@ export default function HomePageManagement() {
         // Reset file input
         e.target.value = "";
       } else {
-        alert("Failed to upload image: " + data.error);
+        showAlert("Failed to upload image: " + data.error);
       }
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert("Failed to upload image");
+      showAlert("Failed to upload image");
     } finally {
       setUploading(false);
     }
@@ -108,7 +111,10 @@ export default function HomePageManagement() {
 
   // Handle image deletion
   const handleDeleteImage = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this image?")) {
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this image?",
+    );
+    if (!confirmed) {
       return;
     }
 
@@ -122,11 +128,11 @@ export default function HomePageManagement() {
       if (data.success) {
         await fetchImages();
       } else {
-        alert("Failed to delete image: " + data.error);
+        showAlert("Failed to delete image: " + data.error);
       }
     } catch (error) {
       console.error("Error deleting image:", error);
-      alert("Failed to delete image");
+      showAlert("Failed to delete image");
     }
   };
 
@@ -140,7 +146,7 @@ export default function HomePageManagement() {
       setPreviewFileName(fileName || "Image");
     } catch (error) {
       console.error("Error loading image preview:", error);
-      alert("Failed to load image preview");
+      showAlert("Failed to load image preview");
     }
   };
 
@@ -174,9 +180,7 @@ export default function HomePageManagement() {
 
         {/* Component Selector */}
         <div className="flex items-center gap-3">
-          <label className="text-sm font-medium text-red-900">
-            Component:
-          </label>
+          <label className="text-sm font-medium text-red-900">Component:</label>
           <select
             value={selectedComponent}
             onChange={(e) => setSelectedComponent(e.target.value)}

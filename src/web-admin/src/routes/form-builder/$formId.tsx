@@ -4,12 +4,23 @@ import MultipleChoiceQuestion from "@/components/MultipleChoiceQuestion";
 import MultiSelectQuestion from "@/components/MultiSelectQuestion";
 import { TextAnswerQuestion } from "@/components/TextAnswerQuestion";
 import DropdownQuestion from "@/components/DropdownQuestion";
-import { Form, FormQuestion } from "@/interfaces/interfaces";
+import {
+  Form,
+  FormProfileCondition,
+  FormQuestion,
+} from "@/interfaces/interfaces";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
+import { useCustomAlert, useCustomConfirm } from "@/components/CustomAlert";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 
-type FormStatus = "Private" | "Live" | "Scheduled" | "Locked";
+type FormStatus = "Private" | "Live" | "Scheduled" | "Unlocked" | "Locked";
+
+const getNowLocalDateTimeValue = () => {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+};
 
 function getFormStatus(form?: Form | null): FormStatus {
   if (!form?.isPublic) return "Private";
@@ -19,7 +30,7 @@ function getFormStatus(form?: Form | null): FormStatus {
   const unlock = new Date(form.unlockAt).getTime();
   const now = Date.now();
 
-  return unlock > now ? "Scheduled" : "Live";
+  return unlock > now ? "Scheduled" : "Unlocked";
 }
 
 function StatusPill({ status }: { status: FormStatus }) {
@@ -30,27 +41,321 @@ function StatusPill({ status }: { status: FormStatus }) {
     Private: "bg-gray-50 text-gray-700 border-gray-200",
     Live: "bg-green-50 text-green-700 border-green-200",
     Scheduled: "bg-amber-50 text-amber-800 border-amber-200",
+    Unlocked: "bg-emerald-50 text-emerald-700 border-emerald-200",
     Locked: "bg-red-50 text-red-700 border-red-200",
   };
 
   return <span className={`${base} ${styles[status]}`}>{status}</span>;
 }
 
+const PROFILE_FIELD_LABELS: Record<string, string> = {
+  faculty: "Faculty",
+  program: "Program",
+  isMcmasterStudent: "McMaster Student",
+};
+
+const FACULTY_OPTIONS = [
+  "Engineering",
+  "Science",
+  "Business",
+  "Humanities",
+  "Social Sciences",
+  "Health",
+];
+
+const PROGRAM_OPTIONS = [
+  "Chemical Engineering",
+  "Civil Engineering",
+  "Computer Engineering",
+  "Electrical Engineering",
+  "Engineering Physics",
+  "Materials Engineering",
+  "Mechanical Engineering",
+  "Software Engineering",
+  "Mechatronics Engineering",
+  "Computer Science",
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "Earth and Environmental Sciences",
+  "Commerce",
+  "Business Analytics",
+  "Finance",
+  "Marketing",
+  "History",
+  "Philosophy",
+  "English",
+  "Linguistics",
+  "Economics",
+  "Political Science",
+  "Psychology",
+  "Sociology",
+  "Nursing",
+  "Health Sciences",
+  "Kinesiology",
+  "Biochemistry",
+];
+
+const PROFILE_VALUE_OPTIONS: Record<
+  "faculty" | "program" | "isMcmasterStudent",
+  string[]
+> = {
+  faculty: FACULTY_OPTIONS,
+  program: PROGRAM_OPTIONS,
+  isMcmasterStudent: ["true", "false"],
+};
+
+const parseProfileConditionValues = (value: string) =>
+  value
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 
 export const Route = createFileRoute("/form-builder/$formId")({
   component: RouteComponent,
 });
 
+// ── CSV import helpers ────────────────────────────────────────────────────────
+
+type CSVImportRow = {
+  id: number;
+  questionTitle: string;
+  questionType: string;
+  choices: string[];
+  scaleMin: number;
+  scaleMax: number;
+  scaleMinLabel: string;
+  scaleMaxLabel: string;
+  selectionsMin: number;
+  selectionsMax: number | null;
+  required: boolean;
+  parseWarning?: string;
+  parseError?: string;
+};
+
+function parseRawCSV(text: string): string[][] {
+  const rows: string[][] = [];
+  let cur = "";
+  let inQuote = false;
+  let row: string[] = [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') {
+      if (inQuote && text[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuote = !inQuote;
+      }
+    } else if (ch === "," && !inQuote) {
+      row.push(cur);
+      cur = "";
+    } else if (
+      (ch === "\n" || (ch === "\r" && text[i + 1] === "\n")) &&
+      !inQuote
+    ) {
+      if (ch === "\r") i++;
+      row.push(cur);
+      cur = "";
+      if (row.some((c) => c.trim() !== "")) rows.push(row);
+      row = [];
+    } else {
+      cur += ch;
+    }
+  }
+  row.push(cur);
+  if (row.some((c) => c.trim() !== "")) rows.push(row);
+  return rows;
+}
+
+function normalizeQuestionType(raw: string): string {
+  // Handle Google Apps Script ItemType integer values (written when enum is
+  // placed in a sheet cell without explicit .toString() conversion)
+  const intTypeMap: Record<string, string> = {
+    "0": "multiple_choice", // MULTIPLE_CHOICE
+    "1": "multi_select", // CHECKBOX
+    "2": "text_answer", // GRID (no direct equivalent, fallback)
+    "8": "dropdown", // LIST
+    "11": "text_answer", // PARAGRAPH_TEXT
+    "12": "linear_scale", // SCALE
+    "16": "text_answer", // TEXT
+    "18": "text_answer", // TIME
+  };
+  if (intTypeMap[raw.trim()]) return intTypeMap[raw.trim()];
+
+  const t = raw.toLowerCase().replace(/[\s_-]/g, "");
+  if (["multiplechoice", "radio", "singlechoice", "mc"].includes(t))
+    return "multiple_choice";
+  if (["dropdown", "select", "list"].includes(t)) return "dropdown";
+  if (["linearscale", "scale", "rating", "likert"].includes(t))
+    return "linear_scale";
+  if (
+    [
+      "multiselect",
+      "multipleselection",
+      "checkboxes",
+      "checkbox",
+      "multi",
+    ].includes(t)
+  )
+    return "multi_select";
+  return "text_answer";
+}
+
+function parseCSVToImportRows(text: string): CSVImportRow[] {
+  const raw = parseRawCSV(text);
+  if (raw.length === 0) return [];
+
+  const headers = raw[0].map((h) => h.trim().toLowerCase());
+  const qCol = headers.findIndex((h) =>
+    ["question", "title", "question title"].includes(h),
+  );
+  const typeCol = headers.findIndex((h) =>
+    ["type", "question type", "questiontype"].includes(h),
+  );
+  const optCol = headers.findIndex((h) =>
+    ["options", "choices", "config"].includes(h),
+  );
+  const reqCol = headers.findIndex((h) =>
+    ["required", "mandatory"].includes(h),
+  );
+
+  const skipHeaders = new Set(["timestamp", "time", "date"]);
+
+  if (qCol !== -1 && typeCol !== -1) {
+    // Format A: structured CSV with question/type columns
+    return raw
+      .slice(1)
+      .filter((row) => row.some((c) => c.trim()))
+      .map((row, idx) => {
+        const questionTitle = row[qCol]?.trim() || "";
+        const rawType = row[typeCol]?.trim() || "";
+        const questionType = normalizeQuestionType(rawType);
+        const optStr = optCol !== -1 ? row[optCol]?.trim() || "" : "";
+        const reqStr =
+          reqCol !== -1 ? row[reqCol]?.trim().toLowerCase() || "" : "";
+        const required = ["true", "yes", "1"].includes(reqStr);
+
+        let choices: string[] = [];
+        let scaleMin = 1,
+          scaleMax = 5,
+          scaleMinLabel = "",
+          scaleMaxLabel = "";
+        const selectionsMin = 0;
+        const selectionsMax: number | null = null;
+        let parseWarning: string | undefined;
+
+        if (questionType === "linear_scale") {
+          const parts = optStr.split(";").map((s) => s.trim());
+          scaleMin = parseInt(parts[0] || "1") || 1;
+          scaleMax = parseInt(parts[1] || "5") || 5;
+          scaleMinLabel = parts[2] || "";
+          scaleMaxLabel = parts[3] || "";
+          if (scaleMin >= scaleMax) {
+            scaleMax = scaleMin + 4;
+            parseWarning = "Adjusted scale (min must be less than max)";
+          }
+        } else if (
+          ["multiple_choice", "dropdown", "multi_select"].includes(questionType)
+        ) {
+          // Prefer semicolon separator; fall back to comma for old-format exports
+          const delimiter = optStr.includes(";") ? ";" : ",";
+          choices = optStr
+            .split(delimiter)
+            .map((s) => s.trim())
+            .filter(Boolean);
+        }
+
+        let parseError: string | undefined;
+        if (!questionTitle.trim()) {
+          parseError = "Question title is required";
+        } else if (
+          ["multiple_choice", "dropdown", "multi_select"].includes(
+            questionType,
+          ) &&
+          choices.length < 2
+        ) {
+          const typeLabel = QUESTION_TYPE_LABELS[questionType] ?? questionType;
+          const found = choices.length;
+          parseError = `${typeLabel} requires at least 2 options (${found} found)`;
+        }
+
+        return {
+          id: idx,
+          questionTitle,
+          questionType,
+          choices,
+          scaleMin,
+          scaleMax,
+          scaleMinLabel,
+          scaleMaxLabel,
+          selectionsMin,
+          selectionsMax,
+          required,
+          parseWarning,
+          parseError,
+        };
+      });
+  }
+
+  // Format B: column headers are questions (Google Forms / Sheets response export)
+  return raw[0]
+    .map((h, colIdx) => ({ h: h.trim(), colIdx }))
+    .filter(({ h }) => h && !skipHeaders.has(h.toLowerCase()))
+    .map(({ h }, rowIdx) => ({
+      id: rowIdx,
+      questionTitle: h,
+      questionType: "text_answer",
+      choices: [],
+      scaleMin: 1,
+      scaleMax: 5,
+      scaleMinLabel: "",
+      scaleMaxLabel: "",
+      selectionsMin: 0,
+      selectionsMax: null,
+      required: false,
+    }));
+}
+
+const QUESTION_TYPE_LABELS: Record<string, string> = {
+  text_answer: "Text Answer",
+  multiple_choice: "Multiple Choice",
+  dropdown: "Dropdown",
+  linear_scale: "Linear Scale",
+  multi_select: "Multiple Selection",
+};
+
 function RouteComponent() {
   const navigate = useNavigate();
+  const { showAlert } = useCustomAlert();
+  const showConfirm = useCustomConfirm();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const { formId } = Route.useParams();
   const [formData, setFormData] = useState<Form | null>(null);
+  const [profileConditions, setProfileConditions] = useState<
+    FormProfileCondition[]
+  >([]);
+  const [profileField, setProfileField] = useState<
+    "faculty" | "program" | "isMcmasterStudent"
+  >("faculty");
+  const [selectedProfileValues, setSelectedProfileValues] = useState<string[]>(
+    [],
+  );
+  const [isProfileAccessModalOpen, setIsProfileAccessModalOpen] =
+    useState(false);
+  const [isProfileValueDropdownOpen, setIsProfileValueDropdownOpen] =
+    useState(false);
+  const [savingProfileCondition, setSavingProfileCondition] = useState(false);
   const [savingVisibility, setSavingVisibility] = useState(false);
-  const [unlockLocal, setUnlockLocal] = useState<string>(""); 
+  const [unlockLocal, setUnlockLocal] = useState<string>("");
   const [savingUnlock, setSavingUnlock] = useState(false);
   const [isEditingUnlock, setIsEditingUnlock] = useState(false);
   const [unlockDraft, setUnlockDraft] = useState<string>("");
+  const [isEditingMeta, setIsEditingMeta] = useState(false);
+  const [savingMeta, setSavingMeta] = useState(false);
+  const [metaName, setMetaName] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
   const status = getFormStatus(formData);
   const handleTogglePublic = async (nextValue: boolean) => {
     if (!formData) return;
@@ -74,10 +379,13 @@ function RouteComponent() {
       }
 
       setFormData(json.data);
+      if (nextValue) {
+        setIsEditingUnlock(false);
+      }
     } catch (err: any) {
       // revert if it fails
       setFormData({ ...formData, isPublic: prev });
-      alert(err?.message || "Failed to update visibility");
+      showAlert(err?.message || "Failed to update visibility");
     } finally {
       setSavingVisibility(false);
     }
@@ -85,16 +393,48 @@ function RouteComponent() {
   const handleSaveUnlockAt = async (override?: string) => {
     if (!formData) return;
 
+    if (formData.isPublic) {
+      showAlert("Unpublish the form before setting an unlock date");
+      return false;
+    }
+
+    const unlockInput = unlockInputRef.current;
+    const value = override ?? unlockLocal;
+
+    if (
+      unlockInput &&
+      value !== "" &&
+      (!unlockInput.validity.valid || unlockInput.matches(":invalid"))
+    ) {
+      showAlert("Unlock date is invalid. Please fix it and try again.");
+      unlockInput.focus();
+      return false;
+    }
+
     setSavingUnlock(true);
     try {
-      const value = override !== undefined ? override : unlockLocal;
+      if (value) {
+        const parsedTime = new Date(value).getTime();
+
+        if (Number.isNaN(parsedTime)) {
+          showAlert("Unlock date is invalid. Please fix it and try again.");
+          return false;
+        }
+
+        if (parsedTime < Date.now()) {
+          showAlert(
+            "Unlock date is invalid. Please choose a future date and time.",
+          );
+          return false;
+        }
+      }
       const nextUnlockAt = value ? new Date(value).toISOString() : null;
       const res = await fetch(`/api/forms/${formId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           unlockAt: nextUnlockAt,
-          isPublic: false, 
+          isPublic: false,
         }),
       });
 
@@ -105,9 +445,10 @@ function RouteComponent() {
       setFormData(json.data);
       setUnlockLocal(value || "");
       setUnlockDraft(value || "");
-
+      return true;
     } catch (err: any) {
-      alert(err?.message || "Failed to update unlock date");
+      showAlert(err?.message || "Failed to update unlock date");
+      return false;
     } finally {
       setSavingUnlock(false);
     }
@@ -127,6 +468,11 @@ function RouteComponent() {
   const [questionTitle, setQuestionTitle] = useState("");
   const [required, setRequired] = useState(false);
   const [mcChoices, setMcChoices] = useState<string[]>(["", ""]);
+  const [isImportingChoices, setIsImportingChoices] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [pendingFocusChoiceIndex, setPendingFocusChoiceIndex] = useState<
+    number | null
+  >(null);
   const [scaleMin, setScaleMin] = useState(1);
   const [scaleMax, setScaleMax] = useState(5);
   const [selectionsMin, setSelectionsMin] = useState<number>(0);
@@ -134,11 +480,20 @@ function RouteComponent() {
   const [scaleMinLabel, setScaleMinLabel] = useState("");
   const [scaleMaxLabel, setScaleMaxLabel] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const profileValueDropdownRef = useRef<HTMLDivElement>(null);
+  const unlockInputRef = useRef<HTMLInputElement>(null);
+  const choiceInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [isCSVImportModalOpen, setIsCSVImportModalOpen] = useState(false);
+  const [csvRows, setCSVRows] = useState<CSVImportRow[]>([]);
+  const [csvSelected, setCSVSelected] = useState<Set<number>>(new Set());
+  const [isImportingCSV, setIsImportingCSV] = useState(false);
+  const csvFileInputRef = useRef<HTMLInputElement>(null);
 
   const allowedTypesForFollowUp = [
     "multiple_choice",
     "linear_scale",
     "dropdown",
+    "multi_select",
   ];
 
   useEffect(() => {
@@ -189,6 +544,25 @@ function RouteComponent() {
   }, [isDropdownOpen, openFollowupFor]);
 
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileValueDropdownRef.current &&
+        !profileValueDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileValueDropdownOpen(false);
+      }
+    };
+
+    if (isProfileValueDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isProfileValueDropdownOpen]);
+
+  useEffect(() => {
     const fetchFormData = async () => {
       try {
         setLoading(true);
@@ -200,6 +574,8 @@ function RouteComponent() {
         }
 
         setFormData(result.data);
+        setMetaName(result.data?.name || "");
+        setMetaDescription(result.data?.description || "");
         const u = result.data?.unlockAt ? new Date(result.data.unlockAt) : null;
         const local = u
           ? new Date(u.getTime() - u.getTimezoneOffset() * 60000)
@@ -209,6 +585,7 @@ function RouteComponent() {
         setUnlockLocal(local);
         setUnlockDraft(local);
         setIsEditingUnlock(false);
+        setIsEditingMeta(false);
 
         // Fetch questions
         const questionsResponse = await fetch(`/api/forms/${formId}/questions`);
@@ -216,6 +593,14 @@ function RouteComponent() {
 
         if (questionsResult.success) {
           setQuestions(questionsResult.data || []);
+        }
+
+        const profileConditionsResponse = await fetch(
+          `/api/forms/${formId}/profile-conditions`,
+        );
+        const profileConditionsResult = await profileConditionsResponse.json();
+        if (profileConditionsResult.success) {
+          setProfileConditions(profileConditionsResult.data || []);
         }
       } catch (err: any) {
         setError(err.message);
@@ -227,11 +612,107 @@ function RouteComponent() {
     fetchFormData();
   }, [formId]);
 
+  useEffect(() => {
+    if (pendingFocusChoiceIndex === null) return;
+
+    const timeout = window.setTimeout(() => {
+      const target = choiceInputRefs.current[pendingFocusChoiceIndex];
+      if (target) {
+        target.focus();
+        const cursorPos = target.value.length;
+        target.setSelectionRange(cursorPos, cursorPos);
+      }
+      setPendingFocusChoiceIndex(null);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [mcChoices, pendingFocusChoiceIndex]);
+
+  const loadProfileConditionDraft = (
+    field: "faculty" | "program" | "isMcmasterStudent",
+  ) => {
+    const existingCondition = profileConditions.find(
+      (condition) => condition.profileField === field,
+    );
+
+    const nextValues = existingCondition
+      ? parseProfileConditionValues(existingCondition.expectedValue).filter(
+          (value) => PROFILE_VALUE_OPTIONS[field].includes(value),
+        )
+      : [];
+
+    setSelectedProfileValues(nextValues);
+  };
+
+  const openProfileAccessModal = () => {
+    loadProfileConditionDraft(profileField);
+    setIsProfileValueDropdownOpen(false);
+    setIsProfileAccessModalOpen(true);
+  };
+
+  const closeProfileAccessModal = () => {
+    setIsProfileValueDropdownOpen(false);
+    setIsProfileAccessModalOpen(false);
+  };
+
+  const toggleProfileValue = (value: string) => {
+    setSelectedProfileValues((prev) =>
+      prev.includes(value)
+        ? prev.filter((currentValue) => currentValue !== value)
+        : [...prev, value],
+    );
+  };
+
+  const handleSaveMeta = async () => {
+    if (!formData) return;
+
+    if (!metaName.trim()) {
+      showAlert("Form title is required");
+      return;
+    }
+
+    setSavingMeta(true);
+    try {
+      const res = await fetch(`/api/forms/${formId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: metaName.trim(),
+          description: metaDescription.trim() || null,
+        }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json?.error || "Failed to update form details");
+      }
+
+      setFormData(json.data);
+      setMetaName(json.data?.name || "");
+      setMetaDescription(json.data?.description || "");
+      setIsEditingMeta(false);
+    } catch (err: any) {
+      showAlert(err?.message || "Failed to update form details");
+    } finally {
+      setSavingMeta(false);
+    }
+  };
+
   const handleAddComponent = () => {
+    if (formData?.isPublic) {
+      showAlert("Unpublish the form before adding questions");
+      return;
+    }
     setIsDropdownOpen(!isDropdownOpen);
   };
 
   const openModal = (questionType: string) => {
+    if (formData?.isPublic) {
+      showAlert("Unpublish the form before adding questions");
+      return;
+    }
     setEditingQuestion(null);
     setFollowupParentId(null);
     setSelectedTriggers([]);
@@ -245,6 +726,10 @@ function RouteComponent() {
     setScaleMaxLabel("");
     setSelectionsMin(0);
     setSelectionsMax(null);
+    setIsImportingChoices(false);
+    setImportText("");
+    setPendingFocusChoiceIndex(null);
+    choiceInputRefs.current = [];
     setIsDropdownOpen(false);
     setIsModalOpen(true);
     setOpenFollowupFor(null);
@@ -306,10 +791,16 @@ function RouteComponent() {
     setFollowupParentId(null);
     setSelectedTriggers([]);
     setOpenFollowupFor(null);
+    setIsImportingChoices(false);
+    setImportText("");
+    setPendingFocusChoiceIndex(null);
+    choiceInputRefs.current = [];
   };
 
   const addMcChoice = () => {
+    const nextIndex = mcChoices.length;
     setMcChoices([...mcChoices, ""]);
+    setPendingFocusChoiceIndex(nextIndex);
   };
 
   const removeMcChoice = (index: number) => {
@@ -324,8 +815,144 @@ function RouteComponent() {
     setMcChoices(updated);
   };
 
+  const handleImportChoices = () => {
+    const parsed = importText
+      .split(/[\n,]/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const deduped = [...new Set(parsed)];
+    const next =
+      deduped.length >= 2
+        ? deduped
+        : [...deduped, ...Array(2 - deduped.length).fill("")];
+    setMcChoices(next);
+    setIsImportingChoices(false);
+    setImportText("");
+  };
+
+  const handleCSVFileRead = (text: string) => {
+    const rows = parseCSVToImportRows(text);
+    setCSVRows(rows);
+    // Only pre-select rows that have no blocking errors
+    setCSVSelected(new Set(rows.filter((r) => !r.parseError).map((r) => r.id)));
+  };
+
+  const handleCSVFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => handleCSVFileRead(ev.target?.result as string);
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  const handleDownloadTemplate = () => {
+    const lines = [
+      "question,type,options,required",
+      "What is your name?,text_answer,,false",
+      "How satisfied are you?,linear_scale,1;5;Not at all;Very satisfied,true",
+      "Which features do you use?,multi_select,Feature A;Feature B;Feature C,false",
+      "What is your department?,dropdown,HR;Engineering;Marketing,true",
+      "Preferred option?,multiple_choice,Option A;Option B;Option C,false",
+    ];
+    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "question_import_template.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCSVImportSubmit = async () => {
+    if (formData?.isPublic) {
+      showAlert("Unpublish the form before adding questions");
+      return;
+    }
+    const toImport = csvRows.filter(
+      (r) => csvSelected.has(r.id) && !r.parseError,
+    );
+    if (toImport.length === 0) {
+      showAlert("No valid questions selected to import");
+      return;
+    }
+
+    setIsImportingCSV(true);
+    let nextOrder =
+      questions.length > 0
+        ? Math.max(...questions.map((q) => q.qorder)) + 1
+        : 1;
+    const newQuestions: import("@/interfaces/interfaces").FormQuestion[] = [];
+
+    try {
+      for (const row of toImport) {
+        if (!row.questionTitle.trim()) continue;
+
+        let optionsCategory = "";
+        if (
+          row.questionType === "multiple_choice" ||
+          row.questionType === "dropdown"
+        ) {
+          const validChoices = row.choices.filter((c) => c.trim());
+          optionsCategory = JSON.stringify({ choices: validChoices });
+        } else if (row.questionType === "linear_scale") {
+          optionsCategory = JSON.stringify({
+            min: row.scaleMin,
+            max: row.scaleMax,
+            minLabel: row.scaleMinLabel,
+            maxLabel: row.scaleMaxLabel,
+            choices: Array.from(
+              { length: row.scaleMax - row.scaleMin + 1 },
+              (_, i) => row.scaleMin + i,
+            ),
+          });
+        } else if (row.questionType === "multi_select") {
+          const validChoices = row.choices.filter((c) => c.trim());
+          optionsCategory = JSON.stringify({
+            choices: validChoices,
+            min: row.selectionsMin,
+            max: row.selectionsMax,
+          });
+        }
+
+        const res = await fetch(`/api/forms/${formId}/questions`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            questionType: row.questionType,
+            questionTitle: row.questionTitle.trim(),
+            optionsCategory,
+            qorder: nextOrder++,
+            required: row.required,
+            enablingAnswers: [],
+          }),
+        });
+
+        const result = await res.json();
+        if (!result.success)
+          throw new Error(result.error || "Failed to import question");
+        newQuestions.push(result.data);
+      }
+
+      setQuestions((prev) => [...prev, ...newQuestions]);
+      setIsCSVImportModalOpen(false);
+      setCSVRows([]);
+      setCSVSelected(new Set());
+      showAlert(
+        `Imported ${newQuestions.length} question${newQuestions.length !== 1 ? "s" : ""} successfully`,
+      );
+    } catch (err: any) {
+      showAlert("Import failed: " + err.message);
+    } finally {
+      setIsImportingCSV(false);
+    }
+  };
+
   const handleDeleteQuestion = async (questionId: number) => {
-    if (!confirm("Are you sure you want to delete this question?")) {
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this question?",
+    );
+    if (!confirmed) {
       return;
     }
 
@@ -346,7 +973,7 @@ function RouteComponent() {
       setQuestions(questions.filter((q) => q.id !== questionId));
     } catch (err: any) {
       console.error("Failed to delete question:", err.message);
-      alert("Failed to delete question: " + err.message);
+      showAlert("Failed to delete question: " + err.message);
     }
   };
 
@@ -374,7 +1001,7 @@ function RouteComponent() {
       }
     } catch (err: any) {
       console.error("Failed to move question up:", err.message);
-      alert("Failed to move question up: " + err.message);
+      showAlert("Failed to move question up: " + err.message);
     }
   };
 
@@ -402,19 +1029,24 @@ function RouteComponent() {
       }
     } catch (err: any) {
       console.error("Failed to move question down:", err.message);
-      alert("Failed to move question down: " + err.message);
+      showAlert("Failed to move question down: " + err.message);
     }
   };
 
   const handleSaveQuestion = async () => {
     try {
+      if (formData?.isPublic) {
+        showAlert("Unpublish the form before modifying questions");
+        return;
+      }
+
       if (!questionTitle.trim()) {
-        alert("Please enter a question title");
+        showAlert("Please enter a question title");
         return;
       }
 
       if (followupParentId && selectedTriggers.length == 0) {
-        alert("Please select atleast one answer to follow up to");
+        showAlert("Please select atleast one answer to follow up to");
         return;
       }
 
@@ -426,11 +1058,11 @@ function RouteComponent() {
       ) {
         const validChoices = mcChoices.filter((c) => c.trim() !== "");
         if (validChoices.length < 2) {
-          alert("Please provide at least 2 choices");
+          showAlert("Please provide at least 2 choices");
           return;
         }
         if (new Set(validChoices).size !== validChoices.length) {
-          alert("Duplicate choices are not allowed");
+          showAlert("Duplicate choices are not allowed");
           return;
         }
         optionsCategory = JSON.stringify({ choices: validChoices });
@@ -448,11 +1080,11 @@ function RouteComponent() {
       } else if (selectedQuestionType === "multi_select") {
         const validChoices = mcChoices.filter((c) => c.trim() !== "");
         if (validChoices.length < 2) {
-          alert("Please provide at least 2 choices");
+          showAlert("Please provide at least 2 choices");
           return;
         }
         if (new Set(validChoices).size !== validChoices.length) {
-          alert("Duplicate choices are not allowed");
+          showAlert("Duplicate choices are not allowed");
           return;
         }
         optionsCategory = JSON.stringify({
@@ -532,7 +1164,7 @@ function RouteComponent() {
       setOpenFollowupFor(null); // ADD THIS LINE - Reset follow-up dropdown state after saving
     } catch (err: any) {
       console.error("Failed to save question:", err.message);
-      alert("Failed to save question: " + err.message);
+      showAlert("Failed to save question: " + err.message);
     }
   };
 
@@ -541,6 +1173,91 @@ function RouteComponent() {
       navigate({ to: `/form-builder/modular-forms/${formData.moduleId}` });
     } else {
       navigate({ to: "/form-builder" });
+    }
+  };
+
+  const handleSaveProfileCondition = async () => {
+    try {
+      if (formData?.isPublic) {
+        showAlert("Unpublish the form before modifying profile conditions");
+        return;
+      }
+
+      const normalizedValues = selectedProfileValues
+        .map((value) => value.trim())
+        .filter(Boolean);
+
+      if (normalizedValues.length === 0) {
+        showAlert("Select at least one allowed value");
+        return;
+      }
+
+      setSavingProfileCondition(true);
+      const response = await fetch(`/api/forms/${formId}/profile-conditions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          profileField,
+          expectedValue: normalizedValues.join(", "),
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to save profile condition");
+      }
+
+      const updated = result.data as FormProfileCondition;
+      setProfileConditions((prev) => {
+        const idx = prev.findIndex(
+          (p) => p.profileField === updated.profileField,
+        );
+        if (idx === -1) return [...prev, updated];
+        const next = [...prev];
+        next[idx] = updated;
+        return next;
+      });
+      setSelectedProfileValues(
+        parseProfileConditionValues(updated.expectedValue),
+      );
+      setIsProfileValueDropdownOpen(false);
+    } catch (err: any) {
+      showAlert(err?.message || "Failed to save profile condition");
+    } finally {
+      setSavingProfileCondition(false);
+    }
+  };
+
+  const handleDeleteProfileCondition = async (conditionId: number) => {
+    const confirmed = await showConfirm(
+      "Are you sure you want to delete this profile condition?",
+    );
+    if (!confirmed) return;
+
+    try {
+      if (formData?.isPublic) {
+        showAlert("Unpublish the form before modifying profile conditions");
+        return;
+      }
+
+      const response = await fetch(
+        `/api/forms/${formId}/profile-conditions/${conditionId}`,
+        { method: "DELETE" },
+      );
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to delete profile condition");
+      }
+
+      setProfileConditions((prev) => prev.filter((p) => p.id !== conditionId));
+      const deletedCondition = profileConditions.find(
+        (p) => p.id === conditionId,
+      );
+      if (deletedCondition?.profileField === profileField) {
+        setSelectedProfileValues([]);
+      }
+    } catch (err: any) {
+      showAlert(err?.message || "Failed to delete profile condition");
     }
   };
 
@@ -568,7 +1285,7 @@ function RouteComponent() {
         {/* Back Button */}
         <button
           onClick={handleBack}
-          className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
         >
           <svg
             className="w-4 h-4"
@@ -583,247 +1300,347 @@ function RouteComponent() {
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          {formData?.moduleId ? "Back to modules" : "Back to Forms"}
+          {formData?.moduleId ? "Back to Module" : "Back to Forms"}
         </button>
 
-        {/* Outer Form Border */}
-        <div className="border-2 border-gray-300 rounded-lg bg-white p-8">
-          {/* Header Section */}
-          <div className="mb-12">
-            <div className="flex items-start justify-between gap-4 mb-3">
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-                  {formData?.name || "Untitled Form"}
-                </h1>
-                {/* Publish controls + status */}
-                <div className="mt-3 flex items-center gap-3">
+        <div className="border-2 border-gray-300 rounded-lg bg-white divide-y divide-gray-200">
+          {/*  HEADER  */}
+          <div className="px-8 py-6">
+            {isEditingMeta ? (
+              <div className="max-w-2xl space-y-3">
+                <input
+                  type="text"
+                  value={metaName}
+                  onChange={(e) => setMetaName(e.target.value)}
+                  placeholder="Form title"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-2xl font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+                <textarea
+                  value={metaDescription}
+                  onChange={(e) => setMetaDescription(e.target.value)}
+                  placeholder="Form description (optional)"
+                  rows={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleSaveMeta}
+                    disabled={savingMeta}
+                    className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
+                  >
+                    {savingMeta ? "Saving…" : "Save"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMetaName(formData?.name || "");
+                      setMetaDescription(formData?.description || "");
+                      setIsEditingMeta(false);
+                    }}
+                    disabled={savingMeta}
+                    className="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-start justify-between gap-4">
+                {/* Title + description */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight truncate">
+                      {formData?.name || "Untitled Form"}
+                    </h1>
+                    <button
+                      onClick={() => setIsEditingMeta(true)}
+                      title="Edit title and description"
+                      className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-700 rounded-md hover:bg-gray-100 transition-colors"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.414.586H9v-2a2 2 0 01.586-1.414z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  {formData?.description && (
+                    <p className="mt-1 text-gray-500 text-base">
+                      {formData.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Publish + status */}
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <StatusPill status={status} />
                   <button
                     onClick={() => handleTogglePublic(!formData?.isPublic)}
                     disabled={savingVisibility}
-                    className={`px-4 py-2 text-sm font-medium rounded-md border disabled:opacity-50 ${
+                    className={`px-4 py-2 text-sm font-semibold rounded-md border-2 disabled:opacity-50 transition-colors ${
                       formData?.isPublic
-                        ? "bg-white text-gray-900 border-gray-300 hover:bg-gray-50"
-                        : "bg-gray-900 text-white border-gray-900 hover:bg-gray-800"
+                        ? "bg-white text-amber-800 border-amber-400 hover:bg-amber-50"
+                        : "bg-amber-500 text-white border-amber-500 hover:bg-amber-600"
                     }`}
                   >
-                    {formData?.isPublic ? "Unpublish" : "Publish"}
+                    {savingVisibility
+                      ? "Saving…"
+                      : formData?.isPublic
+                        ? "Unpublish"
+                        : "Publish"}
                   </button>
-
-                  <StatusPill status={status} />
-                </div>
-                <div className="mt-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-900">Unlock date</span>
-
-                      {!isEditingUnlock ? (
-                        <div className="mt-1 flex flex-wrap items-center gap-2">
-                          <span className="text-sm text-gray-700">
-                            {formData?.unlockAt
-                              ? `Unlocks: ${new Date(formData.unlockAt).toLocaleString()}`
-                              : "No unlock date set"}
-                          </span>
-                          {formData?.unlockAt ? (
-                            <StatusPill status={"Scheduled"} />
-                          ) : (
-                            <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-700 border-gray-200">
-                              None
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="mt-2 flex flex-wrap items-end gap-3">
-                          <input
-                            type="datetime-local"
-                            value={unlockDraft}
-                            onChange={(e) => setUnlockDraft(e.target.value)}
-                            className="w-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                          />
-                          <button
-                            onClick={async () => {
-                              await handleSaveUnlockAt(unlockDraft);
-                              setIsEditingUnlock(false);
-                            }}
-                            disabled={savingUnlock}
-                            className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50"
-                          >
-                            {savingUnlock ? "Saving..." : "Save"}
-                          </button>
-                          <button
-                            onClick={() => {
-                              setUnlockDraft(unlockLocal);
-                              setIsEditingUnlock(false);
-                            }}
-                            disabled={savingUnlock}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
-                          >
-                            Cancel
-                          </button>
-                          {formData?.unlockAt && (
-                            <button
-                              onClick={async () => {
-                                await handleSaveUnlockAt("");
-                                setUnlockDraft("");
-                                setUnlockLocal("");
-                                setIsEditingUnlock(false);
-                              }}
-                              disabled={savingUnlock}
-                              className="px-4 py-2 text-sm font-medium text-red-700 bg-white border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
-                            >
-                              Remove
-                            </button>
-                          )}
-                        </div>
-                      )}
-                      <p className="mt-1 text-xs text-gray-500">
-                      </p>
-                    </div>
-                    {!isEditingUnlock && (
-                      <button
-                        onClick={() => {
-                          setUnlockDraft(unlockLocal); // preload current value
-                          setIsEditingUnlock(true);
-                        }}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-                      >
-                        {formData?.unlockAt ? "Edit" : "Set date"}
-                      </button>
-                    )}
-                  </div>
                 </div>
               </div>
-              <div className="relative z-20" ref={dropdownRef}>
-                <button
-                  onClick={handleAddComponent}
-                  className="px-5 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-all"
-                >
-                  Add Question
-                </button>
-                {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30">
-                    <button
-                      onClick={() => openModal("multiple_choice")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Multiple Choice
-                    </button>
-                    <button
-                      onClick={() => openModal("dropdown")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Dropdown
-                    </button>
-                    <button
-                      onClick={() => openModal("text_answer")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Text Answer
-                    </button>
-                    <button
-                      onClick={() => openModal("linear_scale")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Linear Scale
-                    </button>
-                    <button
-                      onClick={() => openModal("multi_select")}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Multiple Selection
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {formData?.description && (
-              <p className="text-gray-600 text-lg mt-2">
-                {formData.description}
-              </p>
             )}
           </div>
 
-          {/* Questions List */}
-          <div className="space-y-6">
-            {questions.length === 0 ? (
-              <div className="bg-gray-50 rounded-lg border-2 border-gray-300 p-12 text-center">
-                <h3 className="text-lg font-medium text-gray-900 mb-1">
-                  No questions
-                </h3>
-              </div>
-            ) : (
-              questions.map((question, index) => (
-                <div key={question.id} className="relative group">
-                  {/* Question Border */}
-                  <div className="border-2 border-gray-300 rounded-lg p-6 bg-white">
-                    {/* Question Number Badge */}
-                    <div className="absolute -left-4 top-6 w-8 h-8 bg-gray-900 text-white text-xs font-medium rounded-full flex items-center justify-center">
-                      {index + 1}
-                    </div>
+          {/* SETTINGS STRIP */}
+          <div className="px-8 py-5 bg-gray-50">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
+              Settings
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Unlock Date card */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-gray-800">
+                    Unlock Date
+                  </span>
+                  {formData?.unlockAt ? (
+                    <StatusPill
+                      status={
+                        new Date(formData.unlockAt).getTime() > Date.now()
+                          ? "Scheduled"
+                          : "Unlocked"
+                      }
+                    />
+                  ) : (
+                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-500 border-gray-200">
+                      None
+                    </span>
+                  )}
+                </div>
 
-                    {/* Action Buttons */}
-                    <div className="absolute top-4 right-4 flex gap-2">
-                      {/* Move Up Button */}
-                      {index > 0 && (
+                {!isEditingUnlock ? (
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-gray-600">
+                      {formData?.unlockAt
+                        ? new Date(formData.unlockAt).toLocaleString()
+                        : "No unlock date set"}
+                    </p>
+                    {!formData?.isPublic ? (
+                      <button
+                        onClick={() => {
+                          setUnlockDraft(unlockLocal);
+                          setIsEditingUnlock(true);
+                        }}
+                        className="px-2 py-1 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Configure
+                      </button>
+                    ) : (
+                      <span className="ml-3 text-xs text-gray-400 italic">
+                        Unpublish to edit
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-2 mt-1">
+                    <input
+                      ref={unlockInputRef}
+                      type="datetime-local"
+                      min={getNowLocalDateTimeValue()}
+                      value={unlockDraft}
+                      onChange={(e) => setUnlockDraft(e.target.value)}
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={async () => {
+                          const ok = await handleSaveUnlockAt(unlockDraft);
+                          if (ok) setIsEditingUnlock(false);
+                        }}
+                        disabled={savingUnlock}
+                        className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 disabled:opacity-50"
+                      >
+                        {savingUnlock ? "Saving…" : "Save"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setUnlockDraft(unlockLocal);
+                          setIsEditingUnlock(false);
+                        }}
+                        disabled={savingUnlock}
+                        className="px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+                      {formData?.unlockAt && (
                         <button
-                          onClick={() => handleMoveUp(question.id)}
-                          className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
-                          title="Move Up"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 15l7-7 7 7"
-                            />
-                          </svg>
-                        </button>
-                      )}
-
-                      {/* Move Down Button */}
-                      {index < questions.length - 1 && (
-                        <button
-                          onClick={() => handleMoveDown(question.id)}
-                          className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
-                          title="Move Down"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-                      )}
-
-                      {/* Add Follow-up Button */}
-                      {allowedTypesForFollowUp.includes(
-                        question.questionType,
-                      ) && (
-                        <div className="relative" ref={dropdownRef}>
-                          <button
-                            onClick={() =>
-                              setOpenFollowupFor(
-                                openFollowupFor === question.id
-                                  ? null
-                                  : question.id,
-                              )
+                          onClick={async () => {
+                            const ok = await handleSaveUnlockAt("");
+                            if (ok) {
+                              setUnlockDraft("");
+                              setUnlockLocal("");
+                              setIsEditingUnlock(false);
                             }
+                          }}
+                          disabled={savingUnlock}
+                          className="px-3 py-1.5 text-xs font-semibold text-red-700 bg-white border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Profile Access card */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-gray-800">
+                    Profile Access
+                  </span>
+                  {profileConditions.length > 0 ? (
+                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-emerald-50 text-emerald-700 border-emerald-200">
+                      {profileConditions.length} rule
+                      {profileConditions.length !== 1 && "s"}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border bg-gray-50 text-gray-500 border-gray-200">
+                      Open
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-600 truncate pr-2">
+                    {profileConditions.length === 0
+                      ? "All users can access this form"
+                      : profileConditions
+                          .map(
+                            (c) =>
+                              `${PROFILE_FIELD_LABELS[c.profileField]}: ${c.expectedValue}`,
+                          )
+                          .join(" · ")}
+                  </p>
+                  <button
+                    onClick={openProfileAccessModal}
+                    className="px-2 py-1 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Configure
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* QUESTIONS SECTION */}
+          <div className="px-8 py-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Questions
+                </h2>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {questions.length === 0
+                    ? "No questions yet"
+                    : `${questions.length} question${questions.length !== 1 ? "s" : ""}`}
+                </p>
+              </div>
+
+              {/* Questions toolbar */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    setCSVRows([]);
+                    setCSVSelected(new Set());
+                    setIsCSVImportModalOpen(true);
+                  }}
+                  disabled={formData?.isPublic}
+                  className="px-4 py-2 text-sm font-semibold bg-white text-gray-700 border-2 border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Import CSV
+                </button>
+
+                {/* Add Question dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={handleAddComponent}
+                    disabled={formData?.isPublic}
+                    className="px-4 py-2 text-sm font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    + Add Question
+                  </button>
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30">
+                      <button
+                        onClick={() => openModal("multiple_choice")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Multiple Choice
+                      </button>
+                      <button
+                        onClick={() => openModal("dropdown")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Dropdown
+                      </button>
+                      <button
+                        onClick={() => openModal("text_answer")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Text Answer
+                      </button>
+                      <button
+                        onClick={() => openModal("linear_scale")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Linear Scale
+                      </button>
+                      <button
+                        onClick={() => openModal("multi_select")}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        Multiple Selection
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Questions List */}
+            <div className="space-y-6">
+              {questions.length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+                  <p className="text-gray-400 text-sm">
+                    No questions yet. Click "+ Add Question" to get started.
+                  </p>
+                </div>
+              ) : (
+                questions.map((question, index) => (
+                  <div key={question.id} className="relative group">
+                    <div className="border-2 border-gray-300 rounded-lg p-6 bg-white">
+                      {/* Question Number Badge */}
+                      <div className="absolute -left-4 top-6 w-8 h-8 bg-gray-900 text-white text-xs font-medium rounded-full flex items-center justify-center">
+                        {index + 1}
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="absolute top-4 right-4 flex gap-2">
+                        {index > 0 && (
+                          <button
+                            onClick={() => handleMoveUp(question.id)}
                             className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
-                            title="Add follow-up question"
+                            title="Move Up"
                           >
                             <svg
                               className="w-4 h-4"
@@ -835,139 +1652,361 @@ function RouteComponent() {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M9 5l7 7-7 7"
+                                d="M5 15l7-7 7 7"
                               />
                             </svg>
                           </button>
-
-                          {openFollowupFor === question.id && (
-                            <div
-                              className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30"
-                              ref={dropdownRef}
+                        )}
+                        {index < questions.length - 1 && (
+                          <button
+                            onClick={() => handleMoveDown(question.id)}
+                            className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                            title="Move Down"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
                             >
-                              <span className="w-full text-left px-4 py-2 text-sm text-gray-400 italic">
-                                Add a follow-up question
-                              </span>
-                              <button
-                                onClick={() =>
-                                  openFollowUpModal(
-                                    "multiple_choice",
-                                    question.id,
-                                  )
-                                }
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                              />
+                            </svg>
+                          </button>
+                        )}
+
+                        {/* Follow-up dropdown */}
+                        {allowedTypesForFollowUp.includes(
+                          question.questionType,
+                        ) && (
+                          <div className="relative">
+                            <button
+                              onClick={() =>
+                                setOpenFollowupFor(
+                                  openFollowupFor === question.id
+                                    ? null
+                                    : question.id,
+                                )
+                              }
+                              className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                              title="Add follow-up question"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
                               >
-                                Multiple Choice
-                              </button>
-                              <button
-                                onClick={() =>
-                                  openFollowUpModal("dropdown", question.id)
-                                }
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                              >
-                                Dropdown
-                              </button>
-                              <button
-                                onClick={() =>
-                                  openFollowUpModal("text_answer", question.id)
-                                }
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                              >
-                                Text Answer
-                              </button>
-                              <button
-                                onClick={() =>
-                                  openFollowUpModal("linear_scale", question.id)
-                                }
-                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                              >
-                                Linear Scale
-                              </button>
-                            </div>
-                          )}
-                        </div>
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </button>
+                            {openFollowupFor === question.id && (
+                              <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-30">
+                                <span className="w-full text-left px-4 py-2 text-sm text-gray-400 italic block">
+                                  Add a follow-up question
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    openFollowUpModal(
+                                      "multiple_choice",
+                                      question.id,
+                                    )
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  Multiple Choice
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    openFollowUpModal("dropdown", question.id)
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  Dropdown
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    openFollowUpModal(
+                                      "text_answer",
+                                      question.id,
+                                    )
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  Text Answer
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    openFollowUpModal(
+                                      "linear_scale",
+                                      question.id,
+                                    )
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                >
+                                  Linear Scale
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        <button
+                          onClick={() => openEditModal(question)}
+                          className="p-2 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
+                          title="Edit"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteQuestion(question.id)}
+                          className="p-1.5 bg-white border border-gray-300 text-red-900 rounded hover:bg-red-50"
+                          title="Delete"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {/* Question Component */}
+                      {question.questionType === "multiple_choice" && (
+                        <MultipleChoiceQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
                       )}
-
-                      <button
-                        onClick={() => openEditModal(question)}
-                        className="p-1.5 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
-                        title="Edit"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => handleDeleteQuestion(question.id)}
-                        className="p-1.5 bg-white border border-gray-300 text-red-900 rounded hover:bg-red-50"
-                        title="Delete"
-                      >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
+                      {question.questionType === "dropdown" && (
+                        <DropdownQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
+                      )}
+                      {question.questionType === "linear_scale" && (
+                        <LinearScaleQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
+                      )}
+                      {question.questionType === "text_answer" && (
+                        <TextAnswerQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
+                      )}
+                      {question.questionType === "multi_select" && (
+                        <MultiSelectQuestion
+                          question={question}
+                          questionsList={questions}
+                        />
+                      )}
                     </div>
-
-                    {/* Question Component */}
-                    {question.questionType === "multiple_choice" && (
-                      <MultipleChoiceQuestion
-                        question={question}
-                        questionsList={questions}
-                      />
-                    )}
-                    {question.questionType === "dropdown" && (
-                      <DropdownQuestion
-                        question={question}
-                        questionsList={questions}
-                      />
-                    )}
-                    {question.questionType === "linear_scale" && (
-                      <LinearScaleQuestion
-                        question={question}
-                        questionsList={questions}
-                      />
-                    )}
-                    {question.questionType === "text_answer" && (
-                      <TextAnswerQuestion
-                        question={question}
-                        questionsList={questions}
-                      />
-                    )}
-                    {question.questionType === "multi_select" && (
-                      <MultiSelectQuestion
-                        question={question}
-                        questionsList={questions}
-                      />
-                    )}
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
+        {/* end outer border */}
       </div>
 
-      {/* Modal */}
+      {/* MODALS */}
+
+      {isProfileAccessModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div
+            role="dialog"
+            className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Profile Access Conditions
+              </h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Allow access only to users whose profile matches the selected
+                values. If no rules are set, everyone can access the form.
+              </p>
+            </div>
+            <div className="p-6 space-y-5">
+              <div className="grid gap-4 md:grid-cols-[200px,1fr] md:items-start">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Profile Field
+                  </label>
+                  <select
+                    value={profileField}
+                    onChange={(e) => {
+                      const nextField = e.target.value as
+                        | "faculty"
+                        | "program"
+                        | "isMcmasterStudent";
+                      setProfileField(nextField);
+                      setIsProfileValueDropdownOpen(false);
+                      loadProfileConditionDraft(nextField);
+                    }}
+                    disabled={formData?.isPublic || savingProfileCondition}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white"
+                  >
+                    <option value="faculty">Faculty</option>
+                    <option value="program">Program</option>
+                    <option value="isMcmasterStudent">McMaster Student</option>
+                  </select>
+                </div>
+                <div ref={profileValueDropdownRef}>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Allowed Values
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setIsProfileValueDropdownOpen((prev) => !prev)
+                    }
+                    disabled={formData?.isPublic || savingProfileCondition}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white text-left flex items-center justify-between disabled:opacity-50"
+                  >
+                    <span className="truncate pr-4 text-gray-700">
+                      {selectedProfileValues.length > 0
+                        ? selectedProfileValues.join(", ")
+                        : "Select one or more values"}
+                    </span>
+                    <span className="text-gray-400">▾</span>
+                  </button>
+                  {isProfileValueDropdownOpen && (
+                    <div className="mt-2 rounded-md border border-gray-200 bg-white shadow-lg">
+                      <div className="max-h-64 overflow-y-auto p-2 space-y-1">
+                        {PROFILE_VALUE_OPTIONS[profileField].map(
+                          (valueOption) => (
+                            <label
+                              key={valueOption}
+                              className="flex items-start gap-3 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedProfileValues.includes(
+                                  valueOption,
+                                )}
+                                onChange={() => toggleProfileValue(valueOption)}
+                                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                              />
+                              <span>{valueOption}</span>
+                            </label>
+                          ),
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between border-t border-gray-100 px-3 py-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedProfileValues([])}
+                          className="text-xs font-semibold text-gray-600 hover:text-gray-900"
+                        >
+                          Clear
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsProfileValueDropdownOpen(false)}
+                          className="text-xs font-semibold text-amber-700 hover:text-amber-900"
+                        >
+                          Done
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <p className="text-xs text-gray-500">
+                  Select multiple values to grant access to more than one
+                  profile group.
+                </p>
+                <button
+                  onClick={handleSaveProfileCondition}
+                  disabled={formData?.isPublic || savingProfileCondition}
+                  className="px-4 py-2 text-sm font-semibold rounded-md bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50"
+                >
+                  {savingProfileCondition ? "Saving…" : "Save Condition"}
+                </button>
+              </div>
+              {formData?.isPublic && (
+                <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+                  Unpublish the form before modifying profile access rules.
+                </p>
+              )}
+              <div className="space-y-2">
+                {profileConditions.length === 0 ? (
+                  <p className="text-sm text-gray-500">
+                    No profile conditions set.
+                  </p>
+                ) : (
+                  profileConditions.map((condition) => (
+                    <div
+                      key={condition.id}
+                      className="flex items-center justify-between gap-3 rounded-md border border-gray-200 bg-white px-3 py-2"
+                    >
+                      <p className="text-sm text-gray-800">
+                        <span className="font-semibold">
+                          {PROFILE_FIELD_LABELS[condition.profileField] ??
+                            condition.profileField}
+                        </span>{" "}
+                        must be one of: {condition.expectedValue}
+                      </p>
+                      <button
+                        onClick={() =>
+                          handleDeleteProfileCondition(condition.id)
+                        }
+                        disabled={formData?.isPublic}
+                        className="px-2.5 py-1.5 text-xs font-semibold text-red-700 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200 flex justify-end">
+              <button
+                type="button"
+                onClick={closeProfileAccessModal}
+                className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div
@@ -976,8 +2015,8 @@ function RouteComponent() {
           >
             <div className="p-6 border-b border-gray-200">
               <h3 className="text-xl font-semibold text-gray-900">
-                {editingQuestion ? "Edit" : "Add"}{" "}
-                {followupParentId ? "Follow-up" : ""} Question
+                {editingQuestion ? "Edit" : "Add"}
+                {followupParentId ? " Follow-up" : ""} Question
               </h3>
               <p className="text-sm text-gray-500 mt-1">
                 {selectedQuestionType.replace("_", " ")}
@@ -985,7 +2024,7 @@ function RouteComponent() {
             </div>
 
             <div className="p-6 space-y-5">
-              {/* Required Question */}
+              {/* Required */}
               <div className="flex items-center gap-2">
                 <label
                   htmlFor="required"
@@ -1002,7 +2041,7 @@ function RouteComponent() {
                 />
               </div>
 
-              {/* Follow up answers */}
+              {/* Follow-up triggers */}
               {followupParentId &&
                 (() => {
                   const parentQuestion = questions.find(
@@ -1011,21 +2050,18 @@ function RouteComponent() {
                   const answers = parentQuestion?.optionsCategory
                     ? JSON.parse(parentQuestion.optionsCategory).choices
                     : [];
-
-                  if (!parentQuestion) return null;
                   if (
+                    !parentQuestion ||
                     !allowedTypesForFollowUp.includes(
                       parentQuestion.questionType,
                     )
                   )
                     return null;
-
                   return (
                     <div className="mt-4">
                       <label className="block text-sm font-medium text-gray-900 mb-2">
-                        Show question when answering with...
+                        Show question when answering with…
                       </label>
-
                       <div className="space-y-2">
                         {answers?.map((answer: string, index: number) => (
                           <label
@@ -1040,15 +2076,11 @@ function RouteComponent() {
                               }
                               onChange={(e) => {
                                 const checked = e.target.checked;
-                                setSelectedTriggers((prev) => {
-                                  if (checked) {
-                                    return prev ? [...prev, index] : [index];
-                                  } else {
-                                    return (prev || []).filter(
-                                      (i) => i !== index,
-                                    );
-                                  }
-                                });
+                                setSelectedTriggers((prev) =>
+                                  checked
+                                    ? [...(prev || []), index]
+                                    : (prev || []).filter((i) => i !== index),
+                                );
                               }}
                               className="w-4 h-4 text-blue-600 border-gray-300 rounded"
                             />
@@ -1074,7 +2106,7 @@ function RouteComponent() {
                 />
               </div>
 
-              {/* Multiple Choice/Dropdown Options */}
+              {/* Multiple Choice / Dropdown */}
               {(selectedQuestionType === "multiple_choice" ||
                 selectedQuestionType === "dropdown") && (
                 <div>
@@ -1087,9 +2119,18 @@ function RouteComponent() {
                         <input
                           type="text"
                           value={choice}
+                          ref={(el) => {
+                            choiceInputRefs.current[index] = el;
+                          }}
                           onChange={(e) =>
                             updateMcChoice(index, e.target.value)
                           }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addMcChoice();
+                            }
+                          }}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                           placeholder={`Choice ${index + 1}`}
                         />
@@ -1104,16 +2145,59 @@ function RouteComponent() {
                       </div>
                     ))}
                   </div>
-                  <button
-                    onClick={addMcChoice}
-                    className="mt-3 text-sm font-medium text-gray-700 hover:text-gray-900"
-                  >
-                    + Add choice
-                  </button>
+                  <div className="mt-3 flex items-center gap-4">
+                    <button
+                      onClick={addMcChoice}
+                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                    >
+                      + Add choice
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsImportingChoices(!isImportingChoices);
+                        setImportText("");
+                      }}
+                      className="text-sm font-medium text-amber-700 hover:text-amber-900"
+                    >
+                      Import options
+                    </button>
+                  </div>
+                  {isImportingChoices && (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-xs text-gray-500">
+                        Enter options separated by commas or new lines. Existing
+                        choices will be replaced.
+                      </p>
+                      <textarea
+                        rows={4}
+                        value={importText}
+                        onChange={(e) => setImportText(e.target.value)}
+                        placeholder={"Option 1, Option 2\nOption 3"}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleImportChoices}
+                          className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600"
+                        >
+                          Import
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsImportingChoices(false);
+                            setImportText("");
+                          }}
+                          className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* Linear Scale Options */}
+              {/* Linear Scale */}
               {selectedQuestionType === "linear_scale" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -1149,8 +2233,8 @@ function RouteComponent() {
                         type="text"
                         value={scaleMinLabel}
                         onChange={(e) => setScaleMinLabel(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                         placeholder="Not at all"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -1161,18 +2245,18 @@ function RouteComponent() {
                         type="text"
                         value={scaleMaxLabel}
                         onChange={(e) => setScaleMaxLabel(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                         placeholder="Extremely"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                       />
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Multi Select Options */}
+              {/* Multi Select */}
               {selectedQuestionType === "multi_select" && (
                 <div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-2">
                         Minimum required selections
@@ -1189,7 +2273,7 @@ function RouteComponent() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-900 mb-2">
-                        Maximum required selections
+                        Maximum allowed selections
                       </label>
                       <input
                         min={1}
@@ -1211,9 +2295,18 @@ function RouteComponent() {
                         <input
                           type="text"
                           value={choice}
+                          ref={(el) => {
+                            choiceInputRefs.current[index] = el;
+                          }}
                           onChange={(e) =>
                             updateMcChoice(index, e.target.value)
                           }
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              addMcChoice();
+                            }
+                          }}
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                           placeholder={`Choice ${index + 1}`}
                         />
@@ -1228,12 +2321,55 @@ function RouteComponent() {
                       </div>
                     ))}
                   </div>
-                  <button
-                    onClick={addMcChoice}
-                    className="mt-3 text-sm font-medium text-gray-700 hover:text-gray-900"
-                  >
-                    + Add choice
-                  </button>
+                  <div className="mt-3 flex items-center gap-4">
+                    <button
+                      onClick={addMcChoice}
+                      className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                    >
+                      + Add choice
+                    </button>
+                    <button
+                      onClick={() => {
+                        setIsImportingChoices(!isImportingChoices);
+                        setImportText("");
+                      }}
+                      className="text-sm font-medium text-amber-700 hover:text-amber-900"
+                    >
+                      Import options
+                    </button>
+                  </div>
+                  {isImportingChoices && (
+                    <div className="mt-3 space-y-2">
+                      <p className="text-xs text-gray-500">
+                        Enter options separated by commas or new lines. Existing
+                        choices will be replaced.
+                      </p>
+                      <textarea
+                        rows={4}
+                        value={importText}
+                        onChange={(e) => setImportText(e.target.value)}
+                        placeholder={"Option 1, Option 2\nOption 3"}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleImportChoices}
+                          className="px-3 py-1.5 text-xs font-semibold bg-amber-500 text-white rounded-md hover:bg-amber-600"
+                        >
+                          Import
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsImportingChoices(false);
+                            setImportText("");
+                          }}
+                          className="px-3 py-1.5 text-xs font-semibold text-amber-800 bg-white border-2 border-amber-400 rounded-md hover:bg-amber-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -1251,6 +2387,313 @@ function RouteComponent() {
               >
                 {editingQuestion ? "Save changes" : "Add question"}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CSV Import */}
+      {isCSVImportModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div
+            role="dialog"
+            className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col"
+          >
+            {/* Header */}
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Import Questions from CSV
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Upload a CSV file to import questions into this form
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setIsCSVImportModalOpen(false);
+                  setCSVRows([]);
+                  setCSVSelected(new Set());
+                }}
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1">
+              {csvRows.length === 0 ? (
+                <div className="space-y-4">
+                  <div
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center cursor-pointer hover:border-amber-400 hover:bg-amber-50 transition-colors"
+                    onClick={() => csvFileInputRef.current?.click()}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) =>
+                        handleCSVFileRead(ev.target?.result as string);
+                      reader.readAsText(file);
+                    }}
+                  >
+                    <svg
+                      className="w-12 h-12 text-gray-400 mx-auto mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                    <p className="text-gray-600 font-medium">Attach CSV file</p>
+                  </div>
+                  <input
+                    ref={csvFileInputRef}
+                    type="file"
+                    accept=".csv,text/csv"
+                    className="hidden"
+                    onChange={handleCSVFileChange}
+                  />
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm space-y-2">
+                    <p className="font-semibold text-gray-700">Format:</p>
+                    <ul className="space-y-1.5 text-gray-600">
+                      <li>
+                        <span className="font-medium">
+                          Google Forms / Sheets / Excel export:
+                        </span>{" "}
+                        Columns for question, type, and options (if applicable).
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Selection header */}
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={
+                          csvRows.filter((r) => !r.parseError).length > 0 &&
+                          csvSelected.size ===
+                            csvRows.filter((r) => !r.parseError).length
+                        }
+                        onChange={(e) => {
+                          if (e.target.checked)
+                            setCSVSelected(
+                              new Set(
+                                csvRows
+                                  .filter((r) => !r.parseError)
+                                  .map((r) => r.id),
+                              ),
+                            );
+                          else setCSVSelected(new Set());
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                      />
+                      Select all
+                      <span className="text-gray-400 font-normal">
+                        ({csvSelected.size} of{" "}
+                        {csvRows.filter((r) => !r.parseError).length}{" "}
+                        importable)
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Preview table */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="w-10 px-3 py-2" />
+                          <th className="px-3 py-2 text-left font-medium text-gray-600">
+                            Question
+                          </th>
+                          <th className="w-44 px-3 py-2 text-left font-medium text-gray-600">
+                            Type
+                          </th>
+                          <th className="w-52 px-3 py-2 text-left font-medium text-gray-600">
+                            Options
+                          </th>
+                          <th className="w-16 px-3 py-2 text-center font-medium text-gray-600">
+                            Required?
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {csvRows.map((row) => (
+                          <tr
+                            key={row.id}
+                            className={
+                              row.parseError
+                                ? "bg-red-50"
+                                : csvSelected.has(row.id)
+                                  ? "bg-white"
+                                  : "bg-gray-50 opacity-50"
+                            }
+                          >
+                            {/* Select */}
+                            <td className="px-3 py-2 text-center">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  !row.parseError && csvSelected.has(row.id)
+                                }
+                                disabled={!!row.parseError}
+                                onChange={(e) => {
+                                  if (row.parseError) return;
+                                  setCSVSelected((prev) => {
+                                    const next = new Set(prev);
+                                    if (e.target.checked) next.add(row.id);
+                                    else next.delete(row.id);
+                                    return next;
+                                  });
+                                }}
+                                className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500 disabled:opacity-40 disabled:cursor-not-allowed"
+                              />
+                            </td>
+
+                            {/* Title */}
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                value={row.questionTitle}
+                                onChange={(e) =>
+                                  setCSVRows((prev) =>
+                                    prev.map((r) =>
+                                      r.id === row.id
+                                        ? {
+                                            ...r,
+                                            questionTitle: e.target.value,
+                                          }
+                                        : r,
+                                    ),
+                                  )
+                                }
+                                className="w-full px-2 py-1 border border-gray-200 rounded text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-transparent"
+                              />
+                              {row.parseError ? (
+                                <p className="text-xs text-red-600 mt-0.5 flex items-center gap-1">
+                                  <svg
+                                    className="w-3 h-3 flex-shrink-0"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                  {row.parseError}
+                                </p>
+                              ) : row.parseWarning ? (
+                                <p className="text-xs text-amber-600 mt-0.5">
+                                  {row.parseWarning}
+                                </p>
+                              ) : null}
+                            </td>
+
+                            {/* Type — read-only, locked to parsed value */}
+                            <td className="px-3 py-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">
+                                {QUESTION_TYPE_LABELS[row.questionType] ??
+                                  row.questionType}
+                              </span>
+                            </td>
+
+                            {/* Options preview */}
+                            <td className="px-3 py-2 text-xs text-gray-500">
+                              {row.questionType === "linear_scale" ? (
+                                `${row.scaleMin}–${row.scaleMax}${row.scaleMinLabel ? ` (${row.scaleMinLabel} → ${row.scaleMaxLabel})` : ""}`
+                              ) : row.choices.length > 0 ? (
+                                row.choices.slice(0, 3).join(", ") +
+                                (row.choices.length > 3
+                                  ? ` +${row.choices.length - 3} more`
+                                  : "")
+                              ) : (
+                                <span className="text-gray-300 italic">—</span>
+                              )}
+                            </td>
+
+                            {/* Required */}
+                            <td className="px-3 py-2 text-center">
+                              <input
+                                type="checkbox"
+                                checked={row.required}
+                                onChange={(e) =>
+                                  setCSVRows((prev) =>
+                                    prev.map((r) =>
+                                      r.id === row.id
+                                        ? { ...r, required: e.target.checked }
+                                        : r,
+                                    ),
+                                  )
+                                }
+                                className="h-4 w-4 rounded border-gray-300 text-amber-500 focus:ring-amber-500"
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-200 flex items-center justify-between bg-gray-50 flex-shrink-0">
+              <button
+                onClick={() => {
+                  setIsCSVImportModalOpen(false);
+                  setCSVRows([]);
+                  setCSVSelected(new Set());
+                }}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <div className="flex items-center gap-4">
+                {csvRows.some((r) => r.parseError) && (
+                  <p className="text-xs text-red-500">
+                    {csvRows.filter((r) => r.parseError).length} row
+                    {csvRows.filter((r) => r.parseError).length !== 1
+                      ? "s"
+                      : ""}{" "}
+                    Failed to upload
+                  </p>
+                )}
+                {csvRows.length > 0 && (
+                  <button
+                    onClick={handleCSVImportSubmit}
+                    disabled={isImportingCSV || csvSelected.size === 0}
+                    className="px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isImportingCSV
+                      ? "Importing…"
+                      : `Import ${csvSelected.size} Question${csvSelected.size !== 1 ? "s" : ""}`}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

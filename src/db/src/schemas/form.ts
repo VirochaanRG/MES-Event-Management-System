@@ -1,7 +1,12 @@
-import { pgTable, serial, varchar, text, timestamp, integer, json, boolean } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { pgTable, serial, varchar, text, timestamp, integer, json, boolean, pgSequence } from "drizzle-orm/pg-core";
+
+export const sharedFormIdSeq = pgSequence("shared_form_id_seq");
 
 export const modularForms = pgTable("modular_forms", {
-  id: serial("id").primaryKey().notNull(),
+  id: integer("id")
+    .default(sql`nextval('shared_form_id_seq')`)
+    .primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
@@ -9,7 +14,9 @@ export const modularForms = pgTable("modular_forms", {
 });
 
 export const form = pgTable("form", {
-  id: serial("id").primaryKey().notNull(),
+  id: integer("id")
+    .default(sql`nextval('shared_form_id_seq')`)
+    .primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
@@ -62,14 +69,17 @@ export const formAnswers = pgTable("form_answers", {
 export const formConditions = pgTable("form_conditions", {
   id: serial("id").primaryKey().notNull(),
   formId: integer("form_id")
-    .notNull()
     .references(() => form.id, { onDelete: "cascade" }),
+  modFormId: integer("mod_form_id")
+    .references(() => modularForms.id, { onDelete: "cascade" }),
   conditionType: text("condition_type").notNull(),
-  dependentFormId: integer("dependent_form_id").notNull()
+  dependentFormId: integer("dependent_form_id")
     .references(() => form.id, { onDelete: "cascade" }),
+  dependentModFormId: integer("dependent_mod_form_id")
+    .references(() => modularForms.id, { onDelete: "cascade" }),
   dependentQuestionId: integer("dependent_question_id")
     .references(() => formQuestions.id, { onDelete: "cascade" }),
-  dependentAnswerIdx: integer("dependent_answer_idx")
+  dependentAnswer: text("dependent_answer")
 });
 
 

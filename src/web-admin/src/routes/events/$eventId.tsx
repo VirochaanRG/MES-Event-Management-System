@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { FormQuestion } from "@/interfaces/interfaces";
 import RequireRole from "@/components/RequireRole";
 import { AuthUser, getCurrentUser, logout } from "@/lib/auth";
+import { useCustomAlert, useCustomConfirm } from "@/components/CustomAlert";
 
 export const Route = createFileRoute("/events/$eventId")({
   component: EventDetail,
@@ -38,14 +39,27 @@ interface Registration {
   details: RegistrationDetail[] | null;
 }
 
+interface EventLinkedForm {
+  id: number;
+  name: string;
+  description: string | null;
+  isPublic: boolean;
+}
+
 function EventDetail() {
   const { eventId } = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { showAlert } = useCustomAlert();
+  const showConfirm = useCustomConfirm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [selectedRegistration, setSelectedRegistration] =
     useState<Registration | null>(null);
+  const [removingRegistrationId, setRemovingRegistrationId] = useState<
+    number | null
+  >(null);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionFormData>({
     question_type: "text_answer",
     label: "",
@@ -54,6 +68,7 @@ function EventDetail() {
   });
   const [questions, setQuestions] = useState<QuestionFormData[]>([]);
   const [optionInput, setOptionInput] = useState("");
+  const [selectedFormIds, setSelectedFormIds] = useState<number[]>([]);
 
   const handleBack = () => {
     navigate({ to: "/events" });
@@ -72,6 +87,8 @@ function EventDetail() {
       } else {
         navigate({ to: "/" });
       }
+
+      setIsAuthLoading(false);
     };
 
     initAuth();
@@ -83,6 +100,7 @@ function EventDetail() {
     error: registrationsError,
   } = useQuery({
     queryKey: ["eventRegistrations", eventId],
+    enabled: !!currentUser,
     queryFn: async () => {
       const response = await fetch(`/api/events/${eventId}/registrationlist`);
       if (!response.ok) throw new Error("Failed to fetch registrations");
@@ -97,6 +115,7 @@ function EventDetail() {
     error: formError,
   } = useQuery({
     queryKey: ["eventRegistrationForm", eventId],
+    enabled: !!currentUser,
     queryFn: async () => {
       const response = await fetch(`/api/events/${eventId}/registration-form`);
       if (!response.ok) throw new Error("Failed to fetch registration form");
@@ -104,6 +123,67 @@ function EventDetail() {
       return json.questions as FormQuestion[];
     },
   });
+
+  const {
+    data: allForms,
+    isLoading: isLoadingAllForms,
+    error: allFormsError,
+  } = useQuery({
+    queryKey: ["allFormsForEventLinking"],
+    enabled: !!currentUser,
+    queryFn: async () => {
+      const response = await fetch("/api/forms");
+      if (!response.ok) throw new Error("Failed to fetch forms");
+      const json = await response.json();
+      return (json.data || []) as EventLinkedForm[];
+    },
+  });
+
+  const {
+    data: linkedForms,
+    isLoading: isLoadingLinkedForms,
+    error: linkedFormsError,
+  } = useQuery({
+    queryKey: ["eventLinkedForms", eventId],
+    enabled: !!currentUser,
+    queryFn: async () => {
+      const response = await fetch(`/api/events/${eventId}/forms`);
+      if (!response.ok) throw new Error("Failed to fetch linked forms");
+      const json = await response.json();
+      return (json.data || []) as EventLinkedForm[];
+    },
+  });
+
+  const updateLinkedFormsMutation = useMutation({
+    mutationFn: async (formIds: number[]) => {
+      const response = await fetch(`/api/events/${eventId}/forms`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formIds }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to update linked forms");
+      }
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["eventLinkedForms", eventId],
+      });
+      showAlert("Linked surveys updated successfully");
+    },
+    onError: (error: Error) => {
+      showAlert(error.message || "Failed to update linked surveys");
+    },
+  });
+
+  useEffect(() => {
+    if (!linkedForms) return;
+    setSelectedFormIds(linkedForms.map((f) => f.id));
+  }, [linkedForms]);
 
   const updateFormMutation = useMutation({
     mutationFn: async (formData: { questions: QuestionFormData[] }) => {
@@ -123,6 +203,41 @@ function EventDetail() {
       });
       setIsModalOpen(false);
       setQuestions([]);
+    },
+  });
+
+  const removeRegistrationMutation = useMutation({
+    mutationFn: async (registration: Registration) => {
+      const response = await fetch(
+        `/api/events/${eventId}/registrations/${registration.id}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to remove registration");
+      }
+
+      return registration;
+    },
+    onSuccess: (registration) => {
+      queryClient.invalidateQueries({
+        queryKey: ["eventRegistrations", eventId],
+      });
+
+      if (selectedRegistration?.id === registration.id) {
+        setSelectedRegistration(null);
+      }
+
+      showAlert("Registration removed successfully");
+      setRemovingRegistrationId(null);
+    },
+    onError: (error: Error) => {
+      showAlert(error.message || "Failed to remove registration");
+      setRemovingRegistrationId(null);
     },
   });
 
@@ -164,7 +279,7 @@ function EventDetail() {
 
   const addQuestion = () => {
     if (!currentQuestion.label.trim()) {
-      alert("Please enter a question title");
+      showAlert("Please enter a question title");
       return;
     }
 
@@ -173,7 +288,7 @@ function EventDetail() {
         currentQuestion.question_type === "multi_select") &&
       (!currentQuestion.options || currentQuestion.options.length === 0)
     ) {
-      alert("Please add at least one option");
+      showAlert("Please add at least one option");
       return;
     }
 
@@ -215,7 +330,7 @@ function EventDetail() {
 
   const saveForm = () => {
     if (questions.length === 0) {
-      alert("Please add at least one question");
+      showAlert("Please add at least one question");
       return;
     }
 
@@ -248,11 +363,56 @@ function EventDetail() {
     setSelectedRegistration(null);
   };
 
+  const handleRemoveRegistration = async (registration: Registration) => {
+    const confirmed = await showConfirm(
+      `Remove ${registration.userEmail} from this event?`,
+    );
+
+    if (!confirmed) return;
+
+    setRemovingRegistrationId(registration.id);
+    removeRegistrationMutation.mutate(registration);
+  };
+
   const formatAnswer = (answer: string | string[]) => {
     if (Array.isArray(answer)) {
       return answer.join(", ");
     }
     return answer;
+  };
+
+  const toggleLinkedForm = (formId: number) => {
+    setSelectedFormIds((prev) =>
+      prev.includes(formId)
+        ? prev.filter((id) => id !== formId)
+        : [...prev, formId],
+    );
+  };
+
+  const saveLinkedForms = () => {
+    updateLinkedFormsMutation.mutate(selectedFormIds);
+  };
+
+  const getRegistrantName = (registration: Registration) => {
+    const details = registration.details ?? [];
+
+    const findAnswerByQuestion = (matcher: (question: string) => boolean) => {
+      const detail = details.find((d) => matcher(d.question.toLowerCase()));
+      if (!detail) return "";
+      return Array.isArray(detail.answer)
+        ? detail.answer.join(" ").trim()
+        : String(detail.answer ?? "").trim();
+    };
+
+    const firstName = findAnswerByQuestion(
+      (q) => q.includes("first") && q.includes("name"),
+    );
+    const lastName = findAnswerByQuestion(
+      (q) => q.includes("last") && q.includes("name"),
+    );
+
+    const fullName = `${firstName} ${lastName}`.trim();
+    return fullName || "N/A";
   };
 
   if (isLoadingRegistrations) {
@@ -270,6 +430,16 @@ function EventDetail() {
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
         <p className="text-lg text-red-700 font-semibold">
           Error loading event
+        </p>
+      </div>
+    );
+  }
+
+  if (isAuthLoading || !currentUser) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
+        <p className="text-lg text-slate-700 font-medium">
+          Loading event details...
         </p>
       </div>
     );
@@ -340,7 +510,7 @@ function EventDetail() {
                         Email
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
-                        Instance
+                        Name
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
                         Registered At
@@ -366,7 +536,7 @@ function EventDetail() {
                           {reg.userEmail}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-slate-700">
-                          {reg.instance ?? 0}
+                          {getRegistrantName(reg)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-slate-700">
                           {new Date(reg.registeredAt).toLocaleString()}
@@ -388,12 +558,23 @@ function EventDetail() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <button
-                            onClick={() => openDetailsModal(reg)}
-                            className="text-red-900 hover:text-red-700 font-semibold text-sm underline"
-                          >
-                            View Details
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => openDetailsModal(reg)}
+                              className="text-red-900 hover:text-red-700 font-semibold text-sm underline"
+                            >
+                              View Details
+                            </button>
+                            <button
+                              onClick={() => handleRemoveRegistration(reg)}
+                              disabled={removingRegistrationId === reg.id}
+                              className="text-red-700 hover:text-red-900 font-semibold text-sm underline disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {removingRegistrationId === reg.id
+                                ? "Removing..."
+                                : "Remove"}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -421,6 +602,69 @@ function EventDetail() {
                 <p className="text-slate-400 text-sm mt-1">
                   Registrations will appear here once users sign up
                 </p>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl border-t-4 border-yellow-600 p-8 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className="text-3xl font-bold text-red-900 mb-2">
+                  Linked Surveys
+                </h2>
+                <p className="text-slate-600">
+                  Only paid registrants for this event can access these surveys.
+                </p>
+              </div>
+              <button
+                onClick={saveLinkedForms}
+                disabled={updateLinkedFormsMutation.isPending}
+                className="px-6 py-3 bg-yellow-600 text-white font-bold rounded-lg hover:bg-yellow-500 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {updateLinkedFormsMutation.isPending
+                  ? "Saving..."
+                  : "Save Linked Surveys"}
+              </button>
+            </div>
+
+            {isLoadingAllForms || isLoadingLinkedForms ? (
+              <div className="text-center py-8 text-slate-500">
+                Loading surveys...
+              </div>
+            ) : allFormsError || linkedFormsError ? (
+              <div className="text-center py-8 text-red-600 font-semibold">
+                Failed to load surveys
+              </div>
+            ) : !allForms || allForms.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">
+                No surveys available to link
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-80 overflow-y-auto border border-slate-200 rounded-lg p-4">
+                {allForms.map((survey) => (
+                  <label
+                    key={survey.id}
+                    className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-1 w-4 h-4 text-red-900"
+                      checked={selectedFormIds.includes(survey.id)}
+                      onChange={() => toggleLinkedForm(survey.id)}
+                    />
+                    <div>
+                      <p className="font-semibold text-slate-900">
+                        {survey.name}
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        {survey.description || "No description"}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        ID: {survey.id}
+                      </p>
+                    </div>
+                  </label>
+                ))}
               </div>
             )}
           </div>
@@ -481,10 +725,10 @@ function EventDetail() {
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-red-900 uppercase tracking-wide">
-                        Instance
+                        Name
                       </p>
                       <p className="text-slate-900 font-medium mt-1">
-                        {selectedRegistration.instance ?? 0}
+                        {getRegistrantName(selectedRegistration)}
                       </p>
                     </div>
                     <div>

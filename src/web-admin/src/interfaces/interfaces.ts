@@ -6,6 +6,7 @@ export interface Form
   createdAt: string;
   isPublic: boolean;
   moduleId: number;
+  isModular: boolean;
   unlockAt: string | null;
 }
 
@@ -20,7 +21,7 @@ export interface FormQuestion
   createdAt: string;
   parentQuestionId: number | null;
   enablingAnswers: number[];
-  required : boolean
+  required: boolean
 }
 
 export interface Event
@@ -47,10 +48,21 @@ interface AuthUser
 
 export interface FormCondition
 {
+  text: string;
   id: number;
-  formId : number;
-  dependentFormId : number;
+  formId: number;
+  modFormId: number;
+  dependentFormId: number;
+  dependentModFormId: number;
   conditionType: string;
-  dependentQuestionId : number;
-  dependentAnswerIdx : number;
+  dependentQuestionId: number;
+  dependentAnswer: string;
+}
+
+export interface FormProfileCondition
+{
+  id: number;
+  formId: number;
+  profileField: "faculty" | "program" | "isMcmasterStudent";
+  expectedValue: string;
 }
