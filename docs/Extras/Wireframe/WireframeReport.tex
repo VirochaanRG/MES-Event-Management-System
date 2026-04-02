@@ -1,0 +1,91 @@
+\documentclass[12pt]{article}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[a4paper, margin=0.75in]{geometry}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage[table]{xcolor}
+
+
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+
+\title{Wireframe Report\\\progname}
+
+\author{\authname}
+
+\date{}
+
+\input{../../Comments}
+\input{../../Common}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+~\newpage
+
+\pagenumbering{arabic}
+
+\begin{table}[hp]
+\caption{Revision History} \label{TblRevisionHistory}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
+\midrule
+04-06-2026 & Virochaan Ravichandran Gowri & Wireframe Report final Version\\
+
+... & ... & ...\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+~\newpage
+
+\tableofcontents
+
+~\newpage
+
+\pagenumbering{arabic}
+\section{Introduction}
+This Wireframe Report was for the wireframes that we generated between Rev0 and Rev1. For our project we had a major UI overhaul between these two revisions so we decided to utilizes the wireframes and prototypes that we used for these sections
+
+\section{User Portal}
+The mockups below are for the various screens in the user portal. For each wireframe mockup there is an included table to show case the  
+\subsection{Home Tab}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Mockups/HomePage.png}
+    \caption{User Portal Home Tab Wireframe}
+    \label{fig:user-portal-home-tab}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Home Tab Colour Interaction Mapping}
+\label{tab:home-tab-colour-interactions}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Colour} & \textbf{Corresponding interaction}\\
+\midrule
+\rowcolor{yellow!75} Yellow & On click go to Home Page\\
+\rowcolor{green!15} Green & On Click go to the Surveys Page\\
+\rowcolor{orange!25} Orange & On click go to corresponding EventID page\\
+\rowcolor{red!50} Red & Go to the Events Page\\
+\rowcolor{violet!75} Purple & Open User Profile\\
+\rowcolor{blue!60} Blue & Go to next Image in photo Carousel\\
+\bottomrule
+\end{tabularx}
+\end{table}
+\end{document}
+
+

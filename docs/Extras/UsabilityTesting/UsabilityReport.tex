@@ -1,0 +1,461 @@
+\documentclass[12pt]{article}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage[a4paper, margin=0.75in]{geometry}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{enumitem}
+
+
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=red,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+
+\title{Usability Report\\\progname}
+
+\author{\authname}
+
+\date{}
+
+\input{../../Comments}
+\input{../../Common}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+~\newpage
+
+\pagenumbering{arabic}
+
+\begin{table}[hp]
+\caption{Revision History} \label{TblRevisionHistory}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
+\midrule
+04-06-2026 & Virochaan Ravichandran Gowri & Usability Report Final Version\\
+
+... & ... & ...\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+~\newpage
+
+\tableofcontents
+
+~\newpage
+
+\pagenumbering{arabic}
+\section{Introduction}
+\subsection{Purpose of the Report}
+This report documents the usability testing process and outcomes for the MES Event Management System as a complete product. The purpose is to evaluate how effectively target users can complete core tasks across the platform. There was heavy focus on key end-to-end workflows as well as common practices and usecases. The report captures observed user behavior, friction points, and success rates to determine whether the current design supports clear navigation, understandable interaction patterns, and efficient task completion.
+
+In addition to reporting test outcomes, this document provides evidence-based recommendations for improving the user experience before final release. Findings from this report are intended to guide design refinements and to provide a high importance implementation changes and support traceability between identified usability issues and project decisions in subsequent revisions.
+\subsection{Goals of Testing}
+The goals of usability testing are to validate that the MES Event Management System is intuitive, accessible, and reliable for its primary stakeholders, and to identify improvements that have the highest impact on user success.
+
+The specific goals are:
+\begin{itemize}
+    \item Verify that users can complete end-to-end workflows with minimal guidance.
+    \item Assess the clarity and consistency of the interface across major surfaces of the project, including the user web portal and the admin portal.
+    \item Measure usability indicators such as task completion rate, time on task, error frequency, and user-reported confidence/satisfaction.
+    \item Identify interface elements that cause confusion, misclicks, or navigation dead ends, and document actionable fixes.
+    \item Evaluate whether feedback states are visible and understandable during common and edge-case interactions.
+    \item Confirm that the overall interaction flow aligns with project goals for efficiency and easy learnability for new users.
+\end{itemize}
+\section{Methodology}
+\subsection{User Groups}
+Usability testing for the MES Event Management System considered a broad set of stakeholder groups who interact with the platform in different ways. We focused on the primary user groups for testing as they would be the main The following user groups were included for task design and evaluation:
+
+\begin{itemize}
+    \item General attendees: Primarily students who will be using this app to register and attend events and also answer forms and provide feedback
+    \item Administrative users (MES Executives and Event Organizers): These would be the users responsible for managing the platform and organizing event as well as creating forms.
+\end{itemize}
+
+In total we had 6 General Attendee users test our system as well as one Administrative User. We decided that all of the testers would work through both admin and user workflows to maximize the feedback we recieved as well as provide us with new and differing perspectives.
+\subsubsection{User Profiles}
+For this report, user profiles were intentionally broad and representative rather than persona-specific. Participants were assumed to reflect a typical campus and community event audience with the following baseline demographic characteristics. \\
+\\
+\textbf{General Attendees:}
+
+\begin{itemize}
+    \item Age range: primarily young adults aged 18-24.
+    \item Technical familiarity: Experienced with simple technology.
+    \item Academic Status: Currently attending University.
+    \item Device usage: regular use of laptops and smartphones, with both desktop-first and mobile-first behavior represented.
+    \item Language and communication: fluent English users with varied preference for concise labels, visual cues, and guided navigation.
+    \item Accessibility needs: users with different visual and interaction preferences.
+\end{itemize}
+\textbf{Administrative Users:}
+\begin{itemize}
+    \item Age range: primarily young adults aged 18-24
+    \item Technical familiarity: Experience with this type of technology. Used similar alternatives such as google forms and other sources to create these forms in the past. Have experience organizing events online.
+    \item Academic Status: Can both be attending University and are a part of the MES or have graduated and are still involved with the MES in an advisory capacity.
+    \item Device usage: regular use of laptops and smartphones, with both desktop-first and mobile-first behavior represented.
+    \item Language and communication: fluent English users with varied preference for concise labels, visual cues, and guided navigation.
+    \item Accessibility needs: users with different visual and interaction preferences.
+\end{itemize}
+
+\subsection{Testing Environment}
+The testing was done within a \textbf{Chrome Web Browser} to a fully deployed version of our platform to simulate the actual way in which users would interact and utilize our platform.
+
+\subsection{Testing Process}
+The testing process consisted of 4 main steps. First we administered a pre-test survey to get some general information regarding the users. Then we let the users do some general exploration of the platform asking them to vocalize their thoughts while using it while we observed. We then asked them to do specific end-to-end workflows as we observed them accomplishing them once again asking them to vocalize their thoughts. Finally we administered a post-testing survey gathering their feedback on the platform and areas of improvement.
+
+\begin{figure}[H]
+\centering
+\setlength{\fboxsep}{8pt}
+\fbox{%
+\begin{minipage}{0.95\textwidth}
+\centering
+\textbf{Pre-Test Survey}
+\quad$\rightarrow$\quad
+\textbf{Guided Exploration}
+\quad$\rightarrow$\quad
+\textbf{Task-Based Workflows}
+\quad$\rightarrow$\quad
+\textbf{Post-Test Survey}
+\end{minipage}}
+\caption{Usability testing process used for the MES platform}
+\label{fig:usability-testing-process}
+\end{figure}
+
+
+\subsubsection{Step 1: Pre-Test Survey}
+Before interaction with the system, participants completed a short pre-test survey to collect baseline information. This was for us to understand a bit about the tester's background and experience. The pre-test survey used in this study is listed below: \\
+\\
+\textbf{Pre-Test Survey}
+\begin{enumerate}
+    \item What is your role for this testing session?
+    \begin{itemize}[label=$\circ$]
+        \item General attendee
+        \item Administrative user (MES executive/event organizer)
+    \end{itemize}
+    \item What is your age range?
+    \begin{itemize}[label=$\circ$]
+        \item 18--20
+        \item 21--24
+        \item 25--34
+        \item 35+
+    \end{itemize}
+     \item Are you a McMaster Student?
+    \begin{itemize}[label=$\circ$]
+        \item Yes
+        \item No
+    \end{itemize}
+    \item Which device do you use most often?
+    \begin{itemize}[label=$\circ$]
+        \item Laptop/Desktop
+        \item Smartphone
+        \item Tablet
+    \end{itemize}
+    \item Have you previously used tools such as Google Forms, Eventbrite, or similar platforms?
+    \begin{itemize}[label=$\circ$]
+        \item Yes
+        \item No
+    \end{itemize}
+    \item How confident are you in completing common web tasks (navigation, form completion, and account actions)?
+    \begin{itemize}[label=$\circ$]
+        \item Low
+        \item Medium
+        \item High
+    \end{itemize}
+    \item Do you have any accessibility preferences we should account for during the session?
+    \begin{itemize}[label=$\circ$]
+        \item No
+        \item Larger text
+        \item Higher contrast
+        \item Keyboard-first interaction
+        \item Other (short response)
+    \end{itemize}
+\end{enumerate}
+
+Responses to this survey were used only to contextualize usability findings and segment observations by user type and experience level.
+
+\subsubsection{Step 2: Guided Exploration}
+Participants were then asked to freely explore the platform while thinking aloud. During this stage, moderators observed navigation behavior, first impressions, and areas where labels or layout created uncertainty. This helped identify discoverability and learnability issues before introducing formal tasks. This stage also 
+
+\subsubsection{Step 3: Task-Based Workflow Evaluation}
+After exploration, participants completed targeted end-to-end workflows aligned with the primary use-cases of the platform. These workflows were separated so that both attendee-facing and administrative functionality could be evaluated in a realistic context. \textbf{All Testers} worked through the workflows so we could have a wide variety of data and perspectives on the different processes within the platform.
+
+\textbf{General User Workflows}
+\begin{itemize}
+    \item \textbf{Creating an account:} Users were asked to register a new account and move through the standard account creation flow.
+    \item \textbf{Registering for an event, including completion of the payment flow:} Users were asked to browse to an event, begin registration, and complete any required payment steps to evaluate the smoothness of the sign-up process. They were then asked to locate and show the ticket.
+    \item \textbf{Completing a survey:} Users were asked to locate and submit a survey so that the team could assess whether form questions, navigation, and submission feedback were clear and intuitive.
+\end{itemize}
+
+\textbf{Administrative User Workflows}
+\begin{itemize}
+    \item \textbf{Creating an event:} Administrative users were asked to create a new event and configure its core information to evaluate the event setup interface.
+    \item \textbf{Creating a form:} Administrative users were asked to build a standard 5 question form using all question types.
+    \item \textbf{Creating a modular form:} Administrative users were asked to construct a modular form with reusable or organized sections to evaluate whether more advanced form-building functionality remained understandable and manageable.
+    \item \textbf{Viewing form analytics:} Administrative users were asked to access analytics for an existing form and to export these form analytics to a csv file.
+\end{itemize}
+During these workflows, observers recorded task completion, time on task, user hesitation, navigation errors, and points where participants required clarification. This step provided the main evidence for identifying usability issues tied to the system's core functionality.
+
+\subsubsection{Step 4: Post-Test Survey and Debrief}
+At the end of each session, participants completed a detailed post-test survey and a short debrief discussion. The survey was divided into common questions for all participants and role-specific questions for the two primary user groups. This structure allowed the team to evaluate both overall usability and workflow-specific concerns.
+
+\textbf{Post-Test Survey Structure}
+
+\textbf{Section A: Overall Experience Questions for All Users}
+\begin{enumerate}
+    \item Overall, how easy was the platform to use?
+    \begin{itemize}[label=$\circ$]
+        \item Very difficult
+        \item Difficult
+        \item Neutral
+        \item Easy
+        \item Very easy
+    \end{itemize}
+    \item How clear was the navigation throughout the platform?
+    \begin{itemize}[label=$\circ$]
+        \item Very unclear
+        \item Unclear
+        \item Neutral
+        \item Clear
+        \item Very clear
+    \end{itemize}
+    \item How confident would you feel using the platform again without assistance?
+    \begin{itemize}[label=$\circ$]
+        \item Not confident at all
+        \item Slightly confident
+        \item Moderately confident
+        \item Confident
+        \item Very confident
+    \end{itemize}
+    \item How visually clear and readable was the interface?
+    \begin{itemize}[label=$\circ$]
+        \item Very poor
+        \item Poor
+        \item Acceptable
+        \item Good
+        \item Excellent
+    \end{itemize}
+    \item How useful were the feedback messages shown by the system (for example, success, warning, or error messages)?
+    \begin{itemize}[label=$\circ$]
+        \item Not useful
+        \item Slightly useful
+        \item Moderately useful
+        \item Useful
+        \item Very useful
+    \end{itemize}
+    \item Did you encounter any point where you were unsure what to do next?
+    \begin{itemize}[label=$\circ$]
+        \item Yes
+        \item No
+    \end{itemize}
+    \item Which part of the platform felt the most intuitive to use?
+    \begin{itemize}[label=$\square$]
+        \item Account-related actions
+        \item Event browsing or event management
+        \item Forms and surveys
+        \item Analytics and reporting
+        \item Other (short response)
+    \end{itemize}
+    \item Which part of the platform felt the most confusing or frustrating?
+    \begin{itemize}[label=$\circ$]
+        \item Navigation
+        \item Form completion or form creation
+        \item Registration or payment flow
+        \item Event setup or management
+        \item Analytics or reporting
+        \item Other (short response)
+    \end{itemize}
+    \item What was the single biggest usability issue you experienced?\\
+    \underline{\hspace{15cm}}
+    \item What improvement would most improve your experience with the platform?\\
+    \underline{\hspace{15cm}}
+\end{enumerate}
+
+\textbf{Section B: User Portal Questions}
+\begin{enumerate}
+    \item How easy was it to create a new account?
+    \begin{itemize}[label=$\circ$]
+        \item Very difficult
+        \item Difficult
+        \item Neutral
+        \item Easy
+        \item Very easy
+    \end{itemize}
+    \item How clear were the fields and instructions during account creation?
+    \begin{itemize}[label=$\circ$]
+        \item Very unclear
+        \item Unclear
+        \item Neutral
+        \item Clear
+        \item Very clear
+    \end{itemize}
+    \item How easy was it to find and register for an event?
+    \begin{itemize}[label=$\circ$]
+        \item Very difficult
+        \item Difficult
+        \item Neutral
+        \item Easy
+        \item Very easy
+    \end{itemize}
+    \item How comfortable did you feel during the payment process?
+    \begin{itemize}[label=$\circ$]
+        \item Very uncomfortable
+        \item Uncomfortable
+        \item Neutral
+        \item Comfortable
+        \item Very comfortable
+    \end{itemize}
+    \item How easy was it to locate your event ticket or registration confirmation after registering?
+    \begin{itemize}[label=$\circ$]
+        \item Very difficult
+        \item Difficult
+        \item Neutral
+        \item Easy
+        \item Very easy
+    \end{itemize}
+    \item How easy was it to find and complete a survey?
+    \begin{itemize}[label=$\circ$]
+        \item Very difficult
+        \item Difficult
+        \item Neutral
+        \item Easy
+        \item Very easy
+    \end{itemize}
+    \item Did the survey submission process clearly show that your responses were saved successfully?
+    \begin{itemize}[label=$\circ$]
+        \item Yes
+        \item No
+        \item Not sure
+    \end{itemize}
+    \item What attendee-facing feature did you find most useful?
+    \begin{itemize}[label=$\circ$]
+        \item Account creation
+        \item Event browsing
+        \item Event registration
+        \item Ticket access
+        \item Survey completion
+        \item Other (short response)
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Section C: Admin Portal Questions}
+\begin{enumerate}
+    \item How easy was it to create and configure a new event?
+    \begin{itemize}[label=$\circ$]
+        \item Very difficult
+        \item Difficult
+        \item Neutral
+        \item Easy
+        \item Very easy
+    \end{itemize}
+    \item How clear were the event creation fields and setup options?
+    \begin{itemize}[label=$\circ$]
+        \item Very unclear
+        \item Unclear
+        \item Neutral
+        \item Clear
+        \item Very clear
+    \end{itemize}
+    \item How easy was it to create a standard form?
+    \begin{itemize}[label=$\circ$]
+        \item Very difficult
+        \item Difficult
+        \item Neutral
+        \item Easy
+        \item Very easy
+    \end{itemize}
+    \item How understandable was the modular form creation workflow?
+    \begin{itemize}[label=$\circ$]
+        \item Very confusing
+        \item Confusing
+        \item Neutral
+        \item Understandable
+        \item Very understandable
+    \end{itemize}
+    \item How easy was it to manage question types, sections, and form structure?
+    \begin{itemize}[label=$\circ$]
+        \item Very difficult
+        \item Difficult
+        \item Neutral
+        \item Easy
+        \item Very easy
+    \end{itemize}
+    \item How easy was it to locate and understand form analytics?
+    \begin{itemize}[label=$\circ$]
+        \item Very difficult
+        \item Difficult
+        \item Neutral
+        \item Easy
+        \item Very easy
+    \end{itemize}
+    \item How useful and understandable was the exported analytics data?
+    \begin{itemize}[label=$\circ$]
+        \item Not useful
+        \item Slightly useful
+        \item Moderately useful
+        \item Useful
+        \item Very useful
+    \end{itemize}
+    \item Which administrative workflow needs the most improvement?
+    \begin{itemize}[label=$\circ$]
+        \item Event creation
+        \item Standard form creation
+        \item Modular form creation
+        \item Analytics viewing/export
+        \item Other (short response)
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Section D: Open-Ended Feedback Questions}
+\begin{enumerate}
+    \item Please describe your overall impression of the MES Event Management System. What stood out most to you, whether positively or negatively? \\
+    \underline{\hspace{15cm}}
+    \item If you were to redesign one aspect of the platform based on your experience today, what would it be and why?
+    \underline{\hspace{15cm}}
+    \item How would you compare this platform to other similar event management or registration systems you have used? What does this system do better or worse?
+    \underline{\hspace{15cm}}
+    \item What would make you more likely to recommend this platform to a friend or colleague?
+    \underline{\hspace{15cm}}
+    \item From an attendee's perspective, what is the most important feature the platform should have?
+    \underline{\hspace{15cm}}
+    \item What workflow or feature would save you the most time when managing events and forms?
+    \underline{\hspace{15cm}}
+    \item What capabilities do you wish the platform had that are currently missing?
+    \underline{\hspace{15cm}}
+\end{enumerate}
+
+Responses from this survey, including both quantitative ratings and qualitative open-ended feedback, were combined with observation notes and task performance metrics to prioritize usability issues and recommend improvements for future iterations of the platform.
+
+
+\section{Findings}
+\subsection{Testing Feedback}
+\subsection{Usability Issues}
+
+\section{Recommendations}
+\subsection{High Priority Improvements}
+These are the fixes that we will be focusing on to ensure that our platform will be highly useable and ensure a good quality product.
+
+\subsection{Low Priority Improvements}
+
+\subsection{Feedback Not Implemented}
+\begin{itemize}
+    \item Requests for major feature expansion that fall outside the scope of the current capstone release, such as large-scale personalization or advanced notification systems, were not prioritized for implementation.
+    \item Suggestions that would require substantial redesign of completed workflows late in the project timeline were documented but deferred to future iterations.
+    \item Feedback related to highly specific user preferences that did not appear across multiple participants was considered lower priority than recurring usability concerns.
+    \item Nice-to-have interface refinements with limited impact on task success were recorded but not selected over more critical fixes affecting navigation, form completion, and workflow clarity.
+\end{itemize}
+
+
+\end{document}
+
+
