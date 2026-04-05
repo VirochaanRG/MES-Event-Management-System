@@ -6,6 +6,8 @@ export const users = pgTable("users", {
   // Store hashed password - NEVER store plain text passwords
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   roles: text("roles").array().notNull().default(["user"]),
+  resetPasswordToken: varchar("reset_password_token", { length: 255 }),
+  resetPasswordExpiry: timestamp("reset_password_expiry"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

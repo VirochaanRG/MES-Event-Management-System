@@ -39,6 +39,13 @@ interface Registration {
   details: RegistrationDetail[] | null;
 }
 
+interface EventLinkedForm {
+  id: number;
+  name: string;
+  description: string | null;
+  isPublic: boolean;
+}
+
 function EventDetail() {
   const { eventId } = Route.useParams();
   const navigate = useNavigate();
@@ -61,6 +68,7 @@ function EventDetail() {
   });
   const [questions, setQuestions] = useState<QuestionFormData[]>([]);
   const [optionInput, setOptionInput] = useState("");
+  const [selectedFormIds, setSelectedFormIds] = useState<number[]>([]);
 
   const handleBack = () => {
     navigate({ to: "/events" });
@@ -115,6 +123,67 @@ function EventDetail() {
       return json.questions as FormQuestion[];
     },
   });
+
+  const {
+    data: allForms,
+    isLoading: isLoadingAllForms,
+    error: allFormsError,
+  } = useQuery({
+    queryKey: ["allFormsForEventLinking"],
+    enabled: !!currentUser,
+    queryFn: async () => {
+      const response = await fetch("/api/forms");
+      if (!response.ok) throw new Error("Failed to fetch forms");
+      const json = await response.json();
+      return (json.data || []) as EventLinkedForm[];
+    },
+  });
+
+  const {
+    data: linkedForms,
+    isLoading: isLoadingLinkedForms,
+    error: linkedFormsError,
+  } = useQuery({
+    queryKey: ["eventLinkedForms", eventId],
+    enabled: !!currentUser,
+    queryFn: async () => {
+      const response = await fetch(`/api/events/${eventId}/forms`);
+      if (!response.ok) throw new Error("Failed to fetch linked forms");
+      const json = await response.json();
+      return (json.data || []) as EventLinkedForm[];
+    },
+  });
+
+  const updateLinkedFormsMutation = useMutation({
+    mutationFn: async (formIds: number[]) => {
+      const response = await fetch(`/api/events/${eventId}/forms`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ formIds }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to update linked forms");
+      }
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["eventLinkedForms", eventId],
+      });
+      showAlert("Linked surveys updated successfully");
+    },
+    onError: (error: Error) => {
+      showAlert(error.message || "Failed to update linked surveys");
+    },
+  });
+
+  useEffect(() => {
+    if (!linkedForms) return;
+    setSelectedFormIds(linkedForms.map((f) => f.id));
+  }, [linkedForms]);
 
   const updateFormMutation = useMutation({
     mutationFn: async (formData: { questions: QuestionFormData[] }) => {
@@ -310,6 +379,18 @@ function EventDetail() {
       return answer.join(", ");
     }
     return answer;
+  };
+
+  const toggleLinkedForm = (formId: number) => {
+    setSelectedFormIds((prev) =>
+      prev.includes(formId)
+        ? prev.filter((id) => id !== formId)
+        : [...prev, formId],
+    );
+  };
+
+  const saveLinkedForms = () => {
+    updateLinkedFormsMutation.mutate(selectedFormIds);
   };
 
   const getRegistrantName = (registration: Registration) => {
@@ -521,6 +602,69 @@ function EventDetail() {
                 <p className="text-slate-400 text-sm mt-1">
                   Registrations will appear here once users sign up
                 </p>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl border-t-4 border-yellow-600 p-8 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className="text-3xl font-bold text-red-900 mb-2">
+                  Linked Surveys
+                </h2>
+                <p className="text-slate-600">
+                  Only paid registrants for this event can access these surveys.
+                </p>
+              </div>
+              <button
+                onClick={saveLinkedForms}
+                disabled={updateLinkedFormsMutation.isPending}
+                className="px-6 py-3 bg-yellow-600 text-white font-bold rounded-lg hover:bg-yellow-500 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {updateLinkedFormsMutation.isPending
+                  ? "Saving..."
+                  : "Save Linked Surveys"}
+              </button>
+            </div>
+
+            {isLoadingAllForms || isLoadingLinkedForms ? (
+              <div className="text-center py-8 text-slate-500">
+                Loading surveys...
+              </div>
+            ) : allFormsError || linkedFormsError ? (
+              <div className="text-center py-8 text-red-600 font-semibold">
+                Failed to load surveys
+              </div>
+            ) : !allForms || allForms.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">
+                No surveys available to link
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-80 overflow-y-auto border border-slate-200 rounded-lg p-4">
+                {allForms.map((survey) => (
+                  <label
+                    key={survey.id}
+                    className="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-1 w-4 h-4 text-red-900"
+                      checked={selectedFormIds.includes(survey.id)}
+                      onChange={() => toggleLinkedForm(survey.id)}
+                    />
+                    <div>
+                      <p className="font-semibold text-slate-900">
+                        {survey.name}
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        {survey.description || "No description"}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        ID: {survey.id}
+                      </p>
+                    </div>
+                  </label>
+                ))}
               </div>
             )}
           </div>

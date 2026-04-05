@@ -3,6 +3,8 @@ import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 import { db } from '../../../db/src/db';
 import { events, registeredUsers } from '../../../db/src/schemas/events';
 import { profiles, users } from '../../../db/src/schemas/users';
@@ -13,6 +15,7 @@ import QRCode from 'qrcode';
 import formsRoutes from './formsAPI';
 import publicImageRoutes from './imagesAPI';
 import profileRoutes from './profiles';
+import userAnnouncementsRoutes from './announcementsAPI';
 
 const fastify = Fastify({ logger: true });
 const PORT = 3114;
@@ -234,6 +237,202 @@ fastify.get('/api/auth/token', async (request, reply) =>
 {
   const token = request.cookies['auth-token'];
   reply.send({ token });
+});
+
+// ── Email transporter (Gmail App Password) ──────────────────────────────────
+// Set SMTP_USER and SMTP_PASS in your .env file.
+// SMTP_USER: your Gmail address (e.g. yourname@gmail.com)
+// SMTP_PASS: a Gmail App Password (16-char, spaces removed)
+//   Generate one at: https://myaccount.google.com/apppasswords
+const emailTransporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+const RESET_TOKEN_EXPIRY_MINUTES = 30;
+
+// ── POST /api/auth/forgot-password ──────────────────────────────────────────
+// Generates a temporary password, emails it, and stores its hash.
+fastify.post<{ Body: { email: string } }>('/api/auth/forgot-password', async (request, reply) =>
+{
+  try
+  {
+    const email = (request.body.email ?? '').toLowerCase().trim();
+    if (!email)
+    {
+      return reply.code(400).send({ success: false, error: 'Email is required' });
+    }
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    // Always respond the same way to prevent email enumeration
+    if (!user)
+    {
+      return reply.send({ success: true });
+    }
+
+    // Generate a random 12-char temporary password (readable characters only)
+    const tempPassword = crypto.randomBytes(9).toString('base64url').slice(0, 12);
+    const expiry = new Date(Date.now() + RESET_TOKEN_EXPIRY_MINUTES * 60 * 1000);
+    const tokenHash = await bcrypt.hash(tempPassword, SALT_ROUNDS);
+
+    await db
+      .update(users)
+      .set({
+        resetPasswordToken: tokenHash,
+        resetPasswordExpiry: expiry,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id));
+
+    // Send email
+    await emailTransporter.sendMail({
+      from: `"EvENGage" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Your Temporary Password – EvENGage',
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#fff;">
+          <h2 style="color:#7f1d1d;margin-bottom:8px;">Temporary Password</h2>
+          <p style="color:#374151;font-size:15px;">
+            A password reset was requested for <strong>${email}</strong>.
+            Use the temporary password below to log in, then change your password immediately.
+          </p>
+          <div style="background:#fef3c7;border:2px solid #f59e0b;border-radius:8px;padding:16px 24px;text-align:center;margin:20px 0;">
+            <span style="font-size:28px;font-weight:bold;letter-spacing:4px;color:#92400e;font-family:monospace;">
+              ${tempPassword}
+            </span>
+          </div>
+          <p style="color:#6b7280;font-size:13px;">
+            This password expires in <strong>${RESET_TOKEN_EXPIRY_MINUTES} minutes</strong>.
+            If you did not request this, you can safely ignore this email.
+          </p>
+        </div>
+      `,
+    });
+
+    return reply.send({ success: true });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Forgot password error');
+    return reply.code(500).send({ success: false, error: 'Failed to send reset email' });
+  }
+});
+
+// ── POST /api/auth/reset-password ───────────────────────────────────────────
+// Verifies the temporary password and sets a new permanent password.
+fastify.post<{
+  Body: { email: string; tempPassword: string; newPassword: string };
+}>('/api/auth/reset-password', async (request, reply) =>
+{
+  try
+  {
+    const { tempPassword, newPassword } = request.body;
+    const email = (request.body.email ?? '').toLowerCase().trim();
+
+    if (!email || !tempPassword || !newPassword)
+    {
+      return reply.code(400).send({ success: false, error: 'All fields are required' });
+    }
+
+    if (newPassword.length < 8)
+    {
+      return reply.code(400).send({ success: false, error: 'New password must be at least 8 characters' });
+    }
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    if (!user || !user.resetPasswordToken || !user.resetPasswordExpiry)
+    {
+      return reply.code(400).send({ success: false, error: 'Invalid or expired reset token' });
+    }
+
+    if (new Date() > user.resetPasswordExpiry)
+    {
+      return reply.code(400).send({ success: false, error: 'Reset token has expired. Please request a new one.' });
+    }
+
+    const tokenValid = await bcrypt.compare(tempPassword, user.resetPasswordToken);
+    if (!tokenValid)
+    {
+      return reply.code(400).send({ success: false, error: 'Incorrect temporary password' });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    await db
+      .update(users)
+      .set({
+        passwordHash: newHash,
+        resetPasswordToken: null,
+        resetPasswordExpiry: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id));
+
+    return reply.send({ success: true });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Reset password error');
+    return reply.code(500).send({ success: false, error: 'Failed to reset password' });
+  }
+});
+
+// ── POST /api/auth/change-password ──────────────────────────────────────────
+// Authenticated: verifies current password and sets a new one.
+fastify.post<{
+  Body: { email: string; currentPassword: string; newPassword: string };
+}>('/api/auth/change-password', async (request, reply) =>
+{
+  try
+  {
+    const { currentPassword, newPassword } = request.body;
+    const email = (request.body.email ?? '').toLowerCase().trim();
+
+    if (!email || !currentPassword || !newPassword)
+    {
+      return reply.code(400).send({ success: false, error: 'All fields are required' });
+    }
+
+    if (newPassword.length < 8)
+    {
+      return reply.code(400).send({ success: false, error: 'New password must be at least 8 characters' });
+    }
+
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    if (!user)
+    {
+      return reply.code(401).send({ success: false, error: 'User not found' });
+    }
+
+    const passwordMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!passwordMatch)
+    {
+      return reply.code(401).send({ success: false, error: 'Current password is incorrect' });
+    }
+
+    const newHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    await db
+      .update(users)
+      .set({ passwordHash: newHash, updatedAt: new Date() })
+      .where(eq(users.id, user.id));
+
+    return reply.send({ success: true });
+  } catch (error)
+  {
+    fastify.log.error({ err: error }, 'Change password error');
+    return reply.code(500).send({ success: false, error: 'Failed to change password' });
+  }
 });
 
 // ... (rest of your existing endpoints remain the same)
@@ -1382,6 +1581,7 @@ fastify.delete<{
 await fastify.register(formsRoutes)
 await fastify.register(publicImageRoutes)
 await fastify.register(profileRoutes)
+await fastify.register(userAnnouncementsRoutes)
 
 
 // Start server
