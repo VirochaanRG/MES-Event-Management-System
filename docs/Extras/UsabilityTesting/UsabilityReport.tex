@@ -67,8 +67,7 @@ This report documents the usability testing process and outcomes for the MES Eve
 
 In addition to reporting test outcomes, this document provides evidence-based recommendations for improving the user experience before final release. Findings from this report are intended to guide design refinements and to provide a high importance implementation changes and support traceability between identified usability issues and project decisions in subsequent revisions.
 \subsection{Goals of Testing}
-The goals of usability testing are to validate that the MES Event Management System is intuitive, accessible, and reliable for its primary stakeholders, and to identify improvements that have the highest impact on user success.
-
+The goals of usability testing are to validate that the MES Event Management System is intuitive, accessible, and reliable for its primary stakeholders, and to identify improvements that have the highest impact on user success.\\
 The specific goals are:
 \begin{itemize}
     \item Verify that users can complete end-to-end workflows with minimal guidance.
@@ -191,15 +190,13 @@ Responses to this survey were used only to contextualize usability findings and 
 Participants were then asked to freely explore the platform while thinking aloud. During this stage, moderators observed navigation behavior, first impressions, and areas where labels or layout created uncertainty. This helped identify discoverability and learnability issues before introducing formal tasks. This stage also 
 
 \subsubsection{Step 3: Task-Based Workflow Evaluation}
-After exploration, participants completed targeted end-to-end workflows aligned with the primary use-cases of the platform. These workflows were separated so that both attendee-facing and administrative functionality could be evaluated in a realistic context. \textbf{All Testers} worked through the workflows so we could have a wide variety of data and perspectives on the different processes within the platform.
-
+After exploration, participants completed targeted end-to-end workflows aligned with the primary use-cases of the platform. These workflows were separated so that both attendee-facing and administrative functionality could be evaluated in a realistic context. \textbf{All Testers} worked through the workflows so we could have a wide variety of data and perspectives on the different processes within the platform.\\
 \textbf{General User Workflows}
 \begin{itemize}
     \item \textbf{Creating an account:} Users were asked to register a new account and move through the standard account creation flow.
     \item \textbf{Registering for an event, including completion of the payment flow:} Users were asked to browse to an event, begin registration, and complete any required payment steps to evaluate the smoothness of the sign-up process. They were then asked to locate and show the ticket.
     \item \textbf{Completing a survey:} Users were asked to locate and submit a survey so that the team could assess whether form questions, navigation, and submission feedback were clear and intuitive.
 \end{itemize}
-
 \textbf{Administrative User Workflows}
 \begin{itemize}
     \item \textbf{Creating an event:} Administrative users were asked to create a new event and configure its core information to evaluate the event setup interface.
@@ -210,10 +207,8 @@ After exploration, participants completed targeted end-to-end workflows aligned 
 During these workflows, observers recorded task completion, time on task, user hesitation, navigation errors, and points where participants required clarification. This step provided the main evidence for identifying usability issues tied to the system's core functionality.
 
 \subsubsection{Step 4: Post-Test Survey and Debrief}
-At the end of each session, participants completed a detailed post-test survey and a short debrief discussion. The survey was divided into common questions for all participants and role-specific questions for the two primary user groups. This structure allowed the team to evaluate both overall usability and workflow-specific concerns.
-
-\textbf{Post-Test Survey Structure}
-
+At the end of each session, participants completed a detailed post-test survey and a short debrief discussion. The survey was divided into common questions for all participants and role-specific questions for the two primary user groups. This structure allowed the team to evaluate both overall usability and workflow-specific concerns.\\
+\textbf{Post-Test Survey Structure}\\
 \textbf{Section A: Overall Experience Questions for All Users}
 \begin{enumerate}
     \item Overall, how easy was the platform to use?
@@ -283,7 +278,6 @@ At the end of each session, participants completed a detailed post-test survey a
     \item What improvement would most improve your experience with the platform?\\
     \underline{\hspace{15cm}}
 \end{enumerate}
-
 \textbf{Section B: User Portal Questions}
 \begin{enumerate}
     \item How easy was it to create a new account?
@@ -350,7 +344,6 @@ At the end of each session, participants completed a detailed post-test survey a
         \item Other (short response)
     \end{itemize}
 \end{enumerate}
-
 \textbf{Section C: Admin Portal Questions}
 \begin{enumerate}
     \item How easy was it to create and configure a new event?
@@ -418,7 +411,6 @@ At the end of each session, participants completed a detailed post-test survey a
         \item Other (short response)
     \end{itemize}
 \end{enumerate}
-
 \textbf{Section D: Open-Ended Feedback Questions}
 \begin{enumerate}
     \item Please describe your overall impression of the MES Event Management System. What stood out most to you, whether positively or negatively? \\
@@ -445,8 +437,7 @@ Responses from this survey, including both quantitative ratings and qualitative 
 
 \subsubsection{Quantitative Results}
 
-The post-test survey (Step 4, Section A) asked all 7 participants to rate five overall experience dimensions on a 5-point scale. Scores below reflect averages across all participants, where 1 = Very Difficult / Very Poor / Not Confident / Not Useful and 5 = Very Easy / Excellent / Very Confident / Very Useful.
-
+The post-test survey (Step 4, Section A) asked all 7 participants to rate five overall experience dimensions on a 5-point scale. Scores below reflect averages across all participants, where 1 was low on the scale and 5 was high on the scale. of what they thought of the platform as a whole.
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}
@@ -596,66 +587,33 @@ Modular form creation was the lowest-rated admin workflow (2.7). During the Step
 
 \subsubsection{Component Specific Feedback}
 
-The following observations are drawn from think-aloud commentary recorded during Step 2 (Guided Exploration) and Step 3 (Task-Based Workflows), and from open-ended responses in Section D of the post-test survey.
-
+The following observations summarize the most recurring component-level feedback from think-aloud commentary recorded during Step 2 (Guided Exploration), Step 3 (Task-Based Workflows), and open-ended responses in Section D of the post-test survey.\\
 \textbf{User Portal}
 \begin{itemize}
-    \item \textit{Alerts and native components:} During Step 2 free exploration, multiple participants reacted visibly to the browser-native alert dialogs that appeared on form submission, commenting that they looked out of place. The native OS select dropdowns were similarly flagged as inconsistent with the rest of the interface. In Section D, two participants noted the visual inconsistency of these components when asked to describe their overall impression of the platform.
+    \item \textit{Navigation and tab routing:} Participants frequently lost context when returning from forms or event pages, especially when routed back to Overview instead of the originating tab. This remained one of the most common hesitation points and aligns with the lower Navigation Clarity ratings.
 
-    \item \textit{Tab navigation and routing:} During the Step 3 survey completion task, participants who navigated back from a submitted form were returned to the Overview tab rather than the Surveys tab. Several participants expressed confusion, re-browsed to the Surveys tab, and then attempted to determine whether their submission had been recorded. This was one of the most frequently observed hesitation points across Step 3 sessions. Navigation was selected by 3 of 7 participants as the most frustrating area in Section A Q8.
+    \item \textit{Submission clarity and confirmation states:} Users were often unsure whether actions were successfully saved or submitted, particularly in survey completion and post-registration flows. Missing or weak confirmation states reduced user confidence and contributed to repeated actions.
 
-    \item \textit{Form save state and edit flow:} During the Step 3 survey completion task, participants who saved a partial response and reloaded the page found no responses persisted. When subsequently asked to edit a prior submission, the form opened blank rather than pre-filled with previous answers. Participants expressed uncertainty about whether the save function was working at all. Section B Q7 confirmed this: 4 of 7 participants indicated the submission process did not clearly confirm that responses had been saved.
-
-    \item \textit{Event registration --- repeated user fields:} During the Step 3 event registration task, participants were presented with fields for first name, last name, and email despite being logged in. This was commented on unprompted by multiple participants during think-aloud. In Section D, this was cited by two participants as the improvement that would most benefit their experience.
-
-    \item \textit{Post-registration confirmation:} After completing the Step 3 event registration task, participants were asked to locate their ticket. Several attempted to register a second time because the event page showed no visible change after registration. This directly contributed to the lower Ticket Access score (3.0) in Section B and was cited in Section A Q9 as the single biggest usability issue by two participants.
-
-    \item \textit{Featured Events --- View Details routing:} During Step 2 free exploration, participants clicked ``View Details'' on the Overview tab expecting to land on the specific event page. When they were taken to the Events tab instead, several participants initially believed the link had not worked. This was noted in Section D open-ended responses as a confusing first impression.
-
-    \item \textit{Form card timestamps:} During Step 2, participants browsing the form list questioned what the date displayed on each card represented. Think-aloud commentary included uncertainty about whether it reflected when the form was created or last updated. No participant was able to determine this from the UI alone.
+    \item \textit{Registration friction for logged-in users:} Re-entering known profile fields (name and email) during event registration was repeatedly flagged as unnecessary and inconsistent with user expectations from comparable platforms.
 \end{itemize}
 
 \textbf{Admin Portal}
 \begin{itemize}
-    \item \textit{Visibility toggle and unlock date:} During the Step 3 event creation task, all participants paused when reaching the visibility toggle. The toggle's design led participants to interpret ``private'' as an inactive or disabled state. The adjacent ``Set Date'' label was not understood to be connected to an unlock date mechanism without prompting. In Section C Q2, field clarity for event creation scored below neutral, and this section was the primary contributor to that result.
+    \item \textit{Event visibility and scheduling controls:} The visibility toggle and unlock date relationship was not intuitive. Participants misread state meaning and were unsure how scheduling behaved, especially when invalid dates were cleared without explicit feedback.
 
-    \item \textit{Unlock date validation:} During Step 3, participants who entered an invalid date into the unlock date field and saved observed the field clear silently. No error message appeared. Participants expressed uncertainty about whether their input had been accepted or discarded, and in some cases re-entered the date without realising it had already been cleared.
+    \item \textit{Admin event management feedback:} Inconsistent routing and limited post-action confirmation in event management workflows led to uncertainty and occasional duplicate registrations.
 
-    \item \textit{Admin event page routing:} During Step 3 administrative workflows, navigating to an event from the admin events list failed to load the event content in some cases. Participants who encountered this attempted refreshing and re-clicking before concluding the page was broken. This was observed during task execution and noted in Section D open-ended responses.
+    \item \textit{Form builder interaction model (admin workflow):} Building and editing forms required more effort than expected. Common friction included bulk choice entry, keyboard flow (Enter/add row), and ambiguous labels or selection styling that looked like validation errors.
 
-    \item \textit{Duplicate registrations:} During Step 3, the absence of post-registration confirmation on the event page led participants to register for the same event more than once. This was flagged by the administrative tester as a data integrity concern when reviewing the registrations table.
-
-    \item \textit{Registrations table layout:} During the Step 3 admin workflow, participants reviewing the registrations table commented that combining first and last name into a single column made it harder to scan. This was raised in the Section D open-ended question about what workflow or feature would save the most time.
-
-    \item \textit{``Instance'' label and event status:} During Step 2 exploration of the admin portal, no general-user participant understood what ``Instance'' referred to. The ``Scheduled'' event status was also questioned during Step 3, with participants unsure whether it updated automatically or required manual changes.
-
-    \item \textit{Non-functional eye icon:} During Step 2 free exploration, participants noticed the eye icon in the admin interface and attempted to use it, expecting a preview. When it produced no result, participants were unsure whether they had missed something or whether the feature was incomplete.
-
-    \item \textit{Form title and description editing:} During Step 3, participants who wanted to correct a form title after creation could not find a clear path to do so. This was raised in Section D open-ended responses when participants were asked what they would redesign.
-
-    \item \textit{Form card height inconsistency:} Observed during Step 2 exploration of the admin form list. Cards without descriptions rendered noticeably shorter than those with descriptions, producing a visually uneven grid. Participants did not raise this verbally but it was recorded as an observer note.
-\end{itemize}
-
-\textbf{Form Builder}
-\begin{itemize}
-    \item \textit{Bulk option entry:} During the Step 3 standard form creation task, participants building dropdown or multiple-choice questions with many options expressed frustration at having to click ``Add Choice'' individually for each entry. In Section D, this was raised in response to the question about what capabilities they wished the platform had, with explicit comparison to Google Forms' paste-to-populate behaviour.
-
-    \item \textit{Add Choice focus and Enter key:} Observed during Step 3 form creation tasks. After clicking ``Add Choice,'' participants had to click the new input row before typing. Pressing Enter in a choice field did not create the next row. Both behaviours were expected by participants based on prior experience with Google Forms.
-
-    \item \textit{Multi-select ``Required'' label:} During Step 3, participants configuring a multi-select question interpreted the ``Required'' label on the selection limit field as a question-level required marker. This led to incorrect configuration in several sessions and was noted in Section C Q5 responses regarding ease of managing question types.
-
-    \item \textit{Red border on question selection:} Observed during Step 3 form creation. Selecting a question in the builder triggered a red border, which every participant interpreted as a validation error. Participants paused and attempted to identify what they had done wrong before realising the border indicated selection.
+    \item \textit{Information architecture and table clarity:} Participants reported unclear terminology, unclear status meaning, and table/layout choices that made scanning registration data less efficient.
 \end{itemize}
 
 \subsubsection{Observations and General Impressions}
 
-Across all seven sessions, participants responded positively to the visual design of the platform during Step 2 exploration, frequently describing it as clean and well-structured. This is consistent with the Visual Clarity score of 3.9 from Section A of the post-test survey, which was the highest-rated dimension overall.
-
-Functional clarity was a recurring concern. Think-aloud commentary during Steps 2 and 3 showed that participants frequently paused at transition points between sections --- particularly when returning from a completed form or event registration --- and were uncertain whether their prior action had been recorded. This pattern is reflected in the low Feedback Usefulness score (2.9) from Section A and in the Section B Q7 result, where 4 of 7 participants indicated the submission process did not clearly confirm their responses had been saved.
-
-Participants carried strong expectations from prior experience with Google Forms, Eventbrite, and similar platforms, as indicated by pre-test survey responses confirming all participants had used such tools before. When the MES platform deviated from familiar patterns --- such as not auto-populating known user fields, not restoring draft responses, or not routing back to the correct tab after navigation --- participants noticed the deviation immediately and commented on it during think-aloud.
-
-All participants successfully completed the account creation and event browsing tasks in Step 3. Task completion was less consistent for ticket access, the modular form creation workflow, and the event visibility and unlock date configuration task. In these cases, participants either required direct prompting to proceed or reached an incorrect end state without realising it. These outcomes are reflected in the lower post-test scores for Ticket Access (Section B, 3.0) and Modular Form creation (Section C, 2.7).
+Overall, participants viewed the MES Event Management System as a capable platform with a strong functional base and clear potential for day-to-day use by both attendees and administrators. The system was generally perceived as modern, organized, and aligned with real event-management needs, especially in terms of providing end-to-end support across discovery, registration, form workflows, and administrative oversight.\\
+General impressions indicate that the platform is strongest when users are moving through straightforward, linear tasks, and less effective when workflows require interpretation of system state, status meaning, or next-step decisions. At a platform level, this suggests that usability improvements should focus less on adding new features and more on strengthening interaction clarity, consistency of behavior, and transparency of system responses.\\
+Participants also evaluated the platform relative to well-known tools they already use. This comparison was less about visual design and more about workflow predictability and confidence. As a result, the most important product-level takeaway is that user trust will improve most through clearer feedback, consistent navigation behavior, and reduced friction in repeat or high-frequency actions.\\
+In summary, the platform is broadly usable and functionally meaningful in its current state, with the next steps focused on implementing usability changes and quality of life features rather than large overhauls or features that introduce new capabilities.
 
 \subsection{Usability Issues}
 
@@ -738,6 +696,13 @@ These are the fixes that we will be focusing on to ensure that our platform will
     \item Automatic triggers for changing between event states was considered but decided to move to a future expansion. 
     \item More detailed insights and automatic pdf report generation was considered but 
 \end{itemize}
+
+\section{Conclusion}
+The usability testing sessions indicate that the MES Event Management System has a solid visual foundation and supports completion of the platform's main user and administrative workflows, but still contains key usability gaps that affect efficiency and user confidence. Participants consistently responded positively to interface cleanliness and overall structure, while major friction points centered on navigation continuity, clarity of feedback states, and discoverability of important post-action outcomes (such as successful registration or saved form submissions).
+
+Across both attendee and administrative workflows, results show that users are able to accomplish core tasks, but often require additional confirmation cues and clearer interaction patterns to do so confidently on first attempt. The findings suggest that improving state visibility, simplifying complex workflows (especially modular form creation), and aligning interaction behavior with user expectations from comparable platforms will produce the highest impact on overall usability.
+
+Overall, this study confirms that the platform is functionally viable for release readiness progression, provided that the high-priority usability issues identified in this report continue to be addressed in upcoming iterations.
 
 
 \end{document}
