@@ -2,8 +2,6 @@
 
 \usepackage{tabularx}
 \usepackage{booktabs}
-\usepackage{hyperref}
-\usepackage{float}
 
 \title{Reflection and Traceability Report on \progname}
 
@@ -63,67 +61,7 @@ be able to grade your response to feedback.  In that case your grade on this
 document, and likely the Revision 1 versions of the other documents will be
 low.} 
 
-\subsection{SRS}
-
-\begin{table}[H]
-\centering
-\renewcommand{\arraystretch}{1.5}
-\begin{tabularx}{\textwidth}{>{\raggedright}p{0.15\textwidth} 
-                              >{\raggedright}p{0.2\textwidth} 
-                              >{\raggedright}X 
-                              >{\raggedright\arraybackslash}p{0.15\textwidth}}
-  \toprule
-  \textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made} & \textbf{Related Commits / Issues} \\
-  \midrule
-  TA Feedback 
-    & Score of 1/3 for Requirements Traceability 
-    & Added a traceability matrix for functional requirements to goals, 
-      and functional requirements to non-functional requirements 
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/8bc5396d775e0d0a8b8e15ddfbbb528015fec6d9}{8bc5396} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}\\
-    \midrule
-  TA Feedback 
-    & Score of 1/3 for Phase in Plan 
-    & Revamped phase in plan with MoSCoW prioritization of requirements
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/8bc5396d775e0d0a8b8e15ddfbbb528015fec6d9}{8bc5396} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}\\
-  \midrule
-  TA Feedback 
-    & Score of 0/3 for LO\_SpecMath
-    & Add formal definitions to some requirements
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4562b9b7bdc14277b1dbc1892145fdb986e851c5}{4562b9b} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}\\
-  \midrule
-  TA Feedback 
-    & Score of 1/3 for Basis for Design
-    & Add a section for likely and unlikely requirements changes
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4562b9b7bdc14277b1dbc1892145fdb986e851c5}{4562b9b} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}\\
-  \midrule
-Peer Feedback 
-    & Provide Graphics for Stakeholders
-    & Added a diagram grouping stakeholders into categories
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/3e4ecabe6377527c3e0fbc0718594a280f19814a}{3e4ecab} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/69}{\#69}\\
-  \midrule
-  Peer Feedback 
-    & Business Data Model 
-    & Revamped section 7.1 with ER diagram of business entities and relations.
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4a027f855641707b69687eab03ff4d65efe1a0df}{4a027f8} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/71}{\#71}\\
-  \midrule
-  Peer Feedback 
-    & Data Dictionary
-    & Revamped section 7.2 with business entity descriptions
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4a027f855641707b69687eab03ff4d65efe1a0df}{4a027f8} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/72}{\#72}\\
-  \bottomrule
-\end{tabularx}
-\caption{SRS Feedback and Changes}
-\label{tab:feedback}
-\end{table}
-
-\subsection{Hazard Analysis}
+\subsection{SRS and Hazard Analysis}
 
 \subsection{Design and Design Documentation}
 
