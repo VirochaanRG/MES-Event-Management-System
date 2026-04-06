@@ -7,7 +7,19 @@
 \usepackage[a4paper, margin=0.75in]{geometry}
 \usepackage{subcaption}
 \usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{ragged2e}
 
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+% Define colors for Severity Ratings
+\definecolor{sev5}{HTML}{FF0000} % Red
+\definecolor{sev4}{HTML}{FF6600} % Orange
+\definecolor{sev3}{HTML}{FFCC00} % Yellow
+\definecolor{sev2}{HTML}{99FF33} % Light Green
+\definecolor{sev1}{HTML}{00FF00} % Green
 
 \hypersetup{
     colorlinks=true,       % false: boxed links; true: colored links
@@ -28,6 +40,8 @@
 
 \begin{document}
 
+\RaggedRight
+
 \maketitle
 \thispagestyle{empty}
 
@@ -46,7 +60,10 @@
 09-25-2025 & Rayyan Suhail & Added Component Overview and Boundaries\\
 09-29-2025 & Rayyan Suhail & FMEA Added\\
 10-07-2025 & Rayyan Suhail, Virochaan Ravichandran Gowri  & Section 6,7 + Review\\
-10-07-2025 & All members & Reflection\\
+10-07-2026 & All members & Reflection\\
+04-06-2026 & Virochaan & Adressed TA feedback, added section 3.3 - System Diagram\\
+04-06-2026 & Virochaan & Implemented Peer Review Issue 66, redesigned section 5, table 2 with added column\\
+04-06-2026 & Virochaan & Implemented Peer Review Issue 73, updated section 2 with more defined scope and losses incurred\\
 ... & ... & ...\\
 \bottomrule
 \end{tabularx}
@@ -63,7 +80,8 @@
 This document will contain the Hazard Analysis for \teamname. \teamname \ is a platform that provides the McMaster Engineering Society with the functionality to create and manage events, surveys and perform other administrative functions. It will allow both admins and users to interact with platform and register for events and complete surveys. For this Hazard Analysis we will be defining hazard as a potential risk situation which can result in or contribute to a mishap. The purpose of this document is to identify potential hazards and develop requirements and measure to help prevent or mitigate the risk posed by these hazards.
 
 \section{Scope and Purpose of Hazard Analysis}
-The purpose of this Hazard Analysis is to identify and mitigate potential hazards that could negatively impact the \teamname \ platforms. This includes both technical hazards relating to the design of the system as well as user interaction hazards.
+The purpose of this Hazard Analysis is to identify, evaluate, and mitigate hazards that are specific to the core functions of the \teamname \ platform. In particular, this analysis focuses on hazards in both the admin and user portal interfaces of the system. For the admin portal the primary focus is on the form builder and renderer, registration processing, check-in and QR verification, attendee dashboards, and analytics/reporting. In the user portal emphasis was put on the authentication/authorization, and external integration adapters (for example, SSO and email/SMS services). The common data access layer for both components was also considered to ensure that our database layer was properly secure.  The scope therefore covers both technical failure modes and user-facing failure outcomes across the web and mobile usage paths.\\
+At a practical level, this hazard analysis is intended to reduce losses that MES could incur if these hazards occur. Examples of potential losses include: loss of registration or waiver records, privacy breaches, failed check-ins, and unavailable reporting data. These hazards could lead to operational disruption and legal exposure as well as general privacy breaches if we do not properly account for them.
 
 
 \section{System Boundaries and Components}
@@ -119,8 +137,15 @@ Stores form schemas, form responses, and attendee information using structured d
 \subsubsection{External Integration Adapters}
 Interfaces with required external systems such as university single sign-on (SSO) and email services to support core functionality.
 
+\subsection{System Diagram}
+Below is a simple diagram explaining how the various components interact with one another within the system boundaries. This is not the design of the system but rather a crude interaction diagram showing the different components.
 
-
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{SystemDiagram.png}
+    \caption{Component Interaction Diagram}
+    \label{fig:constraints-event-time-order}
+\end{figure}
 
 \section{Critical Assumptions}
 
@@ -136,22 +161,61 @@ Interfaces with required external systems such as university single sign-on (SSO
 \section{Failure Mode and Effects Analysis (FMEA)}
 
 The following section provides a breakdown of the Failure Modes and Effects Analysis (FMEA) for the system. Each component is evaluated for potential failures, their impact on system operation, possible causes, methods of detection, and recommended actions. This analysis ensures that hazards affecting event registration, form processing, check-ins, and analytics are identified early and mitigated through targeted safety and reliability requirements.
-\begin{figure}[H]
-\begin{subfigure}{\textwidth}
-    \centering\includegraphics[width=\textwidth]{FMEA_images/FMEA_1.png}
-    \caption{Fig. 1: FMEA Table Part 1}
-\end{subfigure}
 
-\begin{subfigure}{\textwidth}
-    \centering\includegraphics[width=\textwidth]{FMEA_images/FMEA_2.png}
-    \caption{Fig. 2: FMEA Table Part 2}
-\end{subfigure}
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\begin{longtable}{|L{2.0cm}|L{1.8cm}|L{1.9cm}|L{1.9cm}|L{1.8cm}|L{2.4cm}|L{0.9cm}|L{1.1cm}|L{1cm}|}
+\caption{Failure Mode and Effects Analysis (FMEA)}\label{tab:fmea}\\
+\hline
+\rowcolor{gray!20}
+\textbf{Design Function} & \textbf{Failure Modes} & \textbf{Effects of Failure} & \textbf{Causes of Failure} & \textbf{Detection} & \textbf{Recommended Action} & \textbf{SR} & \textbf{Ref} & \textbf{Sev} \\
+\hline
+\endfirsthead
 
-\begin{subfigure}{\textwidth}
-    \centering\includegraphics[width=\textwidth]{FMEA_images/FMEA_3.png}
-    \caption{Fig. 3: FMEA Table Part 3}
-\end{subfigure}
-\end{figure}
+\hline
+\rowcolor{gray!20}
+\textbf{Design Function} & \textbf{Failure Modes} & \textbf{Effects of Failure} & \textbf{Causes of Failure} & \textbf{Detection} & \textbf{Recommended Action} & \textbf{SR} & \textbf{Ref} & \textbf{Sev} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+Form Builder and Renderer & Form fails to load / render & Users unable to build or complete forms; event sign-ups blocked & Frontend rendering bug, schema parsing error, server downtime & Automated UI tests, monitoring logs & Add robust schema validation, fallback UI, redundant servers & SR1.1, SR1.3 & H1-1 & \cellcolor{sev4}\textbf{4} \\
+\hline
+Form Builder and Renderer & Incorrect form logic execution (branching fails) & Wrong fields shown, incorrect data captured & Logic misconfiguration, database mismatch & Unit tests on conditional logic, integration tests & Enforce schema consistency, admin preview mode & SR1.2 & H1-2 & \cellcolor{sev3}\textbf{3} \\
+\hline
+Registration \& Waiver Manager & Registrations not recorded & Attendees think they registered but system has no record & Database write failure, API timeout & Monitoring DB writes, user confirmation emails & Retry logic, backup DB write queue & SR2.1, SR2.2 & H2-1 & \cellcolor{sev4}\textbf{4} \\
+\hline
+Registration \& Waiver Manager & Waivers not stored / lost & Legal liability exposure & Improper storage, file corruption, missing object storage link & Storage integrity checks & Redundant storage, integrity checksum & SR2.3 & H2-2 & \cellcolor{sev5}\textbf{5} \\
+\hline
+Check-in \& QR Verification & QR code not generated & Attendees cannot check in & QR generation library bug, server failure & Test ticket generation, error alerts & Add retry system, use backup QR library & SR3.1 & H3-1 & \cellcolor{sev3}\textbf{3} \\
+\hline
+Check-in \& QR Verification & QR invalid at check-in & Attendees denied entry despite valid registration & Clock desync, mismatched record, DB corruption & Cross-check logs at check-in, time sync monitoring & Time sync service, redundant DB & SR3.2 & H3-2 & \cellcolor{sev4}\textbf{4} \\
+\hline
+Attendee Overview Dashboard & Data incomplete / inaccurate & Admins make poor decisions (wrong headcount, etc.) & Analytics DB out of sync, caching issue, delayed pipeline & Scheduled DB consistency checks, anomaly detection & Real-time sync pipeline, alerting for mismatches & SR4.1, SR4.2 & H4-1 & \cellcolor{sev3}\textbf{3} \\
+\hline
+Analytics \& Reporting & Reports fail to generate & Event managers lose insights, reduced trust & Query timeout, malformed queries, overloaded analytics service & Load testing, error logging & Optimize queries, asynchronous report generation & SR5.1 & H5-1 & \cellcolor{sev3}\textbf{3} \\
+\hline
+Authentication \& Authorization & Unauthorized access & Data leaks, privacy breach & Role misconfiguration, SSO bypass, weak session handling & Security audits, penetration testing & Stronger role enforcement, periodic access reviews, force MFA & SR6.1, SR6.2, SR6.4 & H6-1 & \cellcolor{sev5}\textbf{5} \\
+\hline
+Authentication \& Authorization & User unable to login & Prevents registration or event management & SSO outage, session misconfig & Monitor auth failures & Graceful fallback login (guest mode for limited ops), error messages & SR6.3 & H6-2 & \cellcolor{sev4}\textbf{4} \\
+\hline
+Data Storage Layer & Data corruption & Permanent loss of registration and waiver data & Hardware failure, unhandled exceptions, misconfigured DB replication & Backups with restore tests, DB monitoring & Automatic DB failover, validated backup-restore process & SR7.1 & H7-1 & \cellcolor{sev5}\textbf{5} \\
+\hline
+Data Storage Layer & Data breach & PII exposed & Weak encryption, insecure connections & Security scanning, breach detection tools & End-to-end encryption, key rotation, VPC isolation & SR7.2, SR7.3 & H7-2 & \cellcolor{sev5}\textbf{5} \\
+\hline
+External Integration Adapters & Failure in SSO or email/SMS delivery & Users can't authenticate / receive confirmations & External API downtime, invalid API keys & Health checks, external service monitoring & Retry queue, failover provider, admin alerts & SR8.1, SR8.2 & H8-1 & \cellcolor{sev4}\textbf{4} \\
+\hline
+\end{longtable}
+\endgroup
 
 
 
@@ -273,7 +337,7 @@ The hazard analysis identified several safety and security requirements. Within 
 \begin{enumerate}
     \item \textbf{Which of your listed risks had your team thought of before this deliverable, and which did you think of while doing this deliverable? For the latter ones (ones you thought of while doing the Hazard Analysis), how did they come about?} \\
     The primary risks that we identified before the project were what we thought were the obvious ones. Risks relating to the authentication and the data safety during a data breach seemed obvious to us and things that we would have to consider if we were to create any system which had users inputting data. \\
-    \\
+
     Some risks that we thought about through the process of writing this deliverable include the ones relating to data corruption and integrity. This is because these risks are less obvious mainly because all major systems that we use have built in fixes to stop these issues from arising. When we were brainstorming hazards this topic popped up and we realized it was something that we would have to consider to ensure our application worked as intended. Also risks related to the QR code were not really taken into account as we didn't have the prior knowledge on this feature and the risks associated with it. 
     \item \textbf{Other than the risk of physical harm (some projects may not have any appreciable risks of this form), list at least 2 other types of risk in software products. Why are they important to consider?}
     \begin{itemize}
@@ -281,9 +345,6 @@ The hazard analysis identified several safety and security requirements. Within 
         \item Data Integrity: Data corruption can lead to large losses since it can cause whole databases to fail. This can lead to loss of not just the corrupted data but the whole database itself.
     \end{itemize}
 \end{enumerate}
-
-\end{document}
-
 
 \end{document}
 

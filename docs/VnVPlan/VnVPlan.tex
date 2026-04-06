@@ -39,10 +39,12 @@
 \section*{Revision History}
 
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
-\toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
+\toprule {\bf Date} & {\bf Authors} & {\bf Notes}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+10-27-2025 & All members & Rev0 of VNV Plan\\
+04-06-2026 & Virochaan & Implemented TA Feedback section, Cleaned Up document and finished section 1\\
+04-06-2026 & Virochaan & Implemented TA Feedback section, Added links to section 2.4\\
+04-06-2026 & Virochaan & Updated Extras to Include Norman's Principles (Section 2.3 and 2.4)\\
 \bottomrule
 \end{tabularx}
 
@@ -66,28 +68,36 @@ Date 2 & 1.1 & Notes\\
 \tableofcontents
 
 \listoftables
-\wss{Remove this section if it isn't needed}
 
 \listoffigures
-\wss{Remove this section if it isn't needed}
+
 
 \newpage
 
 \section{Symbols, Abbreviations, and Acronyms}
 
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{l l}
+\begin{tabularx}{\textwidth}{p{3.2cm}X}
   \toprule
-  \textbf{symbol} & \textbf{description}\\
+  \textbf{Term} & \textbf{Description}\\
   \midrule
-  T & Test\\
+  V\&V & Verification and Validation\\
+  SRS & Software Requirements Specification\\
+  MES & McMaster Engineering Society\\
+  MIS & Module Interface Specification\\
+  FR & Functional Requirement\\
+  NFR & Non-Functional Requirement\\
+  UI & User Interface\\
+  API & Application Programming Interface\\
+  CI/CD & Continuous Integration and Continuous Deployment\\
+  QR & Quick Response (code)\\
+  WCAG & Web Content Accessibility Guidelines\\
+  AODA & Accessibility for Ontarians with Disabilities Act\\
+  TLS & Transport Layer Security\\
+  HTTPS & Hypertext Transfer Protocol Secure\\
+  T & Test (used in test identifiers and tables)\\
   \bottomrule
-\end{tabular}\\
-
-\wss{symbols, abbreviations, or acronyms --- you can simply reference the SRS
-  \citep{SRS} tables, if appropriate}
-
-\wss{Remove this section if it isn't needed}
+\end{tabularx}\\
 
 \newpage
 
@@ -151,10 +161,10 @@ outlined metrics.
 This extra is relevant to the project because the final product is an application which the client
 intends to distribute to the public and expects them to use it for every event.
 
-\subsubsection{Wireframe Report}
-The wireframe report will document the design process for the application user interface for both admins and attendees.
-It will justify design decisions and how the team expects these visual representations to allow users to navigate the
-application with a reasonably low amount of effort.
+\subsubsection{Norman's Principles Report}
+The Norman's Principles report will evaluate the application interface using key human-centered design principles such as
+visibility, feedback, consistency, constraints, and mapping. It will document how these principles are reflected in both
+admin and attendee workflows and identify areas where interaction design can be improved.
 
 All users will interact regularly with the system through an application user interface; design principles employed to
 make these interactions productive are therefore relevant to the project.
@@ -166,13 +176,13 @@ The following documents are relevant to the context of the verification and vali
   labelsep=1em,
   itemindent=0em, font=\bfseries]
   \item {\bfseries SRS:} Defines all functional and non-functional requirements which form the basis of the verification
-    process \citep{SRS}.
+    process \citep{SRS}. Link placeholder: \href{https://replace-with-srs-link}{SRS Link}.
   \item {\bfseries Development Plan:} Outlines the code and development structure as well as lists third-party
-    technologies which will be used for development, and defines the technology to be used for testing \citep{DVP}.
+    technologies which will be used for development, and defines the technology to be used for testing \citep{DVP}. Link placeholder: \href{https://replace-with-development-plan-link}{Development Plan Link}.
   \item {\bfseries Usability Report:} Provides a thorough evaluation of the application and user interface for design
-    validation.
-  \item {\bfseries Wireframe Report:} Documents the user interface design process, including mockups from which design
-    evaluations may stem.
+    validation. Link placeholder: \href{https://replace-with-usability-report-link}{Usability Report Link}.
+  \item {\bfseries Norman's Principles Report:} Documents and evaluates interface decisions using Norman's design
+    principles to support stronger usability and interaction design outcomes. Link placeholder: \href{https://replace-with-normans-principles-link}{Norman's Principles Link}.
 \end{enumerate}
 
 \section{Plan}
