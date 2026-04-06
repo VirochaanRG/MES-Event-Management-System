@@ -17,6 +17,7 @@
 \usepackage[english]{babel}
 \usepackage[acronym,nonumberlist]{glossaries}
 \usepackage{amssymb}
+\usepackage{amsmath}
 
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
@@ -77,6 +78,8 @@
 04/04/2026 & Ibrahim & Addressed Peer Review \#71, Section 7.1 \\
 04/04/2026 & Ibrahim & Addressed Peer Review \#72, Section 7.2 \\
 04/04/2026 & Ibrahim & Addressed Peer Review \#69, Section 2.2 and 2.3 \\
+04/04/2026 & Ibrahim & Addressed TA feedback, added formal definitions to requirements \ref{FR11}, \ref{SL1}, \ref{SL2}, \ref{CR1}, \ref{CR2} \\
+04/04/2026 & Ibrahim & Addressed TA feedback, added Section 18 - Anticipated and Unlikely Changes to Requirements\\
 \bottomrule
 \end{tabularx}
 \caption{Revision History} \label{TblRevisionHistory}
@@ -135,7 +138,7 @@ document.
 % \subsection{Customer}
 % \lips
 % \subsection{Other Stakeholders}
-% \lips
+% \lipsFR
 \subsection{Hands-On Users of the Project}
 \textbf{\gls{mes} Executives and Council Members}: They will be utilizing this system to create and manage events,
 configure forms and surveys, monitor event data and generate data analytics reports. They can be characterized as
@@ -1041,7 +1044,13 @@ Below are formal state diagrams showing the different states of the system and t
     {\bf Motivation:} \{{\bf G-4}, {\bf G-6}, {\bf G-2}\}. \Gls{mes} wants access to be restricted and ensure that
     only authorized personnel can view relevant information.\\
     {\bf Fit Criterion:} Users assigned roles can access information and features specified by those roles, and cannot
-    see irrelevant features or information.
+    see irrelevant features or information. \\ 
+    {\bf Formal Definition:} Let $U$ be the set of all users, $F$ the set of all system features, 
+  and $R$ the set of all roles. Each user $u \in U$ is assigned a set of roles $R_u \subseteq R$, 
+  and each role $r \in R$ grants a set of permissions $P_r \subseteq F$. Access is granted as:
+  \[
+    \text{canAccess}(u, f) \iff \exists\, r \in R_u : f \in P_r
+  \]
 \end{enumerate}
 
 \subsection{Requirements Traceability}
@@ -1267,14 +1276,24 @@ requirement.
 \section{Performance Requirements}
 \subsection{Speed and Latency Requirements}
 \begin{enumerate}[label=\bfseries SL-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries SL-\arabic*]
-  \item \label{SL1} The system shall have a maximum 2-second latency for form loading, optimized for mobile devices.\\
+  \item \label{SL1} The system shall have a maximum 2-second latency for form loading, optimized 
+  for mobile devices.\\[2mm]
   {\bf Motivation:} Allows for faster registration process and avoids user abandonment.\\
   {\bf Fit Criterion:} Conduct a load test on different devices to ensure it meets the threshold.\\
-  {\bf Goals:} G-1, G-5
-  \item \label{SL2} \Gls{atd} information and backend analytics shall have a maximum 4-second latency.\\
+  {\bf Formal Definition:} Let $T_{\text{load}}$ be the elapsed time in seconds between a form 
+  request and full render. The system must satisfy:
+  \[
+    T_{\text{load}} \leq 2 \quad \forall \text{ form requests}
+  \]
+  \item \label{SL2} \Gls{atd} information and backend analytics shall have a maximum 4-second 
+  latency.\\[2mm]
   {\bf Motivation:} \Glspl{adm} and organizers require responsive timing to stay on track.\\
-  {\bf Fit Criterion:} Performance test show that results load within threshold.\\
-  {\bf Goals:} G-3, G-4
+  {\bf Fit Criterion:} Performance tests show that results load within the threshold. \\
+  {\bf Formal Definition:} Let $T_{\text{analytics}}$ be the elapsed time in seconds between an 
+  analytics query and a complete response. The system must satisfy:
+  \[
+    T_{\text{analytics}} \leq 4 \quad \forall \text{ analytics requests}
+  \]
 \end{enumerate}
 
 \subsection{Safety-Critical Requirements}
@@ -1322,11 +1341,21 @@ requirement.
   \item \label{CR1} The system shall support 2047 concurrent users during peak event times.\\
   {\bf Motivation:} Ensures workflow is maintained during surges in usage.\\
   {\bf Fit Criterion:} Conduct performance test with 100 concurrent users with minimal error rate and latency. See \ref{SL1}, \ref{SL2}.\\
-  {\bf Goals:} G-2, G-3, G-4
+  {\bf Goals:} G-2, G-3, G-4 \\
+  {\bf Formal Definition:} Let $U(t)$ denote the number of active concurrent users at time $t$. 
+  The system must satisfy:
+  \[
+    U(t) \leq 2047 \quad \forall\, t
+  \]
   \item \label{CR2} The system database shall support up to 50,000 total user entries.\\
   {\bf Motivation:} Large events over the scope of the year require large tables. Ensures that the product can scale with the growing number of MES events and users.\\
   {\bf Fit Criterion:} Create 50,000 test rows in the database. Check that they are stored correctly and that table interactions (filter, search) exhibit latency. See \ref{SL1}, \ref{SL2}.\\
-  {\bf Goals:} G-2, G-3, G-4
+  {\bf Goals:} G-2, G-3, G-4\\
+  {\bf Formal Definition:} Let $D$ be the set of all user entries stored in the database. The 
+  system must satisfy:
+  \[
+    |D| \leq 50000
+  \]
 \end{enumerate}
 
 \subsection{Scalability or Extensibility Requirements}
@@ -1436,11 +1465,18 @@ Not Applicable.
   ref=\bfseries AC-\arabic*]
   \item \label{SAR1} The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
     {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\
-    {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.
+    {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.\\
+
   \item \label{SAR2} Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
     {\bf Motivation:} Prevents unauthorized users from viewing sensitive event and user data.  \\
-    {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins
-\end{enumerate}
+    {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins.\\
+    {\bf Formal Definition:} Let $F_A \subseteq F$ be the set of admin-only features and 
+      $R_A \subseteq R$ the set of admin roles. Then:
+      \[
+        \text{canAccess}(u, f) \wedge f \in F_A \implies R_u \cap R_A \neq \emptyset
+      \]
+
+  \end{enumerate}
 \subsection{Integrity Requirements}
 \begin{enumerate}[align=left,
   leftmargin=*,
@@ -1524,9 +1560,40 @@ Not Applicable.
     {\bf Fit Criterion:} The system code passes all CI/CD checks related to formatting compliance.\\
 \end{enumerate}
 
-\section{Open Issues}
-There are currently no open issues which need to be considered at this stage of the development cycle.
-% Any problems that remain unresolved and undefined
+\section{Anticipated and Unlikely Changes to Requirements}
+
+\subsection{Anticipated Changes}
+These are requirements likely to evolve during or after development:
+\begin{itemize}
+  \item \textbf{Branding and Styling:} MES branding guidelines (colours, logos) may 
+    change between events or executive terms. 
+  \item \textbf{Authentication Provider:} McMaster's email authentication infrastructure 
+    may change. The authentication module is isolated behind an interface to allow 
+    substitution without affecting other components.
+  \item \textbf{Analytics Metrics:} The specific metrics displayed on the admin dashboard 
+    are likely to evolve as MES identifies new reporting needs after initial deployment.
+  \item \textbf{Capacity Thresholds:} The 2047 concurrent user and 50,000 entry limits 
+    (\ref{CR1}, \ref{CR2}) may need to be revised as MES grows.
+\end{itemize}
+
+\subsection{Unlikely Changes}
+These are requirements considered stable and unlikely to change, with justification:
+\begin{itemize}
+  \item \textbf{Core Technology Stack (Vite + TanStack + PostgreSQL):} Mandated by the 
+    client. Changing the stack would require full redevelopment and is 
+    outside the project scope.
+  \item \textbf{Role-Based Access Model:} The distinction between admin and attendee 
+    roles (\ref{FR11}) is fundamental to the security of the system.
+  \item \textbf{PIPEDA and AODA Compliance:} Legal requirements (\ref{CLR1}, \ref{AC1}) 
+    are imposed by Canadian law and the province of Ontario respectively. These are 
+    external constraints beyond the client's control.
+  \item \textbf{HTTPS-Only Communication:} A foundational security requirement 
+    (\ref{SIR2}) that is universally mandated and will not be relaxed.
+  \item \textbf{Centralized Database Architecture:} The shift from decentralized tools 
+    to a single PostgreSQL backend is the core motivation for the project and will not 
+    revert.
+\end{itemize}
+
 \section{Off-the-Shelf Solutions}
 \subsection{Ready-Made Products}
 There are some products that exist on the market which solve certain components of this product but no product exists
