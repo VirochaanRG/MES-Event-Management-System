@@ -72,6 +72,10 @@
 \midrule
 10/10/2025 & All & Rev0 of SRS\\
 10/10/2025 & All & Reflections \\
+04/04/2026 & Ibrahim & Addressed TA feedback, added Section 9.2 - Requirements Traceability \\
+04/04/2026 & Ibrahim & Addressed TA feedback, overhauled Section 21.2 with MoSCoW prioritization \\
+04/04/2026 & Ibrahim & Addressed Peer Review \#71, Section 7.1 \\
+04/04/2026 & Ibrahim & Addressed Peer Review \#72, Section 7.2 \\
 \bottomrule
 \end{tabularx}
 \caption{Revision History} \label{TblRevisionHistory}
@@ -543,38 +547,68 @@ The purpose of this section is to illustrate the flow of data throughout the sys
 
 \subsection{Business Data Model}
 
-\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into well defined subsystems and outlines the interactions between subsystems.
+\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} shows the relationship between expected business entities within the system. 
 
 \begin{center}
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{images/business_data_model.png}
-    \caption{Diagram of the interactions between main system components}\label{fig:businessdata}
+    \caption{ER Diagram of the relationships between system entities}\label{fig:businessdata}
 \end{figure}
-\end{center}
-\subsection{Data Dictionary}
+\end{center}\subsection{Data Dictionary}
 
-\hyperref[table:datadictionary]{Table \ref{table:datadictionary}} defines each of the system components shown in \hyperref[fig:businessdata]{Figure \ref{fig:businessdata}}.
-{
-\setlength{\tabcolsep}{0.3em}
-\renewcommand{\arraystretch}{1.2}
+\hyperref[table:datadictionary]{Table \ref{table:datadictionary}} defines each of 
+the business entities in the system.
+
 \begin{table}[H]
-    \begin{tabular}{p{0.25\linewidth}p{0.6\linewidth}p{0.2\linewidth}}
-      \toprule
-      \textbf{Component Name}              & \textbf{Description}                                                                                                                                       & \textbf{Type} \\ \midrule
-        \gls{mes} Event/Survey Manager             & The application handling the \gls{adm} side of the system, including event/survey creation, and data analytics                                                 & Application   \\ \midrule
-        Event Builder                        & Contains tools for creating, publishing, and managing events                                                                                               & Module        \\ \midrule
-        Survey Builder                       & Contains tools for creating, publishing, and managing surveys                                                                                              & Module        \\ \midrule
-        Admin Controller                     & Handles the flow of execution of \gls{mes} Event/Survey Manager modules and data flow between the event/survey builders, data analyzers, and the user controller & Module        \\ \midrule
-        Financial Analyzer                   & Automates analysis and visualization of finances from event attendee data                                                                                  & Module        \\ \midrule
-        Survey Analyzer                      & Automates analysis and visualization of survey response data                                                                                               & Module        \\ \midrule
-        \gls{mes} Event Registration/Survey Filler & The application handling the \gls{atd} side of the system, including event registration and survey responses                                                    & Application   \\ \midrule
-        Form Filler                          & Handles input and validation of form responses                                                                                                             & Module        \\ \midrule
-        User Controller                      & Controls the flow of execution of the form filler and handles communication with the admin controller                                                      & Module        \\ \midrule
-    \end{tabular}
-    \captionof{table}{Data dictionary table}\label{table:datadictionary}
+\footnotesize
+\begin{tabular}{p{0.15\linewidth}p{0.15\linewidth}p{0.1\linewidth}p{0.51\linewidth}}
+  \toprule
+  \textbf{Entity} & \textbf{Attribute} & \textbf{Type} & \textbf{Description} \\
+  \midrule
+  Event      & event\_id       & UUID    & Unique identifier for the event \\
+  Event      & title           & String  & Name of the event \\
+  Event      & date            & Date    & Scheduled date of the event \\
+  Event      & location        & String  & Venue or address of the event \\
+  Event      & capacity        & Integer & Maximum number of registrants \\
+  Event      & cost            & Double  & Registration fee for event\\
+  Event      & status          & Enum    & Private, Scheduled, In Progress, or Completed \\
+  \midrule
+  Form       & form\_id        & UUID    & Unique identifier for the form \\
+  Form       & title           & String  & Display name of the form \\
+  Form       & description     & String  & Description of the form \\
+  Form       & unlock\_date    & Date    & Date to unlock the form for responses \\
+  Form       & is\_public      & Boolean & If the form is viewable by users \\
+  \midrule
+  ModularForm & module\_id      & UUID   & Unique identifier for a modular form \\
+  ModularForm & name            & String & Display name of the modular form \\
+  ModularForm & description     & String & Description of the modular form \\
+  ModularForm & subforms        & List   & List of sub-forms under the modular form \\
+  \midrule
+  Question   & question\_id    & UUID    & Unique identifier for the question \\
+  Question   & question\_title & String  & The question text shown to the user \\
+  Question   & type            & Enum    & TextAnswer, MultipleChoice, etc. \\
+  Question   & is\_required    & Boolean & Whether a response is mandatory \\
+  \midrule
+  User       & user\_id        & UUID  & Unique identifier for the user \\
+  User       & email           & String & McMaster email address (encrypted) \\
+  User       & roles           & List   & List of roles such as Admin, Attendee \\
+  \midrule
+  Registration & reg\_id       & UUID  & Unique identifier for the registration \\
+  Registration & user\_id      & UUID  & Foreign key referencing User \\
+  Registration & event\_id     & UUID  & Foreign key referencing Event \\
+  Registration & status        & Enum  & One of: Registered, Paid, Attended \\
+  Registration & qr\_code      & Image & QR code ticket for check-in \\
+  \midrule
+  FormResponse & response\_id  & UUID     & Unique identifier for the form response \\
+  FormResponse & user\_id      & UUID     & Foreign key referencing User \\
+  FormResponse & form\_id      & UUID     & Foreign key referencing Form \\
+  FormResponse & submitted\_at & Date & Timestamp of final submission \\
+  FormResponse & responses     & String   & String encoding question responses \\
+  \bottomrule
+\end{tabular}
+\caption{Data dictionary of business entities}\label{table:datadictionary}
 \end{table}
-}
 
 \section{The Scope of the Product}
 
