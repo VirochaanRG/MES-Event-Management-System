@@ -20,14 +20,6 @@
 
 \maketitle
 
-\plt{Reflection is an important component of getting the full benefits from a
-learning experience.  Besides the intrinsic benefits of reflection, this
-document will be used to help the TAs grade how well your team responded to
-feedback.  Therefore, traceability between Revision 0 and Revision 1 is and
-important part of the reflection exercise.  In addition, several CEAB (Canadian
-Engineering Accreditation Board) Learning Outcomes (LOs) will be assessed based
-on your reflections.}
-
 \section{Changes in Response to Feedback}
 
 \plt{Summarize the changes made over the course of the project in response to
@@ -137,9 +129,54 @@ TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/is
 \end{longtable}
 
 
-\subsection{Hazard Analysis}
-
 \subsection{Design and Design Documentation}
+
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.24\textwidth}|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.40\textwidth}|}
+\caption{Design Feedback Traceability}
+\label{tab:design-feedback-traceability}\\
+\hline
+\textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made (or justification why not)} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made (or justification why not)} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/316}{Issue \#316}) & Figures Labelling & Ensure all the figures had labels inside both the Module Guide and MIS documents\\
+\hline
+
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/143}{Issue \#143}) &   User Interfaces and Images & In the \textbf{Module Guide}: Updated the user interface and images from Rev0 to ensure that it matches our final product.\\
+\hline
+
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/142}{Issue \#142}) &  Incorrect output for access routine & In the \textbf{MIS}: Updated Module 5 in section 10.3.2 to have the proper out put for the respondToForm acess routine\\
+\hline
+
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/153}{Issue \#153}) &  M12 in MIS (Section 17) doesn't have database state& \textbf{Not Implemented:} We already had this implemented within our rev0 implementation. \\
+\hline
+
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/151}{Issue \#151}) &Fix Use Hierarchy Diagram & In the \textbf{Module Guide}: Added clarity and updated the Use Hierarchy diagram as there seems to be confusing. The arrow pointing to the diagram represents the module being pointed to using the outgoing module. For instance M1 is using M12.\\
+\hline
+
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/145}{Issue \#145}) & Traceabilty Matrix Clarity & In the \textbf{Module Guide}: Along with the labels for each table we included a link to the SRS documents so users can better understand the requirements.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/147}{Issue \#147}) and (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/150}{Issue \#150})&  Incorrect Uses & In the \textbf{MIS}: Updated All modules to have the proper uses in reference to the use hierarchy diagram from the module guide.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/146}{Issue \#146}) &  Abstract Data Types & \textbf{Not Implemented}: Our abstract data types were not fully defined as it can vary depending on the usecase and contents. For instance our EventData object varies greatly depending on how the event is customized and the registration form. If were to define all states it would unfeasible. That is why we left the data types as abstract. \\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/149}{Issue \#149}) & MOre Details on Modules & In the \textbf{Module Guide}: Implemented the feedback to to be more detailed for various modules (M1, M4, M6) and added emphasis on the the specific module types to match the required business logic.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/152}{Issue \#152}) and (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/148}{Issue \#152})  & Access Routines and Exceptions & In the \textbf{MIS}: Went over all the modules to properly set exceptions for edge cases or for invalid inputs. Fixed access routines across almost all modules to have proper outputs and inputs and specfying transitions correctly. When we got multiple pieces of feedback on different modules we decided that a full review was necessary so we really considered all the modules to ensure completeness.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/140}{Issue \#140}) & Writing Quality& Ensure correct grammar and spelling in both the Module Guide and MIS documents\\
+\hline
+\end{longtable}
 
 \subsection{VnV Plan and Report}
 \subsubsection{VnV Plan}
@@ -178,16 +215,35 @@ Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/is
 \hline
 Peer Review + TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/86}{Issue \#86})  & NFR Traceability Table & We included a table containing traceability between the NFR and the System Tests to ensure proper connection between the SRS and VNV Plan. This can be seen in table 5 in section 4.3\\
 \hline
-Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/95}{Issue \#95})  &SUpervisor Involvement in Verification & \textbf{Not Implemented:} Section 3.4 is meant to be a verification and validation of our internal strategies so we didn't believe supervisor validation was necessary in that situation. Section 3.5 has supervisor verification done through the usability verification as they will be one of the people doing the testing. \\
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/95}{Issue \#95})  &Supervisor Involvement in Verification & \textbf{Not Implemented:} Section 3.4 is meant to be a verification and validation of our internal strategies so we didn't believe supervisor validation was necessary in that situation. Section 3.5 has supervisor verification done through the usability verification as they will be one of the people doing the testing. \\
+\hline
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/312}{Issue \#312})  & Divide section 2.2 into bulleted lists for better readability & Section 2.2 was updated to seperate the scope of the document better so the objectives in and out of context were in seperate lists\\
+\hline
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/313}{Issue \#313})  & Add links to Other documents and Hazard Analysis &Updated Section 2.4 with proper links and added a link to the hazard analysis document\\
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/314}{Issue \#314})  & Proper Document Formatting and Review & Properly reviewed the whole document removing unnecessary sections and also ensuring all the formatting and visual errors were fixed\\
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/315}{Issue \#315})  & Sample questions for Stakeholder/Peer Review Process& Included some potential questions that we we could ask in section 3.2.2 to see how we could get feedback. These question provide the reader with a preview of the feedback we are looking to achieve and provides a basis for other questions we could've asked.\\
 \hline
 \end{longtable}
 
 \section{Extras}
 
-\plt{Summarize the extras that were tackled by this project.  Extras
-can include usability testing, code walkthroughs, user documentation, formal
-proof, GenderMag personas, Design Thinking, etc.  Extras should have already
-been approved by the course instructor as included in your problem statement.}
+We chose the Usability Report and Norman's Design Principles as our two Extras. These were chosen because the product is a human-facing event management platform used by two distinct user groups, and the overall project risk was more strongly tied to usability, task flow clarity, and overall good design and user experience.
+
+\subsection*{Usability Report}
+
+The Usability Report extra involved conducting a structured evaluation of the system with representative users to assess how effectively both student attendees and administrative organizers could complete their primary workflows. This extra was chosen because the MES platform is inherently interaction-driven: its value depends entirely on users being able to register for events, complete forms, and manage event logistics without any confusion. A functional system that users struggle to navigate still fails to meet its core purpose. \newline
+\newline
+The evaluation followed a task-based methodology. Participants were recruited from both user groups and asked to complete a set of predefined end-to-end workflows covering the most critical parts of the system, in both the user and admin interfaces. Participants were observed while working through each task using a think-aloud protocol, which allowed the evaluators to capture points of hesitation, confusion, and incorrect navigation paths as they occurred rather than relying solely on post-hoc recall.\newline
+\newline
+Following the task sessions, participants completed a structured survey to provide quantitative feedback on perceived ease of use, interface clarity, and overall satisfaction. Task completion rates and the nature of any errors were recorded and analyzed alongside the qualitative observations. The findings from these sessions directly informed several interface refinements made during the final development phase, particularly around form navigation clarity and the visibility of key actions within the admin dashboard.
+
+\subsection*{Norman's Principles}
+
+The Norman's Principles extra applied Don Norman's foundational interaction design framework to critically evaluate the user interface decisions made throughout the project. This extra was chosen because it offered a principled basis for design critique that goes beyond subjective visual preference or informal testing impressions.The evaluation worked through each principle in the context of the platform's two interface surfaces: the student-facing web application and the admin dashboard. 
+
+The value of this extra was that it grounded design decisions in an established theoretical framework rather than purely in testing outcomes. Where usability testing revealed that something was difficult to use, the Norman's Principles analysis provided us with a different outlook and allowed us to approach the design from a different perspective.
+
+
 
 \section{Design Iteration (LO11 (PrototypeIterate))}
 
@@ -226,16 +282,22 @@ technology you planned on using?}
 
 \subsection{What Went Well?}
 
-\plt{What went well for your project management in terms of processes and 
-technology?}
+The team's communication structure worked effectively throughout the project. Discord provided a low-friction channel for day-to-day discussion, while GitHub Issues ensured that action items from meetings were captured and traceable. The Kanban board gave the team a shared, up-to-date view of task status, which reduced ambiguity about who was responsible for what and what remained to be done. Switching from Teams to Discord I think was a good decision as it was a tool we had more familiarity with and also gave us quicker communication times and faster and easier ways to meet and call quickly.
 
+The division of roles based on individual interest and prior experience also proved beneficial. Because team members self-selected into areas they were comfortable with, onboarding to the relevant technologies was faster and the quality of output in each area was higher. The designated Reviewer role ensured that deliverables were consistently checked before submission, which improved overall quality. CI/CD through GitHub Actions was effective once configured, automatically enforcing code style and running tests on code being merged in. Though this was a new tool for many of us we found that it was a good decision to utilize it as it helped stop many errors in the long run.
+
+The tech Stack that we used was also very useful. It got us up and running quite quickly and was very easy to develop and debug with. Specifically the choice of Vite though imposed on us was a blessing in disguise as we managed to develop quickly with the help of the Hot Reload functionality allowing us to see the changes in real-time. Using built in styling libraries through TailWind also saved us a lot of time
 \subsection{What Went Wrong?}
 
-\plt{What went wrong in terms of processes and technology?}
+The initial setup of the CI/CD pipeline required more time and effort than anticipated. Team members with less prior exposure to GitHub Actions found the configuration process unintuitive, and debugging failed workflow runs introduced delays early in the development phase. This overhead temporarily slowed progress on technical deliverables.
+
+Additionally, coordinating across three Capstone teams introduced integration challenges that were difficult to anticipate during the planning phase. 
 
 \subsection{What Would you Do Differently Next Time?}
 
-\plt{What will you do differently for your next project?}
+For future projects, the team would invest more time upfront in configuring and testing the CI/CD pipeline before development begins in earnest, rather than setting it up incrementally alongside feature work. Providing a brief onboarding session for all team members on GitHub Actions would reduce the learning curve and prevent early delays.
+
+When collaborating with multiple external teams, we would also establish shared interface contracts and integration milestones earlier, rather than relying primarily on periodic sync meetings. Formalizing the API boundaries and data formats between teams at the outset would reduce the risk of incompatibility issues later in the project. Finally, we would build more buffer into task estimates for novel or technically complex features, based on the lessons learned from the form builder and event registration components.
 
 \section{Ethics and Equity (LO18)}
 

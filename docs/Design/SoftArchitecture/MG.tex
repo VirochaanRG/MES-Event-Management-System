@@ -49,7 +49,11 @@
 November 13, 2025 & 1.0 & Rev -1\\
 January 21, 2025 & 1.1 & Revision 0 finished. Updated Sections 10,11,12\\
 January 21, 2025 & 1.1 & Finished Abbreviations table.\\
-
+April 6, 2026 & Rev1 & Implemented TA Feedback to ensure all figures have numbers\\
+April 6, 2026 & Rev1 & Peer Review 143, Updating User Interfaces images in Section 10\\
+April 6, 2026 & Rev1 & Peer Review 151, Updating Use hierarchy diagram in section 9\\
+April 6, 2026 & Rev1 & Peer Review 145, Link to SRS document in Section 8\\
+April 6, 2026 & Rev1 & Peer Review 149, More specific secrets and services and better defined types in section 7 \\
 \bottomrule
 \end{tabularx}
 
@@ -103,7 +107,7 @@ hides represent likely future changes.  Design for change is valuable in SC,
 where modifications are frequent, especially during initial development as the
 solution space is explored.  
 
-Our design follows the rules layed out by \citet{ParnasEtAl1984}, as follows:
+Our design follows the rules laid out by \citet{ParnasEtAl1984}, as follows:
 \begin{itemize}
 \item System details that are likely to change independently should be the
   secrets of separate modules.
@@ -179,13 +183,13 @@ adapted here is called design for change.
 The module design should be as general as possible. However, a general system is
 more complex. Sometimes this complexity is not necessary. Fixing some design
 decisions at the system architecture stage can simplify the software design. If
-these decision should later need to be changed, then many parts of the design
+these decisions should later need to be changed, then many parts of the design
 will potentially need to be modified. Hence, it is not intended that these
 decisions will be changed.
 
 \begin{description}
 \item[\refstepcounter{ucnum} \uctheucnum \label{ucUse}:] 
-  Changes to the primary application of events, registration, tickets, and feedback. The development is focused solely on event management and is not expected to change to accomodate other uses.
+  Changes to the primary application of events, registration, tickets, and feedback. The development is focused solely on event management and is not expected to change to accommodate other uses.
 \item[\refstepcounter{ucnum} \uctheucnum \label{ucStack}:] 
   Migrating to a different technology stack. The current architecture is designed around an existing framework. A different technology stack would require reimplementing nearly all modules.
 \item[\refstepcounter{ucnum} \uctheucnum \label{ucData}:] 
@@ -312,8 +316,8 @@ There are no hardware components for this system.
 % \end{description}
 
 \subsubsection{Main System Module (\mref{m1})}
-\textbf{Secrets:} Defines the business logic which allows for the communication between the different modules and with external users\\
-\textbf{Services:} Manages and stores the application states and context and serves as the central entrypoint to the system and which modules to communicate with.\\
+\textbf{Secrets:} Coordination rules for cross-module workflows. This includes how session state is maintained, how role context is synchronized, and how active event or form navigation state is shared across frontend and backend boundaries.\\
+\textbf{Services:} Acts as the system orchestrator. It routes requests to the correct module. It maintains authenticated user state and role state. It also manages active event and survey context and enforces workflow order for both user and admin actions.\\
 \textbf{Implemented By:} React and NodeJS\\
 \textbf{Module Type:} Abstract Object Module.
 
@@ -325,7 +329,7 @@ There are no hardware components for this system.
 
 \subsubsection{User Authorization Module (\mref{m3})}
 \textbf{Secrets:} Rules defining access levels and user roles. Defines which features are to be accessed by each role.\\
-\textbf{Services:} Provides the system with a ruleset on what each roles have access to and limits/grants access to different parts of the system to users based on credentials. \\
+\textbf{Services:} Provides the system with a ruleset on what each role has access to and limits/grants access to different parts of the system to users based on credentials. \\
 \textbf{Implemented By:} Backend JavaScript API.\\
 \textbf{Module Type:} Abstract Data Type Module.
 
@@ -348,10 +352,10 @@ There are no hardware components for this system.
 \textbf{Module Type:} Abstract Object Module.
 
 \subsubsection{Event Notification Module (\mref{m7})}
-\textbf{Secrets:} Notification delivery logic and timing rules.\\
-\textbf{Services:} Sends alerts to users regarding new events, updates, or cancellations.\\
-\textbf{Implemented By:} Third-Party Messaging Apis.\\
-\textbf{Module Type:} Library.
+\textbf{Secrets:} Rules that define when notifications are triggered. Rules for selecting a message template are also hidden here. The module also hides delivery timing and retry behavior when delivery fails.\\
+\textbf{Services:} Generates and sends event notifications based on platform rules. It supports notices for new events, updates, cancellations, and reminders. It delivers messages through external providers using a controlled interface.\\
+\textbf{Implemented By:} Backend JavaScript API with third-party messaging SDKs/APIs.\\
+\textbf{Module Type:} Abstract Object Module.
 
 \subsubsection{Registration Module (\mref{m8})}
 \textbf{Secrets:} Mapping between users, events, and registration states.\\
@@ -361,15 +365,15 @@ There are no hardware components for this system.
 
 \subsubsection{Attendance Tracking Module (\mref{m9})}
 \textbf{Secrets:} Methods for recording attendance and validating entry codes.\\
-\textbf{Services:} Tracks event attendance and verifies participant access. Allows for admins for to view \\
+\textbf{Services:} Tracks event attendance and verifies participant access. Allows admins to view attendance records.\\
 \textbf{Implemented By:} Backend JavaScript APIs.\\
 \textbf{Module Type:} Abstract Data Object Module.
 
 \subsubsection{Report Generation Module (\mref{m10})}
-\textbf{Secrets:} Formatting logic for report generation and provides static data structure of the report.\\
-\textbf{Services:} Converts analytics data into exportable human-readable reports.\\
-\textbf{Implemented By:} Third Part Apis with JavaScript and React.\\
-\textbf{Module Type:} Abstract Data Object Module.
+\textbf{Secrets:} Rules for selecting report content are hidden in this module. It also hides how analytics data is transformed into report views. The formatting and export pipeline for each output type is encapsulated here as well.\\
+\textbf{Services:} Builds user-facing reports from analytics inputs. It applies formatting and aggregation logic to produce readable output. It also exports administrative reports in supported formats such as CSV.\\
+\textbf{Implemented By:} Backend JavaScript APIs with React UI components and external export libraries/APIs.\\
+\textbf{Module Type:} Abstract Object Module.
 
 \subsection{Software Decision Module}
 
@@ -405,8 +409,8 @@ There are no hardware components for this system.
 \section{Traceability Matrix} \label{SecTM}
 
 This section shows two traceability matrices: between the modules and the
-requirements and between the modules and the anticipated changes.
-
+requirements and between the modules and the anticipated changes. \\
+This is a link to the SRS for better understanding of the attached requirements: \href{https://github.com/VirochaanRG/MES-Event-Management-System/blob/main/docs/SRS/SRS.pdf}{SRS Document}
 % the table should use mref, the requirements should be named, use something
 % like fref
 \begin{table}[H]
@@ -662,7 +666,7 @@ The Surveys page operates with a similar structure. Available surveys are listed
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{images/interface_4.png}
-\caption{User - Available Events Page}
+\caption{User - Events Page}
 \label{Fig4}
 \end{figure}
 
@@ -671,13 +675,6 @@ The Surveys page operates with a similar structure. Available surveys are listed
 \includegraphics[width=0.8\textwidth]{images/interface_5.png}
 \caption{User - Event Details Page}
 \label{Fig5}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.8\textwidth]{images/interface_6.png}
-\caption{User - Registered Events Page}
-\label{Fig6}
 \end{figure}
 
 \begin{figure}[H]
@@ -766,15 +763,15 @@ Admin can also use the Form Builder to create and manage surveys (Figure~\ref{Fi
 \end{figure}
 
 \section{Design of Communication Protocols}
-No relevant communication protocols are neccesary for this project.
+No relevant communication protocols are necessary for this project.
 
 \section{Timeline}
-The timeline shows the development of our platform from december after our POC. It describes the deadlines for implementation of the modules and who will be taking ownership of the module. Some modules may have to be updated based on implementations of other modules but this deadline represents implementation of base feature set.
+The timeline shows the development of our platform from December after our POC. It describes the deadlines for module implementation and who will be taking ownership of each module. Some modules may have to be updated based on implementations of other modules, but these deadlines represent implementation of the base feature set.
 
 \subsubsection*{Week 1 (December 1 - 7):} 
 \begin{itemize}
   \item M1 - Main System Module (Ibrahim): Set up the basic framework of the application with the various servers and portals for admin and users. Define interface and connection with other modules.
-  \item M12 - Database Access Module (Virochaan): Set up the Database to work with the Main Application. Create various schema relating to the different stored data in the database.
+  \item M12 - Database Access Module (Virochaan): Set up the database to work with the main application. Create various schemas relating to the different stored data in the database.
 \end{itemize}
 \subsubsection*{Week 2 (December 8 - 14):} 
 \begin{itemize}
@@ -790,7 +787,7 @@ The timeline shows the development of our platform from december after our POC. 
 \subsubsection*{Week 6 (January 5 -  11):} 
 \begin{itemize}
   \item M6 - Event Management Module (Mohammad): Develop the framework to create and edit events. Develop functionality for updating of details regarding events as they change. Create Event rendering and UI components. 
-  \item M8 - Event Registration Module (Ibrahim): Allow for users to register to events and submit details. Develop UI components that allows for the user to view their tickets and admins to see registered users. Integrates the Events with the Database.
+  \item M8 - Event Registration Module (Ibrahim): Allow users to register for events and submit details. Develop UI components that allow users to view their tickets and admins to see registered users. Integrate events with the database.
 \end{itemize}
 \subsubsection*{Week 7 (January 12 -  18):} 
 \begin{itemize}
