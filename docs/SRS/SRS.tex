@@ -16,6 +16,8 @@
 \usepackage{longtable}
 \usepackage[english]{babel}
 \usepackage[acronym,nonumberlist]{glossaries}
+\usepackage{amssymb}
+\usepackage{amsmath}
 
 \hypersetup{
     bookmarks=true,         % show bookmarks bar?
@@ -71,6 +73,13 @@
 \midrule
 10/10/2025 & All & Rev0 of SRS\\
 10/10/2025 & All & Reflections \\
+04/04/2026 & Ibrahim & Addressed TA feedback, added Section 9.2 - Requirements Traceability \\
+04/04/2026 & Ibrahim & Addressed TA feedback, overhauled Section 21.2 with MoSCoW prioritization \\
+04/04/2026 & Ibrahim & Addressed Peer Review \#71, Section 7.1 \\
+04/04/2026 & Ibrahim & Addressed Peer Review \#72, Section 7.2 \\
+04/04/2026 & Ibrahim & Addressed Peer Review \#69, Section 2.2 and 2.3 \\
+04/04/2026 & Ibrahim & Addressed TA feedback, added formal definitions to requirements \ref{FR11}, \ref{SL1}, \ref{SL2}, \ref{CR1}, \ref{CR2} \\
+04/04/2026 & Ibrahim & Addressed TA feedback, added Section 18 - Anticipated and Unlikely Changes to Requirements\\
 \bottomrule
 \end{tabularx}
 \caption{Revision History} \label{TblRevisionHistory}
@@ -129,7 +138,7 @@ document.
 % \subsection{Customer}
 % \lips
 % \subsection{Other Stakeholders}
-% \lips
+% \lipsFR
 \subsection{Hands-On Users of the Project}
 \textbf{\gls{mes} Executives and Council Members}: They will be utilizing this system to create and manage events,
 configure forms and surveys, monitor event data and generate data analytics reports. They can be characterized as
@@ -137,6 +146,11 @@ primarily undergraduate students who value their time greatly. They aim to reduc
 tasks as well as provide a better experience during \gls{mes} events. Their experience with systems like this can range
 from Journeyman - Master as they can be experienced in event planning and student engagement. There may be a slight
 learning curve in using the new technology, but these users have experience performing these functions.\\
+\newline
+\textbf{\gls{cfes} Executives and Council Members}: They will be utilizing this system to create and manage the annual CFES survey,
+which collects responses from engineering students nationwide. They aim to make the survey building process much more intuitive and customized to
+ their specific needs, as well as a platform to perform quick analytics of responses. Additionally, they would like to make modularized surveys to 
+split their large, 70+ page survey into smaller chunks, which can increase the response rate of the survey. \\
 \newline
 \textbf{McMaster Engineering Students}: They will be utilizing this app to register for events, purchase tickets, sign
 waivers, check in at venues, and complete feedback surveys. They want to enjoy their university experience and connect
@@ -150,6 +164,20 @@ beyond the core engineering community. It could also include students and guests
 industry professionals which attend the engineering conferences that the \gls{mes} helps host. They are generally looking for an easy
 and seamless experience registering and attending these events. Their general experience with systems like this is
 Journeyman as they may have used similar systems for other use cases.
+
+\subsection{Stakeholder Summary}
+
+Below is a diagram summarizing all of the project stakeholders. This includes the stakeholders defined in sections 2.1 and 2.2, 
+as well as advisors from the SFWRENG 4G06 course.
+
+\begin{center}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{images/stakeholders.png}
+    \caption{Summary of stakeholders}\label{fig:stakeholders}
+\end{figure}
+\end{center}
+
 \subsection{Personas}
 \begin{enumerate}
   \item \textbf{Matthew Cruise (Engineering Student)}: Matthew is a 20-year-old second-year Mechanical Engineering
@@ -542,38 +570,68 @@ The purpose of this section is to illustrate the flow of data throughout the sys
 
 \subsection{Business Data Model}
 
-\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} splits the system into well defined subsystems and outlines the interactions between subsystems.
+\hyperref[fig:businessdata]{Figure \ref{fig:businessdata}} shows the relationship between expected business entities within the system. 
 
 \begin{center}
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{images/business_data_model.png}
-    \caption{Diagram of the interactions between main system components}\label{fig:businessdata}
+    \caption{ER Diagram of the relationships between system entities}\label{fig:businessdata}
 \end{figure}
-\end{center}
-\subsection{Data Dictionary}
+\end{center}\subsection{Data Dictionary}
 
-\hyperref[table:datadictionary]{Table \ref{table:datadictionary}} defines each of the system components shown in \hyperref[fig:businessdata]{Figure \ref{fig:businessdata}}.
-{
-\setlength{\tabcolsep}{0.3em}
-\renewcommand{\arraystretch}{1.2}
+\hyperref[table:datadictionary]{Table \ref{table:datadictionary}} defines each of 
+the business entities in the system.
+
 \begin{table}[H]
-    \begin{tabular}{p{0.25\linewidth}p{0.6\linewidth}p{0.2\linewidth}}
-      \toprule
-      \textbf{Component Name}              & \textbf{Description}                                                                                                                                       & \textbf{Type} \\ \midrule
-        \gls{mes} Event/Survey Manager             & The application handling the \gls{adm} side of the system, including event/survey creation, and data analytics                                                 & Application   \\ \midrule
-        Event Builder                        & Contains tools for creating, publishing, and managing events                                                                                               & Module        \\ \midrule
-        Survey Builder                       & Contains tools for creating, publishing, and managing surveys                                                                                              & Module        \\ \midrule
-        Admin Controller                     & Handles the flow of execution of \gls{mes} Event/Survey Manager modules and data flow between the event/survey builders, data analyzers, and the user controller & Module        \\ \midrule
-        Financial Analyzer                   & Automates analysis and visualization of finances from event attendee data                                                                                  & Module        \\ \midrule
-        Survey Analyzer                      & Automates analysis and visualization of survey response data                                                                                               & Module        \\ \midrule
-        \gls{mes} Event Registration/Survey Filler & The application handling the \gls{atd} side of the system, including event registration and survey responses                                                    & Application   \\ \midrule
-        Form Filler                          & Handles input and validation of form responses                                                                                                             & Module        \\ \midrule
-        User Controller                      & Controls the flow of execution of the form filler and handles communication with the admin controller                                                      & Module        \\ \midrule
-    \end{tabular}
-    \captionof{table}{Data dictionary table}\label{table:datadictionary}
+\footnotesize
+\begin{tabular}{p{0.15\linewidth}p{0.15\linewidth}p{0.1\linewidth}p{0.51\linewidth}}
+  \toprule
+  \textbf{Entity} & \textbf{Attribute} & \textbf{Type} & \textbf{Description} \\
+  \midrule
+  Event      & event\_id       & UUID    & Unique identifier for the event \\
+  Event      & title           & String  & Name of the event \\
+  Event      & date            & Date    & Scheduled date of the event \\
+  Event      & location        & String  & Venue or address of the event \\
+  Event      & capacity        & Integer & Maximum number of registrants \\
+  Event      & cost            & Double  & Registration fee for event\\
+  Event      & status          & Enum    & Private, Scheduled, In Progress, or Completed \\
+  \midrule
+  Form       & form\_id        & UUID    & Unique identifier for the form \\
+  Form       & title           & String  & Display name of the form \\
+  Form       & description     & String  & Description of the form \\
+  Form       & unlock\_date    & Date    & Date to unlock the form for responses \\
+  Form       & is\_public      & Boolean & If the form is viewable by users \\
+  \midrule
+  ModularForm & module\_id      & UUID   & Unique identifier for a modular form \\
+  ModularForm & name            & String & Display name of the modular form \\
+  ModularForm & description     & String & Description of the modular form \\
+  ModularForm & subforms        & List   & List of sub-forms under the modular form \\
+  \midrule
+  Question   & question\_id    & UUID    & Unique identifier for the question \\
+  Question   & question\_title & String  & The question text shown to the user \\
+  Question   & type            & Enum    & TextAnswer, MultipleChoice, etc. \\
+  Question   & is\_required    & Boolean & Whether a response is mandatory \\
+  \midrule
+  User       & user\_id        & UUID  & Unique identifier for the user \\
+  User       & email           & String & McMaster email address (encrypted) \\
+  User       & roles           & List   & List of roles such as Admin, Attendee \\
+  \midrule
+  Registration & reg\_id       & UUID  & Unique identifier for the registration \\
+  Registration & user\_id      & UUID  & Foreign key referencing User \\
+  Registration & event\_id     & UUID  & Foreign key referencing Event \\
+  Registration & status        & Enum  & One of: Registered, Paid, Attended \\
+  Registration & qr\_code      & Image & QR code ticket for check-in \\
+  \midrule
+  FormResponse & response\_id  & UUID     & Unique identifier for the form response \\
+  FormResponse & user\_id      & UUID     & Foreign key referencing User \\
+  FormResponse & form\_id      & UUID     & Foreign key referencing Form \\
+  FormResponse & submitted\_at & Date & Timestamp of final submission \\
+  FormResponse & responses     & String   & String encoding question responses \\
+  \bottomrule
+\end{tabular}
+\caption{Data dictionary of business entities}\label{table:datadictionary}
 \end{table}
-}
 
 \section{The Scope of the Product}
 
@@ -986,8 +1044,133 @@ Below are formal state diagrams showing the different states of the system and t
     {\bf Motivation:} \{{\bf G-4}, {\bf G-6}, {\bf G-2}\}. \Gls{mes} wants access to be restricted and ensure that
     only authorized personnel can view relevant information.\\
     {\bf Fit Criterion:} Users assigned roles can access information and features specified by those roles, and cannot
-    see irrelevant features or information.
+    see irrelevant features or information. \\ 
+    {\bf Formal Definition:} Let $U$ be the set of all users, $F$ the set of all system features, 
+  and $R$ the set of all roles. Each user $u \in U$ is assigned a set of roles $R_u \subseteq R$, 
+  and each role $r \in R$ grants a set of permissions $P_r \subseteq F$. Access is granted as:
+  \[
+    \text{canAccess}(u, f) \iff \exists\, r \in R_u : f \in P_r
+  \]
 \end{enumerate}
+
+\subsection{Requirements Traceability}
+
+The tables below shows traceability between functional requirements,
+non-functional requirements, and project goals.
+
+\subsubsection*{Functional Requirements to Project Goals}
+
+\hyperref[tab:fr-goals]{Table~\ref{tab:fr-goals}} maps each functional requirement to the
+project goals defined in Section 1.2.
+
+{
+\setlength{\tabcolsep}{0.4em}
+\renewcommand{\arraystretch}{1.3}
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{1.5cm}P{1.5cm}P{1.5cm}P{1.5cm}P{1.5cm}P{1.5cm}}
+  \toprule
+  \textbf{Req.}
+    & \textbf{G-1 Form Builder}
+    & \textbf{G-2 Registration}
+    & \textbf{G-3 Dashboard}
+    & \textbf{G-4 Analytics}
+    & \textbf{G-5 Experience}
+    & \textbf{G-6 Security} \\
+  \midrule
+  \ref{FR1}  & \checkmark &            &            &            & \checkmark &            \\
+  \ref{FR2}  & \checkmark &            & \checkmark &            &            &            \\
+  \ref{FR3}  &            & \checkmark &            &            &            &            \\
+  \ref{FR4}  &            & \checkmark &            &            &            &            \\
+  \ref{FR5}  &            &            & \checkmark & \checkmark &            &            \\
+  \ref{FR6}  &            & \checkmark &            &            & \checkmark & \checkmark \\
+  \ref{FR7}  & \checkmark &            & \checkmark &            &            & \checkmark \\
+  \ref{FR8}  &            &            & \checkmark & \checkmark &            &            \\
+  \ref{FR9}  &            &            &            &            & \checkmark &            \\
+  \ref{FR10} &            &            & \checkmark & \checkmark & \checkmark &            \\
+  \ref{FR11} &            & \checkmark &            & \checkmark &            & \checkmark \\
+  \bottomrule
+\end{tabular}
+\caption{Functional requirements to project goals traceability}\label{tab:fr-goals}
+\end{table}
+}
+
+\subsubsection*{Non-Functional Requirements to Functional Requirements}
+
+\hyperref[tab:nfr-fr]{Table~\ref{tab:nfr-fr}} maps key non-functional requirements to the
+related functional requirements. A checkmark indicates that the non-functional
+requirement imposes a specific implementation constraint on the corresponding functional
+requirement.
+
+{
+\setlength{\tabcolsep}{0.3em}
+\renewcommand{\arraystretch}{1.3}
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{lP{0.8cm}P{1cm}P{1cm}P{1cm}P{1cm}P{1cm}P{1cm}P{1cm}P{1cm}P{1cm}P{1cm}}
+  \toprule
+  \textbf{NFR}
+    & \textbf{\ref{FR1}}
+    & \textbf{\ref{FR2}}
+    & \textbf{\ref{FR3}}
+    & \textbf{\ref{FR4}}
+    & \textbf{\ref{FR5}}
+    & \textbf{\ref{FR6}}
+    & \textbf{\ref{FR7}}
+    & \textbf{\ref{FR8}}
+    & \textbf{\ref{FR9}}
+    & \textbf{\ref{FR10}}
+    & \textbf{\ref{FR11}} \\
+  \midrule
+  \multicolumn{12}{l}{\textit{Security}} \\
+  \midrule
+  \ref{SAR1}  &            &            & \checkmark &            &            & \checkmark & \checkmark &            &            &            & \checkmark \\
+  \ref{SAR2}  &            &            &            &            & \checkmark & \checkmark & \checkmark & \checkmark &            & \checkmark & \checkmark \\
+  \ref{SIR1}  & \checkmark &            & \checkmark &            &            & \checkmark & \checkmark &            & \checkmark &            &            \\
+  \ref{SIR2}  &            &            & \checkmark &            &            & \checkmark & \checkmark &            & \checkmark &            &            \\
+  \ref{SPR2}  &            &            & \checkmark &            &            &            &            &            & \checkmark &            &            \\
+  \ref{SPR3}  &            &            &            &            &            & \checkmark & \checkmark &            &            &            &            \\
+  \ref{SC1}   &            &            &            &            &            & \checkmark & \checkmark &            &            &            &            \\
+  \ref{SAuR1} &            &            &            &            & \checkmark &            &            & \checkmark &            & \checkmark & \checkmark \\
+  \midrule
+  \multicolumn{12}{l}{\textit{Performance}} \\
+  \midrule
+  \ref{SL1}   & \checkmark &            & \checkmark &            &            &            &            &            &            &            &            \\
+  \ref{SL2}   &            & \checkmark &            &            & \checkmark &            &            & \checkmark &            & \checkmark &            \\
+  \ref{FT1}   & \checkmark &            &            &            &            &            &            &            & \checkmark &            &            \\
+  \ref{FT2}   & \checkmark &            &            &            &            &            &            &            & \checkmark &            &            \\
+  \ref{FT3}   & \checkmark &            &            &            &            &            &            &            &            &            &            \\
+  \ref{FT4}   &            &            & \checkmark &            & \checkmark &            &            &            &            &            &            \\
+  \ref{PA1}   &            & \checkmark &            &            &            &            &            & \checkmark &            & \checkmark &            \\
+  \midrule
+  \multicolumn{12}{l}{\textit{Usability and Accessibility}} \\
+  \midrule
+  \ref{ER1}   & \checkmark &            & \checkmark &            &            &            &            &            & \checkmark &            &            \\
+  \ref{ER2}   &            &            & \checkmark &            &            &            &            &            &            &            &            \\
+  \ref{ER3}   &            & \checkmark &            &            & \checkmark &            &            & \checkmark &            &            &            \\
+  \ref{LR1}   & \checkmark &            & \checkmark &            &            &            &            &            & \checkmark &            &            \\
+  \ref{LR2}   & \checkmark &            &            &            &            &            &            &            &            &            &            \\
+  \ref{AC1}   & \checkmark &            & \checkmark &            &            &            &            &            & \checkmark &            &            \\
+  \ref{UR2}   & \checkmark &            & \checkmark &            &            &            &            &            & \checkmark &            &            \\
+  \midrule
+  \multicolumn{12}{l}{\textit{Appearance}} \\
+  \midrule
+  \ref{AR1}   & \checkmark &            & \checkmark &            &            &            &            &            &            &            &            \\
+  \ref{AR2}   & \checkmark &            & \checkmark &            &            &            &            &            &            &            &            \\
+  \ref{AR3}   &            & \checkmark &            &            & \checkmark &            &            & \checkmark &            & \checkmark &            \\
+  \midrule
+  \multicolumn{12}{l}{\textit{Maintainability and Compliance}} \\
+  \midrule
+  \ref{CLR1}  &            &            & \checkmark &            &            & \checkmark & \checkmark &            &            &            &            \\
+  \ref{CSCR1} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+  \ref{MSMR1} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+  \bottomrule
+\end{tabular}
+\caption{Non-functional requirements to functional requirements traceability}\label{tab:nfr-fr}
+\end{table}
+}
 
 \section{Look and Feel Requirements}
 \subsection{Appearance Requirements}
@@ -1093,14 +1276,24 @@ Below are formal state diagrams showing the different states of the system and t
 \section{Performance Requirements}
 \subsection{Speed and Latency Requirements}
 \begin{enumerate}[label=\bfseries SL-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries SL-\arabic*]
-  \item \label{SL1} The system shall have a maximum 2-second latency for form loading, optimized for mobile devices.\\
+  \item \label{SL1} The system shall have a maximum 2-second latency for form loading, optimized 
+  for mobile devices.\\[2mm]
   {\bf Motivation:} Allows for faster registration process and avoids user abandonment.\\
   {\bf Fit Criterion:} Conduct a load test on different devices to ensure it meets the threshold.\\
-  {\bf Goals:} G-1, G-5
-  \item \label{SL2} \Gls{atd} information and backend analytics shall have a maximum 4-second latency.\\
+  {\bf Formal Definition:} Let $T_{\text{load}}$ be the elapsed time in seconds between a form 
+  request and full render. The system must satisfy:
+  \[
+    T_{\text{load}} \leq 2 \quad \forall \text{ form requests}
+  \]
+  \item \label{SL2} \Gls{atd} information and backend analytics shall have a maximum 4-second 
+  latency.\\[2mm]
   {\bf Motivation:} \Glspl{adm} and organizers require responsive timing to stay on track.\\
-  {\bf Fit Criterion:} Performance test show that results load within threshold.\\
-  {\bf Goals:} G-3, G-4
+  {\bf Fit Criterion:} Performance tests show that results load within the threshold. \\
+  {\bf Formal Definition:} Let $T_{\text{analytics}}$ be the elapsed time in seconds between an 
+  analytics query and a complete response. The system must satisfy:
+  \[
+    T_{\text{analytics}} \leq 4 \quad \forall \text{ analytics requests}
+  \]
 \end{enumerate}
 
 \subsection{Safety-Critical Requirements}
@@ -1145,14 +1338,24 @@ Below are formal state diagrams showing the different states of the system and t
 
 \subsection{Capacity Requirements}
 \begin{enumerate}[label=\bfseries CR-\arabic*:, wide=0pt, leftmargin=*, ref=\bfseries CR-\arabic*]
-  \item The system shall support 2047 concurrent users during peak event times.\\
+  \item \label{CR1} The system shall support 2047 concurrent users during peak event times.\\
   {\bf Motivation:} Ensures workflow is maintained during surges in usage.\\
   {\bf Fit Criterion:} Conduct performance test with 100 concurrent users with minimal error rate and latency. See \ref{SL1}, \ref{SL2}.\\
-  {\bf Goals:} G-2, G-3, G-4
-  \item The system database shall support up to 50,000 total user entries.\\
+  {\bf Goals:} G-2, G-3, G-4 \\
+  {\bf Formal Definition:} Let $U(t)$ denote the number of active concurrent users at time $t$. 
+  The system must satisfy:
+  \[
+    U(t) \leq 2047 \quad \forall\, t
+  \]
+  \item \label{CR2} The system database shall support up to 50,000 total user entries.\\
   {\bf Motivation:} Large events over the scope of the year require large tables. Ensures that the product can scale with the growing number of MES events and users.\\
   {\bf Fit Criterion:} Create 50,000 test rows in the database. Check that they are stored correctly and that table interactions (filter, search) exhibit latency. See \ref{SL1}, \ref{SL2}.\\
-  {\bf Goals:} G-2, G-3, G-4
+  {\bf Goals:} G-2, G-3, G-4\\
+  {\bf Formal Definition:} Let $D$ be the set of all user entries stored in the database. The 
+  system must satisfy:
+  \[
+    |D| \leq 50000
+  \]
 \end{enumerate}
 
 \subsection{Scalability or Extensibility Requirements}
@@ -1262,11 +1465,18 @@ Not Applicable.
   ref=\bfseries AC-\arabic*]
   \item \label{SAR1} The system shall require all users to authenticate using their McMaster University Email before accessing the system \\[2mm]
     {\bf Motivation:} Ensure that only the expected users of the system are using and prevent misuse from external actors.  \\
-    {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.
+    {\bf Fit Criterion:} Allow only users who have authenticated with their emails to access the system. Ensure logs track who accesses the system and that they are authenticated.\\
+
   \item \label{SAR2} Admin level features and sensitive data are only available to users who are assigned admin roles. \\ [2mm]
     {\bf Motivation:} Prevents unauthorized users from viewing sensitive event and user data.  \\
-    {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins
-\end{enumerate}
+    {\bf Fit Criterion:} Perform testing to ensure that features deemed to be admin-level are only accessible to the users who are given those roles. Ensure that data is only accessible to admins.\\
+    {\bf Formal Definition:} Let $F_A \subseteq F$ be the set of admin-only features and 
+      $R_A \subseteq R$ the set of admin roles. Then:
+      \[
+        \text{canAccess}(u, f) \wedge f \in F_A \implies R_u \cap R_A \neq \emptyset
+      \]
+
+  \end{enumerate}
 \subsection{Integrity Requirements}
 \begin{enumerate}[align=left,
   leftmargin=*,
@@ -1320,7 +1530,7 @@ Not Applicable.
   itemindent=0em,
   label=\bfseries CL-\arabic*:,
   ref=\bfseries CL-\arabic*]
-  \item \label{CR1} The system shall use Canadian English spelling.\\[2mm]
+  \item \label{CTR1} The system shall use Canadian English spelling.\\[2mm]
     {\bf Motivation:} \Gls{mes} is an organization located in Canada.\\
     {\bf Fit Criterion:} All rendered text provided by the system passes a Canadian English spell-checker.\\
 \end{enumerate}
@@ -1350,9 +1560,40 @@ Not Applicable.
     {\bf Fit Criterion:} The system code passes all CI/CD checks related to formatting compliance.\\
 \end{enumerate}
 
-\section{Open Issues}
-There are currently no open issues which need to be considered at this stage of the development cycle.
-% Any problems that remain unresolved and undefined
+\section{Anticipated and Unlikely Changes to Requirements}
+
+\subsection{Anticipated Changes}
+These are requirements likely to evolve during or after development:
+\begin{itemize}
+  \item \textbf{Branding and Styling:} MES branding guidelines (colours, logos) may 
+    change between events or executive terms. 
+  \item \textbf{Authentication Provider:} McMaster's email authentication infrastructure 
+    may change. The authentication module is isolated behind an interface to allow 
+    substitution without affecting other components.
+  \item \textbf{Analytics Metrics:} The specific metrics displayed on the admin dashboard 
+    are likely to evolve as MES identifies new reporting needs after initial deployment.
+  \item \textbf{Capacity Thresholds:} The 2047 concurrent user and 50,000 entry limits 
+    (\ref{CR1}, \ref{CR2}) may need to be revised as MES grows.
+\end{itemize}
+
+\subsection{Unlikely Changes}
+These are requirements considered stable and unlikely to change, with justification:
+\begin{itemize}
+  \item \textbf{Core Technology Stack (Vite + TanStack + PostgreSQL):} Mandated by the 
+    client. Changing the stack would require full redevelopment and is 
+    outside the project scope.
+  \item \textbf{Role-Based Access Model:} The distinction between admin and attendee 
+    roles (\ref{FR11}) is fundamental to the security of the system.
+  \item \textbf{PIPEDA and AODA Compliance:} Legal requirements (\ref{CLR1}, \ref{AC1}) 
+    are imposed by Canadian law and the province of Ontario respectively. These are 
+    external constraints beyond the client's control.
+  \item \textbf{HTTPS-Only Communication:} A foundational security requirement 
+    (\ref{SIR2}) that is universally mandated and will not be relaxed.
+  \item \textbf{Centralized Database Architecture:} The shift from decentralized tools 
+    to a single PostgreSQL backend is the core motivation for the project and will not 
+    revert.
+\end{itemize}
+
 \section{Off-the-Shelf Solutions}
 \subsection{Ready-Made Products}
 There are some products that exist on the market which solve certain components of this product but no product exists
@@ -1423,37 +1664,145 @@ Following initial deployment, maintenance/scalability challenges may arise, espe
 
 \subsection{Planning of Development Phases}
 
-Development is organized into five phases, each with clear goals and deliverables.
-The primary objective is to have a fully functional \textbf{Minimum Viable Product (MVP)} by the end of \textbf{December 2025}, where all four core features work at a basic level before refinement begins.
+Development is organized into five phases, each with clear goals, deliverables, and associated
+requirements. The primary objective is to have a fully functional \textbf{Minimum Viable Product
+(MVP)} by the end of \textbf{December 2025}, where all four core features work at a basic level
+before refinement begins.
 
-\begin{enumerate}
-    \item \textbf{Phase 1 – Requirements and Design (September–October 2025)}
-    Finalize system requirements, architecture, and UI mockups for the Admin Portal and Custom Form Builder.
-    Deliverables include the SRS, Hazard Analysis, and shared API specifications with Projects B and C.
+\subsubsection*{MoSCoW Prioritization}
 
-    \item \textbf{Phase 2 – Core Functionality and MVP (Mid October–December 2025)}
-    Implement the main system features for a working MVP:
-    \begin{itemize}
-        \item Basic \textbf{Custom Form Builder} for creating and saving modular forms.
-        \item Functional \textbf{Registration and Feedback Forms} linked to the backend.
-        \item Simple \textbf{Attendee Overview Dashboard} showing registration data.
-        \item Initial \textbf{Backend Analytics} for event and submission counts.
-    \end{itemize}
-    The MVP will demonstrate a complete flow—from form creation to submission and viewing results.
+Requirements are prioritized using the MoSCoW method, defined as follows:
 
-    \item \textbf{Phase 3 – Integration and Refinement (January 2026)}
-    Improve performance, UI/UX, and backend data handling.
-    Begin integration testing with Projects B and C to ensure smooth database and API interaction.
+\begin{itemize}
+  \item \textbf{Must Have (M):} Requirements that the system must satisy with no compromises.
+    Failure to deliver any Must Have requirement means the MVP is considered incomplete. 
+    These should be implemented for the POC.
+  \item \textbf{Should Have (S):} Important requirements that are not strictly necessary for the
+    MVP but are expected in the final product. Most if not all of these should be implemented by Rev 0. 
+  \item \textbf{Could Have (C):} Desirable requirements that would improve the product but have
+    a smaller impact if omitted. These should only be addressed after Rev 0 for Rev 1, assuming all Must Have and Should Have requirements are complete.
+  \item \textbf{Won't Have (W):} Requirements that are explicitly deferred as future considerations or only if time permits.
+\end{itemize}
 
-    \item \textbf{Phase 4 – Analytics and Dashboard Expansion (February–March 2026)}
-    Enhance analytics and administrative tools with filtering, charts, and export options (CSV/PDF).
-    The dashboard will evolve into a production-ready tool for MES event organizers.
+The below table seperate all previously defined requirements by priority:
 
-    \item \textbf{Phase 5 – Testing and Deployment (March–April 2026)}
-    Conduct final testing, bug fixes, and documentation updates.
-    Complete cross-team integration and deploy the system for real MES events such as Fireball Formal or CALE Conference.
-    Prepare final deliverables and the Capstone Expo presentation.
-\end{enumerate}
+{
+\setlength{\tabcolsep}{0.3em}
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}[H]{p{0.1\linewidth}p{0.08\linewidth}p{0.75\linewidth}p{0.07\linewidth}}
+  \toprule
+  \textbf{Req.} & \textbf{Phase} & \textbf{Description} & \textbf{Prio} \\
+  \midrule
+  \ref{FR1}   & 2 & Create forms with multiple field types                        & M \\
+  \ref{FR3}   & 2 & Attendees can register for events and view event information  & M \\
+  \ref{FR4}   & 2 & Generate QR codes for confirmation and check-in               & M \\
+  \ref{FR6}   & 2 & Store all event data in a secure, centralized database        & M \\
+  \ref{FR7}   & 2 & Store all questionnaire data in a secure, centralized database & M \\
+  \ref{FR11}  & 2 & Role-based feature access system                              & M \\
+  \ref{SAR1}  & 2 & Authenticate users via McMaster University email              & M \\
+  \ref{SAR2}  & 3 & Admin-level features restricted to admin roles                & M \\
+  \ref{SIR1}  & 2 & Input validation on all user-submitted data                   & M \\
+  \ref{SIR2}  & 1 & HTTPS-only communication between clients and servers          & M \\
+  \ref{SPR2}  & 2 & Obtain user consent before storing sensitive data             & M \\
+  \ref{SPR3}  & 2 & AES-256 encryption of sensitive user data in storage          & M \\
+  \ref{CLR1}  & 1 & PIPEDA compliance for all personal data handling              & M \\
+  \ref{SL1}   & 2 & Maximum 2-second latency for form loading on mobile           & M \\
+  \ref{SC1}   & 3 & No errors introducing data leaks or privacy violations        & M \\
+  \ref{AC1}   & 2 & WCAG 2.0 AA accessibility compliance                          & M \\
+  \ref{AR1}   & 1 & Compliance with MES branding criteria                         & M \\
+  \ref{CSCR1} & 1 & Code conforms to Airbnb JavaScript and React/JSX style guides & M \\
+  \ref{FR5}   & 3 & Admin event dashboard with status filters                     & S \\
+  \ref{FR9}   & 2 & Medium for attendees to submit event feedback                 & S \\
+  \ref{FR10}  & 4 & Admins can view all feedback after an event completes         & S \\
+  \ref{SAuR1} & 3 & Admin action audit log with timestamps                        & S \\
+  \ref{SPR1}  & 3 & Users can request deletion of their stored personal data      & S \\
+  \ref{FT1}   & 2 & Auto-save incomplete surveys every 30 seconds                 & S \\
+  \ref{FT2}   & 2 & Locally queue changes and re-apply after reconnect            & S \\
+  \ref{FT3}   & 3 & Add new form modules without system downtime                  & S \\
+  \ref{FT4}   & 3 & Update event templates without disruption during live events  & S \\
+  \ref{FT5}   & 3 & Display last-updated timestamp on all analytics               & S \\
+  \ref{SL2}   & 3 & Maximum 4-second latency for attendee data and analytics      & S \\
+  \ref{PA1}   & 4 & All analytics displayed accurate to the decimal               & S \\
+  \ref{MSAR1} & 3 & System runs on Chromium, Firefox, and Safari                  & S \\
+  \ref{MSAR2} & 3 & Mobile app works on iOS and Android                           & S \\
+  \ref{ER1}   & 2 & Registration and feedback forms require no clarification       & S \\
+  \ref{ER2}   & 2 & Users can sign up and sign in without instruction              & S \\
+  \ref{ER3}   & 3 & Admins can use the dashboard with minimal instruction         & S \\
+  \ref{LR1}   & 2 & App accessible to anyone with intermediate English            & S \\
+  \ref{LR2}   & 2 & Admins can build a form without prior instruction             & S \\
+  \ref{MSMR1} & 2 & Updated documentation provided with every release             & S \\
+  \ref{FR2}   & 4 & Admins can organize forms and specify analytics methods       & C \\
+  \ref{FR8}   & 4 & Generate analytics visualizations and export CSV/Excel        & C \\
+  \ref{PI1}   & 3 & Form builder supports event-specific custom fields            & C \\
+  \ref{PI2}   & 4 & Admin dashboard supports sorting and filtering of attendees   & C \\
+  \ref{AR2}   & 3 & Clean, minimalist layout prioritizing functionality           & C \\
+  \ref{AR3}   & 4 & Admin dashboard displays distinct and readable analytics      & C \\
+  \ref{SE1}   & 4 & System supports up to 2047 registrations per event            & C \\
+  \ref{SE2}   & 4 & System designed to allow new analytic modules to be added    & C \\
+  \ref{LG1}   & 5 & System maintainable to fit future React or coding changes     & C \\
+  \ref{LG2}   & 4 & System supports data portability via CSV/Excel export         & C \\
+  \ref{MSSR1} & 4 & In-app FAQ section for common user questions                  & C \\
+  \ref{CR1}   & 5 & Support 2047 concurrent users during peak event times         & C \\
+  \ref{CR2}   & 5 & Database supports up to 50,000 total user entries             & C \\
+  \ref{WR1}   & - & Full SaaS redistributability for external organizations      & W \\
+  \ref{WR2}   & - & White-label branding substitution via admin interface        & W \\
+  \ref{WR3}   & - & Live polling of registered attendees during events           & W \\
+  \ref{WR4}   & - & AI-generated recommendations to improve response rates       & W \\
+  \ref{WR5}   & - & Predictive event turnout forecasting                         & W \\
+  \bottomrule
+  \caption{MoSCoW prioritization of all system requirements}\label{tab:moscow}
+\end{longtable}
+}
+
+\subsubsection*{Phase Summary}
+
+The table below summarizes which requirements are targeted in each phase and their associated 
+priority levels. Must Have requirements appear in Phases 1-2; Should Have requirements are 
+largely completed by Phase 3; Could Have requirements are addressed in Phases 4-5 where capacity 
+allows.
+
+{
+\setlength{\tabcolsep}{0.3em}
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}[H]{p{0.22\linewidth}p{0.18\linewidth}p{0.42\linewidth}p{0.13\linewidth}}
+  \toprule
+  \textbf{Phase} & \textbf{Timeline} & \textbf{Requirements Addressed} & \textbf{Priorities} \\
+  \midrule
+  Requirements \& Design
+    & Sept to Oct 2025
+    & \ref{CLR1}, \ref{CSCR1}, \ref{SAR1}, \ref{SAR2}, \ref{SIR2}, \ref{AR1}, \ref{SR1}, \ref{SR2}
+    & M only \\
+  \midrule
+  Core Functionality \& MVP
+    & Mid Oct to Dec 2025
+    & \ref{FR1}, \ref{FR3}, \ref{FR4}, \ref{FR6}, \ref{FR7}, \ref{FR9}, \ref{FR11}, \ref{SIR1},
+      \ref{SPR2}, \ref{SPR3}, \ref{SAR1}, \ref{ER1}, \ref{ER2}, \ref{UR1}, \ref{UR2}, \ref{UR3},
+      \ref{LR1}, \ref{LR2}, \ref{AC1}, \ref{SL1}, \ref{FT1}, \ref{FT2}, \ref{MSMR1}
+    & M, S \\
+  \midrule
+  Integration \& Refinement
+    & Jan 2026
+    & \ref{FR5}, \ref{FR10}, \ref{FR11}, \ref{SAR2}, \ref{SAuR1}, \ref{SPR1}, \ref{SIR2},
+      \ref{FT3}, \ref{FT4}, \ref{FT5}, \ref{SL2}, \ref{SC1}, \ref{MSAR1}, \ref{MSAR2},
+      \ref{AR2}, \ref{ER3}, \ref{PI1}
+    & M, S, C \\
+  \midrule
+  Analytics \& Dashboard
+    & Feb to Mar 2026
+    & \ref{FR2}, \ref{FR8}, \ref{FR10}, \ref{PI2}, \ref{AR3}, \ref{SR2}, \ref{SE1}, \ref{SE2},
+      \ref{PA1}, \ref{SL2}, \ref{LG2}, \ref{MSSR1}
+    & S, C \\
+  \midrule
+  Testing \& Deployment
+    & Mar to Apr 2026
+    & All requirements validated; priority on \ref{CR1}, \ref{CR2}, \ref{SC1}, \ref{SL1},
+      \ref{SL2}, \ref{AC1}, \ref{LG1}, \ref{CLR1}, \ref{MSAR1}, \ref{MSAR2}
+    & C \\
+  \bottomrule
+  \caption{Requirements addressed per development phase}\label{tab:phasereqs}
+\end{longtable}
+}
+
 
 \section{Migration to the New Product}
 \subsection{Requirements for Migration to the New Product}
@@ -1507,7 +1856,7 @@ Overall, training and documentation will be fully integrated into the user exper
 The application itself will serve as the guide, helping users learn by doing rather than reading external instructions.
 
 
-\section{Waiting Room}
+\section{Waiting Room} \label{waitingroom}
 
 This section outlines extra features to consider that may or be not be implemented depending on time constraints.
 
