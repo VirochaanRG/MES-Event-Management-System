@@ -2,8 +2,10 @@
 
 \usepackage{tabularx}
 \usepackage{booktabs}
-\usepackage{hyperref}
 \usepackage{float}
+\usepackage{longtable}
+\usepackage{hyperref}
+
 
 \title{Reflection and Traceability Report on \progname}
 
@@ -63,73 +65,122 @@ be able to grade your response to feedback.  In that case your grade on this
 document, and likely the Revision 1 versions of the other documents will be
 low.} 
 
-\subsection{SRS}
+\subsection{SRS and Hazard Analysis}
+\subsubsection{SRS}
 
 Below is a table of all feedback received and addressed throughout the project.
 
-\begin{table}[H]
-\centering
-\renewcommand{\arraystretch}{1.5}
-\begin{tabularx}{\textwidth}{>{\raggedright}p{0.15\textwidth} 
-                              >{\raggedright}p{0.2\textwidth} 
-                              >{\raggedright}X 
-                              >{\raggedright\arraybackslash}p{0.15\textwidth}}
-  \toprule
-  \textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made} & \textbf{Related Commits / Issues} \\
-  \midrule
-  TA Feedback 
-    & Score of 1/3 for Requirements Traceability 
-    & Added a traceability matrix for functional requirements to goals, 
-      and functional requirements to non-functional requirements 
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/8bc5396d775e0d0a8b8e15ddfbbb528015fec6d9}{8bc5396} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}\\
-    \midrule
-  TA Feedback 
-    & Score of 1/3 for Phase in Plan 
-    & Revamped phase in plan with MoSCoW prioritization of requirements
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/8bc5396d775e0d0a8b8e15ddfbbb528015fec6d9}{8bc5396} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}\\
-  \midrule
-  TA Feedback 
-    & Score of 0/3 for LO\_SpecMath
-    & Add formal definitions to some requirements
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4562b9b7bdc14277b1dbc1892145fdb986e851c5}{4562b9b} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}\\
-  \midrule
-  TA Feedback 
-    & Score of 1/3 for Basis for Design
-    & Add a section for likely and unlikely requirements changes
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4562b9b7bdc14277b1dbc1892145fdb986e851c5}{4562b9b} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}\\
-  \midrule
-Peer Feedback 
-    & Provide Graphics for Stakeholders
-    & Added a diagram grouping stakeholders into categories
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/3e4ecabe6377527c3e0fbc0718594a280f19814a}{3e4ecab} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/69}{\#69}\\
-  \midrule
-  Peer Feedback 
-    & Business Data Model 
-    & Revamped section 7.1 with ER diagram of business entities and relations.
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4a027f855641707b69687eab03ff4d65efe1a0df}{4a027f8} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/71}{\#71}\\
-  \midrule
-  Peer Feedback 
-    & Data Dictionary
-    & Revamped section 7.2 with business entity descriptions
-    & \href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4a027f855641707b69687eab03ff4d65efe1a0df}{4a027f8} 
-    \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/72}{\#72}\\
-  \bottomrule
-\end{tabularx}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.24\textwidth}|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.40\textwidth}|}
 \caption{SRS Feedback and Changes}
-\label{tab:feedback}
-\end{table}
+\label{tab:feedback}\\
+\hline
+\textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made (or justification why not)} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made (or justification why not)} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/8bc5396d775e0d0a8b8e15ddfbbb528015fec6d9}{8bc5396}, \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}) & Score of 1/3 for Requirements Traceability & Added a traceability matrix for functional requirements to goals, and functional requirements to non-functional requirements.\\
+\hline
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/8bc5396d775e0d0a8b8e15ddfbbb528015fec6d9}{8bc5396}, \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}) & Score of 1/3 for Phase in Plan & Revamped phase in plan with MoSCoW prioritization of requirements.\\
+\hline
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4562b9b7bdc14277b1dbc1892145fdb986e851c5}{4562b9b}, \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}) & Score of 0/3 for LO\_SpecMath & Added formal definitions to some requirements.\\
+\hline
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4562b9b7bdc14277b1dbc1892145fdb986e851c5}{4562b9b}, \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/308}{\#308}) & Score of 1/3 for Basis for Design & Added a section for likely and unlikely requirements changes.\\
+\hline
+Peer Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/3e4ecabe6377527c3e0fbc0718594a280f19814a}{3e4ecab}, \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/69}{\#69}) & Provide Graphics for Stakeholders & Added a diagram grouping stakeholders into categories.\\
+\hline
+Peer Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4a027f855641707b69687eab03ff4d65efe1a0df}{4a027f8}, \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/71}{\#71}) & Business Data Model & Revamped section 7.1 with ER diagram of business entities and relations.\\
+\hline
+Peer Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/commit/4a027f855641707b69687eab03ff4d65efe1a0df}{4a027f8}, \href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/72}{\#72}) & Data Dictionary & Revamped section 7.2 with business entity descriptions.\\
+\hline
+\end{longtable}
+
+\subsubsection{Hazard Analysis}
+
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.24\textwidth}|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.40\textwidth}|}
+\caption{Hazard Analysis Feedback Traceability}
+\label{tab:hazard-feedback-traceability}\\
+\hline
+\textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made (or justification why not)} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made (or justification why not)} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/67}{Issue \#67}) & Provide Metrics for Hazards for better clarity of the severity and nature & Added a column in our FMEA table which includes the severity which we colour coded by importance. This was a worthwhile change as it adds better clarity to the user on the level of threat\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/73}{Issue \#73}) &  Update Scope and purpose to be more specific and detailed & Section 2.2 was made more defined and detailed. Short description of the losses that may have been incurred is also included within.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/68}{Issue \#68}) & Turn the critical assumption of malicious usage into hazard & \textbf{Not Implemented:} We considered this a reasonable assumption as the goal of the hazard analysis was not to stop all malicious actors from messing with the system but rather ensure that the system functioned correctly and did not provide an easy entry or failure mode in which it could be exploited. For the current scope of our project it is unreasonable to be able to defend on all potential malicious attacks by users and is something that we can look towards working on in the future.\\
+\hline
+TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/309}{Issue \#309}) & Add a system boudary diagram to better understand of the components interact  & Added section 3.3 with a system diagram showcasing the interactions between the various components within our system in relevance the the hazard analysis. Provides users with a better understanding on the fundamentals of how this system works.\\
+\hline
+\end{longtable}
+
 
 \subsection{Hazard Analysis}
 
 \subsection{Design and Design Documentation}
 
 \subsection{VnV Plan and Report}
+\subsubsection{VnV Plan}
+
+\begin{longtable}{|>{\raggedright\arraybackslash}p{0.24\textwidth}|>{\raggedright\arraybackslash}p{0.30\textwidth}|>{\raggedright\arraybackslash}p{0.40\textwidth}|}
+\caption{VnV Plan Feedback Traceability}
+\label{tab:vnv-feedback-traceability}\\
+\hline
+\textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made (or justification why not)} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Feedback Source} & \textbf{Feedback Summary} & \textbf{Changes Made (or justification why not)} \\
+\hline
+\endhead
+
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/84}{Issue \#84}) & Fix Spelling and Grammar Issues & Ran spellcheck throughout the document and just ensured everything made sense.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/87}{Issue \#87}) & Make system Tests less ambiguous & In section 4.1, every single functional system test case was looked at and improved to be be a bit more specific with the testing methodology and thoroughness of the testing. We also looked at making the output more verifiable by looking directly at database rather than visual confirmations.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/85}{Issue \#85}) & Too Detailed Verification of SRS& \textbf{Not Implemented:} We considered that the requirements validation as part of the verification of the SRS as included within the documentation and the rubric of said document.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/88}{Issue \#88}) & Untested Non-functional requirements& In section 4.2, we went over the system tests to ensure that all the requirements in our SRS were being covered by the current tests. The only one missing was SC-1 so we added a new test covering that. We also reworked existing tests to ensure that they were better covering the NFRs as required.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/93}{Issue \#93}) & Unclear Criterion for PF-2 & In section 4.2.4 we included a specific Measured time to be less than 4 seconds. We also looked at the rest of tests and ensured proper criterions were established as neccesary\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/92}{Issue \#92}) & Section 4.3 Table could be more detailed & \textbf{Not Implemented:} We didn't feel it neccesary to include all the details again and felt it would make the table more cluttered and didn't actually fit the nature of a traceability table. As a compromise we once again included the link to our SRS document were the readers could gain more context if necessary.\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/89}{Issue \#89}) & Include Usability Survey Questions & We included a link to our usability report extra which has all the survey questions as well as additional context and findings which readers may find useful. \\
+\hline
+Peer Review + TA Feedback (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/86}{Issue \#86})  & NFR Traceability Table & We included a table containing traceability between the NFR and the System Tests to ensure proper connection between the SRS and VNV Plan. This can be seen in table 5 in section 4.3\\
+\hline
+Peer Review (\href{https://github.com/VirochaanRG/MES-Event-Management-System/issues/95}{Issue \#95})  &SUpervisor Involvement in Verification & \textbf{Not Implemented:} Section 3.4 is meant to be a verification and validation of our internal strategies so we didn't believe supervisor validation was necessary in that situation. Section 3.5 has supervisor verification done through the usability verification as they will be one of the people doing the testing. \\
+\hline
+\end{longtable}
 
 \section{Extras}
 
