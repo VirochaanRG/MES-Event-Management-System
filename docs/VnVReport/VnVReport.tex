@@ -104,6 +104,8 @@ Output:
 \end{verbatim}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} The administrator successfully created a new form with multiple fields and the form appeared correctly in the dashboard with all fields stored in the system database. \\
+\textbf{Covers:} FR-1, FR-7 \\
+
 \subsubsection{Test-FR-AP-2: View and Analyze Form Data}
 \textbf{Type:} Manual \\ \textbf{Initial State:} At least two forms exist with previously collected responses. \\ \textbf{Test Procedure:}
 \begin{verbatim}
@@ -120,6 +122,8 @@ Output:
 - Displayed analytics match stored backend data
 \end{verbatim}
 \textbf{Result:} Pass \\ \textbf{Discussion:} The analytics dashboard correctly aggregated the responses from multiple forms and displayed charts and summary statistics consistent with the stored backend data. \\
+\textbf{Covers:} FR-2, FR-8 \\
+
 \subsubsection{Test-FR-AP-3: Manage Events via Dashboard}
 \textbf{Type:} Manual \\ \textbf{Initial State:} Multiple events exist in the system with various payment statuses. \\ \textbf{Test Procedure:}
 \begin{verbatim}
@@ -135,6 +139,8 @@ Output:
 - Displayed events match stored system records
 \end{verbatim}
 \textbf{Result:} Pass \\ \textbf{Discussion:} The dashboard filtering functionality worked correctly and displayed only the events matching the selected payment status filter. \\
+\textbf{Covers:} FR-5, FR-6 \\
+
 \subsubsection{Test-FR-AP-4: View and Export Event Analytics}
 \textbf{Type:} Manual \\ \textbf{Initial State:} Events exist with collected survey responses. \\ \textbf{Test Procedure:}
 \begin{verbatim}
@@ -150,7 +156,9 @@ Output:
 - System generates a downloadable report file
 - Exported data matches the analytics displayed
 \end{verbatim}
-\textbf{Result:} Pass \\ \textbf{Discussion:} The export functionality successfully generated a downloadable analytics report containing the correct event statistics and survey response summaries. \\
+\textbf{Result:} Pass \\ 
+\textbf{Discussion:} The export functionality successfully generated a downloadable analytics report containing the correct event statistics and survey response summaries. \\
+\textbf{Covers:} FR-8, FR-10 \\
 
 \subsection{Area of Testing 2: Attendee Application}
 This section evaluates the functional requirements specific to the attendee's mobile experience. Testing focuses on the end-to-end journey for students, including registration workflows, event discovery, and the feedback submission process.
@@ -162,6 +170,7 @@ This section evaluates the functional requirements specific to the attendee's mo
 \textbf{Expected Output:} Registration is saved and a confirmation message is displayed and sent to attendee and a QR ticket is generated. \\
 \textbf{How the test will be performed:} An automated test script will simulate a form submission for a test event and verify the existence of the generated QR code object in the database and the success response from the server. \\
 \textbf{Actual Result:} The registration was processed successfully; a unique QR ticket was generated and linked to the attendee's profile in the database.
+\textbf{Covers:} FR-3, FR-4, FR-6 \\
 
 \subsubsection{Test-FR-AA-2: Access Event Listings}
 \textbf{Type:} Manual \\
@@ -182,6 +191,7 @@ This section evaluates the functional requirements specific to the attendee's mo
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} The attendee was able to browse all available events and view their specific registered events without discrepancy between the UI and the backend data.
+\textbf{Covers:} FR-3 \\
 
 \subsubsection{Test-FR-AA-3: Fill out Form}
 \textbf{Type:} Automatic \\
@@ -190,6 +200,7 @@ This section evaluates the functional requirements specific to the attendee's mo
 \textbf{Expected Output:} Survey responses are stored and a confirmation message appears. \\
 \textbf{How the test will be performed:} Using a headless browser, the system will fill out all required fields in a dynamic feedback form and click submit, then check for a 201 Created status from the API. \\
 \textbf{Actual Result:} Feedback data was successfully committed to the database and associated with the correct Event ID.
+\textbf{Covers:} FR-7, FR-9 \\
 
 \subsection{Area of Testing 3: System Integration and Security}
 This section verifies the robustness of the system's internal communications and its defensive posture. Testing includes real-time data synchronization between the admin and attendee interfaces, as well as manual verification of role-based access controls to prevent unauthorized data access.
@@ -201,6 +212,7 @@ This section verifies the robustness of the system's internal communications and
 \textbf{Expected Output:} Attendee view updates automatically without manual refresh. \\
 \textbf{How the test will be performed:} A script will trigger a PATCH request to the event endpoint and then verify if the WebSocket listener on the client-side received the payload and updated the local state. \\
 \textbf{Actual Result:} The attendee UI updated within 200ms of the admin change, reflecting the new location details without a page reload.
+\textbf{Covers:} FR-6, FR-7 \\
 
 \subsubsection{Test-FR-SI-2: Role-Based Access Verification}
 \textbf{Type:} Manual \\
@@ -220,6 +232,7 @@ This section verifies the robustness of the system's internal communications and
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} The system successfully enforced role-based access control, ensuring that sensitive administrative functions are strictly limited to authorized accounts.
+\textbf{Covers:} FR-11 \\
 
 \subsubsection{Test-FR-SI-3: API Security - SQL Injection}
 \textbf{Type:} Automatic \\
@@ -227,7 +240,7 @@ This section verifies the robustness of the system's internal communications and
 \textbf{Input/Condition:} Submit a string containing SQL commands (e.g., "OR 1=1") into the event search bar. \\
 \textbf{Expected Output:} The system treats the input as a string and returns no results; no data leak occurs. \\
 \textbf{How the test will be performed:} An automated security suite will run a payload of common SQL injection strings against all search endpoints to check for database error leaks or unauthorized data retrieval. \\
-\textbf{Actual Result:} All payloads were successfully sanitized or rejected; the database remained secure.
+\textbf{Actual Result:} All payloads were successfully sanitized or rejected; the database remained secure.\\
 
 \section{Nonfunctional Requirements Evaluation}
 
@@ -251,6 +264,7 @@ This section evaluates the visual and aesthetic requirements of the EvENGage sys
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} A meeting was held with the stakeholder where the design decisions were assessed. The representative confirmed that the UI adheres to the requirements. Minor visual suggestions were noted for future iterations, but the overall direction was approved.
+\textbf{Covers:} AR-1 \\
 
 \subsubsection{Test-NFR-LF-2: Design Reception Survey}
 \textbf{Type:} Manual \\
@@ -267,6 +281,7 @@ This section evaluates the visual and aesthetic requirements of the EvENGage sys
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} Survey responses were collected and analyzed. Average responses were positive and suggested that userse enjoyed the design.
+\textbf{Covers:} AR-2, SR-1 \\
 
 In addition, informal design reviews and validation activities were conducted through stakeholder feedback and usability testing (see Usability Report under Extras).
 
@@ -289,6 +304,7 @@ This section focuses on the ease of use, accessibility, and user-centric design 
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} All participants were able to navigate the registration and feedback workflows without any guidance. While a few users took more time than others, all participants successfully completed the task, suggesting it is intuitive.
+\textbf{Covers:} ER-1, LR-1 \\
 
 \subsubsection{Test-NFR-UH-6: Accessibility Conformance}
 \textbf{Type:} Manual \\
@@ -303,6 +319,9 @@ This section focuses on the ease of use, accessibility, and user-centric design 
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} Accessibility checks were performed manually. No significant accessibility issues were detected during testing. In the future, we plan to use an established web tool, such as WebAIM to ensure the interface meets basic accessibility expectations.
+\textbf{Covers:} AC-1 \\
+
+\textbf{Omitted Tests:} UH-2 to UH-5 were not executed due to time constraints and the need to prioritize core functionality testing. These tests are addressed in the Usability Report under Extras, which includes detailed user testing sessions and feedback analysis.
 
 \subsection{System Testing - Performance}
 This section evaluates the system's responsiveness and capacity, ensuring it can handle typical usage scenarios.
@@ -324,6 +343,9 @@ This section evaluates the system's responsiveness and capacity, ensuring it can
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} Performance measurements were taken using chrome developer tools in a limited development environment. Forms consistently loaded within the acceptable threshold during testing. Next step is to test the deployed build on different browsers, as well as the mobile app.
+\textbf{Covers:} SL1, MSAR1, MSAR2 \\
+
+\textbf{Omitted Tests:} PF-2 and PF-3 were omitted due to hardware constraints and being beyond the scope. The project worked well within the necessary testable environment. OE-1 was addressed in the Usability Report and through informal meetings with the MES representative. MS-1 and MS-2 were not functionally testable and were instead validated through code and documentation review.
 
 \subsection{System Testing - Security}
 This section validates the protection of user data and the integrity of administrative actions within the system.
@@ -343,6 +365,7 @@ This section validates the protection of user data and the integrity of administ
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} Controlled login attempts were performed using both valid and invalid email domains. The system correctly restricted access to unauthorized accounts, and allowed valid users to log-in.
+\textbf{Covers:} SAR1 \\
 
 \subsubsection{Test-NFR-ST-4: Secure Data Encryption}
 \textbf{Type:} Manual \\
@@ -364,6 +387,9 @@ This section validates the protection of user data and the integrity of administ
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} Direct inspection of the PostgreSQL database revealed that there were no plaintext entries found, hashes are consistent with AES-256 encryption, and salting techniques are properly implemented. Attempts to decrypt the data without the key were unsuccessful, confirming effective encryption of sensitive data.
+\textbf{Covers:} SPR2, SPR3 \\
+
+\textbf{Omitted Tests:} ST-2 and ST-3 were addressed with informal review and usability testing. ST-5 was not evaluated due to time constraints and being beyond the scope.
 
 \section{Comparison to Existing Implementation}
 
