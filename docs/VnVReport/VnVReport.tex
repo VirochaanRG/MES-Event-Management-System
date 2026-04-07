@@ -331,6 +331,8 @@ This section will not be appropriate for every project.
 
 \section{Unit Testing}
 
+Unit testing was performed across all backend APIs for both admin and user servers, including Events, Forms, Authentication, and Images. Over 80 test cases were conducted, focusing on input validation, error handling, and data integrity. All tests passed successfully, indicating the robustness of the backend functionality. The following tables summarize the unit tests conducted for each API.
+
 \subsection{Admin Server Testing - Events API}
 
 \noindent
@@ -609,7 +611,7 @@ TC82 & GET /api/public/images/:id/view - Return image with correct headers & Ima
 
 \section{Changes Due to Testing}
 
-Reviews from peers and our supervisor revealed many issues with the first revision of the software, including usability issues and bugs that are difficult to catch with regular unit testing or were simply overlooked during manual testing by developers.
+Reviews from peers and our supervisor revealed many issues with the first revision of the software, including usability issues and bugs that are difficult to catch with regular unit testing or were simply overlooked due to limitations during manual testing by developers.
 
 \subsection{Server Robustness Improvements}
 
@@ -651,9 +653,9 @@ During the reviews, a couple minor bugs were found mostly related to the initial
     \textbf{Fix:} Add placeholder text for missing information (e.g. No description, no deadline) or render the element without any text.
 \end{itemize}
 
-\subsection{Missing Features}
+\subsection{Feature Limitations}
 
-The following are important features or functionality of the software that was noted to be missing by reviewers due to oversights during development.
+The following are important features or functionality of the software noted to be missing by reviewers. These are not direct defects or oversights, but areas that were not prioritized at the time due to time constraints.
 
 \subsubsection{User Portal}
 \begin{itemize}
