@@ -48,8 +48,13 @@
 04-06-2026 & Virochaan & Implemented TA Feedback, section 2.2 was restructured for better understandability. \\
 04-06-2026 & Virochaan & Implemented TA Feedback, section 3.2.2 has sample questions added. \\
 04-06-2026 & Virochaan & Completed Unit testing Section \\
-04-06-2026 & Virochaan & Implemented TA Feedback, Proper traceability in section 4.3 \\
+04-06-2026 & Virochaan & Implemented TA Feedback and Peer Review 86, Proper traceability in section 4.3 for NFR \\
 04-06-2026 & Virochaan & Implemented TA Feedback, Document Formatting and reviewing document \\
+04-06-2026 & Virochaan & Implemented Peer Review 84, Fixed grammer and spelling across the document\\
+04-06-2026 & Virochaan & Implemented Peer Review 87, Revamped all test cases in section 4.1 to be less ambiguous as neccesary\\
+04-06-2026 & Virochaan & Implemented Peer Review 88, In section 4.2 ensure that all the NFRs are properly covered for thoroughness\\
+04-06-2026 & Virochaan & Implemented Peer Review 93, In section 4.2.4 ensure proper measurement criterion for the test\\
+04-06-2026 & Virochaan & Implemented Peer Review 89, Include link to Usability Survey Questions\\
 \bottomrule
 \end{tabularx}
 
@@ -120,7 +125,7 @@ The following core features of the product will be tested:
     attendees of changes; allow attendees to receive notifications regarding events.
   \item[Backend Analytics] Allow admins to query any set of form questions and view aggregated results from the query;
     allow admins to freely visualize relevant data points from surveys; allow admins to export analytics data as
-    SCV/Excel reports.
+    CSV/Excel reports.
 \end{description}
 
 \noindent The testing ranges from individual unit testing to overall system integration testing to ensure that all functionality
@@ -161,7 +166,7 @@ The Norman's Principles report will evaluate the application interface using key
 visibility, feedback, consistency, constraints, mapping and affordance. It will document how these principles are reflected in both
 admin and attendee workflows and identify areas where interaction design can be improved.
 
-All users will interact regularly with the system through different interfaces so evaluating them through the lense of these design principles is good for ensuring effective design It will also make sure these interactions are productive making this extra relevant to the project.
+All users will interact regularly with the system through different interfaces so evaluating them through the lens of these design principles is good for ensuring effective design. It will also make sure these interactions are productive, making this extra relevant to the project.
 
 \subsection{Relevant Documentation}
 The following documents are relevant to the context of the verification and validation plan:
@@ -192,7 +197,7 @@ This sections provides a detailed overview of the validation and verification of
   \item \textbf{Rayyan Suhail}: Web Application Tester. Verifies the admin web application complies with all related functional requirements as well as nonfunctional requirements such as usability and look and feel requirements.
   \item \textbf{Virochaan Ravichandran Gowri}: Integration Tester. Tests the overall integration of system components and their compliance with non-functional requirements such as performance and maintainability.
   \item \textbf{Mohammad Mahdi Mahboob}: Security Tester. Tests the security of the system by checking for compliance with security standards and legal requirements.
-  \item \textbf{Luke Schermann}: Supervisor and Acceptance Tester. Supervises the overal implementation of the system, ensuring stakeholder requirements are met. Responsible for attending acceptance testing workshops with the developers for the admin web portal.
+  \item \textbf{Luke Schermann}: Supervisor and Acceptance Tester. Supervises the overall implementation of the system, ensuring stakeholder requirements are met. Responsible for attending acceptance testing workshops with the developers for the admin web portal.
 \end{itemize}
 
 \subsection{SRS Verification}
@@ -224,7 +229,7 @@ Each of the main components of the system listed below will first be tested in i
 
 
   \subsubsection{User Acceptance Testing}
-  User acceptance testing will be conducted on a staging deployment of the system with a group of about 10 test users. Each user will be given a list of actions to perform on the attendee mobile application without help from developers, such as looking up and registering for an evert or filling out a survey. The user will then provide feedback on the experience of completing these actions which will be analyzed for final improvments before the initial launch.
+  User acceptance testing will be conducted on a staging deployment of the system with a group of about 10 test users. Each user will be given a list of actions to perform on the attendee mobile application without help from developers, such as looking up and registering for an event or filling out a survey. The user will then provide feedback on the experience of completing these actions which will be analyzed for final improvements before the initial launch.
 
 \subsubsection{Pilot Launch}
   By request of the project supervisor, a pilot program of the system will be launched in January. This pilot program will involve testing the system in a scenario with real users, such as the Fireball Formal and CFES National Survey. The system will be deployed to a production environment, where users will use the application as intended. Feedback will be collected by attendees and admins as well as feedback from the supervisor on user satisfaction. to analyze and address any final problems before the official launch of the system.
@@ -298,7 +303,7 @@ The design verification of the system will involve verifying that the proposed s
 
 For peer reviews, design documents such as architecture diagrams, data flow diagrams, and entity-relationship models will be reviewed for feasibility, unambiguity, clarity, and  consistency with requirements specified in the SRS. Reviewers will also have the chance to provide feedback on the design to identify potential design flaws. Peer feedback will be tracked using GitHub Issues and implemented before the formal design review with the supervisor.
 
-For the formal design review, the supervisor will be presented with a detailed walkthrough of the system architecture and rationale for key design decisions. This presentation will cover the entire system architecure with an emphasis on the admin perspective of system. The supervisor will provide feedback and propose changes to ensure the design aligns with the interest of major stakeholders.
+For the formal design review, the supervisor will be presented with a detailed walkthrough of the system architecture and rationale for key design decisions. This presentation will cover the entire system architecture with an emphasis on the admin perspective of system. The supervisor will provide feedback and propose changes to ensure the design aligns with the interest of major stakeholders.
 
 \begin{longtable}{|p{4cm}|p{11cm}|}
 \hline
@@ -343,9 +348,9 @@ For the formal design review, the supervisor will be presented with a detailed w
 
 \subsection{Verification and Validation Plan Verification}
 
-To verify the verification and validation strategies presented in this document, a series of peer reviews and internal reviews will be done. Before peer reviews, developers will review the completed document by reviewing sections written by other developers and compare the content with their own contributions to the document. This will ensure there are no inconsistencies between sections such as inconstent language or conflicting test case definitions. The peer review will be conducted by members of another team, who will conduct a review given a coverage checklist derived from the requirements in SRS to ensure the proposed plan provides complete coverage of all outlined requirements.
+To verify the verification and validation strategies presented in this document, a series of peer reviews and internal reviews will be done. Before peer reviews, developers will review the completed document by reviewing sections written by other developers and compare the content with their own contributions to the document. This will ensure there are no inconsistencies between sections such as inconsistent language or conflicting test case definitions. The peer review will be conducted by members of another team, who will conduct a review given a coverage checklist derived from the requirements in SRS to ensure the proposed plan provides complete coverage of all outlined requirements.
 \\
-Addionally, several mutation tests must be done for every system test and unit test outlined in this document to ensure robustness of the proposed test suite on each of the systems components.
+Additionally, several mutation tests must be done for every system test and unit test outlined in this document to ensure robustness of the proposed test suite on each of the systems components.
 
 \begin{longtable}{|p{4cm}|p{11cm}|}
 \hline
@@ -412,7 +417,11 @@ Dynamic verification will confirm that each feature works correctly through prac
 \end{itemize}
 
 \subsubsection*{Usability Verification}
-As part of the final CAS 741 presentation, we will also conduct a short usability check. MES members and students will try out basic workflows such as creating a form, signing up for an event, or checking analytics. Their feedback on how easy or confusing it feels will help us fine-tune the interface before final deployment.
+Usability verification will follow the same framework used in the Usability Report Extra. This keeps both deliverables consistent.
+
+The team will run task-based sessions with MES members and student attendees. Core tasks will include event registration, form completion, and admin analytics review. We will evaluate each task using clear metrics. These metrics include completion rate, time on task, observed errors, and user satisfaction score.
+
+The team will record both quantitative and qualitative results. Quantitative results include completion percentage and timing data. Qualitative results include confusion points and wording/navigation issues. We will compare results against the success thresholds defined in the Usability Report. Any needed improvements will be tracked as GitHub Issues before final release.
 
 \subsection{Automated Testing and Verification Tools}
 
@@ -449,7 +458,7 @@ There are no external data sets required for validation since this is a new syst
 
 \section{System Tests}
 
-This section outlines the the system wide tests to validate both functional and non-functional requirements defined in our Software Requirements Specification.
+This section outlines the system-wide tests to validate both functional and non-functional requirements defined in our Software Requirements Specification.
 
 \subsection{Tests for Functional Requirements}
 
@@ -460,78 +469,78 @@ The tests are grouped into three \textbf{Areas of Testing}: \textit{Admin Portal
 \noindent\textbf{Test-FR-AP-1: Create Form}\\
 \textbf{Type:} Manual\\
 \textbf{Initial State:} Admin is logged in with form creation privileges.\\
-\textbf{Input/Condition:} Admin enters a new form name and adds multiple field types (text, checkbox, rating).\\
-\textbf{Expected Output:} The new form module is created and is visible in the database and in the admin dashboard.\\
+\textbf{Input/Condition:} Execute at least three sub-cases: (A) create a valid form containing multiple field types (for example text, checkbox, and rating), (B) submit a blank/whitespace-only form title, and (C) submit a title that exceeds the configured maximum length.\\
+\textbf{Expected Output:} (A) Form is created with a unique identifier, appears in the admin dashboard, and the persisted schema matches the configured field types/constraints. (B) and (C) are rejected with validation errors, and no new form record is created.\\
 \textbf{Test Case Derivation:} This test verifies the system’s ability to support dynamic form creation and storage as required by FR-1 and FR-7.\\
-\textbf{How the test will be performed:} The tester will create a new form and confirm it appears correctly in the interface and database.\\[6pt]
+\textbf{How the test will be performed:} Tester records form count before/after each sub-case, validates field schema persistence for the valid case, and confirms no count increase for invalid cases.\\[6pt]
 
 \noindent\textbf{Test-FR-AP-2: View and Analyze Form Data}\\
 \textbf{Type:} Manual\\
 \textbf{Initial State:} At least two forms with collected responses exist.\\
-\textbf{Input/Condition:} Admin selects multiple forms and clicks button to view report analytics\\
-\textbf{Expected Output:} Aggregated analytics are displayed correctly and match backend data.\\
+\textbf{Input/Condition:} Select multiple forms with known seeded response sets and include one form with no responses (or archived status) as a negative case.\\
+\textbf{Expected Output:} Combined totals and per-answer distributions shown on analytics match backend aggregate results for the selected forms; zero-response forms do not inflate totals or produce incorrect chart values.\\
 \textbf{Test Case Derivation:} This test confirms data organization and analytical visualization functionalities described in FR-2 and FR-8, ensuring accurate reporting and analytics.\\
-\textbf{How the test will be performed:} The tester will generate combined analytics and confirm that the displayed charts match backend results.\\[6pt]
+\textbf{How the test will be performed:} Tester computes reference aggregates through SQL/API and compares dashboard metrics (totals and distributions) metric-by-metric with pass/fail logging.\\[6pt]
 
 \noindent\textbf{Test-FR-AP-3: Manage Events via Dashboard}\\
 \textbf{Type:} Manual\\
 \textbf{Initial State:} Several events with participant data exist.\\
-\textbf{Input/Condition:} Admin accesses the dashboard and applies filters (e.g., pending payment).\\
-\textbf{Expected Output:} Filtered results display accurately with correct status counts.\\
+\textbf{Input/Condition:} Use an event dataset containing mixed payment/status states. Apply single filters (for example pending, paid, cancelled), combined filters, and a filter combination expected to return no rows.\\
+\textbf{Expected Output:} Each filter view returns only matching events with correct counts; non-matching events are excluded; no-result scenarios show a clear empty state and do not retain stale rows from previous filter states.\\
 \textbf{Test Case Derivation:} This test validates event management, filtering, and data persistence mechanisms described in FR-5 and FR-6.\\
-\textbf{How the test will be performed:} The tester will apply filters and verify that displayed data matches expected event records.\\[6pt]
+\textbf{How the test will be performed:} Tester captures displayed event IDs/counts for each filter and cross-checks them with baseline seeded data and backend query output.\\[6pt]
 
 \noindent\textbf{Test-FR-AP-4: View and Export Event Analytics}\\
 \textbf{Type:} Manual\\
 \textbf{Initial State:} Events and surveys contain collected feedback.\\
-\textbf{Input/Condition:} Admin selects an event and exports analytics.\\
-\textbf{Expected Output:} Correct analytics display and downloadable report matches system data.\\
+\textbf{Input/Condition:} Select an event with known non-zero analytics and export report data in supported formats (for example CSV/XLSX). Include a negative case for an event with no feedback data.\\
+\textbf{Expected Output:} On-screen analytics values match backend totals. Exported files are generated successfully with expected headers and data consistency. For no-feedback cases, output is valid and explicitly represents zero/no data without corruption.\\
 \textbf{Test Case Derivation:} This test ensures that analytics generation and report export satisfy the requirements for event statistics and reporting defined in FR-8 and FR-10.\\
-\textbf{How the test will be performed:} The tester will view analytics for an event, export the report, and compare the output to dashboard data.\\[12pt]
+\textbf{How the test will be performed:} Tester verifies on-screen metrics first, then validates exported file structure and key totals against dashboard/backend values.\\[12pt]
 
 \subsubsection{Area of Testing 2 – Attendee Application}
 
 \noindent\textbf{Test-FR-AA-1: Register for Event}\\
 \textbf{Type:} Automatic\\
 \textbf{Initial State:} An event is open and attendee is authenticated.\\
-\textbf{Input/Condition:} Attendee submits an event registration form.\\
-\textbf{Expected Output:} Registration is saved and a confirmation message is displayed and sent to attendee and a QR ticket is generated.\\
+\textbf{Input/Condition:} Execute three flows: (A) valid attendee registration to an open event, (B) duplicate registration attempt for the same attendee/event pair, and (C) invalid payload missing a required field.\\
+\textbf{Expected Output:} (A) succeeds and creates one registration with associated confirmation and ticket artifact; (B) and (C) are rejected with appropriate validation/duplicate responses and do not create additional records.\\
 \textbf{Test Case Derivation:} This test validates the registration workflow and QR ticket generation process as required by FR-3, FR-4, and FR-6.\\
-\textbf{How the test will be performed:} An automated test will submit registration data and verify the confirmation message and QR code has been created. Will confirm that the event data has also been updated in the database.\\[6pt]
+\textbf{How the test will be performed:} Automated test asserts status codes, record-count changes, and creation/non-creation of registration artifacts per sub-case.\\[6pt]
 
 \noindent\textbf{Test-FR-AA-2: Access Event Listings}\\
 \textbf{Type:} Manual\\
-\textbf{Initial State:} The system has multiple upcoming and past events.\\
-\textbf{Input/Condition:} Attendee views ``Upcoming'' and ``Registered Events'' tabs.\\
-\textbf{Expected Output:} Each tab displays correct events for that category.\\
+\textbf{Initial State:} The system has multiple available and past events.\\
+\textbf{Input/Condition:} Use a user account with a mixed event set (available/past, registered/not registered). Open \texttt{Available} and \texttt{Registered Events} tabs.\\
+\textbf{Expected Output:} Each tab shows only events that satisfy its rules; events outside the rule set are excluded; displayed event metadata (title/date/location/status) matches backend records.\\
 \textbf{Test Case Derivation:} This test confirms accurate retrieval and filtering of events for authenticated users as required by FR-3 and ensures user can view event info.\\
-\textbf{How the test will be performed:} The tester will view event lists and verify they match stored registration records. Tester will also ensure event info shows up correctly and matches database.\\[6pt]
+\textbf{How the test will be performed:} Tester records event IDs in each tab, compares against expected membership, and validates displayed metadata against backend values.\\[6pt]
 
 \noindent\textbf{Test-FR-AA-3: Fill out Form}\\
 \textbf{Type:} Automatic\\
 \textbf{Initial State:} A survey is available and attendee is authenticated.\\
-\textbf{Input/Condition:} Attendee completes and submits the survey.\\
-\textbf{Expected Output:} Survey responses are stored and a confirmation message appears.\\
+\textbf{Input/Condition:} Execute three survey cases: (A) valid completion with all required fields, (B) submission missing at least one required field, and (C) submission violating an input-length constraint.\\
+\textbf{Expected Output:} (A) persists a completed response and returns success/confirmation; (B) and (C) return validation errors and do not persist a completed response.\\
 \textbf{Test Case Derivation:} This test ensures that survey submission and feedback processing meet the specifications in FR-7, FR-9.\\
-\textbf{How the test will be performed:} An automated test will submit survey responses and confirm that results are stored and submission is found in the centralized database.\\[12pt]
+\textbf{How the test will be performed:} Automated suite checks response status/message and verifies persistence outcomes for each case against expected behavior.\\[12pt]
 
 \subsubsection{Area of Testing 3 – System Integration and Security}
 
 \noindent\textbf{Test-FR-SI-1: Real-Time Data Synchronization}\\
 \textbf{Type:} Automatic\\
 \textbf{Initial State:} Admin and attendee interfaces are active.\\
-\textbf{Input/Condition:} Admin updates event details (e.g., venue or date).\\
-\textbf{Expected Output:} Attendee view updates automatically without manual refresh.\\
+\textbf{Input/Condition:} Admin performs at least two updates to attendee-visible event fields (for example venue, time, description) while attendee view is open. Propagation delay is measured without manual refresh.\\
+\textbf{Expected Output:} Attendee view reflects updates automatically within the agreed synchronization threshold and values match admin/backend state with no stale data persisting after update completion.\\
 \textbf{Test Case Derivation:} This test validates the real-time synchronization and data propagation features required by FR-6 and FR-7 and ensures that both databases are connected to the interface.\\
-\textbf{How the test will be performed:} An automated test will modify event data and verify that the attendee view reflects the change immediately.\\[6pt]
+\textbf{How the test will be performed:} Automation timestamps update and visibility events, then validates propagation-time and field-equality assertions across admin UI, attendee UI, and backend records.\\[6pt]
 
 \noindent\textbf{Test-FR-SI-2: Role-Based Access Verification}\\
 \textbf{Type:} Manual\\
 \textbf{Initial State:} Admin and attendee accounts exist with distinct permissions.\\
-\textbf{Input/Condition:} Each user attempts to access admin-only features.\\
-\textbf{Expected Output:} Admin gains access but attendee is denied access with proper error handling.\\
+\textbf{Input/Condition:} Run a role matrix where admin and attendee users attempt the same set of admin-only UI actions and direct API/URL accesses.\\
+\textbf{Expected Output:} Admin role is authorized for admin-only actions. Attendee role is consistently denied (unauthorized/forbidden), receives no restricted data payload, and denial attempts are captured by logging/audit mechanisms.\\
 \textbf{Test Case Derivation:} This test checks role-based access control and authorization mechanisms as defined in FR-11 ensuring only specific users have access to admin controls.\\
-\textbf{How the test will be performed:} The tester will log in as both user types and attempt to access admin features to confirm proper restriction.\\[12pt]
+\textbf{How the test will be performed:} Tester executes a shared action matrix for both roles, records outcomes per action, and verifies both access-control results and audit logging behavior.\\[12pt]
 
 
 \subsection{Tests for Nonfunctional Requirements}
@@ -545,7 +554,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} UI for basic build is finalized.\\
     {\bf Input/Condition:} MES representative given access to app UI.\\
     {\bf Output/Result:} Approval from MES representative.\\
-    {\bf Covers:} AR-1\\
+    {\bf Covers:} AR1\\
     {\bf How test will be performed:} A meeting will be held with the representative with a clear showing of the app UI, where they will assess design decisions (branding, colour palette) against MES branding criteria.
 
   \item \label{test-LF2} \textbf{Design Reception Survey}\\[2mm]
@@ -553,7 +562,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Basic production build and survey ready.\\
     {\bf Input/Condition:} App used in at least one MES event, and survey sent out to all attendees.\\
     {\bf Output/Result:} Survey filled out to illustrate user reception on design.\\
-    {\bf Covers:} AR-2, SR-1\\
+    {\bf Covers:} AR2, SR1\\
     {\bf How test will be performed:} The survey results will be compiled and analyzed to determine user reception of the design, and whether it meets usability expectations.
 
     \item \label{test-LF3} \textbf{Admin Analytics Acceptance}\\[2mm]
@@ -561,7 +570,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Admin dashboard operational and contains realistic analytics and charts.\\
     {\bf Input/Condition:} MES representative given access to dashboard preview.\\
     {\bf Output/Result:} Approval from MES representative.\\
-    {\bf Covers:} AR-3, SR-2, FT-5\\
+    {\bf Covers:} AR3, SR2, FT5\\
     {\bf How test will be performed:} A meeting will be held with the representative to demonstrate the dashboard analytics. They will give approval on the types of metrics visualized as well as their layout.
 \end{enumerate}
 
@@ -572,7 +581,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Functional live event forms.\\
     {\bf Input/Condition:} App used in at least one MES event, attendees are provided access to app.\\
     {\bf Output/Result:} Successful submission of pertinent forms with no instruction, and highly rating the experience.\\
-    {\bf Covers:} ER-1, LR-1\\
+    {\bf Covers:} ER1, LR1\\
     {\bf How test will be performed:} Observe successful registration and form completion by minimum 30 attendees, with an average of 80\% rating ease of use a 4+ out of 5.(ER-1).
 
   \item \label{test-UH2} \textbf{Seamless Sign-In / Sign-Up}\\[2mm]
@@ -580,7 +589,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Prior to set up of new user accounts.\\
     {\bf Input/Condition:} Users perform sign-up and sign-in with no instruction.\\
     {\bf Output/Result:} 10 users complete registration and sign in to account.\\
-    {\bf Covers:} ER-2\\
+    {\bf Covers:} ER2\\
     {\bf How test will be performed:} A sample of 10 users will be taken and observed for their ability to complete registration and login within 2 minutes (ER-2).
 
   \item \label{test-UH3} \textbf{Admin Dashboard and Form Building Usability}\\[2mm]
@@ -588,15 +597,15 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Access to admin account with no prior training.\\
     {\bf Input/Condition:} Admin creates a basic event form, and interprets analytics.\\
     {\bf Output/Result:} 10 users successfully create event forms, and illustrate correct understanding of analytics.\\
-    {\bf Covers:} SR-2, ER-3, PI-1, PI-2, LR-2\\
+    {\bf Covers:} SR2, ER3, PI1, PI2, LR2\\
     {\bf How test will be performed:} Admins are instructed to create a basic event form, and describe their understanding of the analytics dashboard. A minimum of 10 users will be assessed for successful form creation and understanding of analytics (ER-3/SR-2).
 
-  \item \label{test-UH4} \textbf{Undesrtandable Language and Clear Prompts}\\[2mm]
+  \item \label{test-UH4} \textbf{Understandable Language and Clear Prompts}\\[2mm]
     {\bf Type:} Manual, Dynamic\\
     {\bf Initial State:} All prompts implemented.\\
     {\bf Input/Condition:} Used in at least one MES event where users interact with app prompts and evaluate clarity of wording.\\
-    {\bf Output/Result:} 80\% of users complete survey and rate language as accetptable.\\
-    {\bf Covers:} UR-1, UR-2, UR-4, CL-1\\
+    {\bf Output/Result:} 80\% of users complete survey and rate language as acceptable.\\
+    {\bf Covers:} UR1, UR2, CR1\\
     {\bf How test will be performed:} After completing the registration process for the MES event, users will be prompted to complete a feedback survey, where they rate language clarity out of 5.
 
   \item \label{test-UH5} \textbf{Polite and Constructive Error Handling}\\[2mm]
@@ -604,26 +613,45 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Platform triggers common errors.\\
     {\bf Input/Condition:} User experiences error message and evaluate usefulness.\\
     {\bf Output/Result:} 80\% of users rate the experience as satisfying.\\
-    {\bf Covers:} UR-1, UR-2\\
+    {\bf Covers:} UR2\\
     {\bf How test will be performed:} Users will aim to fill out the forms for at least one MES event, and interact with error messages to direct the completion of the form. Afterwards, they will rate the usefulness of the error messages in a survey out of 5.
 
-  \item \label{test-UH6} \textbf{Accessability Conformance}\\[2mm]
+  \item \label{test-UH6} \textbf{Accessibility Conformance}\\[2mm]
     {\bf Type:} Automatic, Dynamic\\
     {\bf Initial State:} Fully configured UI themes.\\
     {\bf Input/Condition:} Web tool used to assess UI.\\
     {\bf Output/Result:} Design conforms to WCAG 2.0 and AODA requirements.\\
-    {\bf Covers:} AC-1\\
-    {\bf How test will be performed:} Automated web tools will be used to assess conformance to accessability standards (WebAIM).
+    {\bf Covers:} AC1\\
+    {\bf How test will be performed:} Automated web tools will be used to assess conformance to accessibility standards (WebAIM).
 \end{enumerate}
 
-\subsection{Performance}
+\subsubsection{Robustness and Fault Tolerance}
+\begin{enumerate}[label=\bfseries RF-\arabic*:, wide=0pt]
+  \item \label{test-RF1} \textbf{Survey Auto-Save Reliability}\\[2mm]
+    {\bf Type:} Automatic, Dynamic\\
+    {\bf Initial State:} A multi-question survey is open with partially filled responses.\\
+    {\bf Input/Condition:} Enter partial responses, wait at least one auto-save interval, then refresh or relaunch the client.\\
+    {\bf Output/Result:} Previously entered responses are restored and no completed-submission state is incorrectly triggered.\\
+    {\bf Covers:} FT1, FT2\\
+    {\bf How test will be performed:} Use automated browser/device tests to compare field values before and after refresh and confirm state persistence.
+
+  \item \label{test-RF2} \textbf{Template Update Resilience}\\[2mm]
+    {\bf Type:} Automatic, Dynamic\\
+    {\bf Initial State:} Admin and attendee traffic is active in staging.\\
+    {\bf Input/Condition:} Add or update templates/modules while concurrent sessions are active.\\
+    {\bf Output/Result:} Update succeeds, new template state is reflected correctly, and active sessions are not disrupted.\\
+    {\bf Covers:} FT3, FT4\\
+    {\bf How test will be performed:} Run concurrent update and usage scenarios, then verify both update correctness and uninterrupted user operations.
+\end{enumerate}
+
+\subsubsection{Performance}
 \begin{enumerate}[label=\bfseries PF-\arabic*:, wide=0pt]
   \item \label{test-PF1} \textbf{Form Latency}\\[2mm]
     {\bf Type:} Automatic, Dynamic\\
     {\bf Initial State:} Platform open on variety of devices (iOS, Android, Windows).\\
     {\bf Input/Condition:} Loading event forms.\\
     {\bf Output/Result:} Measured Time to First Byte (TTFB) will be less than 2 seconds.\\
-    {\bf Covers:} SL-1, IR-1, IR-2, PD-1, PD-2, AD-1, AD-2\\
+    {\bf Covers:} SL1, MSAR1, MSAR2\\
     {\bf How test will be performed:} App will be opened on distinct devices, and the according browser developer tools and APM's will be used to measure whether form loading latency meets performance requirements.
 
   \item \label{test-PF2} \textbf{Data and Analytics Latency}\\[2mm]
@@ -631,7 +659,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Admin dashboard open on variety of devices (iOS, Android, Windows).\\
     {\bf Input/Condition:} Loading data analytics and performing filtering queries.\\
     {\bf Output/Result:} Measured Time to First Byte (TTFB) using browser developer tools and APM's.\\
-    {\bf Covers:} SL-2, IR-1, IR-2, PD-1, PD-2\\
+    {\bf Covers:} SL2, PA1\\
     {\bf How test will be performed:} App will be opened on distinct devices, and the according browser developer tools and APM's will be used to measure whether analytics latency meets performance requirements.
 
   \item \label{test-PF4} \textbf{Wide User and Data Capacity}\\[2mm]
@@ -639,21 +667,8 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Fully configured user access.\\
     {\bf Input/Condition:} Stress tool used to simulate high traffic.\\
     {\bf Output/Result:} Assess tool results to determine platform performance and bottlenecks.\\
-    {\bf Covers:} CR-1, CR-2\\
+    {\bf Covers:} SE1\\
     {\bf How test will be performed:} Load and stress tools (JMeter, DevTools) will be used to determine performance capacity of the app and areas of improvement to increase limitations.
-
-{Untested Requirements}
-\begin{itemize}
-    \item \textbf{Safety Critical (SC-1):} Verified by \textbf{Test-FR-AP-2}, which compare dashboard values to backend analytics and exported reports.
-
-    \item \textbf{Precision or Accuracy (PA-1):}Verified by \textbf{Test-FR-AP-2} and \textbf{Test-FR-AP-4}, which compare dashboard values to backend analytics and exported reports.
-
-    \item \textbf{Robustness or Fault Tolerance (PA-1, PA-2, PA-3, PA-4):} Verified by \textbf{Test-FR-SI-1}, which tests data synchronization and ensures all updates are saved and automatically viewable.
-
-    \item \textbf{Scalability or Extensibility (SE-2):} Verified through code review. This is not directly measureable through system testing.
-
-    \item \textbf{Longevity (LG-2):} \textbf{Test-FR-AP-4} confirms the report/export function.
-\end{itemize}
 
 \end{enumerate}
 
@@ -664,7 +679,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Completion of basic prototype.\\
     {\bf Input/Condition:} Give MES representative access to prototype.\\
     {\bf Output/Result:} Receive approval.\\
-    {\bf Covers:} RR-1\\
+    {\bf Covers:} RR1\\
     {\bf How test will be performed:} The MES representative will be given access to the basic prototype, and a meeting will be held to receive their approval on whether it meets expectations for the initial release.
 \end{enumerate}
 
@@ -675,7 +690,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Latest release of product available.\\
     {\bf Input/Condition:} Developer references product documentation.\\
     {\bf Output/Result:} Documentation will be followed to add new features or correct errors.\\
-    {\bf Covers:} MT-1\\
+    {\bf Covers:} MSMR1\\
     {\bf How test will be performed:} Developers will follow documentation to identify the changes made with each release and direct future modification processes.
 
   \item \label{test-MS2} \textbf{FAQ Coverage}\\[2mm]
@@ -683,8 +698,16 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Published FAQ section.\\
     {\bf Input/Condition:} Crosscheck FAQ postings with stakeholder/representative questions.\\
     {\bf Output/Result:} Listing of ideal postings for FAQ section.\\
-    {\bf Covers:} SU-1\\
+    {\bf Covers:} MSSR1\\
     {\bf How test will be performed:} Compile stakeholder feedback and survey results and compare to FAQ section to validate inclusion of pertinent topics.
+
+  \item \label{test-MS3} \textbf{Extensibility and Maintainability Review}\\[2mm]
+    {\bf Type:} Manual, Static\\
+    {\bf Initial State:} Current architecture and module boundaries are documented.\\
+    {\bf Input/Condition:} Perform a structured review by adding a small analytics extension in a feature branch and evaluating integration effort and isolation of changes.\\
+    {\bf Output/Result:} Extension can be integrated without large refactors, and architecture/docs remain maintainable across framework updates.\\
+    {\bf Covers:} SE2, LG1, LG2\\
+    {\bf How test will be performed:} Use review checklist and change-scope metrics (files touched, coupling points) to assess extensibility and maintainability.
 \end{enumerate}
 
 \subsubsection{Security}
@@ -695,7 +718,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Access to app with authentication configured to McMaster emails.\\
     {\bf Input/Condition:} Attempt login with non-McMaster and McMaster emails.\\
     {\bf Output/Result:} Only authorized users pass. Any invalid attempts are logged for admin to view\\
-    {\bf Covers:} AC-1\\
+    {\bf Covers:} SAR1\\
     {\bf How test will be performed:} App login will be tested with valid and invalid email addresses. Only the valid should be able to access the app. The invalid attempt should be logged in history.\\
 
   \item \label{test-ST2} \textbf{HTTPS-Limited Communication}\\[2mm]
@@ -703,7 +726,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} TLS configured domain.\\
     {\bf Input/Condition:} Attempt HTTP connections and inspect traffic.\\
     {\bf Output/Result:} All HTTP traffic redirects to HTTPS.\\
-    {\bf Covers:} IG-2\\
+    {\bf Covers:} SIR2\\
     {\bf How test will be performed:} Different connections from different devices will be attempted, followed by inspections of the browser logs to verify correct use of HTTPS.\\
 
   \item \label{test-ST3} \textbf{Personal Data Deletion}\\[2mm]
@@ -711,7 +734,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} User account already made with personal data stored in database.\\
     {\bf Input/Condition:} Submit a request to delete data through the app.\\
     {\bf Output/Result:} All personal data removed fairly in accordance with policy.\\
-    {\bf Covers:} PV-1\\
+    {\bf Covers:} SPR1\\
     {\bf How test will be performed:} User will create an account, and request deletion after confirming its data was stored in the database. After alleged deletion, query the database to verify complete removal of data.\\
 
   \item \label{test-ST4} \textbf{Secure Data Encryption (AES-256)}\\[2mm]
@@ -719,7 +742,7 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} No account created yet.\\
     {\bf Input/Condition:} Send account information to database.\\
     {\bf Output/Result:} Data entry is fully encrypted with no plaintext values.\\
-    {\bf Covers:} PV-2, PV-3\\
+    {\bf Covers:} SPR2, SPR3\\
     {\bf How test will be performed:} Test account will be created, followed by an inspection of the data entry to ensure competent encryption.\\
 
   \item \label{test-ST5} \textbf{Detailed Admin Audit Log}\\[2mm]
@@ -727,34 +750,27 @@ The following will outline system tests for the nonfunctional requirements highl
     {\bf Initial State:} Audit logging fully enabled.\\
     {\bf Input/Condition:} Perform different admin actions (create, update, delete, export).\\
     {\bf Output/Result:} Each action recorded with actor, timestamp, and action type.\\
-    {\bf Covers:} AU-1\\
+    {\bf Covers:} SAuR1\\
     {\bf How test will be performed:} Replay test scenarios and confirm completeness and accuracy of logs.\\
-
-{Untested Requirements}
-\begin{itemize}
-    \item \textbf{Access (AC-2):} Verified by \textbf{Test-FR-SI-2}, which ensures restriction of data based on permissions.
-
-    \item \textbf{Integrity (IG-1):}Verified by \textbf{Test-FR-SI-1}, which covers data synchronization and accuracy of inputs.
-\end{itemize}
 
 \end{enumerate}
 
 \subsubsection{Compliance}
-\begin{enumerate}[label=\bfseries ST-\arabic*:, wide=0pt]
-  \item \label{test-ST1} \textbf{Updated Product Documentation}\\[2mm]
+\begin{enumerate}[label=\bfseries CM-\arabic*:, wide=0pt]
+  \item \label{test-CM1} \textbf{PIPEDA Compliance Validation}\\[2mm]
     {\bf Type:} Manual, Static\\
-    {\bf Initial State:} Latest release of product available.\\
-    {\bf Input/Condition:} Developer references product documentation.\\
-    {\bf Output/Result:} Documentation will be followed to add new features or correct errors.\\
-    {\bf Covers:} MT-1\\
-    {\bf How test will be performed:} Developers will follow documentation to identify the changes made with each release and direct future modification processes.
+    {\bf Initial State:} Data handling flows and privacy controls are documented.\\
+    {\bf Input/Condition:} Perform checklist-based review of collection, consent, storage, access, and deletion controls against PIPEDA-aligned criteria.\\
+    {\bf Output/Result:} Compliance checklist passes or produces actionable remediation items with owners.\\
+    {\bf Covers:} CLR1, CSCR1\\
+    {\bf How test will be performed:} Security/compliance reviewer traces implemented controls to policy checklist and records evidence links.
 \end{enumerate}
 
 
 ...
 
 \subsection{Traceability Between Test Cases and Requirements}
-
+These tests have traceability with our SRS document which can be found at the following link: \href{https://github.com/VirochaanRG/MES-Event-Management-System/blob/main/docs/SRS/SRS.pdf}{SRS Document}
 \begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
@@ -781,27 +797,34 @@ Test-FR-SI-2 & FR-11 \\
 \hline
 \textbf{Test ID} & \textbf{Nonfunctional Requirements Covered} \\
 \hline
-Test-NFR-LF-1 & AR-1 \\
-Test-NFR-LF-2 & AR-2, SR-1 \\
-Test-NFR-LF-3 & AR-3, SR-2, FT-5 \\
-Test-NFR-UH-1 & ER-1, LR-1 \\
-Test-NFR-UH-2 & ER-2 \\
-Test-NFR-UH-3 & SR-2, ER-3, PI-1, PI-2, LR-2 \\
-Test-NFR-UH-4 & UR-1, UR-2, UR-4, CL-1 \\
-Test-NFR-UH-5 & UR-1, UR-2 \\
-Test-NFR-UH-6 & AC-1 \\
-Test-NFR-PF-1 & SL-1, IR-1, IR-2, PD-1, PD-2, AD-1, AD-2 \\
-Test-NFR-PF-2 & SL-2, IR-1, IR-2, PD-1, PD-2 \\
-Test-NFR-PF-4 & CR-1, CR-2 \\
-Test-NFR-OE-1 & RR-1 \\
-Test-NFR-MS-1 & MT-1 \\
-Test-NFR-MS-2 & SU-1 \\
-Test-NFR-ST-1 & AC-1 \\
-Test-NFR-ST-2 & IG-2 \\
-Test-NFR-ST-3 & PV-1 \\
-Test-NFR-ST-4 & PV-2, PV-3 \\
-Test-NFR-ST-5 & AU-1 \\
-Test-NFR-CM-1 & MT-1 \\
+Test-NFR-LF-1 & AR1 \\
+Test-NFR-LF-2 & AR2, SR1 \\
+Test-NFR-LF-3 & AR3, SR2, FT5 \\
+Test-NFR-UH-1 & ER1, LR1 \\
+Test-NFR-UH-2 & ER2 \\
+Test-NFR-UH-3 & SR2, ER3, PI1, PI2, LR2 \\
+Test-NFR-UH-4 & UR1, UR2, CR1 \\
+Test-NFR-UH-5 & UR2 \\
+Test-NFR-UH-6 & AC1 \\
+Test-NFR-RF-1 & FT1, FT2 \\
+Test-NFR-RF-2 & FT3, FT4 \\
+Test-NFR-PF-1 & SL1, MSAR1, MSAR2 \\
+Test-NFR-PF-2 & SL2, PA1 \\
+Test-NFR-PF-4 & SE1 \\
+Test-NFR-OE-1 & RR1 \\
+Test-NFR-MS-1 & MSMR1 \\
+Test-NFR-MS-2 & MSSR1 \\
+Test-NFR-MS-3 & SE2, LG1, LG2 \\
+Test-NFR-ST-1 & SAR1 \\
+Test-NFR-ST-2 & SIR2 \\
+Test-NFR-ST-3 & SPR1 \\
+Test-NFR-ST-4 & SPR2, SPR3, SC1 \\
+Test-NFR-ST-5 & SAuR1 \\
+Test-FR-SI-2 & SAR2, UR3 \\
+Test-FR-AP-1 & SIR1 \\
+Test-FR-AA-1 & SIR1 \\
+Test-FR-AA-3 & SIR1 \\
+Test-NFR-CM-1 & CLR1, CSCR1 \\
 \hline
 \end{tabular}
 \caption{Mapping of System Tests to Nonfunctional Requirements}
@@ -824,7 +847,7 @@ Test-NFR-CM-1 & MT-1 \\
   \item \textbf{M1 - Main System Module}: This is primarily an orchestration layer connecting multiple modules. It is better validated through integration and end-to-end workflows where inter-module data flow and correct behaviour can be better recognized and evaluated.
   \item \textbf{M3 - User Authorization Module}: Authorization behavior depends on authenticated identity, role policies, and protected-route integration. It is validated through role-based access system tests that confirm real permission boundaries across modules.
   \item \textbf{M7 - Event Notification Module}: Notification delivery relies on external providers and environment configuration. Validation is performed through integration and system tests that confirm trigger-to-delivery behavior rather than isolated local unit tests.
-  \item \textbf{M10 - Report Generation Module}: Report quality depends on aggregated cross-module data and formatting/export pipelines. It is validated through functional/system analytics export tests that assess completeness and ensure the outputted files are of the correct formatt.
+  \item \textbf{M10 - Report Generation Module}: Report quality depends on aggregated cross-module data and formatting/export pipelines. It is validated through functional/system analytics export tests that assess completeness and ensure the outputted files are of the correct format.
   \item \textbf{M11 - Analytics Module}: The testing for this module is integrated within the system tests of the report generation module due to the closely linked nature of the two modules.
   \item \textbf{M12 - Database Access Module}: This module is exercised indirectly by all API unit tests and integration tests.
   \item \textbf{M13 - Audit Module}: Audit reliability is most meaningful in real admin workflows. It is validated through security/system tests that verify action coverage and ensuring proper authorized users are performing the actual actions.
@@ -1015,7 +1038,7 @@ The main challenge was keeping the content concise and focused instead of diving
   \item \textbf{What went well while writing this deliverable?} \\
   Based on what was written in each section of the verification plan, I was able to come up with a ready to use and exhaustive checklist of ways to verify that our design follows the outlined plan. These checklists may be useful in the future when performing unit testing, stakeholder reviews, etc.
   \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
-  It was very difficult to come up with an exhaustive list of things that needed verification, people who need to be involved in verification, and steps to complete it due to the large scale of the system. This issue was mitigated by consistenly referencing and thoroughly checking older documents such as the development plan, SRS, and hazard analysis to ensure nothing was missed.
+  It was very difficult to come up with an exhaustive list of things that needed verification, people who need to be involved in verification, and steps to complete it due to the large scale of the system. This issue was mitigated by consistently referencing and thoroughly checking older documents such as the development plan, SRS, and hazard analysis to ensure nothing was missed.
 \end{enumerate}
 
 \subsubsection*{Omar Al-Asfar Reflection}
@@ -1024,7 +1047,7 @@ The main challenge was keeping the content concise and focused instead of diving
 The process of writing out NFR tests went well due to having a finalized SRS. The groundwork for identifying key system functionalities and requirements was already in place. This allowed us to efficiently translate those requirements into clear and structured test cases, allowing us to exhibit traceability and better organize both nonfunctional system tests.
 
 \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \
-A noteable challenge was connecting all the tests for the nonfunctional and functional requirements without causing overlap or redundancy. Many of the NFRs would have already been covered in the tests for functinal requirements, so there was a lot of retracing steps in order to dictate which NFRs remained to be tested. Each test needed to have a distinct purpose while still providing competent coverage. By exention, also ensuring that the tests were feasible, but still good enough to satisfy the criteria was slightly difficult as we want to ensure the testing remains within the scope of the project.
+A notable challenge was connecting all the tests for the nonfunctional and functional requirements without causing overlap or redundancy. Many of the NFRs would have already been covered in the tests for functional requirements, so there was a lot of retracing steps in order to dictate which NFRs remained to be tested. Each test needed to have a distinct purpose while still providing competent coverage. By extension, also ensuring that the tests were feasible, but still good enough to satisfy the criteria was slightly difficult as we want to ensure the testing remains within the scope of the project.
 \end{enumerate}
 
 \end{document}
