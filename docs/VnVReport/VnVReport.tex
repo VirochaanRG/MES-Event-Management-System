@@ -333,7 +333,10 @@ This section will not be appropriate for every project.
 
 Unit testing was performed across all backend APIs for both admin and user servers, including Events, Forms, Authentication, and Images. Over 80 test cases were conducted, focusing on input validation, error handling, and data integrity. All tests passed successfully, indicating the robustness of the backend functionality. The following tables summarize the unit tests conducted for each API.
 
-\subsection{Admin Server Testing - Events API}
+\subsection{Admin Server Testing}
+The following unit tests validate admin backend functionality, including CRUD operations and error handling.
+
+\subsubsection{Events API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -411,7 +414,7 @@ TC32 & PATCH /api/events/:id/qr-check-in - Return 404 when event not found & 404
 
 {\small \textit{Table: Events API Unit Tests}}
 
-\subsection{Admin Server Testing - Forms API}
+\subsubsection{Forms API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -443,7 +446,7 @@ TC41 & PUT /api/forms/:id - Return 404 when form not found & 404 error response 
 
 {\small \textit{Table: Forms API Unit Tests}}
 
-\subsection{Admin Server Testing - Form Builder API}
+\subsubsection{Form Builder API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -471,7 +474,7 @@ TC48 & DELETE /api/forms/:formId/questions/:questionId - Return 404 when questio
 
 {\small \textit{Table: Form Builder API Unit Tests}}
 
-\subsection{Admin Server Testing - Images API}
+\subsubsection{Images API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{5cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{3.25cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -501,7 +504,10 @@ TC56 & GET /api/images/:component/:index - Return 404 when image not found & 404
 
 {\small \textit{Table: Images API Unit Tests}}
 
-\subsubsection{User Server Testing - Authentication API}
+\subsection{User Server Testing}
+The following unit tests validate user backend functionality, including authentication, event interaction, and form submissions.
+
+\subsubsection{Authentication API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -525,7 +531,7 @@ TC61 & POST /api/auth/logout - Clear authentication token & 200 status with succ
 
 {\small \textit{Table: Authentication API Unit Tests}}
 
-\subsubsection{User Server Testing - Events API}
+\subsubsection{Events API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -555,7 +561,7 @@ TC69 & POST /api/events/:id/register - Return 400 for duplicate registrations & 
 
 {\small \textit{Table: Events API Unit Tests (User Server)}}
 
-\subsubsection{User Server Testing - Forms API}
+\subsubsection{Forms API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
@@ -585,7 +591,7 @@ TC77 & PATCH /api/forms/:fid/submit/:uid - Submit completed form & 200 status wi
 
 {\small \textit{Table: Forms API Unit Tests (User Server)}}
 
-\subsubsection{User Server Testing - Images API}
+\subsubsection{Images API}
 
 \noindent
 \begin{longtable}{|>{\raggedright\arraybackslash}p{1cm}|>{\raggedright\arraybackslash}p{4.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}p{1.5cm}|}
