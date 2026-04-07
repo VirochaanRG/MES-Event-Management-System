@@ -21,42 +21,6 @@
 \maketitle
 
 \section{Changes in Response to Feedback}
-
-\plt{Summarize the changes made over the course of the project in response to
-feedback from TAs, the instructor, teammates, other teams, the project
-supervisor (if present), and from user testers.}
-
-\plt{For those teams with an external supervisor, please highlight how the feedback 
-from the supervisor shaped your project.  In particular, you should highlight the 
-supervisor's response to your Rev 0 demonstration to them.}
-
-\plt{Version control can make the summary relatively easy, if you used issues
-and meaningful commits.  If you feedback is in an issue, and you responded in
-the issue tracker, you can point to the issue as part of explaining your
-changes.  If addressing the issue required changes to code or documentation, you
-can point to the specific commit that made the changes.  Although the links are
-helpful for the details, you should include a label for each item of feedback so
-that the reader has an idea of what each item is about without the need to click
-on everything to find out.}
-
-\plt{If you were not organized with your commits, traceability between feedback
-and commits will not be feasible to capture after the fact.  You will instead
-need to spend time writing down a summary of the changes made in response to
-each item of feedback.}
-
-\plt{You should address EVERY item of feedback.  A table or itemized list is
-recommended.  You should record every item of feedback, along with the source of
-that feedback and the change you made in response to that feedback.  The
-response can be a change to your documentation, code, or development process.
-The response can also be the reason why no changes were made in response to the
-feedback.  To make this information manageable, you will record the feedback and
-response separately for each deliverable in the sections that follow.}
-
-\plt{If the feedback is general or incomplete, the TA (or instructor) will not
-be able to grade your response to feedback.  In that case your grade on this
-document, and likely the Revision 1 versions of the other documents will be
-low.} 
-
 \subsection{SRS and Hazard Analysis}
 \subsubsection{SRS}
 
@@ -350,8 +314,9 @@ Usability testing directly influenced our UI design,
 \section{Design Decisions}
 
  \subsection{Limitations}
-There were no identifiable limitations. All design decisions were based on
-assumptions and constraints.
+The system is built on a synchronous REST API architecture, which means it does not support real-time data propagation. Changes made by an admin are not automatically propogate meaning users must refresh or re-navigate to see updated state, which is a functional boundary of the current implementation rather than a deliberate design preference.
+
+The form builder supports conditional section unlocking based on prior responses, but this branching logic is linear. It cannot support complex non-linear branching where multiple prior responses across different sections combine to determine which content is shown next. This limits the expressiveness of surveys that require more sophisticated conditional flows.
 
  \subsection{Assumptions}
 Certain assumptions about event-day proceedings have influenced how we track and
@@ -415,33 +380,40 @@ open source project, how would you go about attracting users?  How many potentia
 users currently exist?}
 
 \section{Reflection on Project Management (LO24)}
-
-\plt{This question focuses on processes and tools used for project management.}
-
 \subsection{How Does Your Project Management Compare to Your Development Plan}
-
-\plt{Did you follow your Development plan, with respect to the team meeting plan, 
-team communication plan, team member roles and workflow plan.  Did you use the 
-technology you planned on using?}
+When comparing the original Development Plan to the our actual Project Management we managed to stick to certain aspects of the plan but there were some discrepancies. \newline
+\newline
+For the team management and communication plan we did have weekly meetings within our team but they were done through discord rather than Teams. We found discord was a better faster alternative and was easier to use for most purposes. We decided that the meetings did not have to be too formal as specified in the plan but we did ensure we covered the main topic as seen in each meeting. We also use discord for meeting with our supervisor as we were in a discord server with him for quick and easy communication.
+\newline\newline
+The team member roles were overall pretty effective especially when we wanted to start the devleopment process. We ensured that after we got into development though we had crossover in some of the responsibilities so team members could get experience in other areas of development as well to improve our overall experience during this project. The project management roles assigned were also effective in ensuring we stayed on track during meetings and when completing deliverables.
+\newline\newline
+The workflow plan we used was essentielly followed except we decided to forgo making unit tests on each pull request and decided this would be done during the testing stage of the project.
+\newline\newline
+Our expected technology essentielly stayed the same as it was constrained upon us by our supervisor. The one change that we decided was that instead of Next.Js we would use Vite which is a more lightweight framework allowing for faster development and deploying. To accompany that we had to use Vitest as our testing library in conjunction with Jest.
 
 \subsection{What Went Well?}
 
-The team's communication structure worked effectively throughout the project. Discord provided a low-friction channel for day-to-day discussion, while GitHub Issues ensured that action items from meetings were captured and traceable. The Kanban board gave the team a shared, up-to-date view of task status, which reduced ambiguity about who was responsible for what and what remained to be done. Switching from Teams to Discord I think was a good decision as it was a tool we had more familiarity with and also gave us quicker communication times and faster and easier ways to meet and call quickly.
-
-The division of roles based on individual interest and prior experience also proved beneficial. Because team members self-selected into areas they were comfortable with, onboarding to the relevant technologies was faster and the quality of output in each area was higher. The designated Reviewer role ensured that deliverables were consistently checked before submission, which improved overall quality. CI/CD through GitHub Actions was effective once configured, automatically enforcing code style and running tests on code being merged in. Though this was a new tool for many of us we found that it was a good decision to utilize it as it helped stop many errors in the long run.
-
-The tech Stack that we used was also very useful. It got us up and running quite quickly and was very easy to develop and debug with. Specifically the choice of Vite though imposed on us was a blessing in disguise as we managed to develop quickly with the help of the Hot Reload functionality allowing us to see the changes in real-time. Using built in styling libraries through TailWind also saved us a lot of time
+The team's communication structure worked effectively throughout the project. Discord provided a low-friction channel for day-to-day discussion, while GitHub Issues ensured that action items from meetings were captured and traceable. The Kanban board gave the team a shared, up-to-date view of task status, which reduced ambiguity about who was responsible for what and what remained to be done. Switching from Teams to Discord I think was a good decision as it was a tool we had more familiarity with and also gave us quicker communication times and faster and easier ways to meet and call quickly. \newline\newline
+When looking at it from a process point of view having standardized requirements very early on made it super easy for us to develop and since they didn't change it gave us ample time to implement the. Having solid requirements was a real boon in this project and having good communication with our supervisor who could help clarify or flesh out requirements helped us immensely during the development process.
+\newline\newline
+The division of roles based on individual interest and prior experience also proved beneficial. Because team members self-selected into areas they were comfortable with, onboarding to the relevant technologies was faster and the quality of output in each area was higher. Even though there was some crossover in who worked on what having the roles at the start made it easier to start the development process. The designated Reviewer role ensured that deliverables were consistently checked before submission, which improved overall quality. CI/CD through GitHub Actions was effective once configured, automatically enforcing code style and running tests on code being merged in. Though this was a new tool for many of us we found that it was a good decision to utilize it as it helped stop many errors in the long run.
+\newline\newline
+The tech Stack that we used was also very useful. It got us up and running quite quickly and was very easy to develop and debug with. Specifically the choice of Vite though imposed on us was a blessing in disguise as we managed to develop quickly with the help of the Hot Reload functionality allowing us to see the changes in real-time. Using built in styling libraries through TailWind also saved us a lot of time and made our design look better and more consistent.
 \subsection{What Went Wrong?}
 
 The initial setup of the CI/CD pipeline required more time and effort than anticipated. Team members with less prior exposure to GitHub Actions found the configuration process unintuitive, and debugging failed workflow runs introduced delays early in the development phase. This overhead temporarily slowed progress on technical deliverables.
-
-Additionally, coordinating across three Capstone teams introduced integration challenges that were difficult to anticipate during the planning phase. 
+\newline\newline
+The complexity of the form builder and event registration components was consistently underestimated at the planning stage. Both features required significant custom design work: the form builder needed to support modular, reusable survey sections with conditional unlocking logic, and the event registration system needed to integrate QR code generation with attendance tracking. We wanted to have this ready for Rev0 but since we built this in-house it wasn't fully ready. This extended the development timeline for both components well beyond initial estimates, and required revisiting some architecture decisions partway through implementation.
+\newline\newline
+Automated testing was not integrated into the development workflow as early as it should have been. Because tests were written primarily toward the end of the project rather than alongside feature development, some edge cases and regressions were caught later than they could have been. This also meant that the CI/CD pipeline was not fully leveraged for quality assurance during the most active development period, reducing its practical value until the project was nearly complete.
 
 \subsection{What Would you Do Differently Next Time?}
 
-For future projects, the team would invest more time upfront in configuring and testing the CI/CD pipeline before development begins in earnest, rather than setting it up incrementally alongside feature work. Providing a brief onboarding session for all team members on GitHub Actions would reduce the learning curve and prevent early delays.
+For future projects, the team would invest more time upfront in configuring and testing the CI/CD pipeline before development begins in earnest, rather than setting it up incrementally alongside feature work. Also having testing better integrated with the workflow and development process would probably more akin to a real world environment and provide us with an easier time integrating new changes. From a technical development perspective, we would have liked to have all our features done in a crude implementation for our POC or Rev0 demonstrations so we could expand or add more features for our Rev1. This would have really helped us push and try and achieve the strech goals we set at the start of the project.
+\newline\newline
+Also in general we would like to have better team coordination and communication. Though it wasn't a big obstacle to our success having more consistent formal meetings rather than our informal discussions could have proven useful in ensuring that we all on the same track. Doing this would have also helped ensure we could track progress more effectively and been a bit more organized.
 
-When collaborating with multiple external teams, we would also establish shared interface contracts and integration milestones earlier, rather than relying primarily on periodic sync meetings. Formalizing the API boundaries and data formats between teams at the outset would reduce the risk of incompatibility issues later in the project. Finally, we would build more buffer into task estimates for novel or technically complex features, based on the lessons learned from the form builder and event registration components.
+
 
 \section{Ethics and Equity (LO18)}
 
