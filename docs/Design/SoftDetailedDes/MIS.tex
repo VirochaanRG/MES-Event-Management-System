@@ -80,6 +80,9 @@ urlcolor=cyan          % color of external links
 November 13, 2025 & 1.0 & Revision -1\\
 January 21, 2026 & 1.1 & Revision 0: Added formal state and transition specifications.\\
 January 21, 2026 & 1.1 & Revision 0: Added all reflections and grammar fixes, removed all scaffolding.\\
+April 6, 2026 & Rev1& Peer Review 142, Fixed Module 5 section 10.3.2 to have an output have responseID\\
+April 6, 2026 & Rev1& Peer Review 147, Fixed uses for all modules to ensure proper use hierarchy\\
+April 6, 2026 & Rev1& Peer Review 152 and 148, Covered all the Modules to ensure proper edge case exception handling and correct access routines\\
 \bottomrule
 \end{tabularx}
 
@@ -200,7 +203,7 @@ Acts as the entry point for all other modules
 
 \subsection{Uses}
 
-Acts as the entry point for M\ref{m2}, M\ref{m4}, M\ref{m6}, M\ref{m10}.
+Acts as the entry point for M\ref{m2}, M\ref{m4}, M\ref{m6}, M\ref{m10}. Uses M\ref{m12} and M\ref{m13}.
 
 \subsection{Syntax}
 
@@ -240,11 +243,11 @@ None
 
 \subsection{Module}
 
-Contains functionality for authenticating users and registering new users. \textbf{Note: Parts of this module was defined using discrete math.}
+Contains functionality for authenticating users and registering new users. \textbf{Note: Parts of this module were defined using discrete math.}
 
 \subsection{Uses}
 
-None
+Uses M\ref{m1} for integration and coordination.
 
 \subsection{Syntax}
 
@@ -259,13 +262,13 @@ None
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\texttt{attemptLogin} & \texttt{username : string } \newline \texttt{password : string} & \texttt{sessionCookie : Cookie} & None \\
+\texttt{attemptLogin} & \texttt{username : string } \newline \texttt{password : string} & \texttt{sessionCookie : Cookie} & \texttt{InvalidInput} \newline \texttt{InvalidCredentials} \\
 \hline
 \texttt{logout} & \texttt{sessionCookie : Cookie }  & None & \texttt{InvalidSession} \\
 \hline
 \texttt{validateSession} & \texttt{sessionCookie : Cookie} & \texttt{sessionIsValid : bool} & None\\
 \hline
-\texttt{registerUser} & \texttt{username : string } \newline \texttt{password : string} & \texttt{registrationSuccessful : bool} & None \\
+\texttt{registerUser} & \texttt{username : string } \newline \texttt{password : string} & \texttt{registrationSuccessful : bool} & \texttt{InvalidInput} \newline \texttt{UnauthorizedRegistration} \newline \texttt{UsernameTaken} \\
 \hline
 \end{tabularx}
 \end{center}
@@ -284,6 +287,7 @@ None
 \subsubsection{Assumptions}
 
 Passwords are encrypted before storage.
+Only users that satisfy the system registration policy are allowed to create accounts.
 
 \subsubsection{Access Routine Semantics}
 
@@ -292,7 +296,7 @@ Attempts a login given a username and password.
 \begin{itemize}
 \item transition: If \texttt{tuple(username, password) $\in$ credentials}, then \texttt{sessions := sessions $\cup$ set(generateCookie(username))}
 \item output: Cookie containing session data to be sent back to the client
-\item exception: None
+\item exception: \texttt{InvalidInput} if username or password is empty or malformed. \texttt{InvalidCredentials} if \texttt{tuple(username, password)} is not in \texttt{credentials}.
 \end{itemize}
 
 \noindent \texttt{logout(sessionCookie: Cookie)}: \\
@@ -304,7 +308,7 @@ Logs the specified user out.
 \end{itemize}
 
 \noindent \texttt{validateSession(sessionCookie: Cookie)}: \\
-Validates and refreshes a users session.
+Validates and refreshes a user's session.
 \begin{itemize}
 \item transition: If \texttt{sessionCookie $\in$ sessions}, then \texttt{sessionCookie.lastRefresh := currentTime}
 \item output: Boolean indicating if sessionCookie exists in \texttt{sessions}
@@ -314,14 +318,22 @@ Validates and refreshes a users session.
 \noindent \texttt{registerUser(username : string, password : string)}: \\
 Registers a new user to the database of users.
 \begin{itemize}
-\item transition: \texttt{credentials := credentials $\cup$ set(tuple(username, password))}
+\item transition: If the request satisfies validation and registration policy checks, then \texttt{credentials := credentials $\cup$ set(tuple(username, password))}
 \item output: Boolean stating whether registration was successful
-\item exception: None
+\item exception: \texttt{InvalidInput} if username or password does not satisfy format and policy requirements. \texttt{UnauthorizedRegistration} if the requester is not allowed to self-register under system policy. \texttt{UsernameTaken} if the username already exists in \texttt{credentials}.
 \end{itemize}
 
 \subsubsection{Local Functions}
 
-\noindent \texttt{generateCookie(username : stiring)}: \\
+\noindent \texttt{isAuthorizedRegistrant(username : string)}: \\
+Checks whether a registration request is permitted by system policy.
+\begin{itemize}
+\item transition: None
+\item output: Boolean indicating whether the requester may register
+\item exception: None
+\end{itemize}
+
+\noindent \texttt{generateCookie(username : string)}: \\
 Generates a cookie for a user.
 \begin{itemize}
 \item transition: None
@@ -435,7 +447,7 @@ Contains functionality for creating and linking form modules.
 
 \subsection{Uses}
 
-Uses M\ref{m3} to check for form managment permissions.
+Uses M\ref{m2} for coordination and integration.
 
 \subsection{Syntax}
 
@@ -448,19 +460,19 @@ Uses M\ref{m3} to check for form managment permissions.
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\texttt{createModule} & \texttt{moduleTitle : string} \newline \texttt{questions : list(Question)} & \texttt{module : FormModule} & None \\
+\texttt{createModule} & \texttt{moduleTitle : string} \newline \texttt{questions : list(Question)} & \texttt{module : FormModule} & \texttt{InvalidInput} \newline \texttt{DuplicateModuleTitle} \\
 \hline
 \texttt{deleteModule} & \texttt{moduleId : $\mathbb{N}$} & None & \texttt{InvalidModule} \\
 \hline
 \texttt{editModule} & \texttt{moduleId : $\mathbb{N}$} \newline \texttt{newModuleName : string} \newline \texttt{newQuestions : list(Question)} & None & \texttt{InvalidModule}  \\
 \hline
-\texttt{copyModule} & \texttt{moduleId : $\mathbb{N}$} & \texttt{copiedModule : FormModule } & \texttt{InvalidModule} \\
+\texttt{copyModule} & \texttt{moduleId : $\mathbb{N}$} & \texttt{copiedModule : FormModule } & \texttt{InvalidModule} \newline \texttt{DuplicateModuleTitle} \\
 \hline
 \texttt{getModules} & None & \texttt{modules : set(FormModule)} & None  \\
 \hline
 \texttt{linkQuestion} & \texttt{question : Question} \newline \texttt{linkedModule: list(string)} & None & \texttt{InvalidModule} \newline \texttt{IllegalArgument} \\
 \hline
-\texttt{createForm} & \texttt{formName : string} \newline \texttt{startingModuleId : $\mathbb{N}$} \newline \texttt{formSettings : map(string, string)}  & Form & None \\
+\texttt{createForm} & \texttt{formName : string} \newline \texttt{startingModuleId : $\mathbb{N}$} \newline \texttt{formSettings : map(string, string)}  & Form & \texttt{InvalidInput} \newline \texttt{InvalidModule} \newline \texttt{DuplicateFormTitle} \\
 \hline
 \texttt{deleteForm} & \texttt{formId : $\mathbb{N}$} & None & \texttt{InvalidForm} \\
 \hline
@@ -496,7 +508,7 @@ Creates a new module given a title and a list of questions.
 \begin{itemize}
 \item transition: Inserts the created module into \texttt{modules}
 \item output: The created FormModule
-\item exception: None
+\item exception: \texttt{InvalidInput} if moduleTitle is empty or questions are malformed. \texttt{DuplicateModuleTitle} if a module with the same title already exists.
 \end{itemize}
 
 \noindent \texttt{deleteModule(moduleId : $\mathbb{N}$)}: \\
@@ -520,7 +532,7 @@ Copies an existing module.
 \begin{itemize}
 \item transition: Creates a copy of the given module with a different module ID, then inserts it into \texttt{modules}
 \item output: The copied FormModule
-\item exception: InvalidModule if module does not exist
+\item exception: \texttt{InvalidModule} if module does not exist. \texttt{DuplicateModuleTitle} if a unique title cannot be generated for the copied module.
 \end{itemize}
 
 \noindent \texttt{getModules()}: \\
@@ -544,7 +556,7 @@ Creates a form starting from a specified module with certain settings (e.g. mult
 \begin{itemize}
 \item transition: Inserts the created form into \texttt{createdForms}
 \item output: The created Form
-\item exception: None
+\item exception: \texttt{InvalidInput} if the form title or settings are malformed. \texttt{InvalidModule} if \texttt{startingModuleId} does not refer to an existing module. \texttt{DuplicateFormTitle} if a form with the same title already exists.
 \end{itemize}
 
 \noindent \texttt{deleteForm(formId : $\mathbb{N}$)}: \\
@@ -595,11 +607,11 @@ Periodically checks \texttt{createdForms} for expired deadlines and closes them.
 
 \subsection{Module}
 
-Contains functionality for submitting reponses to forms.
+Contains functionality for submitting responses to forms.
 
 \subsection{Uses}
 
-Uses M\ref{m4} to retreive fillable forms.
+Uses M\ref{m4} to retrieve fillable forms.
 
 \subsection{Syntax}
 
@@ -655,7 +667,7 @@ None
 \subsubsection{Access Routine Semantics}
 
 \noindent \texttt{getFillableForms(userId : $\mathbb{N}$)}: \\
-Retreives all forms fillable by the user.
+Retrieves all forms fillable by the user.
 \begin{itemize}
 \item transition: None
 \item output: The set of all forms available for the user to fill
@@ -666,12 +678,12 @@ Retreives all forms fillable by the user.
 Records a user's response to a form.
 \begin{itemize}
 \item transition: Inserts the created response ID into \texttt{userResponses} and \texttt{formResponses}
-\item output: None
+\item output: \texttt{responseId}
 \item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist, IllegalArgument if the responses do not match the expected format given by the form (e.g. unidentified question)
 \end{itemize}
 
 \noindent \texttt{getResponses(userId : $\mathbb{N}$, formId: string)}: \\
-Retrieves all of a user's responses for a given forms.
+Retrieves all of a user's responses for a given form.
 \begin{itemize}
 \item transition: None
 \item output: The set of all responses for the user in \texttt{userResponses} for a particular form in \texttt{formResponses}
@@ -681,7 +693,7 @@ Retrieves all of a user's responses for a given forms.
 \noindent \texttt{editResponse(userId : $\mathbb{N}$, formId: string, \newline formResponse: map(Question, string))}: \\
 Modifies a user's response to a form.
 \begin{itemize}
-\item transition: Edits the reponse for the given form (if it allows editing) in \texttt{userResponses} and \texttt{formResponses}
+\item transition: Edits the response for the given form (if it allows editing) in \texttt{userResponses} and \texttt{formResponses}
 \item output: None
 \item exception: InvalidUser if user does not exist, InvalidForm if the form does not exist, IllegalArgument if the responses do not match the expected format given by the form, UnsupportedOperation if the form does not allow editing responses
 \end{itemize}
@@ -700,7 +712,7 @@ Contains functionality for creating and managing events.
 
 \subsection{Uses}
 
-Uses M\ref{m3} to check permissions for managing events, and M\ref{m7} for sending event related notifications.
+Uses M\ref{m3} to check permissions for managing events. Uses M\ref{m1} for coordination and integration.
 
 \subsection{Syntax}
 
@@ -792,11 +804,11 @@ None
 
 \subsection{Module}
 
-Contains functionality for notifying users abouts upcoming events.
+Contains functionality for notifying users about upcoming events.
 
 \subsection{Uses}
 
-None
+Uses M\ref{m6} for event coordination and information.
 
 \subsection{Syntax}
 
@@ -811,9 +823,9 @@ None
 \hline
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
 \hline
-\texttt{sendNotification} & \texttt{userIds : list($\mathbb{N}$) \newline message : string} & None & InvalidUser \\
+\texttt{sendNotification} & \texttt{userIds : list($\mathbb{N}$) \newline message : string} & None & \texttt{InvalidUser} \newline \texttt{InvalidInput} \\
 \hline
-\texttt{scheduleNotification} & \texttt{userIds : list($\mathbb{N}$) \newline message : string \newline datetime: DateTime} & None & InvalidEvent \\
+\texttt{scheduleNotification} & \texttt{userIds : list($\mathbb{N}$) \newline message : string \newline datetime: DateTime} & None & \texttt{InvalidUser} \newline \texttt{InvalidInput} \\
 \hline
 \end{tabularx}
 \end{center}
@@ -839,7 +851,7 @@ Sends a notification to the list of users specified.
 \begin{itemize}
 \item transition: None
 \item output: None
-\item exception: None
+\item exception: \texttt{InvalidUser} if any user ID does not exist. \texttt{InvalidInput} if the message payload is empty or malformed.
 \end{itemize}
 
 \noindent \texttt{scheduleNotification(userIds : list($\mathbb{N}$), message : string, \newline datetime : DateTime)}: \\
@@ -847,7 +859,7 @@ Schedules a notification to send to the list of users specified.
 \begin{itemize}
 \item transition: None
 \item output: None
-\item exception: None
+\item exception: \texttt{InvalidUser} if any user ID does not exist. \texttt{InvalidInput} if the message payload is empty or malformed, or if \texttt{datetime} is not a valid future schedule time.
 \end{itemize}
 
 \subsubsection{Local Functions}
@@ -869,9 +881,8 @@ Periodically checks and sends out scheduled notifications at their deadline.
 Contains functionality for registering users for events.
 
 \subsection{Uses}
-\begin{itemize}
-  \item Event Management Module (M\ref{m7})
-\end{itemize}
+Uses M\ref{m6} for event coordination and information.
+
 
 \subsection{Syntax}
 
@@ -954,7 +965,7 @@ before a user can register.
 \begin{itemize}
   \item transition: None.
   \item output: A generated QRCode based on the given confirmation code.
-\item exception: Returns \texttt{InvalidConformation} if a non-existent confirmation is provided.
+\item exception: Returns \texttt{InvalidConfirmation} if a non-existent confirmation is provided.
 \end{itemize}
 
 \noindent \texttt{getRegistrationCode(userId, eventId)} (2):
@@ -968,7 +979,7 @@ before a user can register.
 \begin{itemize}
   \item transition: None.
   \item output: A \texttt{(userId, eventId)} tuple to specify a registration instance.
-\item exception: Returns \texttt{InvalidConformation} if a non-existent confirmation is provided.
+\item exception: Returns \texttt{InvalidConfirmation} if a non-existent confirmation is provided.
 \end{itemize}
 
 \subsubsection{Local Functions}
@@ -1155,12 +1166,7 @@ Contains functionality for computing summary statistics and trends for events,
 registrations, attendance, and surveys.
 
 \subsection{Uses}
-
-Database Access Module (M\ref{m12}) \\
-Registration Module (M\ref{m8}) \\
-Attendance Tracking Module (M\ref{m9}) \\
-Form Submission Module (M\ref{m5})
-
+None
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
@@ -1433,7 +1439,7 @@ actions in an append-only audit log for traceability and accountability.
 
 \subsection{Uses}
 
-Database Access Module (M\ref{m12})
+None
 
 \subsection{Syntax}
 
@@ -1534,8 +1540,8 @@ graduate attribute of Problem Analysis and Design.
   ``outsider'' completes some of the implementation?} \\
 
   I think through implementing another team's module it showed the difficulties of understanding a foreign codebase and the time it takes to make sure that your module implementation works within another team's structure. I think it shows the importance of having proper documentation on the usage of your application. It would make the process a lot quicker to get started Also reading through the other team's MIS and MG there were some things that they did involving the structure of their modules that we could potentially use within our design when we update it for Revision 1. \\
-  In general their MIS provided the required information but there were some sections that were ambiguous so it was hard to ascertain how much detail was required when implementing. Specifically when we look at the GameStateData datatype we don't know what details or fields were required so a barebones implementation was created rather than one which would have all the fields that they might want. I think also since they may not be implementing the exact version of the game Catan, it is hard figure out what ruleset that they might be going with so I had to make an assumption on what constituted a move, the scoirng and victory conditions. \\
-  I think the experience was generally seamless in having a different team implementing our module. I believe that the module we chose was not difficult in its implementation and its specification in the MIS was detailed enough that the implementation could be done. Also we had decent documentation on how to run our platform so the other team could start developing without any help. I think if it was possible to help improve their implementation it would need some more documentation on how this module interacts with the other modules and how it works specificially with the UI as their design choices may not be the same that we wanted.
+  In general their MIS provided the required information but there were some sections that were ambiguous so it was hard to ascertain how much detail was required when implementing. Specifically when we look at the GameStateData datatype we don't know what details or fields were required so a barebones implementation was created rather than one that would have all the fields they might want. I think also since they may not be implementing the exact version of the game Catan, it is hard to figure out what ruleset they might be going with, so I had to make an assumption on what constituted a move, the scoring, and victory conditions. \\
+  I think the experience was generally seamless in having a different team implement our module. I believe that the module we chose was not difficult to implement, and its specification in the MIS was detailed enough for implementation. Also, we had decent documentation on how to run our platform so the other team could start developing without any help. I think if it was possible to improve their implementation, it would need some more documentation on how this module interacts with the other modules and how it works specifically with the UI, as their design choices may not be the same as what we wanted.
 
 \subsubsection*{Group Reflection}
 \begin{enumerate}
@@ -1543,19 +1549,19 @@ graduate attribute of Problem Analysis and Design.
   or a proxy (e.g. your peers, stakeholders, potential users)? For those that
   were not, why, and where did they come from?
   
-  Some of our design decision in relation to the seperation of the modules into the event related modules and form related modules was decided through consultation with our clients. This was an important distinction for us to make because there were some design solutions where we could have had these components together. We found through dicussion that seperating these two functions into seperate module (or group of modules) would probably be the best for future maintainability, testing these modules and actually implementing them. We also had discussions relating to the report generation and data analytics module. We found that seperating these modules would be good for expandability in the future if we wanted to perform further analysis or in a different form. 
+  Some of our design decisions related to the separation of modules into event-related modules and form-related modules were made through consultation with our clients. This was an important distinction for us to make because there were design solutions where we could have had these components together. We found through discussion that separating these two functions into separate modules (or groups of modules) would likely be better for future maintainability, testing, and implementation. We also had discussions relating to the report generation and data analytics modules. We found that separating these modules would be good for expandability in the future if we wanted to perform further analysis or present it in a different form. 
 
-  Our other design sources primarily came from our past experiences working with these types of web applications and how we wanted to develop it to make it a seamless development experience. For instance, creating a seperate data access layer module was decison we made since some team members learned from past projects that it would be redundant to try and access the database directly from the other modules and a unified interface would be better. For some other decisions we decided to look into best practices when designing web applications to ensure that our structure and implementation was good.
+  Our other design sources primarily came from our past experiences working with these types of web applications and how we wanted to develop them to make the development experience seamless. For instance, creating a separate data access layer module was a decision we made since some team members learned from past projects that it would be redundant to access the database directly from other modules and that a unified interface would be better. For other decisions, we looked into best practices when designing web applications to ensure that our structure and implementation were strong.
 
   \item While creating the design doc, what parts of your other documents (e.g.
   requirements, hazard analysis, etc), it any, needed to be changed, and why?
 
-  We found that in general that our other documents didn't really need to be modified when creating this documentation. This was because we had to essentielly utilize the requirements to inform our design decisions and the seperation of modules to implement our requirements. This meant that we built off our design from these documents so we didn't feel had any changes that needed to be made currently for the past documents in relation to our design.
+  We found in general that our other documents did not really need to be modified when creating this documentation. This was because we had to essentially use the requirements to inform our design decisions and the separation of modules used to implement them. This meant that we built our design from these documents, so we did not feel there were any changes that needed to be made to past documents at this time.
 
   \item What are the limitations of your solution?  Put another way, given
   unlimited resources, what could you do to make the project better? (LO\_ProbSolutions)
 
-  The primary limitations of our solution pertain to practicality and realism due to our constraints as a student team with limited time and resources. Due to hardware limitations, we are not be able to fully test the scalability of our system under strenuous conditions, which could impact performance in real-world scenarios, including include registration capacity and concurrent use. With additional resources, we could perform comprhensive testing, fine-tuning the ability of the system to handle large input.
+  The primary limitations of our solution pertain to practicality and realism due to our constraints as a student team with limited time and resources. Due to hardware limitations, we are not able to fully test the scalability of our system under strenuous conditions, which could impact performance in real-world scenarios, including registration capacity and concurrent use. With additional resources, we could perform comprehensive testing and fine-tune the system's ability to handle large inputs.
 
   In addition, the system is lacking in terms of security, particularly in the area of user authentication and data encryption. We are limited to using straightforward security mechanisms due to the minimal timeframe. While the information of our system is not entirely critical, being limited to simple user information which is generally public, it would still be an asset and open up future possibilities regarding the level of data we are entrusted with.
 
@@ -1568,7 +1574,7 @@ graduate attribute of Problem Analysis and Design.
 
   We considered various different design approaches, particularly in terms of how to structure the modules and their interactions. One option was integrating the database access logic directly into each module, rather than having a separate database module. While this would simplify the architecture and module implementation, it would likely lead to redundancy and complicate future modifications. We ultimately decided that a dedicated database access module would be cleaner and more maintainable.
 
-  Likewise, we explored the possibility of implementing the authentication and authorization logic directly into the system modules. In a similar manner, we decided to separate these responsiblities into their own modules to prioritize clarity, modularity, and consistency.
+  Likewise, we explored the possibility of implementing the authentication and authorization logic directly into the system modules. In a similar manner, we decided to separate these responsibilities into their own modules to prioritize clarity, modularity, and consistency.
 
   Another alternative choice involved a registration model that accounted for guests, allowing users to register multiple instances for a given event. This would increase flexibility and usability, better supporting real-world expectations. However, it would introduce complexity in registration, attendance tracking, analytics, and data management. Given our time constraints and the current scope, we decided to proceed with a simpler single registration design for now.
 
@@ -1576,19 +1582,19 @@ graduate attribute of Problem Analysis and Design.
 \subsubsection*{Virochaan Ravichandran Gowri Reflection}
 \begin{enumerate}
  \item \textbf{What went well while writing this deliverable?} \\
- Overall we had a good understanding of what we wanted to do when designing and creating our platform. We had a general idea of what the structure of the system was going to be and we also knew what kind of modules that we wanted to actually deliver. We had some more discussions to finetune our modules to ensure that they weren't too large or encompassing too much functionality but since we had a good understanding of it in the first place it was quite easy for us to develop a effective architecture. We also managed to have a good timeline as we had a plan for what we wanted develop and in what order already in place and we discussed before hand what sections each person would try and do.
+ Overall we had a good understanding of what we wanted to do when designing and creating our platform. We had a general idea of what the system structure would be and we also knew what kind of modules we wanted to deliver. We had further discussions to fine-tune our modules to ensure that they were not too large or encompassing too much functionality, but since we had a good understanding from the start, it was quite easy for us to develop an effective architecture. We also managed to maintain a good timeline because we had a plan for what we wanted to develop and in what order, and we discussed beforehand what sections each person would complete.
   
  \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
- The main painpoint was understanding the different terms in the MIS and how to properly fill them for each module. We had the added difficulty of having multiple UI related components so it added an added difficulty to properly ensure we completed the sections. We had a small challenge in the Module Guide in ensuring that the structure and hierarchy of the modules made sense. This was because we had the possibility of cyclic dependencies so we resolved this by decomposing some of the modules further.
+ The main pain point was understanding the different terms in the MIS and how to properly complete them for each module. We had the added difficulty of multiple UI-related components, which made it harder to ensure we completed the sections properly. We also had a challenge in the Module Guide in ensuring that the structure and hierarchy of the modules made sense. This was because we had the possibility of cyclic dependencies, so we resolved this by decomposing some modules further.
 \end {enumerate}
 
 \subsubsection*{Omar Al-Asfar Reflection}
 \begin{enumerate}
  \item \textbf{What went well while writing this deliverable?} \\
- Ultimately, our team worked well together to break down the system into feasible modules. We always had a solid idea of the general stucture of our system, so the design process was quite straightforward. All the major functionalities, and their interactions with one another were discussed in detail beforehand, which allowed us to focus on finer details, such as efficiency and user experience.
+ Ultimately, our team worked well together to break down the system into feasible modules. We always had a solid idea of the general structure of our system, so the design process was quite straightforward. All the major functionalities and their interactions with one another were discussed in detail beforehand, which allowed us to focus on finer details, such as efficiency and user experience.
 
  \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
- The main challenge invovled applying our design ideas into the report format. Although we had a clear understanding of the system structure, it was nontheless challenging to express it in terms of the MIS semantics, especially for more abstract modules. Moreover, it was also difficult maintaining a consistent level of detail, ensuring the specification was clear but also not a full implementation. This was resolved by regularly referencing the Module Guide to ensure that we remained aligned with expectations.
+ The main challenge involved applying our design ideas to the report format. Although we had a clear understanding of the system structure, it was nonetheless challenging to express it in terms of MIS semantics, especially for more abstract modules. Moreover, it was also difficult to maintain a consistent level of detail while ensuring the specification was clear but not a full implementation. This was resolved by regularly referencing the Module Guide to ensure that we remained aligned with expectations.
  \end {enumerate}
 
 \subsubsection*{Rayyan Suhail Reflection}
@@ -1616,7 +1622,7 @@ graduate attribute of Problem Analysis and Design.
     my usage of state variables was correct (in the context of our database).
 
   \item \textbf{What pain points did you experience during this deliverable, and how did you resolve them?} \\
-    I was first confused about the feedback given by the TA and did now know how to reconcile the TA feedback that QR
+    I was first confused about the feedback given by the TA and did not know how to reconcile the TA feedback that QR
     code generation should be part of state. After discussing with the TA, the confusion was clarified and the issue was
     resolved. In addition to writing this formal document, there were some issues I faced while implementing the
     modules as outlined in this document, mainly with the Registration Module. These were resolved by reconfiguring the
