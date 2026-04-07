@@ -283,8 +283,9 @@ This section evaluates the system's responsiveness and capacity, ensuring it can
 \end{itemize}
 \textbf{Output:}
 \begin{itemize}
-    \item Form pages load within 2 seconds.
-    \item No severe delays or loading failures.
+    \item Form pages load within $\leq$ 2 seconds.
+    \item Delays between 2-4 seconds are acceptable.
+    \item Delays > 4 seconds constitute performance issues.
 \end{itemize}
 \textbf{Result:} Pass \\
 \textbf{Discussion:} Performance measurements were taken using chrome developer tools in a limited development environment. Forms consistently loaded within the acceptable threshold during testing. Next step is to test the deployed build on different browsers, as well as the mobile app.
@@ -318,12 +319,16 @@ This section validates the protection of user data and the integrity of administ
 \end{itemize}
 \textbf{Output:}
 \begin{itemize}
-    \item Sensitive authentication fields such as passwords are encrypted.
+    \item Results of inspection which checks for:
+    \begin{itemize}
+        \item Plaintext data
+        \item Hash encryptions
+        \item Repeated entries
+        \item Decryption attempts
+    \end{itemize}
 \end{itemize}
 \textbf{Result:} Pass \\
-\textbf{Discussion:} Direct inspection of the PostgreSQL database confirmed that sensitive data is stored using AES-256 encryption.
-
-\subsection{etc.}
+\textbf{Discussion:} Direct inspection of the PostgreSQL database revealed that there were no plaintext entries found, hashes are consistent with AES-256 encryption, and salting techniques are properly implemented. Attempts to decrypt the data without the key were unsuccessful, confirming effective encryption of sensitive data.
 
 \section{Comparison to Existing Implementation}
 
