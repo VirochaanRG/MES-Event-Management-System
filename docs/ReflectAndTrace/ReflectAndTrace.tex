@@ -245,21 +245,165 @@ The value of this extra was that it grounded design decisions in an established 
 
 
 
-\section{Design Iteration (LO11 (PrototypeIterate))}
+\section{Design Iteration}
 
-\plt{Explain how you arrived at your final design and implementation.  How did
-the design evolve from the first version to the final version?} 
+Our front-end design underwent revisions based on supervisor feedback, who
+evaluated the product as an end-user for both attendee and admin portals as
+part of our usability testing. The UI for specified sections was revamped to
+address the concerns raised.
 
-\plt{Don't just say what you changed, say why you changed it.  The needs of the
-client should be part of the explanation.  For example, if you made changes in
-response to usability testing, explain what the testing found and what changes
-it led to.}
+The underlying architecture remained the same as the client was clear and
+specific about how the system should interact with the environment and how
+data should be stored. As a result, it was possible to satisfy requirements
+with the initial architecture.
 
-\section{Design Decisions (LO12)}
+\subsection{Usability Testing}
 
-\plt{Reflect and justify your design decisions.  How did limitations,
- assumptions, and constraints influence your decisions?  Discuss each of these
- separately.}
+Usability testing directly influenced our UI design,
+
+\subsubsection{User Profile Configuration}
+
+\begin{itemize}
+    \item \textbf{Problem:} Manual re-entry of user details for every event is
+    redundant for participants and creates administrative overhead when
+    designing registration forms.
+    \item \textbf{Solution:} Implement a mandatory user profile system that
+    automatically populates relevant fields in registration tables, streamlining
+    the enrollment process.
+\end{itemize}
+
+\subsubsection{Form Builder Survey Creation Automation}
+
+\begin{itemize}
+    \item \textbf{Problem:} Manual form construction is labor-intensive and
+    error-prone, particularly when managing large-scale surveys.
+    \item \textbf{Solution:} Support CSV template uploads to automate form
+    generation, significantly reducing development time and ensuring data
+    consistency.
+\end{itemize}
+
+\subsubsection{UI Consistency}
+\begin{itemize}
+    \item \textbf{Problem:} Fragmented UI Components and Aesthetic Inconsistency
+    \begin{itemize}
+        \item Disparity between custom UI library components and native
+        browser-default form elements (e.g., buttons, inputs, and dropdowns).
+        \item Non-uniform colour application and lack of a cohesive visual
+        identity across different modules.
+    \end{itemize}
+    
+    \item \textbf{Rationale:} Enhanced Platform Literacy and User Intuition
+    \begin{itemize}
+        \item A standardized interface reduces cognitive load, allowing users to
+        predict behavior based on established visual patterns.
+        \item Consistent design strengthens brand identity and provides a more
+        professional, polished user experience.
+    \end{itemize}
+    
+    \item \textbf{Solution:} Global Component Standardization
+    \begin{itemize}
+        \item Refactor all modals and interactive elements to strictly utilize
+        the primary UI library.
+        \item Enforce a unified design system for state-dependent styling,
+        specifically for:
+        \begin{itemize}
+            \item High-contrast borders for selected or focused elements.
+            \item Standardized hover states and active press feedback.
+            \item Consistent padding, shadows, and corner radii across all containers.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Problem:} Lack of Visual Feedback for Multi-Step Workflows
+    \begin{itemize}
+        \item Users have no clear indication of completion status when
+        navigating modular surveys or multi-page forms.
+        \item Absence of "save-and-continue" context leads to uncertainty and
+        higher abandonment rates.
+    \end{itemize}
+    
+    \item \textbf{Rationale:} Cognitive Mapping and Completion Motivation
+    \begin{itemize}
+        \item Visualizing progress provides a "mental map" of the task, reducing
+        the perceived effort of long forms.
+        \item Constant feedback reinforces a sense of accomplishment,
+        encouraging users to finish the registration or survey.
+    \end{itemize}
+    
+    \item \textbf{Solution:} Integrated Progress Tracking System
+    \begin{itemize}
+        \item Implement a dynamic progress bar or "stepper" component at the top
+        of modular interfaces.
+        \item Enhance the UI with specific status indicators, including:
+        \begin{itemize}
+            \item \textbf{Percentage Completion:} A real-time calculation of
+            answered versus total required fields.
+            \item \textbf{Sectional Checkmarks:} Visual confirmation when an
+            entire module or category is successfully validated.
+            \item \textbf{Time-to-Complete Estimates:} Providing an approximate
+            remaining duration based on average user interaction.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\section{Design Decisions}
+
+ \subsection{Limitations}
+There were no identifiable limitations. All design decisions were based on
+assumptions and constraints.
+
+ \subsection{Assumptions}
+Certain assumptions about event-day proceedings have influenced how we track and
+show attendance statuses for event participants. In the current system, it is
+assumed that once attendees have checked-in at the event, they are given a
+physical indicator of their attendance on-site, such as a wristband or a stamp.
+As a result, there is no software indicator in the attendee portal which can be
+used to demonstrate to event administrators that the user has checked-in to the
+event. This is a decision we are happy to make as it reduces the workload
+required for an MVP, and there is a system in place already which does not need
+to be replaced which addresses this issue.
+
+\subsection{Constraints}
+\subsubsection{Technological Constraints}
+The technological constraints determined by our client influenced our design,
+especially our backend and data architecture. The tech stack constraints
+required us to use JavaScript and TypeScript-based backend frameworks and
+methodologies to implement our APIs and routing. Our data needed to be formatted
+and stored in a relational database as we used a SQL DBMS. These constraints
+also required us to deploy using our client's hosted server as it was compatible
+with the deployment technology used for our backend. As a result of using JS and
+TS-based frameworks, error handling and complete case coverage was less prioritized
+where possible in order to deliver an MVP faster.
+
+The requirement to implement a bespoke form builder and form submission system
+meant we could not use any pre-existing open-source form libraries. This
+required us to design how modular forms interact with each other, how they
+stored with respect to the relational database, and how they are rendered to the
+user. We decided to implement modular surveys as a series of independent
+surveys, with sections unlocking if necessary based on specific responses or the
+completion of previous sections. This ensured our form builder was meaningfully
+different from existing form-building software, and provides the client with the
+flexibility to reuse form results and make surveys digestible for attendees when
+they complete them.
+
+\subsubsection{Scheduling Constraints}
+The initial and revised scheduling constraints influenced our MVP features. We
+decided to forego a fully-integrated login system with the McMaster ecosystem as
+specific features such as the ability to purchase multiple tickets or transfer
+tickets to other users. We recognized that these changes are trivial compared to
+the features we have deployed in our MVP, so pushing it in the backlog made sense
+from a continuous and iterative development process perspective.
+
+\subsubsection{Expandability \& Integration Constraints}
+One of the stretch goals of this project was to provide this product as a SAAS
+product for organizations outside of the McMaster Engineering Society to use.
+The initial plan of the software was also to be integrated with software from
+other groups within the same ecosystem, though this later changed. As a result,
+our API and database design remained mostly detatched from McMaster-specific
+infrastructure, making it more portable. This design decision helped with
+abstraction of the system, and made front-end integration simpler as API routes
+were well-defined.
 
 \section{Economic Considerations (LO23)}
 
